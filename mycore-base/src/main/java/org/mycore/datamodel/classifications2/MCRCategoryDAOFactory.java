@@ -56,7 +56,7 @@ public class MCRCategoryDAOFactory {
     // this is known as "Bill Pugh singleton"
     private static final class MCRCategoryDAOHolder {
         private static MCRCategoryDAO instance = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRCategoryDAO.class, "MCR.Category.DAO");
+            MCRCategoryDAO.class, "MCR.Category.DAO.Class");
     }
 
 }

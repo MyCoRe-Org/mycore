@@ -29,8 +29,8 @@ import org.mycore.pi.MCRPIManager;
  * to specify the PI service and type of the PI which should be checked. 
  * <p>
  * sample configuration:
- * MCR.PI.Service.RosDokURN.CreationPredicate=org.mycore.pi.condition.MCRPIAndPredicate
- * MCR.PI.Service.RosDokURN.CreationPredicate.1=org.mycore.pi.condition.MCRPIOtherPICreatedPredicate
+ * MCR.PI.Service.RosDokURN.CreationPredicate.Class=org.mycore.pi.condition.MCRPIAndPredicate
+ * MCR.PI.Service.RosDokURN.CreationPredicate.1.Class=org.mycore.pi.condition.MCRPIOtherPICreatedPredicate
  * MCR.PI.Service.RosDokURN.CreationPredicate.1.Service=MCRLocalID
  * MCR.PI.Service.RosDokURN.CreationPredicate.1.Type=local_id
  * ...

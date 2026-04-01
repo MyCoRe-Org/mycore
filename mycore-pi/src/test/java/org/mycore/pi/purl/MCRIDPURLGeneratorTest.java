@@ -33,11 +33,11 @@ import org.mycore.test.MyCoReTest;
 @MyCoReTest
 @MCRTestConfiguration(properties = {
     @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true"),
-    @MCRTestProperty(key = GENERATOR_CONFIG_PREFIX + MCRIDPURLGeneratorTest.GENERATOR_1,
+    @MCRTestProperty(key = GENERATOR_CONFIG_PREFIX + MCRIDPURLGeneratorTest.GENERATOR_1 + ".Class",
         classNameOf = MCRIDPURLGenerator.class),
     @MCRTestProperty(key = GENERATOR_CONFIG_PREFIX + MCRIDPURLGeneratorTest.GENERATOR_1 + ".BaseURLTemplate",
         string = MCRIDPURLGeneratorTest.TEST_BASE_1),
-    @MCRTestProperty(key = GENERATOR_CONFIG_PREFIX + MCRIDPURLGeneratorTest.GENERATOR_2,
+    @MCRTestProperty(key = GENERATOR_CONFIG_PREFIX + MCRIDPURLGeneratorTest.GENERATOR_2 + ".Class",
         classNameOf = MCRIDPURLGenerator.class),
     @MCRTestProperty(key = GENERATOR_CONFIG_PREFIX + MCRIDPURLGeneratorTest.GENERATOR_2 + ".BaseURLTemplate",
         string = MCRIDPURLGeneratorTest.TEST_BASE_2)
@@ -59,12 +59,12 @@ public class MCRIDPURLGeneratorTest {
         mcrObject.setId(testID);
 
         MCRIDPURLGenerator generator1 = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRIDPURLGenerator.class, GENERATOR_CONFIG_PREFIX + GENERATOR_1);
+            MCRIDPURLGenerator.class, GENERATOR_CONFIG_PREFIX + GENERATOR_1 + ".Class");
         assertEquals("http://purl.myurl.de/my_test_00000001",
                 generator1.generate(mcrObject, "").asString(), "");
 
         MCRIDPURLGenerator generator2 = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRIDPURLGenerator.class, GENERATOR_CONFIG_PREFIX + GENERATOR_2);
+            MCRIDPURLGenerator.class, GENERATOR_CONFIG_PREFIX + GENERATOR_2 + ".Class");
         assertEquals("http://purl.myurl.de/my_test_00000001/my_test_00000001/my_test_00000001",
                 generator2.generate(mcrObject, "").asString(), "");
 

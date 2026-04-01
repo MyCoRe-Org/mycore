@@ -113,7 +113,7 @@ public final class MCRInstantiatorUtils {
         return new MCRConfigurationException(
             capitalize(description) + ", configured in " + property + " (and its sub-properties)," +
                 " for target " + targetTypeName(target) + " '" + target.name() + "' in configured class "
-                + target.declaringClass().getName() + " is has element with non-integer key " + key,
+                + target.declaringClass().getName() + " has element with non-integer key " + key,
             exception);
     }
 

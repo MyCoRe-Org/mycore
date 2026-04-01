@@ -43,13 +43,14 @@ public class MCRInstantiatorCollectionTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithMap.class),
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithMap.class),
             @MCRTestProperty(key = "Foo.EntryA", string = "ValueA"),
             @MCRTestProperty(key = "Foo.EntryB", string = "ValueB"),
         })
     public void map() {
 
-        TestClassWithMap instance = ofName(TestClassWithMap.class, "Foo").instantiate();
+        TestClassWithMap instance = ofName(TestClassWithMap.class,
+            "Foo.Class").instantiate();
 
         assertNotNull(instance);
         assertNotNull(instance.map);
@@ -68,25 +69,26 @@ public class MCRInstantiatorCollectionTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithMap.class),
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithMap.class),
         })
     public void mapNotPresent() {
 
         assertThrows(MCRConfigurationException.class,
-            () -> MCRInstanceConfiguration.ofName(Object.class, "Foo").instantiate());
+            () -> MCRInstanceConfiguration.ofName(Object.class, "Foo.Class").instantiate());
 
     }
 
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithOptionalMap.class),
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithOptionalMap.class),
             @MCRTestProperty(key = "Foo.EntryA", string = "ValueA"),
             @MCRTestProperty(key = "Foo.EntryB", string = "ValueB"),
         })
     public void optionalMap() {
 
-        TestClassWithOptionalMap instance = ofName(TestClassWithOptionalMap.class, "Foo").instantiate();
+        TestClassWithOptionalMap instance = ofName(TestClassWithOptionalMap.class,
+            "Foo.Class").instantiate();
 
         assertNotNull(instance);
         assertNotNull(instance.map);
@@ -105,11 +107,12 @@ public class MCRInstantiatorCollectionTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithOptionalMap.class),
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithOptionalMap.class),
         })
     public void optionalMapNotPresent() {
 
-        TestClassWithOptionalMap instance = ofName(TestClassWithOptionalMap.class, "Foo").instantiate();
+        TestClassWithOptionalMap instance = ofName(TestClassWithOptionalMap.class,
+            "Foo.Class").instantiate();
 
         assertNotNull(instance);
         assertNotNull(instance.map);
@@ -120,7 +123,7 @@ public class MCRInstantiatorCollectionTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithMapWithSentinel.class),
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithMapWithSentinel.class),
             @MCRTestProperty(key = "Foo.EntryA.Sentinel", string = "false"),
             @MCRTestProperty(key = "Foo.EntryA", string = "ValueA"),
             @MCRTestProperty(key = "Foo.EntryB.Sentinel", string = "true"),
@@ -129,7 +132,8 @@ public class MCRInstantiatorCollectionTest {
         })
     public void mapWithSentinel() {
 
-        TestClassWithMapWithSentinel instance = ofName(TestClassWithMapWithSentinel.class, "Foo").instantiate();
+        TestClassWithMapWithSentinel instance = ofName(TestClassWithMapWithSentinel.class,
+            "Foo.Class").instantiate();
 
         assertNotNull(instance);
         assertNotNull(instance.map);
@@ -146,13 +150,14 @@ public class MCRInstantiatorCollectionTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithMapsWithPrefix.class),
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithMapsWithPrefix.class),
             @MCRTestProperty(key = "Foo.Map1.Entry", string = "ValueA"),
             @MCRTestProperty(key = "Foo.Map2.Entry", string = "ValueB"),
         })
     public void mapWithPrefix() {
 
-        TestClassWithMapsWithPrefix instance = ofName(TestClassWithMapsWithPrefix.class, "Foo").instantiate();
+        TestClassWithMapsWithPrefix instance = ofName(TestClassWithMapsWithPrefix.class,
+            "Foo.Class").instantiate();
 
         assertNotNull(instance);
         assertNotNull(instance.map1);
@@ -173,12 +178,13 @@ public class MCRInstantiatorCollectionTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithMapWithPrefix.class),
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithMapWithPrefix.class),
             @MCRTestProperty(key = "Foo.Map", string = "EntryA:ValueA,EntryB:ValueB"),
         })
     public void shortFormMapWithPrefix() {
 
-        TestClassWithMapWithPrefix instance = ofName(TestClassWithMapWithPrefix.class, "Foo").instantiate();
+        TestClassWithMapWithPrefix instance = ofName(TestClassWithMapWithPrefix.class,
+            "Foo.Class").instantiate();
 
         assertNotNull(instance);
         assertNotNull(instance.map);
@@ -197,14 +203,15 @@ public class MCRInstantiatorCollectionTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithMapWithPrefix.class),
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithMapWithPrefix.class),
             @MCRTestProperty(key = "Foo.Map", string = "A:ShortValueA,B:ShortValueB"),
             @MCRTestProperty(key = "Foo.Map.EntryA", string = "ValueA"),
             @MCRTestProperty(key = "Foo.Map.EntryB", string = "ValueB"),
         })
     public void mixedFormMapWithPrefix() {
 
-        TestClassWithMapWithPrefix instance = ofName(TestClassWithMapWithPrefix.class, "Foo").instantiate();
+        TestClassWithMapWithPrefix instance = ofName(TestClassWithMapWithPrefix.class,
+            "Foo.Class").instantiate();
 
         assertNotNull(instance);
         assertNotNull(instance.map);
@@ -255,14 +262,15 @@ public class MCRInstantiatorCollectionTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithMapWithPrefix.class),
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithMapWithPrefix.class),
             @MCRTestProperty(key = "Foo.Map", string = "A:ShortValueA,B"),
             @MCRTestProperty(key = "Foo.Map.EntryA", string = "ValueA"),
             @MCRTestProperty(key = "Foo.Map.EntryB", empty = true),
         })
     public void mapWithEmptyMapValues() {
 
-        TestClassWithMapWithPrefix instance = ofName(TestClassWithMapWithPrefix.class, "Foo").instantiate();
+        TestClassWithMapWithPrefix instance = ofName(TestClassWithMapWithPrefix.class,
+            "Foo.Class").instantiate();
 
         assertNotNull(instance);
         assertNotNull(instance.map);
@@ -281,7 +289,7 @@ public class MCRInstantiatorCollectionTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithMapWithPrefixAndSentinel.class),
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithMapWithPrefixAndSentinel.class),
             @MCRTestProperty(key = "Foo.Map.EntryA.Sentinel", string = "false"),
             @MCRTestProperty(key = "Foo.Map.EntryA", string = "ValueA"),
             @MCRTestProperty(key = "Foo.Map.EntryB.Sentinel", string = "true"),
@@ -290,8 +298,8 @@ public class MCRInstantiatorCollectionTest {
         })
     public void mapWithPrefixAndSentinel() {
 
-        TestClassWithMapWithPrefixAndSentinel instance =
-            ofName(TestClassWithMapWithPrefixAndSentinel.class, "Foo").instantiate();
+        TestClassWithMapWithPrefixAndSentinel instance = ofName(TestClassWithMapWithPrefixAndSentinel.class,
+            "Foo.Class").instantiate();
 
         assertNotNull(instance);
         assertNotNull(instance.map);
@@ -308,13 +316,14 @@ public class MCRInstantiatorCollectionTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithList.class),
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithList.class),
             @MCRTestProperty(key = "Foo.23", string = "Value23"),
             @MCRTestProperty(key = "Foo.42", string = "Value42"),
         })
     public void list() {
 
-        TestClassWithList instance = ofName(TestClassWithList.class, "Foo").instantiate();
+        TestClassWithList instance = ofName(TestClassWithList.class,
+            "Foo.Class").instantiate();
 
         assertNotNull(instance);
         assertNotNull(instance.list);
@@ -333,25 +342,26 @@ public class MCRInstantiatorCollectionTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithList.class),
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithList.class),
         })
     public void listNotPresent() {
 
         assertThrows(MCRConfigurationException.class,
-            () -> MCRInstanceConfiguration.ofName(Object.class, "Foo").instantiate());
+            () -> MCRInstanceConfiguration.ofName(Object.class, "Foo.Class").instantiate());
 
     }
 
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithOptionalList.class),
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithOptionalList.class),
             @MCRTestProperty(key = "Foo.23", string = "Value23"),
             @MCRTestProperty(key = "Foo.42", string = "Value42"),
         })
     public void optionalList() {
 
-        TestClassWithOptionalList instance = ofName(TestClassWithOptionalList.class, "Foo").instantiate();
+        TestClassWithOptionalList instance = ofName(TestClassWithOptionalList.class,
+            "Foo.Class").instantiate();
 
         assertNotNull(instance);
         assertNotNull(instance.list);
@@ -370,11 +380,12 @@ public class MCRInstantiatorCollectionTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithOptionalList.class),
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithOptionalList.class),
         })
     public void optionalListNotPresent() {
 
-        TestClassWithOptionalList instance = ofName(TestClassWithOptionalList.class, "Foo").instantiate();
+        TestClassWithOptionalList instance = ofName(TestClassWithOptionalList.class,
+            "Foo.Class").instantiate();
 
         assertNotNull(instance);
         assertNotNull(instance.list);
@@ -385,7 +396,7 @@ public class MCRInstantiatorCollectionTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithListAndSentinel.class),
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithListAndSentinel.class),
             @MCRTestProperty(key = "Foo.7.Sentinel", string = "false"),
             @MCRTestProperty(key = "Foo.7", string = "Value7"),
             @MCRTestProperty(key = "Foo.23.Sentinel", string = "true"),
@@ -395,7 +406,8 @@ public class MCRInstantiatorCollectionTest {
         })
     public void listWithSentinel() {
 
-        TestClassWithListAndSentinel instance = ofName(TestClassWithListAndSentinel.class, "Foo").instantiate();
+        TestClassWithListAndSentinel instance = ofName(TestClassWithListAndSentinel.class,
+            "Foo.Class").instantiate();
 
         assertNotNull(instance);
         assertNotNull(instance.list);
@@ -409,13 +421,14 @@ public class MCRInstantiatorCollectionTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithListsWithPrefix.class),
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithListsWithPrefix.class),
             @MCRTestProperty(key = "Foo.List1.23", string = "Value23"),
             @MCRTestProperty(key = "Foo.List2.42", string = "Value42"),
         })
     public void listWithPrefix() {
 
-        TestClassWithListsWithPrefix instance = ofName(TestClassWithListsWithPrefix.class, "Foo").instantiate();
+        TestClassWithListsWithPrefix instance = ofName(TestClassWithListsWithPrefix.class,
+            "Foo.Class").instantiate();
 
         assertNotNull(instance);
         assertNotNull(instance.list1);
@@ -436,12 +449,13 @@ public class MCRInstantiatorCollectionTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithListWithPrefix.class),
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithListWithPrefix.class),
             @MCRTestProperty(key = "Foo.List", string = "ShortValue23,ShortValue42"),
         })
     public void shortFormListWithPrefix() {
 
-        TestClassWithListWithPrefix instance = ofName(TestClassWithListWithPrefix.class, "Foo").instantiate();
+        TestClassWithListWithPrefix instance = ofName(TestClassWithListWithPrefix.class,
+            "Foo.Class").instantiate();
 
         assertNotNull(instance);
         assertNotNull(instance.list);
@@ -460,14 +474,15 @@ public class MCRInstantiatorCollectionTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithListWithPrefix.class),
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithListWithPrefix.class),
             @MCRTestProperty(key = "Foo.List", string = "ShortValue23,ShortValue42"),
             @MCRTestProperty(key = "Foo.List.42", string = "AfterValue42"),
             @MCRTestProperty(key = "Foo.List.-23", string = "BeforeValue23"),
         })
     public void mixedFormListWithPrefix() {
 
-        TestClassWithListWithPrefix instance = ofName(TestClassWithListWithPrefix.class, "Foo").instantiate();
+        TestClassWithListWithPrefix instance = ofName(TestClassWithListWithPrefix.class,
+            "Foo.Class").instantiate();
 
         assertNotNull(instance);
         assertNotNull(instance.list);
@@ -518,14 +533,15 @@ public class MCRInstantiatorCollectionTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithListWithPrefix.class),
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithListWithPrefix.class),
             @MCRTestProperty(key = "Foo.List", string = "ShortValue23,"),
             @MCRTestProperty(key = "Foo.List.42", string = "AfterValue42"),
             @MCRTestProperty(key = "Foo.List.-23", empty = true),
         })
     public void listWithEmptyValues() {
 
-        TestClassWithListWithPrefix instance = ofName(TestClassWithListWithPrefix.class, "Foo").instantiate();
+        TestClassWithListWithPrefix instance = ofName(TestClassWithListWithPrefix.class,
+            "Foo.Class").instantiate();
 
         assertNotNull(instance);
         assertNotNull(instance.list);
@@ -544,7 +560,7 @@ public class MCRInstantiatorCollectionTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithListWithPrefixAndSentinel.class),
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithListWithPrefixAndSentinel.class),
             @MCRTestProperty(key = "Foo.List.7.Sentinel", string = "false"),
             @MCRTestProperty(key = "Foo.List.7", string = "Value7"),
             @MCRTestProperty(key = "Foo.List.23.Sentinel", string = "true"),
@@ -553,8 +569,8 @@ public class MCRInstantiatorCollectionTest {
         })
     public void listWithPrefixAndSentinel() {
 
-        TestClassWithListWithPrefixAndSentinel instance =
-            ofName(TestClassWithListWithPrefixAndSentinel.class, "Foo").instantiate();
+        TestClassWithListWithPrefixAndSentinel instance = ofName(TestClassWithListWithPrefixAndSentinel.class,
+            "Foo.Class").instantiate();
 
         assertNotNull(instance);
         assertNotNull(instance.list);
