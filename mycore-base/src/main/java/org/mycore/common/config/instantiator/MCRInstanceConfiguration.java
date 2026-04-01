@@ -234,22 +234,24 @@ public final class MCRInstanceConfiguration<S> {
     private static Map<String, String> reduceProperties(MCRInstanceName name, String prefix,
         Map<String, String> properties) {
 
-        final String prefixWithDot = prefix + '.';
-        final int prefixWithDotLength = prefixWithDot.length();
+        final String prefixWithDelimiter = prefix + '.';
+        final int prefixWithDelimiterLength = prefixWithDelimiter.length();
         final List<String> ignoredKeys = name.ignoredKeys();
 
         Map<String, String> reducedProperties = new HashMap<>();
         for (Map.Entry<String, String> entry : properties.entrySet()) {
             String key = entry.getKey();
-            if (!key.startsWith(prefixWithDot)) {
+            if (!key.startsWith(prefixWithDelimiter)) {
                 continue;
             }
-            String reducedKey = key.substring(prefixWithDotLength);
-            if (!ignoredKeys.contains(reducedKey)) {
-                reducedProperties.put(reducedKey, entry.getValue());
-            }
+            String reducedKey = key.substring(prefixWithDelimiterLength);
+            reducedProperties.put(reducedKey, entry.getValue());
         }
-
+        String directProperty = properties.get(prefix);
+        if (directProperty != null) {
+            reducedProperties.put("", directProperty);
+        }
+        name.ignoredKeys().forEach(reducedProperties::remove);
         return reducedProperties;
     }
 
