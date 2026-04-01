@@ -124,7 +124,7 @@ public class MCRInstanceConfigurationTest {
     }
 
     @Test
-    public void configurationWithUpperCaseSuffixRemovesClassEntries() {
+    public void configurationWithUpperCaseSuffixRemovesLowerCaseClassEntry() {
 
         Map<String, String> properties = new HashMap<>();
         properties.put("Foo.Bar.Class", TEST_CLASS);
@@ -133,10 +133,10 @@ public class MCRInstanceConfigurationTest {
 
         MCRInstanceConfiguration<?> configuration = ofName(Object.class, "Foo.Bar.Class", properties);
 
-        assertFalse(configuration.properties().containsKey(""));
+        assertEquals("ClassValue", configuration.properties().get(""));
         assertFalse(configuration.properties().containsKey("Class"));
         assertFalse(configuration.properties().containsKey("class"));
-        assertEquals(0, configuration.properties().size());
+        assertEquals(1, configuration.properties().size());
 
     }
 
@@ -172,7 +172,7 @@ public class MCRInstanceConfigurationTest {
     }
 
     @Test
-    public void configurationWithLowerCaseSuffixRemovesClassEntries() {
+    public void configurationWithLowerCaseSuffixRemovesUpperCaseClassEntry() {
 
         Map<String, String> properties = new HashMap<>();
         properties.put("Foo.Bar.class", TEST_CLASS);
@@ -181,10 +181,10 @@ public class MCRInstanceConfigurationTest {
 
         MCRInstanceConfiguration<?> configuration = ofName(Object.class, "Foo.Bar.class", properties);
 
-        assertFalse(configuration.properties().containsKey(""));
+        assertEquals("ClassValue", configuration.properties().get(""));
         assertFalse(configuration.properties().containsKey("Class"));
         assertFalse(configuration.properties().containsKey("class"));
-        assertEquals(0, configuration.properties().size());
+        assertEquals(1, configuration.properties().size());
 
     }
 
@@ -278,7 +278,7 @@ public class MCRInstanceConfigurationTest {
     }
 
     @Test
-    public void nestedConfigurationWithUpperCaseSuffixRemovesClassEntries() {
+    public void nestedConfigurationWithUpperCaseSuffixRemovesLowerCaseClassEntry() {
 
         Map<String, String> properties = new HashMap<>();
         properties.put("Foo.Bar.Class", TEST_CLASS);
@@ -289,10 +289,10 @@ public class MCRInstanceConfigurationTest {
         MCRInstanceConfiguration<?> configuration = ofName(Object.class, "Foo.Bar.Class", properties);
         MCRInstanceConfiguration<?> nestedConfiguration = configuration.nested(Object.class, "Baz");
 
-        assertFalse(nestedConfiguration.properties().containsKey(""));
+        assertEquals("ClassValue", nestedConfiguration.properties().get(""));
         assertFalse(nestedConfiguration.properties().containsKey("Class"));
         assertFalse(nestedConfiguration.properties().containsKey("class"));
-        assertEquals(0, nestedConfiguration.properties().size());
+        assertEquals(1, nestedConfiguration.properties().size());
 
     }
 
@@ -332,7 +332,7 @@ public class MCRInstanceConfigurationTest {
     }
 
     @Test
-    public void nestedConfigurationWithLowerCaseSuffixRemovesClassEntries() {
+    public void nestedConfigurationWithLowerCaseSuffixRemovesUpperCaseClassEntry() {
 
         Map<String, String> properties = new HashMap<>();
         properties.put("Foo.Bar.class", TEST_CLASS);
@@ -343,10 +343,10 @@ public class MCRInstanceConfigurationTest {
         MCRInstanceConfiguration<?> configuration = ofName(Object.class, "Foo.Bar.class", properties);
         MCRInstanceConfiguration<?> nestedConfiguration = configuration.nested(Object.class, "Baz");
 
-        assertFalse(nestedConfiguration.properties().containsKey(""));
+        assertEquals("ClassValue", nestedConfiguration.properties().get(""));
         assertFalse(nestedConfiguration.properties().containsKey("Class"));
         assertFalse(nestedConfiguration.properties().containsKey("class"));
-        assertEquals(0, nestedConfiguration.properties().size());
+        assertEquals(1, nestedConfiguration.properties().size());
 
     }
 
@@ -528,7 +528,7 @@ public class MCRInstanceConfigurationTest {
     }
 
     @Test
-    public void nestedMapWithUpperCaseSuffixRemovesClassEntries() {
+    public void nestedMapWithUpperCaseSuffixRemovesLowerCaseClassEntries() {
 
         Map<String, String> properties = new HashMap<>();
         properties.put("Foo.Bar.Class", TEST_CLASS);
@@ -549,20 +549,20 @@ public class MCRInstanceConfigurationTest {
         MCRInstanceConfiguration<?> nestedConfigurationC = nestedConfigurations.get("C");
         assertEquals(3, nestedConfigurations.size());
 
-        assertFalse(nestedConfigurationA.properties().containsKey(""));
+        assertEquals("ClassValue", nestedConfigurationA.properties().get(""));
         assertFalse(nestedConfigurationA.properties().containsKey("Class"));
         assertFalse(nestedConfigurationA.properties().containsKey("class"));
-        assertEquals(0, nestedConfigurationA.properties().size());
+        assertEquals(1, nestedConfigurationA.properties().size());
 
-        assertFalse(nestedConfigurationB.properties().containsKey(""));
+        assertEquals("ClassValue", nestedConfigurationB.properties().get(""));
         assertFalse(nestedConfigurationB.properties().containsKey("Class"));
         assertFalse(nestedConfigurationB.properties().containsKey("class"));
-        assertEquals(0, nestedConfigurationB.properties().size());
+        assertEquals(1, nestedConfigurationB.properties().size());
 
-        assertFalse(nestedConfigurationC.properties().containsKey(""));
+        assertEquals("ClassValue", nestedConfigurationC.properties().get(""));
         assertFalse(nestedConfigurationC.properties().containsKey("Class"));
         assertFalse(nestedConfigurationC.properties().containsKey("class"));
-        assertEquals(0, nestedConfigurationC.properties().size());
+        assertEquals(1, nestedConfigurationC.properties().size());
 
     }
 
@@ -636,7 +636,7 @@ public class MCRInstanceConfigurationTest {
     }
 
     @Test
-    public void nestedMapWithLowerCaseSuffixRemovesClassEntries() {
+    public void nestedMapWithLowerCaseSuffixRemovesUpperCaseClassEntries() {
 
         Map<String, String> properties = new HashMap<>();
         properties.put("Foo.Bar.class", TEST_CLASS);
@@ -648,6 +648,7 @@ public class MCRInstanceConfigurationTest {
         properties.put("Foo.Bar.B", "ClassValue");
         properties.put("Foo.Bar.C.class", NESTED_TEST_CLASS_C);
         properties.put("Foo.Bar.C.Class", "ClassValue");
+        properties.put("Foo.Bar.C", "ClassValue");
 
         MCRInstanceConfiguration<?> configuration = ofName(Object.class, "Foo.Bar.class", properties);
         Map<String, ? extends MCRInstanceConfiguration<?>> nestedConfigurations = configuration.nestedMap(Object.class);
@@ -656,20 +657,20 @@ public class MCRInstanceConfigurationTest {
         MCRInstanceConfiguration<?> nestedConfigurationC = nestedConfigurations.get("C");
         assertEquals(3, nestedConfigurations.size());
 
-        assertFalse(nestedConfigurationA.properties().containsKey(""));
+        assertEquals("ClassValue", nestedConfigurationA.properties().get(""));
         assertFalse(nestedConfigurationA.properties().containsKey("Class"));
         assertFalse(nestedConfigurationA.properties().containsKey("class"));
-        assertEquals(0, nestedConfigurationA.properties().size());
+        assertEquals(1, nestedConfigurationA.properties().size());
 
-        assertFalse(nestedConfigurationB.properties().containsKey(""));
+        assertEquals("ClassValue", nestedConfigurationB.properties().get(""));
         assertFalse(nestedConfigurationB.properties().containsKey("Class"));
         assertFalse(nestedConfigurationB.properties().containsKey("class"));
-        assertEquals(0, nestedConfigurationB.properties().size());
+        assertEquals(1, nestedConfigurationB.properties().size());
 
-        assertFalse(nestedConfigurationC.properties().containsKey(""));
+        assertEquals("ClassValue", nestedConfigurationC.properties().get(""));
         assertFalse(nestedConfigurationC.properties().containsKey("Class"));
         assertFalse(nestedConfigurationC.properties().containsKey("class"));
-        assertEquals(0, nestedConfigurationC.properties().size());
+        assertEquals(1, nestedConfigurationC.properties().size());
 
     }
 
@@ -881,7 +882,7 @@ public class MCRInstanceConfigurationTest {
     }
 
     @Test
-    public void nestedMapWithPrefixWithUpperCaseSuffixRemovesClassEntries() {
+    public void nestedMapWithPrefixWithUpperCaseSuffixRemovesLowerCaseClassEntries() {
 
         Map<String, String> properties = new HashMap<>();
         properties.put("Foo.Bar.Class", TEST_CLASS);
@@ -908,20 +909,20 @@ public class MCRInstanceConfigurationTest {
 
         assertEquals(3, nestedConfigurations.size());
 
-        assertFalse(nestedConfigurationA.properties().containsKey(""));
+        assertEquals("ClassValue", nestedConfigurationA.properties().get(""));
         assertFalse(nestedConfigurationA.properties().containsKey("Class"));
         assertFalse(nestedConfigurationA.properties().containsKey("class"));
-        assertEquals(0, nestedConfigurationA.properties().size());
+        assertEquals(1, nestedConfigurationA.properties().size());
 
-        assertFalse(nestedConfigurationB.properties().containsKey(""));
+        assertEquals("ClassValue", nestedConfigurationB.properties().get(""));
         assertFalse(nestedConfigurationB.properties().containsKey("Class"));
         assertFalse(nestedConfigurationB.properties().containsKey("class"));
-        assertEquals(0, nestedConfigurationB.properties().size());
+        assertEquals(1, nestedConfigurationB.properties().size());
 
-        assertFalse(nestedConfigurationC.properties().containsKey(""));
+        assertEquals("ClassValue", nestedConfigurationC.properties().get(""));
         assertFalse(nestedConfigurationC.properties().containsKey("Class"));
         assertFalse(nestedConfigurationC.properties().containsKey("class"));
-        assertEquals(0, nestedConfigurationC.properties().size());
+        assertEquals(1, nestedConfigurationC.properties().size());
 
     }
 
@@ -1007,7 +1008,7 @@ public class MCRInstanceConfigurationTest {
     }
 
     @Test
-    public void nestedMapWithPrefixWithLowerCaseSuffixRemovesClassEntries() {
+    public void nestedMapWithPrefixWithLowerCaseSuffixRemovesUpperCaseClassEntry() {
 
         Map<String, String> properties = new HashMap<>();
         properties.put("Foo.Bar.class", TEST_CLASS);
@@ -1034,20 +1035,20 @@ public class MCRInstanceConfigurationTest {
 
         assertEquals(3, nestedConfigurations.size());
 
-        assertFalse(nestedConfigurationA.properties().containsKey(""));
+        assertEquals("ClassValue", nestedConfigurationA.properties().get(""));
         assertFalse(nestedConfigurationA.properties().containsKey("Class"));
         assertFalse(nestedConfigurationA.properties().containsKey("class"));
-        assertEquals(0, nestedConfigurationA.properties().size());
+        assertEquals(1, nestedConfigurationA.properties().size());
 
-        assertFalse(nestedConfigurationB.properties().containsKey(""));
+        assertEquals("ClassValue", nestedConfigurationB.properties().get(""));
         assertFalse(nestedConfigurationB.properties().containsKey("Class"));
         assertFalse(nestedConfigurationB.properties().containsKey("class"));
-        assertEquals(0, nestedConfigurationB.properties().size());
+        assertEquals(1, nestedConfigurationB.properties().size());
 
-        assertFalse(nestedConfigurationC.properties().containsKey(""));
+        assertEquals("ClassValue", nestedConfigurationC.properties().get(""));
         assertFalse(nestedConfigurationC.properties().containsKey("Class"));
         assertFalse(nestedConfigurationC.properties().containsKey("class"));
-        assertEquals(0, nestedConfigurationC.properties().size());
+        assertEquals(1, nestedConfigurationC.properties().size());
 
     }
 
@@ -1067,19 +1068,22 @@ public class MCRInstanceConfigurationTest {
     }
 
     @Test
-    public void directConfigurationRemovesClassEntries() {
+    public void directConfigurationWithUpperCaseSuffixRemovesLowerCaseClassEntry() {
 
         Map<String, String> properties = new HashMap<>();
         properties.put("Class", "ClassValue");
         properties.put("class", "ClassValue");
+        properties.put("", "ClassValue");
 
         MCRInstanceConfiguration<?> configuration =
             ofClass(Object.class, TestClass.class, "Instance", Suffix.UPPER_CASE, properties, properties);
 
-        assertFalse(configuration.properties().containsKey(""));
+        System.out.println(" ---- " + configuration.properties());
+        
+        assertEquals("ClassValue", configuration.properties().get(""));
         assertFalse(configuration.properties().containsKey("Class"));
         assertFalse(configuration.properties().containsKey("class"));
-        assertEquals(0, configuration.properties().size());
+        assertEquals(1, configuration.properties().size());
 
     }
 
@@ -1140,7 +1144,7 @@ public class MCRInstanceConfigurationTest {
     }
 
     @Test
-    public void nestedDirectConfigurationMapRemovesClassEntries() {
+    public void nestedDirectConfigurationMapWithUpperCaseSuffixRemovesLowerCaseClassEntries() {
 
         Map<String, String> properties = new HashMap<>();
         properties.put("A.Class", NESTED_TEST_CLASS_A);
@@ -1166,25 +1170,25 @@ public class MCRInstanceConfigurationTest {
 
         assertEquals(3, nestedConfigurations.size());
 
-        assertFalse(nestedConfigurationA.properties().containsKey(""));
+        assertEquals("ClassValue", nestedConfigurationA.properties().get(""));
         assertFalse(nestedConfigurationA.properties().containsKey("Class"));
         assertFalse(nestedConfigurationA.properties().containsKey("class"));
-        assertEquals(0, nestedConfigurationA.properties().size());
+        assertEquals(1, nestedConfigurationA.properties().size());
 
-        assertFalse(nestedConfigurationB.properties().containsKey(""));
+        assertEquals("ClassValue", nestedConfigurationB.properties().get(""));
         assertFalse(nestedConfigurationB.properties().containsKey("Class"));
         assertFalse(nestedConfigurationB.properties().containsKey("class"));
-        assertEquals(0, nestedConfigurationB.properties().size());
+        assertEquals(1, nestedConfigurationB.properties().size());
 
-        assertFalse(nestedConfigurationC.properties().containsKey(""));
+        assertEquals("ClassValue", nestedConfigurationC.properties().get(""));
         assertFalse(nestedConfigurationC.properties().containsKey("Class"));
         assertFalse(nestedConfigurationC.properties().containsKey("class"));
-        assertEquals(0, nestedConfigurationC.properties().size());
+        assertEquals(1, nestedConfigurationC.properties().size());
 
     }
 
     @Test
-    public void nestedDirectConfigurationMapKeepsClassEntries() {
+    public void nestedDirectConfigurationMapWithoutSuffixKeepsClassEntries() {
 
         Map<String, String> properties = new HashMap<>();
         properties.put("A", NESTED_TEST_CLASS_A);
@@ -1266,7 +1270,7 @@ public class MCRInstanceConfigurationTest {
     }
 
     @Test
-    public void nestedDirectConfigurationMapWithPrefixRemovesClassEntries() {
+    public void nestedDirectConfigurationMapWithUpperCasePrefixRemovesLowerCaseClassEntries() {
 
         Map<String, String> properties = new HashMap<>();
         properties.put("Baz.A.Class", NESTED_TEST_CLASS_A);
@@ -1292,25 +1296,25 @@ public class MCRInstanceConfigurationTest {
 
         assertEquals(3, nestedConfigurations.size());
 
-        assertFalse(nestedConfigurationA.properties().containsKey(""));
+        assertEquals("ClassValue", nestedConfigurationA.properties().get(""));
         assertFalse(nestedConfigurationA.properties().containsKey("Class"));
         assertFalse(nestedConfigurationA.properties().containsKey("class"));
-        assertEquals(0, nestedConfigurationA.properties().size());
+        assertEquals(1, nestedConfigurationA.properties().size());
 
-        assertFalse(nestedConfigurationB.properties().containsKey(""));
+        assertEquals("ClassValue", nestedConfigurationB.properties().get(""));
         assertFalse(nestedConfigurationB.properties().containsKey("Class"));
         assertFalse(nestedConfigurationB.properties().containsKey("class"));
-        assertEquals(0, nestedConfigurationB.properties().size());
+        assertEquals(1, nestedConfigurationB.properties().size());
 
-        assertFalse(nestedConfigurationC.properties().containsKey(""));
+        assertEquals("ClassValue", nestedConfigurationC.properties().get(""));
         assertFalse(nestedConfigurationC.properties().containsKey("Class"));
         assertFalse(nestedConfigurationC.properties().containsKey("class"));
-        assertEquals(0, nestedConfigurationC.properties().size());
+        assertEquals(1, nestedConfigurationC.properties().size());
 
     }
 
     @Test
-    public void nestedDirectConfigurationMapWithPrefixKeepsClassEntries() {
+    public void nestedDirectConfigurationMapWithoutPrefixKeepsLowerCaseClassEntries() {
 
         Map<String, String> properties = new HashMap<>();
         properties.put("Baz.A", NESTED_TEST_CLASS_A);
