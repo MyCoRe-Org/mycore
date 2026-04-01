@@ -127,7 +127,7 @@ public class MCRURNGranularRESTServiceTest {
         Function<MCRDerivate, Stream<MCRPath>> foo = deriv -> fileList.stream();
         String serviceID = "TestService";
         MCRURNGranularRESTService testService = new MCRURNGranularRESTService(foo);
-        testService.init("MCR.PI.Service.TestService");
+        testService.init("MCR.PI.Service.TestService.Class");
         testService.setProperties(getTestServiceProperties());
         testService.register(derivate, "", true);
 

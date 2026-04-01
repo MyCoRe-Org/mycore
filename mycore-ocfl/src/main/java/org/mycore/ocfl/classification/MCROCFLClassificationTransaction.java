@@ -46,7 +46,7 @@ public class MCROCFLClassificationTransaction implements MCRPersistenceTransacti
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final MCROCFLXMLClassificationManager MANAGER = MCRConfiguration2
-        .getSingleInstanceOf(MCROCFLXMLClassificationManager.class, "MCR.Classification.Manager")
+        .getSingleInstanceOf(MCROCFLXMLClassificationManager.class, "MCR.Classification.Manager.Class")
         .orElse(null);
 
     private static final ThreadLocal<Map<MCRCategoryID, Character>> CATEGORY_WORKSPACE = new ThreadLocal<>();

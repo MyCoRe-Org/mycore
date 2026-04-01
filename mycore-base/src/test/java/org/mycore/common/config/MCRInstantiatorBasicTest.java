@@ -20,6 +20,8 @@ package org.mycore.common.config;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mycore.common.config.instantiator.MCRInstanceConfiguration.IMPLICIT_OPTION;
+import static org.mycore.common.config.instantiator.MCRInstanceConfiguration.ofName;
 
 import java.util.function.Supplier;
 
@@ -31,7 +33,7 @@ import org.mycore.common.config.annotation.MCRFactory;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
-public class MCRConfigurableInstanceHelperBasicTest {
+public class MCRInstantiatorBasicTest {
 
     @Test
     @MCRTestConfiguration(
@@ -40,9 +42,7 @@ public class MCRConfigurableInstanceHelperBasicTest {
         })
     public void singletonFactory() {
 
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithSingletonFactory instance = MCRConfigurableInstanceHelper
-            .getInstance(TestClassWithSingletonFactory.class, configuration);
+        TestClassWithSingletonFactory instance = ofName(TestClassWithSingletonFactory.class, "Foo").instantiate();
 
         assertNotNull(instance);
 
@@ -55,9 +55,7 @@ public class MCRConfigurableInstanceHelperBasicTest {
         })
     public void annotatedFactory() {
 
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWitAnnotatedFactory instance = MCRConfigurableInstanceHelper
-            .getInstance(TestClassWitAnnotatedFactory.class, configuration);
+        TestClassWitAnnotatedFactory instance = ofName(TestClassWitAnnotatedFactory.class, "Foo").instantiate();
 
         assertNotNull(instance);
 
@@ -70,12 +68,8 @@ public class MCRConfigurableInstanceHelperBasicTest {
         })
     public void annotatedFactories() {
 
-        assertThrows(
-            MCRConfigurationException.class,
-            () -> {
-                MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-                MCRConfigurableInstanceHelper.getInstance(TestClassWitAnnotatedFactories.class, configuration);
-            });
+        assertThrows(MCRConfigurationException.class,
+            () -> ofName(TestClassWitAnnotatedFactories.class, "Foo").instantiate());
 
     }
 
@@ -86,9 +80,7 @@ public class MCRConfigurableInstanceHelperBasicTest {
         })
     public void constructorFactory() {
 
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithConstructor instance = MCRConfigurableInstanceHelper
-            .getInstance(TestClassWithConstructor.class, configuration);
+        TestClassWithConstructor instance = ofName(TestClassWithConstructor.class, "Foo").instantiate();
 
         assertNotNull(instance);
 
@@ -101,12 +93,8 @@ public class MCRConfigurableInstanceHelperBasicTest {
         })
     public void noConstructorOrFactory() {
 
-        assertThrows(
-            MCRConfigurationException.class,
-            () -> {
-                MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-                MCRConfigurableInstanceHelper.getInstance(Object.class, configuration);
-            });
+        assertThrows(MCRConfigurationException.class,
+            () -> ofName(TestClassWithoutConstructorOrFactory.class, "Foo").instantiate());
 
     }
 
@@ -117,12 +105,8 @@ public class MCRConfigurableInstanceHelperBasicTest {
         })
     public void multipleFactories() {
 
-        assertThrows(
-            MCRConfigurationException.class,
-            () -> {
-                MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-                MCRConfigurableInstanceHelper.getInstance(Object.class, configuration);
-            });
+        assertThrows(MCRConfigurationException.class,
+            () -> ofName(TestClassWithMultipleFactories.class, "Foo").instantiate());
 
     }
 
@@ -133,9 +117,7 @@ public class MCRConfigurableInstanceHelperBasicTest {
         })
     public void configurationImplicit() {
 
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        ImplicitTestClass instance = MCRConfigurableInstanceHelper.getInstance(ImplicitTestClass.class, configuration,
-            MCRConfigurableInstanceHelper.ADD_IMPLICIT_CLASS_PROPERTIES);
+        ImplicitTestClass instance = ofName(ImplicitTestClass.class, "Foo", IMPLICIT_OPTION).instantiate();
 
         assertNotNull(instance);
 
@@ -149,9 +131,7 @@ public class MCRConfigurableInstanceHelperBasicTest {
         })
     public void configurationProxy() {
 
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithConfigurationProxy instance = MCRConfigurableInstanceHelper
-            .getInstance(TestClassWithConfigurationProxy.class, configuration);
+        TestClassWithConfigurationProxy instance = ofName(TestClassWithConfigurationProxy.class, "Foo").instantiate();
 
         assertNotNull(instance);
 

@@ -36,7 +36,7 @@ import org.mycore.test.MyCoReTest;
 })
 public class MCRPIXPathPredicateTest {
 
-    private static final String KEY_CREATION_PREDICATE = "MCR.PI.Service.Mock.CreationPredicate";
+    private static final String KEY_CREATION_PREDICATE = "MCR.PI.Service.Mock.CreationPredicate.Class";
 
     private static final String KEY_CREATION_PREDICATE_XPATH = KEY_CREATION_PREDICATE + ".XPath";
 

@@ -36,7 +36,7 @@ public class GsonSerializationTest {
     public void init() {
         final MCRConfigurationLoader configurationLoader = MCRConfigurationLoaderFactory.getConfigurationLoader();
         MCRConfigurationBase.initialize(configurationLoader.loadDeprecated(), configurationLoader.load(), true);
-        MCRConfiguration2.set("MCR.Category.DAO", CategoryDAOMock.class.getName());
+        MCRConfiguration2.set("MCR.Category.DAO.Class", CategoryDAOMock.class.getName());
     }
 
     protected MCRCategoryImpl createCateg(String rootID, String id2, String text) {
