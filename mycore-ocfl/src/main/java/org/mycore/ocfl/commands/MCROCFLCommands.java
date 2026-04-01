@@ -301,7 +301,7 @@ public class MCROCFLCommands {
     public static void writeClassToDbVersioned(String classId, String revision)
         throws URISyntaxException, JDOMException, IOException, SAXException {
         MCROCFLXMLClassificationManager manager = MCRConfiguration2.getSingleInstanceOfOrThrow(
-            MCROCFLXMLClassificationManager.class, "MCR.Classification.Manager");
+            MCROCFLXMLClassificationManager.class, "MCR.Classification.Manager.Class");
         MCRCategoryID cId = MCRCategoryID.ofString(classId);
         MCRContent content = manager.retrieveContent(cId, revision);
         MCRCategory category = MCRXMLTransformer.getCategory(content.asXML());
@@ -373,7 +373,7 @@ public class MCROCFLCommands {
             throw new MCRUsageException("You can only purge root classifications!");
         }
         MCRConfiguration2.getSingleInstanceOfOrThrow(
-            MCROCFLXMLClassificationManager.class, "MCR.Classification.Manager").purge(mcrCgId);
+            MCROCFLXMLClassificationManager.class, "MCR.Classification.Manager.Class").purge(mcrCgId);
 
     }
 
@@ -436,7 +436,7 @@ public class MCROCFLCommands {
         String repositoryKey = MCRConfiguration2.getStringOrThrow("MCR.Classification.Manager.Repository");
         OcflRepository repository = MCROCFLRepositoryProvider.getRepository(repositoryKey);
         MCROCFLXMLClassificationManager manager = MCRConfiguration2.getSingleInstanceOfOrThrow(
-            MCROCFLXMLClassificationManager.class, "MCR.Classification.Manager");
+            MCROCFLXMLClassificationManager.class, "MCR.Classification.Manager.Class");
         repository.listObjectIds()
             .filter(obj -> obj.startsWith(MCROCFLObjectIDPrefixHelper.CLASSIFICATION))
             .filter(obj -> Objects.equals(repository.describeObject(obj).getHeadVersion().getVersionInfo().getMessage(),

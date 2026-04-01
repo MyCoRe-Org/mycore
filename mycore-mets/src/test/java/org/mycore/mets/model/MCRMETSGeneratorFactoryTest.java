@@ -22,13 +22,15 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 import org.junit.jupiter.api.Test;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.test.MyCoReTest;
 
+@MyCoReTest
 public class MCRMETSGeneratorFactoryTest {
 
     @Test
     public void getGenerator() {
         // prepare config
-        MCRConfiguration2.set("MCR.Component.MetsMods.Generator", TestGenerator.class.getName());
+        MCRConfiguration2.set("MCR.Component.MetsMods.Generator.Class", TestGenerator.class.getName());
         // check getGenerator
         MCRMETSGenerator generator = MCRMETSGeneratorFactory.create(null);
         assertInstanceOf(TestGenerator.class, generator);

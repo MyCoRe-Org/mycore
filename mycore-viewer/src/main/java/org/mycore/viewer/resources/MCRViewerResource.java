@@ -62,7 +62,7 @@ import jakarta.xml.bind.JAXBException;
 public class MCRViewerResource {
 
     private static final MCRIviewACLProvider IVIEW_ACL_PROVDER = MCRConfiguration2.getInstanceOfOrThrow(
-        MCRIviewACLProvider.class, "MCR.Viewer.MCRIviewACLProvider");
+        MCRIviewACLProvider.class, "MCR.Viewer.MCRIviewACLProvider.Class");
 
     private static final String JSON_CONFIG_ELEMENT_NAME = "json";
 
@@ -143,7 +143,7 @@ public class MCRViewerResource {
         }
         // build configuration object
         MCRViewerConfigurationStrategy configurationStrategy = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRViewerConfigurationStrategy.class, "MCR.Viewer.configuration.strategy");
+            MCRViewerConfigurationStrategy.class, "MCR.Viewer.configuration.strategy.Class");
         MCRJDOMContent source = new MCRJDOMContent(buildResponseDocument(configurationStrategy.get(req)));
         MCRParameterCollector parameter = new MCRParameterCollector(req);
         MCRContentTransformer transformer = getContentTransformer(source.getDocType(), parameter);

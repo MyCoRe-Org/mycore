@@ -92,14 +92,17 @@ public class MCROCFLSetupExtension implements BeforeEachCallback, AfterEachCallb
         MCRConfiguration2.set(purgePropertyName, Boolean.toString(purge != null ? purge : false));
 
         // Set transactional storage
-        MCRConfiguration2.set("MCR.Content.TransactionalStorage", MCROCFLDefaultTransactionalStorage.class.getName());
+        MCRConfiguration2.set("MCR.Content.TransactionalStorage.Class",
+            MCROCFLDefaultTransactionalStorage.class.getName());
 
         // Set remote configuration
         if (remote != null && remote) {
-            MCRConfiguration2.set("MCR.Content.RemoteStorage", MCROCFLDefaultRemoteTemporaryStorage.class.getName());
-            MCRConfiguration2.set("MCR.Content.RemoteStorage.EvictionStrategy",
+            MCRConfiguration2.set("MCR.Content.RemoteStorage.Class",
+                MCROCFLDefaultRemoteTemporaryStorage.class.getName());
+            MCRConfiguration2.set("MCR.Content.RemoteStorage.EvictionStrategy.Class",
                 MCROCFLNeverEvictStrategy.class.getName());
-            MCRConfiguration2.set("MCR.Content.RemoteStorage.Path", "%MCR.datadir%/ocfl-storage/remote");
+            MCRConfiguration2.set("MCR.Content.RemoteStorage.Path",
+                "%MCR.datadir%/ocfl-storage/remote");
         }
 
         // Execute common initialization

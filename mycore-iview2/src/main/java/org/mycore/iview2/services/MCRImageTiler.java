@@ -77,7 +77,7 @@ public final class MCRImageTiler implements Runnable, Closeable {
         runLock = new ReentrantLock();
         try {
             Class<? extends MCRTilingAction> tilingActionImpl = MCRConfiguration2.<MCRTilingAction>getClass(
-                MCRIView2Tools.CONFIG_PREFIX + "MCRTilingActionImpl").orElse(MCRTilingAction.class);
+                MCRIView2Tools.CONFIG_PREFIX + "MCRTilingActionImpl.Class").orElse(MCRTilingAction.class);
             tilingActionConstructor = tilingActionImpl.getConstructor(MCRTileJob.class);
         } catch (Exception e) {
             LOGGER.error("Error while initializing", e);

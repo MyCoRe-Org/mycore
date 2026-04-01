@@ -47,7 +47,7 @@ public class MCRCipherManager {
 
     public static MCRCipher getCipher(String id) throws MCRCryptKeyFileNotFoundException {
         LOGGER.debug("getCipher for id {} .", id);
-        String property = "MCR.Crypt.Cipher." + id + ".class";
+        String property = "MCR.Crypt.Cipher." + id + ".Class";
         MCRCipher cipher = MCRConfiguration2.getSingleInstanceOfOrThrow(MCRCipher.class, property);
         if (!cipher.isInitialised()) {
             LOGGER.debug("init Cipher for id {} .", id);
@@ -71,7 +71,7 @@ public class MCRCipherManager {
 
     public static MCRCipher getUnIntitialisedCipher(String id) {
         LOGGER.debug("getCipher for id {} .", id);
-        String property = "MCR.Crypt.Cipher." + id + ".class";
+        String property = "MCR.Crypt.Cipher." + id + ".Class";
         MCRCipher cipher = MCRConfiguration2.getSingleInstanceOfOrThrow(MCRCipher.class, property);
         cipher.reset();
         return cipher;

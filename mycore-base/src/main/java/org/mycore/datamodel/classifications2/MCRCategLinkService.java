@@ -160,7 +160,8 @@ public interface MCRCategLinkService {
     void setLinks(MCRCategLinkReference objectReference, Collection<MCRCategoryID> categories);
 
     static MCRCategLinkService obtainInstance() {
-        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRCategLinkService.class, "MCR.Category.LinkService");
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRCategLinkService.class,
+            "MCR.Category.LinkService.Class");
     }
     
 }

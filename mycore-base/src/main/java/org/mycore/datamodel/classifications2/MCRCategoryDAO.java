@@ -284,7 +284,7 @@ public interface MCRCategoryDAO {
     long getLastModified(String root);
 
     static MCRCategoryDAO obtainInstance() {
-        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRCategoryDAO.class, "MCR.Category.DAO");
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRCategoryDAO.class, "MCR.Category.DAO.Class");
     }
 
 }

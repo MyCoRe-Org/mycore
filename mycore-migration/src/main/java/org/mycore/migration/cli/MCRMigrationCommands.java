@@ -87,7 +87,7 @@ public class MCRMigrationCommands {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public static final String CHILDREN_ORDER_STRATEGY_PROPERTY = "MCR.Migration.ChildrenOrder.Strategy";
+    public static final String CHILDREN_ORDER_STRATEGY_PROPERTY = "MCR.Migration.ChildrenOrder.Strategy.Class";
 
     public static final String MIGRATE_NORMALIZED_OBJECT = "migrate to normalized object {0}";
     public static final String MIGRATE_NORMALIZED_OBJECT_VERSION = "migrate svn store to normalized versioned objects";

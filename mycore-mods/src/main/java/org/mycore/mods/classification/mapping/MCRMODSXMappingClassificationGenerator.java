@@ -91,7 +91,7 @@ public final class MCRMODSXMappingClassificationGenerator extends MCRXMappingCla
     @Override
     protected Stream<MCRCategory> getCategories(MCRCategoryDAO dao, MCRObject object) {
         return new MCRMODSWrapper(object).getMcrCategoryIDs().stream()
-            .map(categoryId -> dao.getCategory(categoryId, 0));
+                .map(categoryId -> dao.getCategory(categoryId, 0));
     }
 
     public static class Factory implements Supplier<MCRMODSXMappingClassificationGenerator> {

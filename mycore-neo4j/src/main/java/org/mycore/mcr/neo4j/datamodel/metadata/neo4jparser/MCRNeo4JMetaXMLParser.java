@@ -46,7 +46,7 @@ public class MCRNeo4JMetaXMLParser extends MCRNeo4JAbstractDataModelParser {
     private static final String CLASS_KEY = "MCRMetaXML";
 
     public MCRNeo4JMetaXMLParser() {
-        Map<String, String> propertiesMap = MCRConfiguration2.getSubPropertiesMap(NEO4J_CONFIG_PREFIX + "ParserClass.");
+        Map<String, String> propertiesMap = MCRConfiguration2.getSubPropertiesMap(NEO4J_CONFIG_PREFIX + "Parser.");
         parserMap = getMCRNeo4JInstantiatedParserMap(propertiesMap, CLASS_KEY);
     }
 

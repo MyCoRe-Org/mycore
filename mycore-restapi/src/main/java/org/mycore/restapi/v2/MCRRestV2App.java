@@ -19,16 +19,21 @@
 package org.mycore.restapi.v2;
 
 import java.net.URI;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.Collection;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.config.annotation.MCRRawProperties;
+import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRInstanceMap;
+import org.mycore.common.config.annotation.MCRPostConstruction;
+import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.restapi.MCRApiDraftFilter;
 import org.mycore.restapi.MCRContentNegotiationViaExtensionFilter;
@@ -50,7 +55,6 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.servers.Server;
-
 import jakarta.ws.rs.ApplicationPath;
 import jakarta.ws.rs.InternalServerErrorException;
 
@@ -62,8 +66,8 @@ public class MCRRestV2App extends MCRJerseyRestApp {
     public MCRRestV2App() {
         super();
 
-        this.serviceBindingsResolver =
-            MCRConfiguration2.getInstanceOfOrThrow(BindingsResolver.class, "MCR.RestAPI.V2.Services");
+        serviceBindingsResolver = MCRConfiguration2.getInstanceOfOrThrow(BindingsResolver.class,
+            "MCR.RestAPI.V2.Services.Class");
 
         register(MCRContentNegotiationViaExtensionFilter.class);
         register(MCRNormalizeMCRObjectIDsFilter.class);
@@ -85,11 +89,11 @@ public class MCRRestV2App extends MCRJerseyRestApp {
     }
 
     private void registerServices() {
-        final Map<Class<?>, Class<?>> bindings = this.serviceBindingsResolver.resolve();
+        Collection<Binding> bindings = this.serviceBindingsResolver.resolve();
         register(new AbstractBinder() {
             @Override
             protected void configure() {
-                bindings.forEach((from, to) -> bind(from).to(to));
+                bindings.forEach(binding -> bind(binding.implementationClass).to(binding.apiClass));
             }
         });
     }
@@ -137,6 +141,49 @@ public class MCRRestV2App extends MCRJerseyRestApp {
         }
     }
 
+    @MCRConfigurationProxy(proxyClass = Binding.Factory.class)
+    public record Binding(Class<?> implementationClass, Class<?> apiClass) {
+
+        public static final class Factory implements Supplier<Binding> {
+
+            @MCRProperty(name = "From")
+            public String implementationClass;
+
+            @MCRProperty(name = "To")
+            public String apiClass;
+
+            private String property;
+
+            @MCRPostConstruction(MCRPostConstruction.Value.CANONICAL)
+            public void init(String property) {
+                this.property = property;
+            }
+
+            @Override
+            public Binding get() {
+                Class<?> implementationClass = toClass(this.implementationClass, "From");
+                Class<?> apiClass = toClass(this.apiClass, "To");
+                if (!apiClass.isAssignableFrom(implementationClass)) {
+                    throw new IllegalArgumentException("Implementation " + this.implementationClass + " configured in "
+                        + property + ".From does not implement/extend " + this.apiClass + " configured in "
+                        + property + ".To");
+                }
+                return new Binding(implementationClass, apiClass);
+            }
+
+            private Class<?> toClass(String className, String key) {
+                try {
+                    return MCRClassTools.forName(className);
+                } catch (ClassNotFoundException e) {
+                    throw new MCRConfigurationException("Cannot load class " + className + "configured in "
+                        + property + "." + key, e);
+                }
+            }
+
+        }
+
+    }
+
     /**
      * Scans entries like:
      * <ul>
@@ -146,57 +193,15 @@ public class MCRRestV2App extends MCRJerseyRestApp {
      * <p>
      * and returns a map of From -> To classes for DI registration.
      */
-    public static class BindingsResolver {
+    public static final class BindingsResolver {
 
-        @MCRRawProperties(namePattern = "*", required = false)
-        public Map<String, String> bindings;
+        @MCRInstanceMap(valueClass = Binding.class)
+        public Map<String, Binding> bindings;
 
-        public Map<Class<?>, Class<?>> resolve() {
-            Map<String, String> props = (bindings != null) ? bindings : Map.of();
-
-            Map<String, String> fromByName = new HashMap<>();
-            Map<String, String> toByName = new HashMap<>();
-
-            for (Map.Entry<String, String> entry : props.entrySet()) {
-                String key = entry.getKey();
-                String value = entry.getValue() != null ? entry.getValue().trim() : null;
-                if (value == null || value.isEmpty()) {
-                    continue;
-                }
-                int dotIndex = key.lastIndexOf('.');
-                if (dotIndex < 0) {
-                    continue;
-                }
-                String name = key.substring(0, dotIndex);
-                String suffix = key.substring(dotIndex + 1);
-                if ("From".equals(suffix)) {
-                    fromByName.put(name, value);
-                } else if ("To".equals(suffix)) {
-                    toByName.put(name, value);
-                }
-            }
-            Map<Class<?>, Class<?>> result = new LinkedHashMap<>();
-            for (String name : toByName.keySet()) {
-                String toClassName = toByName.get(name);
-                String fromClassName = fromByName.get(name);
-                if (toClassName == null || fromClassName == null) {
-                    throw new IllegalStateException("Missing From/To for service: " + name);
-                }
-                try {
-                    Class<?> toCls = Class.forName(toClassName);
-                    Class<?> fromCls = Class.forName(fromClassName);
-                    if (!toCls.isAssignableFrom(fromCls)) {
-                        throw new IllegalArgumentException(
-                            "Implementation " + fromCls.getName() + " does not implement/extend " + toCls.getName());
-                    }
-                    result.put(fromCls, toCls);
-                } catch (ClassNotFoundException ex) {
-                    throw new IllegalStateException("Cannot load classes for service " + name + ": " + ex.getMessage(),
-                        ex);
-                }
-            }
-            return result;
+        public Collection<Binding> resolve() {
+            return bindings.values();
         }
+
     }
 
 }

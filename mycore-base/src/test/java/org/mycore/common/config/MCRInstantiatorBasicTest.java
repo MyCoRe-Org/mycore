@@ -38,11 +38,12 @@ public class MCRInstantiatorBasicTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithSingletonFactory.class)
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithSingletonFactory.class)
         })
     public void singletonFactory() {
 
-        TestClassWithSingletonFactory instance = ofName(TestClassWithSingletonFactory.class, "Foo").instantiate();
+        TestClassWithSingletonFactory instance = ofName(TestClassWithSingletonFactory.class,
+            "Foo.Class").instantiate();
 
         assertNotNull(instance);
 
@@ -51,11 +52,12 @@ public class MCRInstantiatorBasicTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWitAnnotatedFactory.class)
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWitAnnotatedFactory.class)
         })
     public void annotatedFactory() {
 
-        TestClassWitAnnotatedFactory instance = ofName(TestClassWitAnnotatedFactory.class, "Foo").instantiate();
+        TestClassWitAnnotatedFactory instance = ofName(TestClassWitAnnotatedFactory.class,
+            "Foo.Class").instantiate();
 
         assertNotNull(instance);
 
@@ -64,23 +66,24 @@ public class MCRInstantiatorBasicTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWitAnnotatedFactories.class)
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWitAnnotatedFactories.class)
         })
     public void annotatedFactories() {
 
         assertThrows(MCRConfigurationException.class,
-            () -> ofName(TestClassWitAnnotatedFactories.class, "Foo").instantiate());
+            () -> ofName(TestClassWitAnnotatedFactories.class, "Foo.Class").instantiate());
 
     }
 
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithConstructor.class)
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithConstructor.class)
         })
     public void constructorFactory() {
 
-        TestClassWithConstructor instance = ofName(TestClassWithConstructor.class, "Foo").instantiate();
+        TestClassWithConstructor instance = ofName(TestClassWithConstructor.class,
+            "Foo.Class").instantiate();
 
         assertNotNull(instance);
 
@@ -89,24 +92,24 @@ public class MCRInstantiatorBasicTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithoutConstructorOrFactory.class)
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithoutConstructorOrFactory.class)
         })
     public void noConstructorOrFactory() {
 
         assertThrows(MCRConfigurationException.class,
-            () -> ofName(TestClassWithoutConstructorOrFactory.class, "Foo").instantiate());
+            () -> ofName(TestClassWithoutConstructorOrFactory.class, "Foo.Class").instantiate());
 
     }
 
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithMultipleFactories.class)
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithMultipleFactories.class)
         })
     public void multipleFactories() {
 
         assertThrows(MCRConfigurationException.class,
-            () -> ofName(TestClassWithMultipleFactories.class, "Foo").instantiate());
+            () -> ofName(TestClassWithMultipleFactories.class, "Foo.Class").instantiate());
 
     }
 
@@ -117,8 +120,8 @@ public class MCRInstantiatorBasicTest {
         })
     public void configurationImplicit() {
 
-        ImplicitTestClass instance = ofName(ImplicitTestClass.class, "Foo",
-            MCRInstanceConfiguration.Options.IMPLICIT).instantiate();
+        ImplicitTestClass instance = ofName(ImplicitTestClass.class,
+            "Foo.Class", MCRInstanceConfiguration.Options.IMPLICIT).instantiate();
 
         assertNotNull(instance);
 
@@ -127,12 +130,13 @@ public class MCRInstantiatorBasicTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithConfigurationProxy.class),
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithConfigurationProxy.class),
             @MCRTestProperty(key = "Foo.Value", string = "Value")
         })
     public void configurationProxy() {
 
-        TestClassWithConfigurationProxy instance = ofName(TestClassWithConfigurationProxy.class, "Foo").instantiate();
+        TestClassWithConfigurationProxy instance = ofName(TestClassWithConfigurationProxy.class,
+            "Foo.Class").instantiate();
 
         assertNotNull(instance);
 

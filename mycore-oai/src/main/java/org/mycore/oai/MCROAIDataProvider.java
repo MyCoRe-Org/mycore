@@ -171,10 +171,10 @@ public class MCROAIDataProvider extends MCRServlet {
 
     private MCROAIAdapter createOAIAdapter(String oaiAdapterKey) {
         MCROAIAdapter oaiAdapter;
-        String adapter = MCROAIAdapter.PREFIX + oaiAdapterKey + ".Adapter";
+        String adapter = MCROAIAdapter.PREFIX + oaiAdapterKey + ".Adapter.Class";
         oaiAdapter = MCRConfiguration2.getInstanceOf(MCROAIAdapter.class, adapter)
             .orElseGet(() -> MCRConfiguration2.getInstanceOfOrThrow(
-                MCROAIAdapter.class, MCROAIAdapter.PREFIX + "DefaultAdapter"));
+                MCROAIAdapter.class, MCROAIAdapter.PREFIX + "DefaultAdapter.Class"));
         oaiAdapter.init(this.myBaseURL, oaiAdapterKey);
         return oaiAdapter;
     }

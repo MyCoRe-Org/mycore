@@ -35,15 +35,17 @@ import org.mycore.test.MyCoReTest;
 })
 public class MCRPIAndPredicateTest {
 
-    private static final String KEY_CREATION_PREDICATE = "MCR.PI.Service.Mock.CreationPredicate";
+    public static final String PREFIX = "MCR.PI.Service.Mock.CreationPredicate";
 
-    private static final String KEY_CREATION_PREDICATE_1 = KEY_CREATION_PREDICATE + ".1";
+    private static final String KEY_CREATION_PREDICATE = PREFIX + ".Class";
 
-    private static final String KEY_CREATION_PREDICATE_1_1 = KEY_CREATION_PREDICATE + ".1.1";
+    private static final String KEY_CREATION_PREDICATE_1 = PREFIX + ".1.Class";
 
-    private static final String KEY_CREATION_PREDICATE_1_2 = KEY_CREATION_PREDICATE + ".1.2";
+    private static final String KEY_CREATION_PREDICATE_1_1 = PREFIX + ".1.1.Class";
 
-    private static final String KEY_CREATION_PREDICATE_2 = KEY_CREATION_PREDICATE + ".2";
+    private static final String KEY_CREATION_PREDICATE_1_2 = PREFIX + ".1.2.Class";
+
+    private static final String KEY_CREATION_PREDICATE_2 = PREFIX + ".2.Class";
 
     @Test
     @MCRTestConfiguration(properties = {

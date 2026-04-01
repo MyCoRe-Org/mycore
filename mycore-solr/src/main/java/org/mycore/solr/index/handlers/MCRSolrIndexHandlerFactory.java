@@ -51,7 +51,7 @@ public abstract class MCRSolrIndexHandlerFactory {
 
     public static MCRSolrIndexHandlerFactory obtainInstance() {
         return MCRConfiguration2.getInstanceOfOrThrow(MCRSolrIndexHandlerFactory.class,
-            SOLR_CONFIG_PREFIX + "IndexHandler.Factory");
+            SOLR_CONFIG_PREFIX + "IndexHandler.Factory.Class");
     }
 
     public abstract MCRSolrIndexHandler getIndexHandler(MCRContent content, MCRObjectID id);
