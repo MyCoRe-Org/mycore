@@ -63,7 +63,7 @@ public class MCRRestV2App extends MCRJerseyRestApp {
         super();
 
         this.serviceBindingsResolver =
-            MCRConfiguration2.getInstanceOfOrThrow(BindingsResolver.class, "MCR.RestAPI.V2.Services");
+            MCRConfiguration2.getInstanceOfOrThrow(BindingsResolver.class, "MCR.RestAPI.V2.Services.Class");
 
         register(MCRContentNegotiationViaExtensionFilter.class);
         register(MCRNormalizeMCRObjectIDsFilter.class);

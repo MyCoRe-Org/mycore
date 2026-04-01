@@ -72,6 +72,13 @@ public final class MCRInstanceConfiguration<S> {
         this.name = name;
         this.properties = properties;
         this.fullProperties = fullProperties;
+        if (name.suffix() != Suffix.UPPER_CASE) {
+            if (LOGGER.isWarnEnabled()) {
+                LOGGER.warn("Using instance configuration for actual instance name {}, " +
+                    "which doesn't have suffix '.Class'. Support for such names is deprecated" +
+                    "and support will be removed in a future release of MyCoRe", name::actual);
+            }
+        }
     }
 
     public boolean instantiatable() {

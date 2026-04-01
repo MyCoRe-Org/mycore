@@ -116,7 +116,7 @@ public final class MCRNeo4JUtil {
             // avoid loop instantiation
             if (!Objects.equals(k, filterClassKey)) {
                 parserMap.put(k, MCRConfiguration2.getInstanceOfOrThrow(MCRNeo4JAbstractDataModelParser.class,
-                    NEO4J_CONFIG_PREFIX + "ParserClass." + k));
+                    NEO4J_CONFIG_PREFIX + "Parser." + k));
             }
         });
         return parserMap;

@@ -31,7 +31,6 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRPropertyList;
 import org.mycore.common.config.annotation.MCRSentinel;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
-import org.mycore.common.config.instantiator.MCRInstanceName;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
 /**

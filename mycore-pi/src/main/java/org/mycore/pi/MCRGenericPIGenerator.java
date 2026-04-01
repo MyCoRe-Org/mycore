@@ -57,7 +57,7 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 /**
  *
- * MCR.PI.Generator.myGenerator=org.mycore.pi.urn.MCRGenericPIGenerator
+ * MCR.PI.Generator.myGenerator.Class=org.mycore.pi.urn.MCRGenericPIGenerator
  * <p>
  * Set a generic pattern.
  * <p>

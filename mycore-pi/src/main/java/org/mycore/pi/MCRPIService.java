@@ -237,7 +237,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
                 getServiceID() + " has no " + METADATA_SERVICE_PROPERTY_KEY + "!");
         }
 
-        String msProperty = METADATA_SERVICE_CONFIG_PREFIX + metadataService;
+        String msProperty = METADATA_SERVICE_CONFIG_PREFIX + metadataService + ".Class";
         return MCRConfiguration2.getInstanceOfOrThrow(MCRPIMetadataService.class, msProperty);
     }
 
@@ -249,7 +249,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         String generatorName = Optional.ofNullable(getProperties().get(GENERATOR_PROPERTY_KEY))
             .orElseThrow(generatorPropertiesNotSetError);
 
-        String generatorPropertyKey = GENERATOR_CONFIG_PREFIX + generatorName;
+        String generatorPropertyKey = GENERATOR_CONFIG_PREFIX + generatorName + ".Class";
         return MCRConfiguration2.getInstanceOfOrThrow(MCRPIGenerator.class, generatorPropertyKey);
     }
 

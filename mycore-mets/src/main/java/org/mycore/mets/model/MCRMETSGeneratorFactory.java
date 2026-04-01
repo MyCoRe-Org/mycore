@@ -49,21 +49,13 @@ public final class MCRMETSGeneratorFactory {
     private static boolean ignoreMetsXml;
 
     static {
+
+        generatorSelector = MCRConfiguration2.getInstanceOfOrThrow(MCRMETSGeneratorSelector.class,
+            "MCR.Component.MetsMods.Generator.Selector.Class");
+
         // ignore mets.xml of the derivate by default
         ignoreMetsXml = true;
 
-        // get selector
-        Class<? extends MCRMETSGeneratorSelector> cn = MCRConfiguration2.<MCRMETSPropertyGeneratorSelector>getClass(
-            "MCR.Component.MetsMods.Generator.Selector").orElse(MCRMETSPropertyGeneratorSelector.class);
-        try {
-            generatorSelector = cn.getDeclaredConstructor().newInstance();
-        } catch (Exception cause) {
-            generatorSelector = new MCRMETSPropertyGeneratorSelector();
-            throw new MCRException(
-                "Unable to instantiate " + cn + ". Please check the 'MCR.Component.MetsMods.Generator.Selector'."
-                    + " Using default MCRMETSPropertyGeneratorSelector.",
-                cause);
-        }
     }
 
     private MCRMETSGeneratorFactory() {
@@ -170,22 +162,12 @@ public final class MCRMETSGeneratorFactory {
      */
     public static class MCRMETSPropertyGeneratorSelector implements MCRMETSGeneratorSelector {
 
-        private static Class<? extends MCRMETSGenerator> metsGeneratorClass;
-
         @Override
         public MCRMETSGenerator get(MCRPath derivatePath) {
-            String cn = MCRConfiguration2.getString("MCR.Component.MetsMods.Generator")
-                .orElse(MCRMETSDefaultGenerator.class.getName());
-            try {
-                if (metsGeneratorClass == null || !cn.equals(metsGeneratorClass.getName())) {
-                    metsGeneratorClass = MCRClassTools.forName(cn);
-                }
-                return metsGeneratorClass.getDeclaredConstructor().newInstance();
-            } catch (Exception cause) {
-                throw new MCRException("Unable to instantiate " + cn
-                    + ". Please check the 'MCR.Component.MetsMods.Generator' property'.", cause);
-            }
+            return MCRConfiguration2.getInstanceOfOrThrow(MCRMETSGenerator.class,
+                "MCR.Component.MetsMods.Generator.Class");
         }
+
     }
 
 }

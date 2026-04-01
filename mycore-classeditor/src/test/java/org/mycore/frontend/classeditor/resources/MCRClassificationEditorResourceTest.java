@@ -66,8 +66,8 @@ import jakarta.ws.rs.core.Response.Status;
     @MCRTestProperty(key = "MCR.IFS2.Store.ClasseditorTempStore.SlotLayout", string = "4-2-2"),
     @MCRTestProperty(key = "MCR.EventHandler.MCRObject.2.Class", classNameOf = MCRXMLMetadataEventHandler.class),
     @MCRTestProperty(key = "MCR.Persistence.LinkTable.Store.Class", classNameOf = LinkTableStoreMock.class),
-    @MCRTestProperty(key = "MCR.Category.DAO", classNameOf = CategoryDAOMock.class),
-    @MCRTestProperty(key = "MCR.Category.LinkService", classNameOf = CategoryLinkServiceMock.class),
+    @MCRTestProperty(key = "MCR.Category.DAO.Class", classNameOf = CategoryDAOMock.class),
+    @MCRTestProperty(key = "MCR.Category.LinkService.Class", classNameOf = CategoryLinkServiceMock.class),
     @MCRTestProperty(key = "MCR.Access.Class", classNameOf = MCRAccessBaseImpl.class),
     @MCRTestProperty(key = "MCR.Access.Cache.Size", string = "200")
 })
