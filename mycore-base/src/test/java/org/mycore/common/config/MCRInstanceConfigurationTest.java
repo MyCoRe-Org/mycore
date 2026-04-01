@@ -1078,8 +1078,6 @@ public class MCRInstanceConfigurationTest {
         MCRInstanceConfiguration<?> configuration =
             ofClass(Object.class, TestClass.class, "Instance", Suffix.UPPER_CASE, properties, properties);
 
-        System.out.println(" ---- " + configuration.properties());
-        
         assertEquals("ClassValue", configuration.properties().get(""));
         assertFalse(configuration.properties().containsKey("Class"));
         assertFalse(configuration.properties().containsKey("class"));

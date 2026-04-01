@@ -117,301 +117,301 @@ public class MCRInstantiatorPropertyMapTest {
     private static final Map<String, String> MAP = Map.of("NonEmpty", "Value");
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = NotRequiredDefaultNotSet.class),
     })
     public void notRequiredPropertyMissingDefaultNotSetDefaultPropertyMissing() {
-        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo").instantiate();
+        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo.Class").instantiate();
         assertEquals(EMPTY, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = NotRequiredDefaultNotSet.class),
         @MCRTestProperty(key = "MCR.Map", empty = true),
     })
     public void notRequiredPropertyMissingDefaultNotSetDefaultPropertyShortEmpty() {
-        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo").instantiate();
+        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo.Class").instantiate();
         assertEquals(EMPTY, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = NotRequiredDefaultNotSet.class),
         @MCRTestProperty(key = "MCR.Map", string = "NonEmpty:DefaultValue,Empty:"),
     })
     public void notRequiredPropertyMissingDefaultNotSetDefaultPropertyShortNotEmpty() {
-        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo").instantiate();
+        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo.Class").instantiate();
         assertEquals(EMPTY, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = NotRequiredDefaultNotSet.class),
         @MCRTestProperty(key = "MCR.Map.NonEmpty", string = "DefaultValue"),
         @MCRTestProperty(key = "MCR.Map.Empty", empty = true),
     })
     public void notRequiredPropertyMissingDefaultNotSetDefaultPropertyLongNotEmpty() {
-        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo").instantiate();
+        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo.Class").instantiate();
         assertEquals(EMPTY, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = NotRequiredDefaultSet.class),
     })
     public void notRequiredPropertyMissingDefaultSetDefaultPropertyMissing() {
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
-            () -> ofName(NotRequiredDefaultSet.class, "Foo").instantiate());
+            () -> ofName(NotRequiredDefaultSet.class, "Foo.Class").instantiate());
         assertEquals("Default property map, configured in MCR.Map (and its sub-properties)," +
             " for target field 'map' in configured class " + NotRequiredDefaultSet.class.getName()
             + " is empty", exception.getMessage());
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = NotRequiredDefaultSet.class),
         @MCRTestProperty(key = "MCR.Map", empty = true),
     })
     public void notRequiredPropertyMissingDefaultSetDefaultPropertyShortEmpty() {
-        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo").instantiate();
+        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo.Class").instantiate();
         assertEquals(EMPTY, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = NotRequiredDefaultSet.class),
         @MCRTestProperty(key = "MCR.Map", string = "NonEmpty:DefaultValue,Empty:"),
     })
     public void notRequiredPropertyMissingDefaultSetDefaultPropertyShortNotEmpty() {
-        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo").instantiate();
+        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo.Class").instantiate();
         assertEquals(DEFAULT_LIST, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = NotRequiredDefaultSet.class),
         @MCRTestProperty(key = "MCR.Map.NonEmpty", string = "DefaultValue"),
         @MCRTestProperty(key = "MCR.Map.Empty", empty = true),
     })
     public void notRequiredPropertyMissingDefaultSetDefaultPropertyLongNotEmpty() {
-        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo").instantiate();
+        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo.Class").instantiate();
         assertEquals(DEFAULT_LIST, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = NotRequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.Map", empty = true),
     })
     public void notRequiredPropertyShortEmptyDefaultNotSetDefaultPropertyMissing() {
-        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo").instantiate();
+        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo.Class").instantiate();
         assertEquals(EMPTY, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = NotRequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.Map", empty = true),
         @MCRTestProperty(key = "MCR.Map", empty = true),
     })
     public void notRequiredPropertyShortEmptyDefaultNotSetDefaultPropertyShortEmpty() {
-        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo").instantiate();
+        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo.Class").instantiate();
         assertEquals(EMPTY, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = NotRequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.Map", empty = true),
         @MCRTestProperty(key = "MCR.Map", string = "NonEmpty:DefaultValue,Empty:"),
     })
     public void notRequiredPropertyShortEmptyDefaultNotSetDefaultPropertyShortNotEmpty() {
-        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo").instantiate();
+        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo.Class").instantiate();
         assertEquals(EMPTY, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = NotRequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.Map", empty = true),
         @MCRTestProperty(key = "MCR.Map.NonEmpty", string = "DefaultValue"),
         @MCRTestProperty(key = "MCR.Map.Empty", empty = true),
     })
     public void notRequiredPropertyShortEmptyDefaultNotSetDefaultPropertyLongNotEmpty() {
-        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo").instantiate();
+        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo.Class").instantiate();
         assertEquals(EMPTY, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = NotRequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.Map", empty = true),
     })
     public void notRequiredPropertyShortEmptyDefaultSetDefaultPropertyMissing() {
-        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo").instantiate();
+        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo.Class").instantiate();
         assertEquals(EMPTY, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = NotRequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.Map", empty = true),
         @MCRTestProperty(key = "MCR.Map", empty = true),
     })
     public void notRequiredPropertyShortEmptyDefaultSetDefaultPropertyShortEmpty() {
-        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo").instantiate();
+        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo.Class").instantiate();
         assertEquals(EMPTY, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = NotRequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.Map", empty = true),
         @MCRTestProperty(key = "MCR.Map", string = "NonEmpty:DefaultValue,Empty:"),
     })
     public void notRequiredPropertyShortEmptyDefaultSetDefaultPropertyShortNotEmpty() {
-        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo").instantiate();
+        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo.Class").instantiate();
         assertEquals(EMPTY, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = NotRequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.Map", empty = true),
         @MCRTestProperty(key = "MCR.Map.NonEmpty", string = "DefaultValue"),
         @MCRTestProperty(key = "MCR.Map.Empty", empty = true),
     })
     public void notRequiredPropertyShortEmptyDefaultSetDefaultPropertyLongNotEmpty() {
-        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo").instantiate();
+        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo.Class").instantiate();
         assertEquals(EMPTY, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = NotRequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.Map", string = "NonEmpty:Value,Empty:"),
     })
     public void notRequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyMissing() {
-        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo").instantiate();
+        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo.Class").instantiate();
         assertEquals(MAP, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = NotRequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.Map", string = "NonEmpty:Value,Empty:"),
         @MCRTestProperty(key = "MCR.Map", empty = true),
     })
     public void notRequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyShortEmpty() {
-        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo").instantiate();
+        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo.Class").instantiate();
         assertEquals(MAP, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = NotRequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.Map", string = "NonEmpty:Value,Empty:"),
         @MCRTestProperty(key = "MCR.Map", string = "NonEmpty:DefaultValue,Empty:"),
     })
     public void notRequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyShortNotEmpty() {
-        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo").instantiate();
+        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo.Class").instantiate();
         assertEquals(MAP, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = NotRequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.Map", string = "NonEmpty:Value,Empty:"),
         @MCRTestProperty(key = "MCR.Map.NonEmpty", string = "DefaultValue"),
         @MCRTestProperty(key = "MCR.Map.Empty", empty = true),
     })
     public void notRequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyLongNotEmpty() {
-        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo").instantiate();
+        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo.Class").instantiate();
         assertEquals(MAP, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = NotRequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.Map", string = "NonEmpty:Value,Empty:"),
     })
     public void notRequiredPropertyShortNotEmptyDefaultSetDefaultPropertyMissing() {
-        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo").instantiate();
+        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo.Class").instantiate();
         assertEquals(MAP, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = NotRequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.Map", string = "NonEmpty:Value,Empty:"),
         @MCRTestProperty(key = "MCR.Map", empty = true),
     })
     public void notRequiredPropertyShortNotEmptyDefaultSetDefaultPropertyShortEmpty() {
-        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo").instantiate();
+        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo.Class").instantiate();
         assertEquals(MAP, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = NotRequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.Map", string = "NonEmpty:Value,Empty:"),
         @MCRTestProperty(key = "MCR.Map", string = "NonEmpty:DefaultValue,Empty:"),
     })
     public void notRequiredPropertyShortNotEmptyDefaultSetDefaultPropertyShortNotEmpty() {
-        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo").instantiate();
+        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo.Class").instantiate();
         assertEquals(MAP, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = NotRequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.Map", string = "NonEmpty:Value,Empty:"),
         @MCRTestProperty(key = "MCR.Map.NonEmpty", string = "DefaultValue"),
         @MCRTestProperty(key = "MCR.Map.Empty", empty = true),
     })
     public void notRequiredPropertyShortNotEmptyDefaultSetDefaultPropertyLongNotEmpty() {
-        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo").instantiate();
+        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo.Class").instantiate();
         assertEquals(MAP, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = NotRequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.Map.NonEmpty", string = "Value"),
         @MCRTestProperty(key = "Foo.Map.Empty", empty = true),
     })
     public void notRequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyMissing() {
-        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo").instantiate();
+        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo.Class").instantiate();
         assertEquals(MAP, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = NotRequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.Map.NonEmpty", string = "Value"),
         @MCRTestProperty(key = "Foo.Map.Empty", empty = true),
         @MCRTestProperty(key = "MCR.Map", empty = true),
     })
     public void notRequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyShortEmpty() {
-        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo").instantiate();
+        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo.Class").instantiate();
         assertEquals(MAP, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = NotRequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.Map.NonEmpty", string = "Value"),
         @MCRTestProperty(key = "Foo.Map.Empty", empty = true),
         @MCRTestProperty(key = "MCR.Map", string = "NonEmpty:DefaultValue,Empty:"),
     })
     public void notRequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyShortNotEmpty() {
-        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo").instantiate();
+        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo.Class").instantiate();
         assertEquals(MAP, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = NotRequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.Map.NonEmpty", string = "Value"),
         @MCRTestProperty(key = "Foo.Map.Empty", empty = true),
@@ -419,47 +419,47 @@ public class MCRInstantiatorPropertyMapTest {
         @MCRTestProperty(key = "MCR.Map.Empty", empty = true),
     })
     public void notRequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyLongNotEmpty() {
-        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo").instantiate();
+        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo.Class").instantiate();
         assertEquals(MAP, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = NotRequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.Map.NonEmpty", string = "Value"),
         @MCRTestProperty(key = "Foo.Map.Empty", empty = true),
     })
     public void notRequiredPropertyLongNotEmptyDefaultSetDefaultPropertyMissing() {
-        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo").instantiate();
+        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo.Class").instantiate();
         assertEquals(MAP, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = NotRequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.Map.NonEmpty", string = "Value"),
         @MCRTestProperty(key = "Foo.Map.Empty", empty = true),
         @MCRTestProperty(key = "MCR.Map", empty = true),
     })
     public void notRequiredPropertyLongNotEmptyDefaultSetDefaultPropertyShortEmpty() {
-        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo").instantiate();
+        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo.Class").instantiate();
         assertEquals(MAP, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = NotRequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.Map.NonEmpty", string = "Value"),
         @MCRTestProperty(key = "Foo.Map.Empty", empty = true),
         @MCRTestProperty(key = "MCR.Map", string = "NonEmpty:DefaultValue,Empty:"),
     })
     public void notRequiredPropertyLongNotEmptyDefaultSetDefaultPropertyShortNotEmpty() {
-        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo").instantiate();
+        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo.Class").instantiate();
         assertEquals(MAP, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = NotRequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.Map.NonEmpty", string = "Value"),
         @MCRTestProperty(key = "Foo.Map.Empty", empty = true),
@@ -467,151 +467,151 @@ public class MCRInstantiatorPropertyMapTest {
         @MCRTestProperty(key = "MCR.Map.Empty", empty = true),
     })
     public void notRequiredPropertyLongNotEmptyDefaultSetDefaultPropertyLongNotEmpty() {
-        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo").instantiate();
+        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo.Class").instantiate();
         assertEquals(MAP, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = RequiredDefaultNotSet.class),
     })
     public void requiredPropertyMissingDefaultNotSetDefaultPropertyMissing() {
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
-            () -> ofName(MCRConfigurationException.class, "Foo").instantiate());
+            () -> ofName(MCRConfigurationException.class, "Foo.Class").instantiate());
         assertEquals("Property map, configured in Foo.Map (and its sub-properties)," +
             " for target field 'map' in configured class " + RequiredDefaultNotSet.class.getName()
             + " is empty", exception.getMessage());
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = RequiredDefaultNotSet.class),
         @MCRTestProperty(key = "MCR.Map", empty = true),
     })
     public void requiredPropertyMissingDefaultNotSetDefaultPropertyShortEmpty() {
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
-            () -> ofName(MCRConfigurationException.class, "Foo").instantiate());
+            () -> ofName(MCRConfigurationException.class, "Foo.Class").instantiate());
         assertEquals("Property map, configured in Foo.Map (and its sub-properties)," +
             " for target field 'map' in configured class " + RequiredDefaultNotSet.class.getName()
             + " is empty", exception.getMessage());
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = RequiredDefaultNotSet.class),
         @MCRTestProperty(key = "MCR.Map", string = "NonEmpty:DefaultValue,Empty:"),
     })
     public void requiredPropertyMissingDefaultNotSetDefaultPropertyShortNotEmpty() {
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
-            () -> ofName(MCRConfigurationException.class, "Foo").instantiate());
+            () -> ofName(MCRConfigurationException.class, "Foo.Class").instantiate());
         assertEquals("Property map, configured in Foo.Map (and its sub-properties)," +
             " for target field 'map' in configured class " + RequiredDefaultNotSet.class.getName()
             + " is empty", exception.getMessage());
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = RequiredDefaultNotSet.class),
         @MCRTestProperty(key = "MCR.Map.NonEmpty", string = "DefaultValue"),
         @MCRTestProperty(key = "MCR.Map.Empty", empty = true),
     })
     public void requiredPropertyMissingDefaultNotSetDefaultPropertyLongNotEmpty() {
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
-            () -> ofName(MCRConfigurationException.class, "Foo").instantiate());
+            () -> ofName(MCRConfigurationException.class, "Foo.Class").instantiate());
         assertEquals("Property map, configured in Foo.Map (and its sub-properties)," +
             " for target field 'map' in configured class " + RequiredDefaultNotSet.class.getName()
             + " is empty", exception.getMessage());
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = RequiredDefaultSet.class),
     })
     public void requiredPropertyMissingDefaultSetDefaultPropertyMissing() {
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
-            () -> ofName(MCRConfigurationException.class, "Foo").instantiate());
+            () -> ofName(MCRConfigurationException.class, "Foo.Class").instantiate());
         assertEquals("Default property map, configured in MCR.Map (and its sub-properties)," +
             " for target field 'map' in configured class " + RequiredDefaultSet.class.getName()
             + " is empty", exception.getMessage());
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = RequiredDefaultSet.class),
         @MCRTestProperty(key = "MCR.Map", empty = true),
     })
     public void requiredPropertyMissingDefaultSetDefaultPropertyShortEmpty() {
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
-            () -> ofName(MCRConfigurationException.class, "Foo").instantiate());
+            () -> ofName(MCRConfigurationException.class, "Foo.Class").instantiate());
         assertEquals("Default property map, configured in MCR.Map (and its sub-properties)," +
             " for target field 'map' in configured class " + RequiredDefaultSet.class.getName()
             + " is empty", exception.getMessage());
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = RequiredDefaultSet.class),
         @MCRTestProperty(key = "MCR.Map", string = "NonEmpty:DefaultValue,Empty:"),
     })
     public void requiredPropertyMissingDefaultSetDefaultPropertyShortNotEmpty() {
-        RequiredDefaultSet instance = ofName(RequiredDefaultSet.class, "Foo").instantiate();
+        RequiredDefaultSet instance = ofName(RequiredDefaultSet.class, "Foo.Class").instantiate();
         assertEquals(DEFAULT_LIST, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = RequiredDefaultSet.class),
         @MCRTestProperty(key = "MCR.Map.NonEmpty", string = "DefaultValue"),
         @MCRTestProperty(key = "MCR.Map.Empty", empty = true),
     })
     public void requiredPropertyMissingDefaultSetDefaultPropertyLongNotEmpty() {
-        RequiredDefaultSet instance = ofName(RequiredDefaultSet.class, "Foo").instantiate();
+        RequiredDefaultSet instance = ofName(RequiredDefaultSet.class, "Foo.Class").instantiate();
         assertEquals(DEFAULT_LIST, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = RequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.Map", empty = true),
     })
     public void requiredPropertyShortEmptyDefaultNotSetDefaultPropertyMissing() {
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
-            () -> ofName(MCRConfigurationException.class, "Foo").instantiate());
+            () -> ofName(MCRConfigurationException.class, "Foo.Class").instantiate());
         assertEquals("Property map, configured in Foo.Map (and its sub-properties)," +
             " for target field 'map' in configured class " + RequiredDefaultNotSet.class.getName()
             + " is empty", exception.getMessage());
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = RequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.Map", empty = true),
         @MCRTestProperty(key = "MCR.Map", empty = true),
     })
     public void requiredPropertyShortEmptyDefaultNotSetDefaultPropertyShortEmpty() {
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
-            () -> ofName(MCRConfigurationException.class, "Foo").instantiate());
+            () -> ofName(MCRConfigurationException.class, "Foo.Class").instantiate());
         assertEquals("Property map, configured in Foo.Map (and its sub-properties)," +
             " for target field 'map' in configured class " + RequiredDefaultNotSet.class.getName()
             + " is empty", exception.getMessage());
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = RequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.Map", empty = true),
         @MCRTestProperty(key = "MCR.Map", string = "NonEmpty:DefaultValue,Empty:"),
     })
     public void requiredPropertyShortEmptyDefaultNotSetDefaultPropertyShortNotEmpty() {
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
-            () -> ofName(MCRConfigurationException.class, "Foo").instantiate());
+            () -> ofName(MCRConfigurationException.class, "Foo.Class").instantiate());
         assertEquals("Property map, configured in Foo.Map (and its sub-properties)," +
             " for target field 'map' in configured class " + RequiredDefaultNotSet.class.getName()
             + " is empty", exception.getMessage());
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = RequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.Map", empty = true),
         @MCRTestProperty(key = "MCR.Map.NonEmpty", string = "DefaultValue"),
@@ -619,55 +619,55 @@ public class MCRInstantiatorPropertyMapTest {
     })
     public void requiredPropertyShortEmptyDefaultNotSetDefaultPropertyLongNotEmpty() {
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
-            () -> ofName(MCRConfigurationException.class, "Foo").instantiate());
+            () -> ofName(MCRConfigurationException.class, "Foo.Class").instantiate());
         assertEquals("Property map, configured in Foo.Map (and its sub-properties)," +
             " for target field 'map' in configured class " + RequiredDefaultNotSet.class.getName()
             + " is empty", exception.getMessage());
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = RequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.Map", empty = true),
     })
     public void requiredPropertyShortEmptyDefaultSetDefaultPropertyMissing() {
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
-            () -> ofName(MCRConfigurationException.class, "Foo").instantiate());
+            () -> ofName(MCRConfigurationException.class, "Foo.Class").instantiate());
         assertEquals("Property map, configured in Foo.Map (and its sub-properties)," +
             " for target field 'map' in configured class " + RequiredDefaultSet.class.getName()
             + " is empty", exception.getMessage());
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = RequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.Map", empty = true),
         @MCRTestProperty(key = "MCR.Map", empty = true),
     })
     public void requiredPropertyShortEmptyDefaultSetDefaultPropertyShortEmpty() {
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
-            () -> ofName(MCRConfigurationException.class, "Foo").instantiate());
+            () -> ofName(MCRConfigurationException.class, "Foo.Class").instantiate());
         assertEquals("Property map, configured in Foo.Map (and its sub-properties)," +
             " for target field 'map' in configured class " + RequiredDefaultSet.class.getName()
             + " is empty", exception.getMessage());
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = RequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.Map", empty = true),
         @MCRTestProperty(key = "MCR.Map", string = "NonEmpty:DefaultValue,Empty:"),
     })
     public void requiredPropertyShortEmptyDefaultSetDefaultPropertyShortNotEmpty() {
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
-            () -> ofName(MCRConfigurationException.class, "Foo").instantiate());
+            () -> ofName(MCRConfigurationException.class, "Foo.Class").instantiate());
         assertEquals("Property map, configured in Foo.Map (and its sub-properties)," +
             " for target field 'map' in configured class " + RequiredDefaultSet.class.getName()
             + " is empty", exception.getMessage());
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = RequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.Map", empty = true),
         @MCRTestProperty(key = "MCR.Map.NonEmpty", string = "DefaultValue"),
@@ -675,137 +675,137 @@ public class MCRInstantiatorPropertyMapTest {
     })
     public void requiredPropertyShortEmptyDefaultSetDefaultPropertyLongNotEmpty() {
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
-            () -> ofName(MCRConfigurationException.class, "Foo").instantiate());
+            () -> ofName(MCRConfigurationException.class, "Foo.Class").instantiate());
         assertEquals("Property map, configured in Foo.Map (and its sub-properties)," +
             " for target field 'map' in configured class " + RequiredDefaultSet.class.getName()
             + " is empty", exception.getMessage());
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = RequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.Map", string = "NonEmpty:Value,Empty:"),
     })
     public void requiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyMissing() {
-        RequiredDefaultNotSet instance = ofName(RequiredDefaultNotSet.class, "Foo").instantiate();
+        RequiredDefaultNotSet instance = ofName(RequiredDefaultNotSet.class, "Foo.Class").instantiate();
         assertEquals(MAP, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = RequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.Map", string = "NonEmpty:Value,Empty:"),
         @MCRTestProperty(key = "MCR.Map", empty = true),
     })
     public void requiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyShortEmpty() {
-        RequiredDefaultNotSet instance = ofName(RequiredDefaultNotSet.class, "Foo").instantiate();
+        RequiredDefaultNotSet instance = ofName(RequiredDefaultNotSet.class, "Foo.Class").instantiate();
         assertEquals(MAP, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = RequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.Map", string = "NonEmpty:Value,Empty:"),
         @MCRTestProperty(key = "MCR.Map", string = "NonEmpty:DefaultValue,Empty:"),
     })
     public void requiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyShortNotEmpty() {
-        RequiredDefaultNotSet instance = ofName(RequiredDefaultNotSet.class, "Foo").instantiate();
+        RequiredDefaultNotSet instance = ofName(RequiredDefaultNotSet.class, "Foo.Class").instantiate();
         assertEquals(MAP, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = RequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.Map", string = "NonEmpty:Value,Empty:"),
         @MCRTestProperty(key = "MCR.Map.NonEmpty", string = "DefaultValue"),
         @MCRTestProperty(key = "MCR.Map.Empty", empty = true),
     })
     public void requiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyLongNotEmpty() {
-        RequiredDefaultNotSet instance = ofName(RequiredDefaultNotSet.class, "Foo").instantiate();
+        RequiredDefaultNotSet instance = ofName(RequiredDefaultNotSet.class, "Foo.Class").instantiate();
         assertEquals(MAP, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = RequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.Map", string = "NonEmpty:Value,Empty:"),
     })
     public void requiredPropertyShortNotEmptyDefaultSetDefaultPropertyMissing() {
-        RequiredDefaultSet instance = ofName(RequiredDefaultSet.class, "Foo").instantiate();
+        RequiredDefaultSet instance = ofName(RequiredDefaultSet.class, "Foo.Class").instantiate();
         assertEquals(MAP, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = RequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.Map", string = "NonEmpty:Value,Empty:"),
         @MCRTestProperty(key = "MCR.Map", empty = true),
     })
     public void requiredPropertyShortNotEmptyDefaultSetDefaultPropertyShortEmpty() {
-        RequiredDefaultSet instance = ofName(RequiredDefaultSet.class, "Foo").instantiate();
+        RequiredDefaultSet instance = ofName(RequiredDefaultSet.class, "Foo.Class").instantiate();
         assertEquals(MAP, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = RequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.Map", string = "NonEmpty:Value,Empty:"),
         @MCRTestProperty(key = "MCR.Map", string = "NonEmpty:DefaultValue,Empty:"),
     })
     public void requiredPropertyShortNotEmptyDefaultSetDefaultPropertyShortNotEmpty() {
-        RequiredDefaultSet instance = ofName(RequiredDefaultSet.class, "Foo").instantiate();
+        RequiredDefaultSet instance = ofName(RequiredDefaultSet.class, "Foo.Class").instantiate();
         assertEquals(MAP, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = RequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.Map", string = "NonEmpty:Value,Empty:"),
         @MCRTestProperty(key = "MCR.Map.NonEmpty", string = "DefaultValue"),
         @MCRTestProperty(key = "MCR.Map.Empty", empty = true),
     })
     public void requiredPropertyShortNotEmptyDefaultSetDefaultPropertyLongNotEmpty() {
-        RequiredDefaultSet instance = ofName(RequiredDefaultSet.class, "Foo").instantiate();
+        RequiredDefaultSet instance = ofName(RequiredDefaultSet.class, "Foo.Class").instantiate();
         assertEquals(MAP, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = RequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.Map.NonEmpty", string = "Value"),
         @MCRTestProperty(key = "Foo.Map.Empty", empty = true),
     })
     public void requiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyMissing() {
-        RequiredDefaultNotSet instance = ofName(RequiredDefaultNotSet.class, "Foo").instantiate();
+        RequiredDefaultNotSet instance = ofName(RequiredDefaultNotSet.class, "Foo.Class").instantiate();
         assertEquals(MAP, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = RequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.Map.NonEmpty", string = "Value"),
         @MCRTestProperty(key = "Foo.Map.Empty", empty = true),
         @MCRTestProperty(key = "MCR.Map", empty = true),
     })
     public void requiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyShortEmpty() {
-        RequiredDefaultNotSet instance = ofName(RequiredDefaultNotSet.class, "Foo").instantiate();
+        RequiredDefaultNotSet instance = ofName(RequiredDefaultNotSet.class, "Foo.Class").instantiate();
         assertEquals(MAP, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = RequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.Map.NonEmpty", string = "Value"),
         @MCRTestProperty(key = "Foo.Map.Empty", empty = true),
         @MCRTestProperty(key = "MCR.Map", string = "NonEmpty:DefaultValue,Empty:"),
     })
     public void requiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyShortNotEmpty() {
-        RequiredDefaultNotSet instance = ofName(RequiredDefaultNotSet.class, "Foo").instantiate();
+        RequiredDefaultNotSet instance = ofName(RequiredDefaultNotSet.class, "Foo.Class").instantiate();
         assertEquals(MAP, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = RequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.Map.NonEmpty", string = "Value"),
         @MCRTestProperty(key = "Foo.Map.Empty", empty = true),
@@ -813,47 +813,47 @@ public class MCRInstantiatorPropertyMapTest {
         @MCRTestProperty(key = "MCR.Map.Empty", empty = true),
     })
     public void requiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyLongNotEmpty() {
-        RequiredDefaultNotSet instance = ofName(RequiredDefaultNotSet.class, "Foo").instantiate();
+        RequiredDefaultNotSet instance = ofName(RequiredDefaultNotSet.class, "Foo.Class").instantiate();
         assertEquals(MAP, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = RequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.Map.NonEmpty", string = "Value"),
         @MCRTestProperty(key = "Foo.Map.Empty", empty = true),
     })
     public void requiredPropertyLongNotEmptyDefaultSetDefaultPropertyMissing() {
-        RequiredDefaultSet instance = ofName(RequiredDefaultSet.class, "Foo").instantiate();
+        RequiredDefaultSet instance = ofName(RequiredDefaultSet.class, "Foo.Class").instantiate();
         assertEquals(MAP, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = RequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.Map.NonEmpty", string = "Value"),
         @MCRTestProperty(key = "Foo.Map.Empty", empty = true),
         @MCRTestProperty(key = "MCR.Map", empty = true),
     })
     public void requiredPropertyLongNotEmptyDefaultSetDefaultPropertyShortEmpty() {
-        RequiredDefaultSet instance = ofName(RequiredDefaultSet.class, "Foo").instantiate();
+        RequiredDefaultSet instance = ofName(RequiredDefaultSet.class, "Foo.Class").instantiate();
         assertEquals(MAP, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = RequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.Map.NonEmpty", string = "Value"),
         @MCRTestProperty(key = "Foo.Map.Empty", empty = true),
         @MCRTestProperty(key = "MCR.Map", string = "NonEmpty:DefaultValue,Empty:"),
     })
     public void requiredPropertyLongNotEmptyDefaultSetDefaultPropertyShortNotEmpty() {
-        RequiredDefaultSet instance = ofName(RequiredDefaultSet.class, "Foo").instantiate();
+        RequiredDefaultSet instance = ofName(RequiredDefaultSet.class, "Foo.Class").instantiate();
         assertEquals(MAP, instance.map);
     }
 
     @Test
-    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
+    @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo.Class",
         classNameOf = RequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.Map.NonEmpty", string = "Value"),
         @MCRTestProperty(key = "Foo.Map.Empty", empty = true),
@@ -861,7 +861,7 @@ public class MCRInstantiatorPropertyMapTest {
         @MCRTestProperty(key = "MCR.Map.Empty", empty = true),
     })
     public void requiredPropertyLongNotEmptyDefaultSetDefaultPropertyLongNotEmpty() {
-        RequiredDefaultSet instance = ofName(RequiredDefaultSet.class, "Foo").instantiate();
+        RequiredDefaultSet instance = ofName(RequiredDefaultSet.class, "Foo.Class").instantiate();
         assertEquals(MAP, instance.map);
     }
 

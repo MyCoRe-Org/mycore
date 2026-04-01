@@ -37,13 +37,14 @@ public class MCRInstantiatorProxyTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithConfigurationProxy.class),
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithConfigurationProxy.class),
             @MCRTestProperty(key = "Foo.Property1", string = "Value1"),
             @MCRTestProperty(key = "Foo.Property2", string = "Value2")
         })
     public void annotated() {
 
-        TestClassWithConfigurationProxy instance = ofName(TestClassWithConfigurationProxy.class, "Foo").instantiate();
+        TestClassWithConfigurationProxy instance = ofName(TestClassWithConfigurationProxy.class,
+            "Foo.Class").instantiate();
 
         assertNotNull(instance);
         assertEquals("Value1-Value2", instance.value());
