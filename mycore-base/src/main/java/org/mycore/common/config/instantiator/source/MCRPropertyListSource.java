@@ -31,7 +31,6 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRPropertyList;
 import org.mycore.common.config.annotation.MCRSentinel;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
-import org.mycore.common.config.instantiator.MCRInstanceName;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
 /**
@@ -79,18 +78,15 @@ final class MCRPropertyListSource extends MCRSourceBase {
             Map<String, String> properties = fullProperties;
             propertyList = getPropertyList(property, annotation.name(), ".", target, properties, description);
         } else {
-            Map<String, String> properties = configuration.properties();
             if (annotation.name().isEmpty()) {
                 property = configuration.name().canonical();
                 description = "property list";
-                // when non-empty class suffix is used, the property with empty name may contain the short-form-list
-                if (configuration.name().suffix() != MCRInstanceName.Suffix.NONE) {
-                    properties.put("", fullProperties.get(property));
-                }
+                Map<String, String> properties = configuration.properties();
                 propertyList = getPropertyList(property, "", "", target, properties, description);
             } else {
                 property = configuration.name().canonical() + "." + annotation.name();
                 description = "property list";
+                Map<String, String> properties = configuration.properties();
                 propertyList = getPropertyList(property, annotation.name(), ".", target, properties, description);
             }
         }
