@@ -197,7 +197,7 @@ public class MCRConfiguration2 {
      * @throws MCRConfigurationException if the class can not be loaded or instantiated
      */
     public static <S> Optional<S> getInstanceOf(Class<S> superClass, String name) throws MCRConfigurationException {
-        if (MCRConfigurableInstanceHelper.isSingleton(superClass)) {
+        if (MCRConfigurableInstanceHelper.isSingleton(name)) {
             return getSingleInstanceOf(superClass, name);
         } else {
             return MCRConfigurableInstanceHelper.getInstance(superClass, name);
