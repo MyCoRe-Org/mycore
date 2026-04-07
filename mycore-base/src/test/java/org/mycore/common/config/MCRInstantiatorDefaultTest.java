@@ -20,6 +20,7 @@ package org.mycore.common.config;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mycore.common.config.instantiator.MCRInstanceConfiguration.ofName;
 
 import java.util.List;
 import java.util.Map;
@@ -41,7 +42,7 @@ import org.mycore.test.MyCoReTest;
         @MCRTestProperty(key = "Default.OneProperty", string = "OneValue"),
         @MCRTestProperty(key = "Default.OtherProperty", string = "OtherValue")
     })
-public class MCRConfigurableInstanceHelperDefaultTest {
+public class MCRInstantiatorDefaultTest {
 
     @Test
     @MCRTestConfiguration(
@@ -51,9 +52,7 @@ public class MCRConfigurableInstanceHelperDefaultTest {
         })
     public void nested() {
 
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithNestedClass instance = MCRConfigurableInstanceHelper
-            .getInstance(TestClassWithNestedClass.class, configuration);
+        TestClassWithNestedClass instance = ofName(TestClassWithNestedClass.class, "Foo").instantiate();
 
         assertNotNull(instance);
         assertNotNull(instance.nested);
@@ -69,9 +68,7 @@ public class MCRConfigurableInstanceHelperDefaultTest {
         })
     public void nestedImplicit() {
 
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithImplicitNestedClass instance = MCRConfigurableInstanceHelper
-            .getInstance(TestClassWithImplicitNestedClass.class, configuration);
+        TestClassWithImplicitNestedClass instance = ofName(TestClassWithImplicitNestedClass.class, "Foo").instantiate();
 
         assertNotNull(instance);
         assertNotNull(instance.nested);
@@ -89,9 +86,7 @@ public class MCRConfigurableInstanceHelperDefaultTest {
         })
     public void nestedNested() {
 
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithNestedNestedClass instance = MCRConfigurableInstanceHelper
-            .getInstance(TestClassWithNestedNestedClass.class, configuration);
+        TestClassWithNestedNestedClass instance = ofName(TestClassWithNestedNestedClass.class, "Foo").instantiate();
 
         assertNotNull(instance);
         assertNotNull(instance.nested);
@@ -110,9 +105,7 @@ public class MCRConfigurableInstanceHelperDefaultTest {
         })
     public void nestedMap() {
 
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithNestedMap instance = MCRConfigurableInstanceHelper
-            .getInstance(TestClassWithNestedMap.class, configuration);
+        TestClassWithNestedMap instance = ofName(TestClassWithNestedMap.class, "Foo").instantiate();
 
         assertNotNull(instance);
         assertNotNull(instance.map);
@@ -139,9 +132,8 @@ public class MCRConfigurableInstanceHelperDefaultTest {
         })
     public void nestedMapImplicit() {
 
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithNestedMapOfImplicitEntries instance = MCRConfigurableInstanceHelper
-            .getInstance(TestClassWithNestedMapOfImplicitEntries.class, configuration);
+        TestClassWithNestedMapOfImplicitEntries instance =
+            ofName(TestClassWithNestedMapOfImplicitEntries.class, "Foo").instantiate();
 
         assertNotNull(instance);
         assertNotNull(instance.map);
@@ -170,9 +162,7 @@ public class MCRConfigurableInstanceHelperDefaultTest {
         })
     public void nestedList() {
 
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithNestedList instance = MCRConfigurableInstanceHelper
-            .getInstance(TestClassWithNestedList.class, configuration);
+        TestClassWithNestedList instance = ofName(TestClassWithNestedList.class, "Foo").instantiate();
 
         assertNotNull(instance);
         assertNotNull(instance.list);
@@ -199,9 +189,8 @@ public class MCRConfigurableInstanceHelperDefaultTest {
         })
     public void nestedListImplicit() {
 
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithNestedListOfImplicitEntries instance = MCRConfigurableInstanceHelper
-            .getInstance(TestClassWithNestedListOfImplicitEntries.class, configuration);
+        TestClassWithNestedListOfImplicitEntries instance =
+            ofName(TestClassWithNestedListOfImplicitEntries.class, "Foo").instantiate();
 
         assertNotNull(instance);
         assertNotNull(instance.list);

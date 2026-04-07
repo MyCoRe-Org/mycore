@@ -23,9 +23,9 @@ import static org.mycore.common.config.instantiator.MCRInstantiatorUtils.missing
 
 import java.util.Map;
 
-import org.mycore.common.config.MCRInstanceConfiguration;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.config.annotation.MCRSentinel;
+import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
 /**
@@ -60,12 +60,14 @@ final class MCRPropertySource extends MCRSourceBase {
     }
 
     @Override
-    public String get(MCRInstanceConfiguration configuration, MCRTarget target) {
+    public String get(MCRInstanceConfiguration<?> configuration, MCRTarget target) {
 
         String name = annotation.name();
         if (name.isEmpty()) {
             throw emptyNameException(target);
         }
+
+        Map<String, String> fullProperties = configuration.fullProperties();
 
         String property;
         String description;
@@ -73,13 +75,11 @@ final class MCRPropertySource extends MCRSourceBase {
         if (annotation.absolute()) {
             property = annotation.name();
             description = "absolute property";
-            propertyValue = getPropertyValue(property, annotation.name(),
-                configuration.fullProperties(), description);
+            propertyValue = getPropertyValue(property, annotation.name(), fullProperties, description);
         } else {
             property = configuration.name().canonical() + "." + annotation.name();
             description = "property";
-            propertyValue = getPropertyValue(property, annotation.name(),
-                configuration.properties(), description);
+            propertyValue = getPropertyValue(property, annotation.name(), configuration.properties(), description);
         }
 
         String defaultName = annotation.defaultName();
@@ -87,8 +87,7 @@ final class MCRPropertySource extends MCRSourceBase {
 
             property = defaultName;
             description = "default property";
-            propertyValue = getPropertyValue(defaultName, defaultName,
-                configuration.fullProperties(), description);
+            propertyValue = getPropertyValue(defaultName, defaultName, fullProperties, description);
 
             if (propertyValue == null) {
                 throw missingException(property, target, description);
