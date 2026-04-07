@@ -18,8 +18,8 @@
 
 package org.mycore.common.config.instantiator.source;
 
-import org.mycore.common.config.MCRInstanceConfiguration;
 import org.mycore.common.config.annotation.MCRPostConstruction;
+import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
 /**
@@ -54,7 +54,7 @@ final class MCRPostConstructionSource extends MCRSourceBase {
     }
 
     @Override
-    public String get(MCRInstanceConfiguration configuration, MCRTarget target) {
+    public String get(MCRInstanceConfiguration<?> configuration, MCRTarget target) {
         return switch (annotation.value()) {
             case ACTUAL -> configuration.name().actual();
             case CANONICAL -> configuration.name().canonical();

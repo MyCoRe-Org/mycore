@@ -24,8 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.mycore.common.config.MCRConfigurationException;
-import org.mycore.common.config.MCRInstanceConfiguration;
 import org.mycore.common.config.annotation.MCRRawProperties;
+import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
 /**
@@ -70,7 +70,7 @@ final class MCRRawPropertiesSource extends MCRSourceBase {
     }
 
     @Override
-    public Map<String, String> get(MCRInstanceConfiguration configuration, MCRTarget target) {
+    public Map<String, String> get(MCRInstanceConfiguration<?> configuration, MCRTarget target) {
 
         Map<String, String> properties =
             annotation.absolute() ? configuration.fullProperties() : configuration.properties();

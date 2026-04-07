@@ -60,4 +60,9 @@ public final class MCRFieldTarget implements MCRTarget {
         }
     }
 
+    @Override
+    public String toString() {
+        return field.getDeclaringClass().getSimpleName() + "#" + field.getName();
+    }
+
 }
