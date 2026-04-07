@@ -26,10 +26,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.config.MCRInstanceConfiguration;
-import org.mycore.common.config.MCRInstanceName;
 import org.mycore.common.config.annotation.MCRPropertyMap;
 import org.mycore.common.config.annotation.MCRSentinel;
+import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
+import org.mycore.common.config.instantiator.MCRInstanceName;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
 /**
@@ -64,7 +64,9 @@ final class MCRPropertyMapSource extends MCRSourceBase {
     }
 
     @Override
-    public Map<String, String> get(MCRInstanceConfiguration configuration, MCRTarget target) {
+    public Map<String, String> get(MCRInstanceConfiguration<?> configuration, MCRTarget target) {
+
+        Map<String, String> fullProperties = configuration.fullProperties();
 
         String property;
         String description;
@@ -72,7 +74,7 @@ final class MCRPropertyMapSource extends MCRSourceBase {
         if (annotation.absolute()) {
             property = annotation.name();
             description = "absolute property map";
-            Map<String, String> properties = configuration.fullProperties();
+            Map<String, String> properties = fullProperties;
             propertyMap = getPropertyMap(property, annotation.name(), ".", properties, description);
         } else {
             Map<String, String> properties = configuration.properties();
@@ -81,9 +83,8 @@ final class MCRPropertyMapSource extends MCRSourceBase {
                 description = "property map";
                 // when non-empty class suffix is used, the property with empty name may contain the short-form-map
                 if (configuration.name().suffix() != MCRInstanceName.Suffix.NONE) {
-                    properties.put("", configuration.fullProperties().get(property));
+                    properties.put("", fullProperties.get(property));
                 }
-
                 propertyMap = getPropertyMap(property, "", "", properties, description);
             } else {
                 property = configuration.name().canonical() + "." + annotation.name();
@@ -97,8 +98,7 @@ final class MCRPropertyMapSource extends MCRSourceBase {
 
             property = defaultName;
             description = "default property map";
-            propertyMap = getPropertyMap(defaultName, defaultName, ".",
-                configuration.fullProperties(), description);
+            propertyMap = getPropertyMap(defaultName, defaultName, ".", fullProperties, description);
 
             if (propertyMap == null || (propertyMap.isEmpty() && annotation.required())) {
                 throw emptyException(property, target, description);

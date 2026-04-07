@@ -28,9 +28,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import org.mycore.common.MCRClassTools;
 import org.mycore.common.config.MCRConfigurationException;
-import org.mycore.common.config.MCRInstanceConfiguration;
 import org.mycore.common.config.instantiator.source.MCRSource;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
@@ -41,15 +39,6 @@ import org.mycore.common.config.instantiator.target.MCRTarget;
 public final class MCRInstantiatorUtils {
 
     private MCRInstantiatorUtils() {
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T> Class<T> getClass(String property, String className) {
-        try {
-            return (Class<T>) MCRClassTools.forName(className);
-        } catch (ClassNotFoundException e) {
-            throw new MCRConfigurationException("Missing class (" + className + ") configured in: " + property, e);
-        }
     }
 
     public static String methodNames(List<Method> methods) {
@@ -72,7 +61,7 @@ public final class MCRInstantiatorUtils {
         return source.annotationClass().getName();
     }
 
-    public static String property(MCRInstanceConfiguration configuration, String annotationName) {
+    public static String property(MCRInstanceConfiguration<?> configuration, String annotationName) {
         if (Objects.equals("", annotationName)) {
             return configuration.name().canonical();
         } else {
@@ -124,7 +113,8 @@ public final class MCRInstantiatorUtils {
         return new MCRConfigurationException(
             capitalize(description) + ", configured in " + property + " (and its sub-properties)," +
                 " for target " + targetTypeName(target) + " '" + target.name() + "' in configured class "
-                + target.declaringClass().getName() + " has element with non-integer key " + key, exception);
+                + target.declaringClass().getName() + " has element with non-integer key " + key,
+            exception);
     }
 
     public static String capitalize(String description) {

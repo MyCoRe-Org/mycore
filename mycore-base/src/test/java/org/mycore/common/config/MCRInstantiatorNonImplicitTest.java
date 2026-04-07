@@ -21,7 +21,6 @@ package org.mycore.common.config;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,9 +34,10 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
-import org.mycore.common.config.annotation.MCRInstanceList;
+import org.mycore.common.config.annotation.MCRInstance;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.config.annotation.MCRSentinel;
+import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.test.MyCoReTest;
 
 /**
@@ -53,7 +53,7 @@ import org.mycore.test.MyCoReTest;
  *     <li>a disabling sentinel, but no configured sentinel value (implicitly disabling sentinel)</li>
  *     <li>a sentinel and a disabling configured sentinel value (explicitly disabling sentinel)</li>
  *   </ol>
- *   <li>Value-property value (for a single element-list) is not set, set empty or set non-empty</li>
+ *   <li>Value-property value is not set, set empty or set non-empty</li>
  * </ol>
  * <table style="border-collapse: collapse;">
  *   <caption>
@@ -69,96 +69,96 @@ import org.mycore.test.MyCoReTest;
  *     <th style="border: 1px solid;">Expected Required Result</th>
  *   </tr>
  *   <tr>
+ *     <td style="border: 1px solid;">not set</td>
+ *     <td style="border: 1px solid;">none or impl. enabled</td>
+ *     <td style="border: 1px solid;">not set</td>
+ *     <td style="border: 1px solid;"><code>null</code></td>
+ *     <td style="border: 1px solid;">Exception</td>
+ *   </tr>
+ *   <tr>
  *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;">impl. or expl. disabled</td>
  *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;"><code>[]</code></td>
+ *     <td style="border: 1px solid;"><code>null</code></td>
  *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;">set empty</td>
  *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;"><code>[]</code></td>
+ *     <td style="border: 1px solid;"><code>null</code></td>
  *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;">none or impl. enabled</td>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;"><code>[]</code></td>
+ *     <td style="border: 1px solid;"><code>a=</code></td>
+ *     <td style="border: 1px solid;"><code>null</code></td>
  *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;">none or impl. enabled</td>
- *     <td style="border: 1px solid;"><code>1.a=</code></td>
- *     <td style="border: 1px solid;"><code>[]</code></td>
- *     <td style="border: 1px solid;">Exception</td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">none or impl. enabled</td>
- *     <td style="border: 1px solid;"><code>1.a=Value</code></td>
- *     <td style="border: 1px solid;"><code>[]</code></td>
+ *     <td style="border: 1px solid;"><code>a=Value</code></td>
+ *     <td style="border: 1px solid;"><code>null</code></td>
  *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;">expl. enabled</td>
  *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;"><code>[]</code></td>
+ *     <td style="border: 1px solid;"><code>null</code></td>
  *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;">expl. enabled</td>
- *     <td style="border: 1px solid;"><code>1.a=</code></td>
- *     <td style="border: 1px solid;"><code>[]</code></td>
+ *     <td style="border: 1px solid;"><code>a=</code></td>
+ *     <td style="border: 1px solid;"><code>null</code></td>
  *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;">expl. enabled</td>
  *     <td style="border: 1px solid;"><code>Value</code></td>
- *     <td style="border: 1px solid;"><code>[]</code></td>
+ *     <td style="border: 1px solid;"><code>null</code></td>
  *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;">set</td>
  *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;"><code>[_]</code></td>
- *     <td style="border: 1px solid;"><code>[_]</code></td>
+ *     <td style="border: 1px solid;"><code>_</code></td>
+ *     <td style="border: 1px solid;"><code>_</code></td>
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;">set</td>
  *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;"><code>1.a=</code></td>
- *     <td style="border: 1px solid;"><code>[()]</code></td>
- *     <td style="border: 1px solid;"><code>[()]</code></td>
+ *     <td style="border: 1px solid;"><code>a=</code></td>
+ *     <td style="border: 1px solid;"><code>()</code></td>
+ *     <td style="border: 1px solid;"><code>()</code></td>
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;">set</td>
  *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;"><code>1.a=Value</code></td>
+ *     <td style="border: 1px solid;"><code>a=Value</code></td>
  *     <td style="border: 1px solid;"><code>(Value)</code></td>
- *     <td style="border: 1px solid;"><code>[(Value)]</code></td>
+ *     <td style="border: 1px solid;"><code>(Value)</code></td>
  *   </tr>
  * </table>
  */
 @MyCoReTest
-public class MCRConfigurableInstanceHelperNonImplicitListTest {
+public class MCRInstantiatorNonImplicitTest {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     public static final String CONFIGURED_CLASS_PROPERTY = "Foo.Class";
 
-    public static final String NESTED_CLASS_PROPERTY = "Foo.Nested.42.Class";
+    public static final String NESTED_CLASS_PROPERTY = "Foo.Nested.Class";
 
-    public static final String NESTED_SENTINEL_PROPERTY = "Foo.Nested.42.Enabled";
+    public static final String NESTED_SENTINEL_PROPERTY = "Foo.Nested.Enabled";
 
-    public static final String NESTED_VALUE_PROPERTY = "Foo.Nested.42.Value";
+    public static final String NESTED_VALUE_PROPERTY = "Foo.Nested.Value";
 
     private static Stream<Arguments> provideAllParameterCombinations() {
         List<Arguments> argumentsList = new ArrayList<>();
@@ -240,8 +240,7 @@ public class MCRConfigurableInstanceHelperNonImplicitListTest {
         Configurable instance = null;
         MCRConfigurationException exception = null;
         try {
-            MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName(CONFIGURED_CLASS_PROPERTY);
-            instance = MCRConfigurableInstanceHelper.getInstance(Configurable.class, configuration);
+            instance = MCRInstanceConfiguration.ofName(Configurable.class, CONFIGURED_CLASS_PROPERTY).instantiate();
         } catch (MCRConfigurationException e) {
             exception = e;
         }
@@ -258,26 +257,23 @@ public class MCRConfigurableInstanceHelperNonImplicitListTest {
             assertNull(instance);
             assertNotNull(exception);
 
-            assertEquals("Instance list, configured in Foo.Nested (and its sub-properties)," +
-                " for target field 'nestedList' in configured class " + configuredClass.getName()
-                + " is empty", exception.getMessage());
+            assertEquals("Instance, configured in Foo.Nested (and its sub-properties)," +
+                " for target field 'nested' in configured class " + configuredClass.getName()
+                + " is missing", exception.getMessage());
 
         } else {
 
             assertNull(exception);
             assertNotNull(instance);
 
-            List<Nested> nestedList = instance.nestedList();
-            assertNotNull(nestedList);
+            Nested nested = instance.nested();
 
             if (shouldNotInstantiateNestedClass) {
 
-                assertTrue(nestedList.isEmpty());
+                assertNull(nested);
 
             } else {
 
-                assertEquals(1, nestedList.size());
-                Nested nested = nestedList.getFirst();
                 assertNotNull(nested);
 
                 switch (valueProperty) {
@@ -333,79 +329,79 @@ public class MCRConfigurableInstanceHelperNonImplicitListTest {
 
     public interface Configurable {
 
-        List<Nested> nestedList();
+        Nested nested();
 
     }
 
     public static class NotRequiredNoSentinel implements Configurable {
 
-        @MCRInstanceList(name = "Nested", valueClass = Nested.class, required = false)
-        public List<Nested> nestedList;
+        @MCRInstance(name = "Nested", valueClass = Nested.class, required = false)
+        public Nested nested;
 
         @Override
-        public List<Nested> nestedList() {
-            return nestedList;
+        public Nested nested() {
+            return nested;
         }
 
     }
 
     public static class NotRequiredEnablingSentinel implements Configurable {
 
-        @MCRInstanceList(name = "Nested", valueClass = Nested.class, required = false, sentinel = @MCRSentinel)
-        public List<Nested> nestedList;
+        @MCRInstance(name = "Nested", valueClass = Nested.class, required = false, sentinel = @MCRSentinel)
+        public Nested nested;
 
         @Override
-        public List<Nested> nestedList() {
-            return nestedList;
+        public Nested nested() {
+            return nested;
         }
 
     }
 
     public static class NotRequiredDisablingSentinel implements Configurable {
 
-        @MCRInstanceList(name = "Nested", valueClass = Nested.class, required = false,
+        @MCRInstance(name = "Nested", valueClass = Nested.class, required = false,
             sentinel = @MCRSentinel(defaultValue = false))
-        public List<Nested> nestedList;
+        public Nested nested;
 
         @Override
-        public List<Nested> nestedList() {
-            return nestedList;
+        public Nested nested() {
+            return nested;
         }
 
     }
 
     public static class RequiredNoSentinel implements Configurable {
 
-        @MCRInstanceList(name = "Nested", valueClass = Nested.class)
-        public List<Nested> nestedList;
+        @MCRInstance(name = "Nested", valueClass = Nested.class)
+        public Nested nested;
 
         @Override
-        public List<Nested> nestedList() {
-            return nestedList;
+        public Nested nested() {
+            return nested;
         }
 
     }
 
     public static class RequiredEnablingSentinel implements Configurable {
 
-        @MCRInstanceList(name = "Nested", valueClass = Nested.class, sentinel = @MCRSentinel)
-        public List<Nested> nestedList;
+        @MCRInstance(name = "Nested", valueClass = Nested.class, sentinel = @MCRSentinel)
+        public Nested nested;
 
         @Override
-        public List<Nested> nestedList() {
-            return nestedList;
+        public Nested nested() {
+            return nested;
         }
 
     }
 
     public static class RequiredDisablingSentinel implements Configurable {
 
-        @MCRInstanceList(name = "Nested", valueClass = Nested.class, sentinel = @MCRSentinel(defaultValue = false))
-        public List<Nested> nestedList;
+        @MCRInstance(name = "Nested", valueClass = Nested.class, sentinel = @MCRSentinel(defaultValue = false))
+        public Nested nested;
 
         @Override
-        public List<Nested> nestedList() {
-            return nestedList;
+        public Nested nested() {
+            return nested;
         }
 
     }
