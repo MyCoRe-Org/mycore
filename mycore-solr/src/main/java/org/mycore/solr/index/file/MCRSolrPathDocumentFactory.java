@@ -33,7 +33,6 @@ import org.apache.solr.common.SolrInputDocument;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
-import org.mycore.common.config.annotation.MCRFactory;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.solr.index.handlers.MCRSolrIndexHandlerFactory;
 import org.mycore.solr.index.handlers.stream.MCRSolrFileIndexHandler;
@@ -52,7 +51,6 @@ public class MCRSolrPathDocumentFactory {
 
     private static final List<MCRSolrFileIndexAccumulator> ACCUMULATOR_LIST = resolveAccumulators();
 
-    @MCRFactory
     public static MCRSolrPathDocumentFactory obtainInstance() {
         return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRSolrPathDocumentFactory.class, CLASS_PROPERTY);
     }
