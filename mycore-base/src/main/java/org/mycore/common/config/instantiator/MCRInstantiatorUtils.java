@@ -19,13 +19,11 @@
 package org.mycore.common.config.instantiator;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -34,7 +32,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.config.MCRConfigurationException;
-import org.mycore.common.config.MCRInstanceConfiguration;
 import org.mycore.common.config.annotation.MCRSentinel;
 import org.mycore.common.config.instantiator.source.MCRSource;
 import org.mycore.common.config.instantiator.target.MCRTarget;
@@ -59,15 +56,14 @@ public final class MCRInstantiatorUtils {
         }
     }
 
-    public static Object createInstance(String property, MCRTarget target, Class<?> valueClass,
-        MCRInstanceConfiguration nestedConfiguration, MCRSentinel sentinel, String description) {
+    public static Object createInstance(MCRTarget target, MCRInstanceConfiguration<?> configuration,
+        MCRSentinel sentinel, String description) {
 
-        Set<MCRInstanceConfiguration.Option> options = options(valueClass);
-        boolean implicitValueClass = Modifier.isFinal(valueClass.getModifiers());
+        String property = configuration.name().canonical();
 
         if (sentinel.enabled()) {
             boolean sentinelValue = sentinel.defaultValue();
-            String configuredSentinelValue = nestedConfiguration.properties().remove(sentinel.name());
+            String configuredSentinelValue = configuration.properties().remove(sentinel.name());
             if (configuredSentinelValue != null) {
                 sentinelValue = Boolean.parseBoolean(configuredSentinelValue);
             }
@@ -79,36 +75,27 @@ public final class MCRInstantiatorUtils {
             }
         }
 
-        String className = nestedConfiguration.className();
-        if (className == null && !implicitValueClass) {
+        Class<?> className = configuration.valueClass();
+        if (className == null) {
             if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("[CLEAN-UP] Ignoring {} {} and all sub-properties (no class name)",
-                    description, property);
-            }
-            return null;
-        } else if (className != null && className.isBlank()) {
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("[CLEAN-UP] Ignoring {} {} and all sub-properties (empty class name)",
-                    description, property);
+                LOGGER.info("[CLEAN-UP] Ignoring {} {} and all sub-properties (no or empty class name)", description,
+                    property);
             }
             return null;
         }
 
-        Object instance = MCRInstantiator.getInstance(valueClass, nestedConfiguration, options);
-        if (!valueClass.isAssignableFrom(instance.getClass())) {
-            throw incompatibilityException(property, target, valueClass, instance);
+        if (!configuration.instantiatable()) {
+            return null;
+        }
+
+        Object instance = configuration.instantiate();
+
+        if (!configuration.valueClass().isAssignableFrom(instance.getClass())) {
+            throw incompatibilityException(property, target, configuration.valueClass(), instance);
         }
 
         return instance;
 
-    }
-
-    private static Set<MCRInstanceConfiguration.Option> options(Class<?> valueClass) {
-        if (Modifier.isFinal(valueClass.getModifiers())) {
-            return MCRInstanceConfiguration.Options.IMPLICIT;
-        } else {
-            return MCRInstanceConfiguration.Options.NONE;
-        }
     }
 
     public static String methodNames(List<Method> methods) {
@@ -131,7 +118,7 @@ public final class MCRInstantiatorUtils {
         return source.annotationClass().getName();
     }
 
-    public static String property(MCRInstanceConfiguration configuration, String annotationName) {
+    public static String property(MCRInstanceConfiguration<?> configuration, String annotationName) {
         if (Objects.equals("", annotationName)) {
             return configuration.name().canonical();
         } else {

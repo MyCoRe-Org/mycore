@@ -258,11 +258,6 @@ public final class MCRConfigurationBase {
         deprecatedProperties.putAll(deprecated);
         checkForDeprecatedProperties(props);
 
-        // instance helper cache
-        if (clear) {
-            MCRConfigurableInstanceHelper.clearCache();
-        }
-
         // base properties
         if (clear) {
             getBaseProperties().clear();

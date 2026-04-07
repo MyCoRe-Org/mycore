@@ -31,10 +31,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.config.MCRInstanceConfiguration;
-import org.mycore.common.config.MCRInstanceName;
 import org.mycore.common.config.annotation.MCRPropertyList;
 import org.mycore.common.config.annotation.MCRSentinel;
+import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
+import org.mycore.common.config.instantiator.MCRInstanceName;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
 /**
@@ -76,7 +76,9 @@ final class MCRPropertyListSource implements MCRSource {
     }
 
     @Override
-    public List<String> get(MCRInstanceConfiguration configuration, MCRTarget target) {
+    public List<String> get(MCRInstanceConfiguration<?> configuration, MCRTarget target) {
+
+        Map<String, String> fullProperties = configuration.fullProperties();
 
         String property;
         String description;
@@ -84,7 +86,7 @@ final class MCRPropertyListSource implements MCRSource {
         if (annotation.absolute()) {
             property = annotation.name();
             description = "absolute property list";
-            Map<String, String> properties = configuration.fullProperties();
+            Map<String, String> properties = fullProperties;
             propertyList = getPropertyList(property, annotation.name(), ".", target, properties, description);
         } else {
             Map<String, String> properties = configuration.properties();
@@ -93,7 +95,7 @@ final class MCRPropertyListSource implements MCRSource {
                 description = "property list";
                 // when non-empty class suffix is used, the property with empty name may contain the short-form-list
                 if (configuration.name().suffix() != MCRInstanceName.Suffix.NONE) {
-                    properties.put("", configuration.fullProperties().get(property));
+                    properties.put("", fullProperties.get(property));
                 }
                 propertyList = getPropertyList(property, "", "", target, properties, description);
             } else {
@@ -108,8 +110,7 @@ final class MCRPropertyListSource implements MCRSource {
 
             property = defaultName;
             description = "default property list";
-            propertyList = getPropertyList(defaultName, defaultName, ".",
-                target, configuration.fullProperties(), description);
+            propertyList = getPropertyList(defaultName, defaultName, ".", target, fullProperties, description);
 
             if (propertyList == null || (propertyList.isEmpty() && annotation.required())) {
                 throw emptyException(property, target, description);
