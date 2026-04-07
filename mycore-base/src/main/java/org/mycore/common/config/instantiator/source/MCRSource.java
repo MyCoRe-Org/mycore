@@ -23,7 +23,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Set;
 
-import org.mycore.common.config.MCRInstanceConfiguration;
+import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 import org.mycore.common.config.instantiator.target.MCRTargetType;
 
@@ -43,6 +43,6 @@ public interface MCRSource {
 
     Class<?> valueClass();
 
-    Object get(MCRInstanceConfiguration configuration, MCRTarget target);
+    Object get(MCRInstanceConfiguration<?> configuration, MCRTarget target);
 
 }
