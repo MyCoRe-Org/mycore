@@ -77,13 +77,13 @@ public class MCRDefaultLinkProvider implements MCRBaseLinkProvider {
         MCRObjectID mcrId = obj.getId();
         // set new entries
         MCRObjectMetadata meta = obj.getMetadata();
-        //use Set for category collection to remove duplicates if there are any
+        // use Set for category collection to remove duplicates if there are any
         meta.stream().flatMap(MCRMetaElement::stream).forEach(inf -> {
             if (inf instanceof MCRMetaLinkID linkID) {
                 linkReferences.add(new MCRLinkReference(mcrId, linkID.getXLinkHrefID(), ENTRY_TYPE_REFERENCE, ""));
             } else if (inf instanceof MCRMetaDerivateLink derLink) {
-                linkReferences.add(new MCRLinkReference(mcrId, MCRObjectID.getInstance(derLink.getXLinkHref()),
-                    ENTRY_TYPE_DERIVATE_LINK, ""));
+                MCRObjectID derivateId = MCRObjectID.getInstance(derLink.getOwner());
+                linkReferences.add(new MCRLinkReference(mcrId, derivateId, ENTRY_TYPE_DERIVATE_LINK, ""));
             }
         });
 
