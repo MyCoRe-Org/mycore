@@ -31,7 +31,6 @@ import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Date;
-import java.util.Locale;
 
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
@@ -45,6 +44,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
+import org.mycore.common.MCRUtils;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectIDTest;
@@ -90,7 +90,7 @@ public class MCRXMLMetadataManagerTest {
 
     @AfterEach
     public void tearDown(MCRMetadataExtension.BaseDirs baseDirs) throws Exception {
-        if (!System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("windows")) {
+        if (!MCRUtils.isWindowsOS()) {
             for (File projectDir : baseDirs.storeBaseDir().toFile().listFiles()) {
                 for (File typeDir : projectDir.listFiles()) {
                     Files.walkFileTree(typeDir.toPath(), new MCRRecursiveDeleter());
