@@ -44,6 +44,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
+import org.mycore.common.MCRUtils;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectIDTest;
@@ -89,19 +90,21 @@ public class MCRXMLMetadataManagerTest {
 
     @AfterEach
     public void tearDown(MCRMetadataExtension.BaseDirs baseDirs) throws Exception {
-        for (File projectDir : baseDirs.storeBaseDir().toFile().listFiles()) {
-            for (File typeDir : projectDir.listFiles()) {
-                Files.walkFileTree(typeDir.toPath(), new MCRRecursiveDeleter());
-                typeDir.mkdir();
+        if (!MCRUtils.isWindowsOS()) {
+            for (File projectDir : baseDirs.storeBaseDir().toFile().listFiles()) {
+                for (File typeDir : projectDir.listFiles()) {
+                    Files.walkFileTree(typeDir.toPath(), new MCRRecursiveDeleter());
+                    typeDir.mkdir();
+                }
             }
-        }
-        for (File projectDir : baseDirs.storeBaseDir().toFile().listFiles()) {
-            for (File typeDir : projectDir.listFiles()) {
-                //does not work on Windows (AccessdeniedExceptions):
-                //Files.walkFileTree(typeDir.toPath(), new MCRRecursiveDeleter());
-                SVNFileUtil.deleteAll(typeDir, true);
-                typeDir.mkdir();
-                SVNRepositoryFactory.createLocalRepository(typeDir, true, false);
+            for (File projectDir : baseDirs.storeBaseDir().toFile().listFiles()) {
+                for (File typeDir : projectDir.listFiles()) {
+                    //does not work on Windows (AccessdeniedExceptions):
+                    //Files.walkFileTree(typeDir.toPath(), new MCRRecursiveDeleter());
+                    SVNFileUtil.deleteAll(typeDir, true);
+                    typeDir.mkdir();
+                    SVNRepositoryFactory.createLocalRepository(typeDir, true, false);
+                }
             }
         }
     }
