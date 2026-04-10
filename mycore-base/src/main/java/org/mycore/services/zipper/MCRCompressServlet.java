@@ -22,7 +22,6 @@ import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
 import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serial;
 import java.nio.file.FileVisitResult;
@@ -45,6 +44,7 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRXlink;
 import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRParameterizedTransformer;
 import org.mycore.common.xml.MCRLayoutService;
@@ -53,6 +53,8 @@ import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRExpandedObject;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectStructure;
 import org.mycore.datamodel.metadata.MCRXMLConstants;
@@ -169,10 +171,10 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
     }
 
     private void sendObject(MCRObjectID id, MCRServletJob job, T container) throws Exception {
-        MCRContent content = MCRXMLMetadataManager.getInstance().retrieveContent(id);
-        if (content == null) {
-            throw new FileNotFoundException("Could not find object: " + id);
-        }
+
+        MCRExpandedObject object = MCRMetadataManager.retrieveMCRExpandedObject(id);
+        MCRContent content = new MCRJDOMContent(object.createXML());
+
         long lastModified = MCRXMLMetadataManager.getInstance().getLastModified(id);
         HttpServletRequest req = job.getRequest();
         byte[] metaDataContent = getMetaDataContent(content, req);
