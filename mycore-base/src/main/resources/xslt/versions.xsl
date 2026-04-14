@@ -19,31 +19,31 @@
 
   <xsl:template match="*[@ID]">
     <xsl:if test="mcracl:checkPermission(@ID,'view-history')">
-      <xsl:variable name="verinfo" select="document(concat('versioninfo:',@ID))" />
+      <xsl:variable name="version-info" select="document(concat('versioninfo:',@ID))" />
       <ol class="versioninfo">
-        <xsl:for-each select="$verinfo/versions/version">
+        <xsl:for-each select="$version-info/versions/version">
           <xsl:sort order="descending" select="position()" data-type="number" />
           <li>
             <xsl:if test="@r">
-              <xsl:variable name="noLayout">
-                <xsl:call-template name="UrlDelParam">
-                  <xsl:with-param name="url" select="$RequestURL" />
-                  <xsl:with-param name="par" select="'XSL.Style'" />
-                </xsl:call-template>
-              </xsl:variable>
-              <xsl:variable name="href">
-                <xsl:call-template name="UrlSetParam">
-                  <xsl:with-param name="url" select="$noLayout" />
-                  <xsl:with-param name="par" select="'r'" />
-                  <xsl:with-param name="value" select="@r" />
-                </xsl:call-template>
-              </xsl:variable>
               <span class="rev">
                 <xsl:choose>
                   <xsl:when test="@action='D'">
                     <xsl:value-of select="@r" />
                   </xsl:when>
                   <xsl:otherwise>
+                    <xsl:variable name="no-layout">
+                      <xsl:call-template name="UrlDelParam">
+                        <xsl:with-param name="url" select="$RequestURL" />
+                        <xsl:with-param name="par" select="'XSL.Style'" />
+                      </xsl:call-template>
+                    </xsl:variable>
+                    <xsl:variable name="href">
+                      <xsl:call-template name="UrlSetParam">
+                        <xsl:with-param name="url" select="$no-layout" />
+                        <xsl:with-param name="par" select="'r'" />
+                        <xsl:with-param name="value" select="@r" />
+                      </xsl:call-template>
+                    </xsl:variable>
                     <a href="{$href}">
                       <xsl:value-of select="@r" />
                     </a>
