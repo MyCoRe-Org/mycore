@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.solr.rest;
+package org.mycore.solr.api;
 
 import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
 import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
