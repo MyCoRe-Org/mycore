@@ -48,7 +48,7 @@
               </span>
               <xsl:value-of select="' '" />
             </xsl:if>
-            <span class="@date">
+            <span class="date">
               <xsl:call-template name="formatISODate">
                 <xsl:with-param name="date" select="@date" />
                 <xsl:with-param name="format" select="i18n:translate('metaData.dateTime')" />
@@ -66,4 +66,5 @@
       </ol>
     </xsl:if>
   </xsl:template>
+
 </xsl:stylesheet>
