@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0"
-  xmlns:mcracl="xalan://org.mycore.access.MCRAccessManager"
-  xmlns:mcri18n="xalan://org.mycore.services.i18n.MCRTranslation"
-  xmlns:xalan="http://xml.apache.org/xalan"
+<xsl:stylesheet version="3.0"
+  xmlns:mcracl="http://www.mycore.de/xslt/acl"
+  xmlns:mcri18n="http://www.mycore.de/xslt/i18n"
+  xmlns:mcrobject="http://www.mycore.de/xslt/object"
+  xmlns:mcrurl="http://www.mycore.de/xslt/url"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  exclude-result-prefixes="mcracl mcri18n xalan">
+  exclude-result-prefixes="#all">
 
   <xsl:output
     method="html"
@@ -14,15 +15,15 @@
     media-type="text/html"
     version="5" />
 
-  <xsl:include href="coreFunctions.xsl" />
-  <xsl:param name="RequestURL" />
+  <xsl:include href="resource:xslt/default-parameters.xsl" />
+  <xsl:include href="xslInclude:functions" />
 
   <xsl:template match="*[@ID]">
-    <xsl:if test="mcracl:checkPermission(@ID,'view-history')">
-      <xsl:variable name="version-info" select="document(concat('versioninfo:',@ID))" />
+    <xsl:if test="mcracl:check-permission(@ID,'view-history')">
+      <xsl:variable name="version-info" select="mcrobject:get-version-info(@ID)" />
+
       <ol class="versioninfo">
-        <xsl:for-each select="$version-info/versions/version">
-          <xsl:sort order="descending" select="position()" data-type="number" />
+        <xsl:for-each select="reverse($version-info/versions/version)">
           <li>
             <xsl:if test="@r">
               <span class="rev">
@@ -31,19 +32,9 @@
                     <xsl:value-of select="@r" />
                   </xsl:when>
                   <xsl:otherwise>
-                    <xsl:variable name="no-layout">
-                      <xsl:call-template name="UrlDelParam">
-                        <xsl:with-param name="url" select="$RequestURL" />
-                        <xsl:with-param name="par" select="'XSL.Style'" />
-                      </xsl:call-template>
-                    </xsl:variable>
-                    <xsl:variable name="href">
-                      <xsl:call-template name="UrlSetParam">
-                        <xsl:with-param name="url" select="$no-layout" />
-                        <xsl:with-param name="par" select="'r'" />
-                        <xsl:with-param name="value" select="@r" />
-                      </xsl:call-template>
-                    </xsl:variable>
+                    <xsl:variable name="href" select="
+                      mcrurl:set-param(mcrurl:del-param($RequestURL, 'XSL.Style'), 'r', @r)
+                    " />
                     <a href="{$href}">
                       <xsl:value-of select="@r" />
                     </a>
@@ -54,15 +45,12 @@
             </xsl:if>
             <xsl:if test="@action">
               <span class="action">
-                <xsl:value-of select="mcri18n:translate(concat('metaData.versions.action.',@action))" />
+                <xsl:value-of select="mcri18n:translate(concat('metaData.versions.action.', @action))" />
               </span>
               <xsl:text> </xsl:text>
             </xsl:if>
             <span class="date">
-              <xsl:call-template name="formatISODate">
-                <xsl:with-param name="date" select="@date" />
-                <xsl:with-param name="format" select="mcri18n:translate('metaData.dateTime')" />
-              </xsl:call-template>
+              <xsl:value-of select="format-dateTime(@date, mcri18n:translate('metaData.dateTime.xsl3'))" />
             </span>
             <xsl:text> </xsl:text>
             <xsl:if test="@user">
