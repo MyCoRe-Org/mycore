@@ -1738,7 +1738,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
-        <artifactId>mycore-solr-restapi</artifactId>
+        <artifactId>mycore-solr-api</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -2602,7 +2602,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <module>mycore-restapi</module>
     <module>mycore-sass</module>
     <module>mycore-solr</module>
-    <module>mycore-solr-restapi</module>
+    <module>mycore-solr-api</module>
     <module>mycore-sword</module>
     <module>mycore-tei</module>
     <module>mycore-user2</module>

@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.solr.rest;
+package org.mycore.solr.api;
 
 import org.apache.logging.log4j.LogManager;
 import org.mycore.common.config.MCRConfiguration2;
@@ -29,7 +29,7 @@ public class MCRSolrRestApp extends MCRJerseyRestApp {
 
     @Override
     protected void initAppName() {
-        setApplicationName("MyCoRe Solr REST-API " + getVersion());
+        setApplicationName("MyCoRe Solr API " + getVersion());
         LogManager.getLogger().info("Initialize {}", this::getApplicationName);
     }
 
@@ -41,7 +41,7 @@ public class MCRSolrRestApp extends MCRJerseyRestApp {
     @Override
     protected String[] getRestPackages() {
         return MCRConfiguration2
-            .getOrThrow("MCR.Solr.Rest.Resource.Packages", MCRConfiguration2::splitValue)
+            .getOrThrow("MCR.Solr.Api.Resource.Packages", MCRConfiguration2::splitValue)
             .toArray(String[]::new);
     }
 }
