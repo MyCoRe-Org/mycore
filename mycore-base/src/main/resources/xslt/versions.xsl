@@ -40,13 +40,13 @@
                   </xsl:otherwise>
                 </xsl:choose>
               </span>
-              <xsl:value-of select="' '" />
+              <xsl:text> </xsl:text>
             </xsl:if>
             <xsl:if test="@action">
               <span class="action">
                 <xsl:value-of select="i18n:translate(concat('metaData.versions.action.',@action))" />
               </span>
-              <xsl:value-of select="' '" />
+              <xsl:text> </xsl:text>
             </xsl:if>
             <span class="date">
               <xsl:call-template name="formatISODate">
@@ -54,12 +54,11 @@
                 <xsl:with-param name="format" select="i18n:translate('metaData.dateTime')" />
               </xsl:call-template>
             </span>
-            <xsl:value-of select="' '" />
+            <xsl:text> </xsl:text>
             <xsl:if test="@user">
               <span class="user">
                 <xsl:value-of select="@user" />
               </span>
-              <xsl:value-of select="' '" />
             </xsl:if>
           </li>
         </xsl:for-each>
