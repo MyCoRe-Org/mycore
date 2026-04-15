@@ -133,37 +133,34 @@
         </xsl:choose>
     </xsl:function>
 
-    <xsl:function name="mcrurl:del-param" as="xs:string">
-        <xsl:param name="url" as="xs:string?"/>
-        <xsl:param name="par" as="xs:string"/>
+  <xsl:function name="mcrurl:del-param" as="xs:string">
+    <xsl:param name="url" as="xs:string?" />
+    <xsl:param name="par" as="xs:string" />
 
-        <!-- Normalize: XPath has empty-sequence; treat it like empty string. -->
-        <xsl:variable name="u" as="xs:string" select="string($url)"/>
+    <xsl:variable name="u" as="xs:string" select="string($url)" />
 
-        <!-- Escape the parameter name so it is safe to embed into a regex. -->
-        <xsl:variable name="par-esc" as="xs:string"
-                      select="replace($par, '([\\.^$|?*+(){}\[\]-])', '\\$1')"/>
+    <!-- escape param name -->
+    <xsl:variable name="par-esc" as="xs:string" select="replace($par, '([\\.^$|?*+(){}\[\]-])', '\\$1')" />
 
-        <!--
-          Case A: The parameter is NOT the last one (…par=value&…).
-            - If it starts with '?', '?par=value&' collapses to '?'.
-            - If it starts with '&', '&par=value&' collapses to '&'.
-        -->
-        <xsl:variable name="case-a" as="xs:string"
-                      select="replace($u, concat('([?&amp;])', $par-esc, '=[^&amp;]*&amp;'), '$1', 'q')"/>
+    <!-- remove parameter -->
+    <xsl:variable name="step1" as="xs:string" select="
+      replace(
+        $u,
+        concat('([?&amp;])', $par-esc, '=[^&amp;]*(&amp;)?'),
+        '$1'
+      )
+    " />
 
-        <!--
-          Case B: The parameter IS the last one (…?par=value or …&par=value at end).
-          Remove it (including the leading separator) to the end of the string.
-        -->
-        <xsl:variable name="case-b" as="xs:string"
-                      select="replace($u, concat('([?&amp;])', $par-esc, '=[^&amp;]*$'), '', 'q')"/>
+    <!-- cleanup dangling separators -->
+    <xsl:variable name="step2" as="xs:string" select="replace($step1, '\?&amp;?', '?')" />
 
-        <!-- Choose which transformation actually applied; otherwise return the original URL. -->
-        <xsl:sequence select="
-    if ($case-a ne $u) then $case-a
-    else if ($case-b ne $u) then $case-b
-    else $u
-  "/>
-    </xsl:function>
+    <xsl:variable name="step3" as="xs:string" select="replace($step2, '[?&amp;]+$', '')" />
+
+    <!-- final safety: remove trailing '?' -->
+    <xsl:sequence select="
+      if (ends-with($step3, '?'))
+      then substring($step3, 1, string-length($step3) - 1)
+      else $step3
+    " />
+  </xsl:function>
 </xsl:stylesheet>
