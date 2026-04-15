@@ -87,7 +87,7 @@ public class MCRJanitorEventHandlerBaseTest extends MCRTestCase {
                 insideHandler.countDown();
                 try {
                     // wait until the other thread has checked the user
-                    checkedUser.await();
+                    checkedUser.await(30, TimeUnit.SECONDS);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
@@ -98,7 +98,7 @@ public class MCRJanitorEventHandlerBaseTest extends MCRTestCase {
         Thread otherThread = new Thread(() -> {
             MCRSessionMgr.setCurrentSession(session);
             try {
-                insideHandler.await();
+                insideHandler.await(30, TimeUnit.SECONDS);
                 observedUserId.set(session.getUserInformation().getUserID());
                 checkedUser.countDown();
             } catch (InterruptedException e) {
@@ -145,7 +145,7 @@ public class MCRJanitorEventHandlerBaseTest extends MCRTestCase {
             new Thread(() -> {
                 MCRSessionMgr.setCurrentSession(session);
                 try {
-                    barrier.await();
+                    barrier.await(30, TimeUnit.SECONDS);
                     MCREvent evt = new MCREvent(MCREvent.ObjectType.OBJECT, MCREvent.EventType.CREATE);
                     evt.put(MCREvent.OBJECT_KEY, new MCRObject());
                     eventHandler.doHandleEvent(evt);
