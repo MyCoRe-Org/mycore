@@ -96,7 +96,7 @@ public class MCRClassificationEditorResourceTest {
                     MCRJimfsTestStoreConfig config = new MCRJimfsTestStoreConfig(name);
                     return MCRStoreManager.buildStore(config, MCRMetadataStore.class);
                 } catch (ReflectiveOperationException | IOException e) {
-                    LOGGER.error("while creating store ClasseditorTempStore", e);
+                    LOGGER.error("Error while creating store: ", e);
                     fail();
                     return null;
                 }
