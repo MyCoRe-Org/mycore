@@ -34,6 +34,7 @@ import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRTransactionManager;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.MCRUserInformationResolver;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -297,7 +298,7 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
         if (jobApiUser != null && !jobApiUser.contains(":")) {
             String userProviderKey = MCRUserInformationResolver.PROVIDERS_KEY + ".user.Class";
             String userProviderClass = "org.mycore.user2.MCRUserProvider";
-            if (userProviderClass.equals(this.getProperties().get(userProviderKey))) {
+            if (userProviderClass.equals(MCRConfiguration2.getString(userProviderKey).orElse(null))) {
                 LOGGER.warn(() -> "JobApiUser references username '" + jobApiUser
                     + "' directly. Switching to 'user:" + jobApiUser
                     + "' using the compatible user information provider "
