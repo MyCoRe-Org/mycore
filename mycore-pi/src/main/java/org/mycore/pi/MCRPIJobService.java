@@ -297,7 +297,7 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
         if (jobApiUser != null && !jobApiUser.contains(":")) {
             String userProviderKey = MCRUserInformationResolver.PROVIDERS_KEY + ".user";
             String userProviderClass = "org.mycore.user2.MCRUserProvider";
-            if (this.getProperties().get(userProviderKey).equals(userProviderClass)) {
+            if (userProviderClass.equals(this.getProperties().get(userProviderKey))) {
                 LOGGER.warn(() -> "JobApiUser references username '" + jobApiUser
                     + "' directly. Switching to 'user:" + jobApiUser
                     + "' using the compatible user information provider "
