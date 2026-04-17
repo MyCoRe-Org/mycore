@@ -295,7 +295,7 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
         String jobApiUser = this.getProperties().get(JOB_API_USER_PROPERTY);
         // try to remain compatible with values configured before MCR-3033
         if (jobApiUser != null && !jobApiUser.contains(":")) {
-            String userProviderKey = MCRUserInformationResolver.PROVIDERS_KEY + ".user";
+            String userProviderKey = MCRUserInformationResolver.PROVIDERS_KEY + ".user.Class";
             String userProviderClass = "org.mycore.user2.MCRUserProvider";
             if (userProviderClass.equals(this.getProperties().get(userProviderKey))) {
                 LOGGER.warn(() -> "JobApiUser references username '" + jobApiUser
