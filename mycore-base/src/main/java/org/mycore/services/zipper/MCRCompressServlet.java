@@ -45,6 +45,7 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRXlink;
 import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRParameterizedTransformer;
 import org.mycore.common.xml.MCRLayoutService;
@@ -53,6 +54,8 @@ import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRExpandedObject;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectStructure;
 import org.mycore.datamodel.metadata.MCRXMLConstants;
@@ -169,7 +172,8 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
     }
 
     private void sendObject(MCRObjectID id, MCRServletJob job, T container) throws Exception {
-        MCRContent content = MCRXMLMetadataManager.obtainInstance().retrieveContent(id);
+        MCRExpandedObject object = MCRMetadataManager.retrieveMCRExpandedObject(id);
+        MCRContent content = new MCRJDOMContent(object.createXML());
         if (content == null) {
             throw new FileNotFoundException("Could not find object: " + id);
         }

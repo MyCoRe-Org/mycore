@@ -119,7 +119,8 @@ public class MCRDefaultUploadHandler implements MCRUploadHandler {
             }
             // check if we have write access to the newly created derivate
             if (!MCRAccessManager.checkPermission(derivateID, MCRAccessManager.PERMISSION_WRITE)) {
-                throw new MCRUploadServerException("No write access to newly created derivate " + derivateID);
+                throw new MCRUploadServerException("component.webtools.upload.derivate.noWriteAccess",
+                    derivateID.toString());
             }
         }
 
