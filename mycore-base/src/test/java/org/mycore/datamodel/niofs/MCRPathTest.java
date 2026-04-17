@@ -18,6 +18,7 @@
 
 package org.mycore.datamodel.niofs;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -60,6 +61,61 @@ public class MCRPathTest {
         assertFalse(test1.startsWith(test2));
         test2 = test1.resolve(new TestMCRPath("bin", "/bar"));
         assertFalse(test1.startsWith(test2));
+    }
+
+    @Test
+    public void normalizeRelativeWithLeadingDotDot() {
+        // ../../Test.png should stay unchanged — no preceding elements to cancel
+        Path path = new TestMCRPath(null, "../../Test.png");
+        assertEquals("../../Test.png", path.normalize().toString());
+    }
+
+    @Test
+    public void normalizeRelativeSingleDotDot() {
+        // ../foo should stay unchanged
+        Path path = new TestMCRPath(null, "../foo");
+        assertEquals("../foo", path.normalize().toString());
+    }
+
+    @Test
+    public void normalizeRelativeDotDotBeyondBase() {
+        // foo/../../bar should normalize to ../bar
+        Path path = new TestMCRPath(null, "foo/../../bar");
+        assertEquals("../bar", path.normalize().toString());
+    }
+
+    @Test
+    public void normalizeRelativeDotDotCancels() {
+        // foo/bar/../baz should normalize to foo/baz
+        Path path = new TestMCRPath(null, "foo/bar/../baz");
+        assertEquals("foo/baz", path.normalize().toString());
+    }
+
+    @Test
+    public void normalizeRelativeDot() {
+        // foo/./bar should normalize to foo/bar
+        Path path = new TestMCRPath(null, "foo/./bar");
+        assertEquals("foo/bar", path.normalize().toString());
+    }
+
+    @Test
+    public void normalizeAbsoluteDotDot() {
+        // absolute: /foo/bar/../baz should normalize to /foo/baz
+        Path path = new TestMCRPath("owner", "/foo/bar/../baz");
+        assertEquals("owner:/foo/baz", path.normalize().toString());
+    }
+
+    @Test
+    public void normalizeAbsoluteDotDotAtRoot() {
+        // absolute: /foo/.. should normalize to root
+        Path path = new TestMCRPath("owner", "/foo/..");
+        assertEquals("owner:/", path.normalize().toString());
+    }
+
+    @Test
+    public void normalizeNoOpWhenClean() {
+        Path path = new TestMCRPath(null, "foo/bar");
+        assertEquals("foo/bar", path.normalize().toString());
     }
 
     private static class TestMCRPath extends MCRPath {
