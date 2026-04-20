@@ -95,6 +95,21 @@ public class MCRTestCaseXSLTUtil {
     }
 
     /**
+     * Transforms a dummy XML document using the given XSL stylesheet from the classpath.
+     * <p>
+     * This is a convenience method that internally creates a default test XML document
+     * (via {@code prepareTestDocument("dummy")}) and delegates to the main transform method.
+     *
+     * @param xsl the XSL stylesheet file used for parsing
+     * @param parameters the XSL transformation parameters
+     * @return the resulting transformed XML document
+     * @throws TransformerException if the XSL transformation fails
+     */
+    public static Document transform(String xsl, Map<String, Object> parameters) throws TransformerException {
+        return transform(prepareTestDocument("dummy"), xsl, parameters);
+    }
+
+    /**
      * Transforms the XML document using the given XSL stylesheet from classpath with the given parameters.
      *
      * @param xml        the XML document to parse
