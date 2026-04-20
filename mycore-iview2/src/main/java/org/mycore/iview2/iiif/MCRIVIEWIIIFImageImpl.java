@@ -192,10 +192,6 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
             Graphics2D graphics = targetImage.createGraphics();
             graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
                 RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-            graphics.setRenderingHint(RenderingHints.KEY_RENDERING,
-                RenderingHints.VALUE_RENDER_QUALITY);
-            graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                RenderingHints.VALUE_ANTIALIAS_ON);
             if (rotation.mirrored()) {
                 graphics.scale(-1, 1);
                 graphics.translate(-width, 0);
