@@ -48,8 +48,12 @@ public class MCRURLFunctionsTests {
         "'?foo=bar', os, ''",
         // no query string
         "'', foo, ''",
+        // empty param
+        "'?x=1&foo', foo, ''",
         // empty value
         "'?foo=', foo, ''",
+        // multiple params with the same name (only first is returned)
+        "'?x=1&foo=bar&foo=baz', foo, 'bar'",
         // url encoded value (no decoding expected)
         "'?foo=bar%20os', foo, bar%20os",
         // duplicate params (first wins)
@@ -72,6 +76,8 @@ public class MCRURLFunctionsTests {
         "'?foo=bar', foo, os, '?foo=os'",
         // multiple params already present
         "'?foo=bar&x=1', os, linux, '?foo=bar&x=1&os=linux'",
+        // multiple params with same name (only first will be replaced)
+        "'?foo=bar&x=1&foo=baz', foo, ber, '?foo=ber&x=1&foo=baz'",
         // empty value
         "'?foo=bar', foo, '', '?foo='",
         // url encoding (value unchanged expected here)
