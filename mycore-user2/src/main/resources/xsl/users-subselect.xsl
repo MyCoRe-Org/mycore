@@ -20,6 +20,10 @@
     </xsl:call-template>
   </xsl:variable>
 
+  <xsl:template match="/users" mode="searchFormAdditional" priority="10">
+    <input type="hidden" name="_xed_subselect_session" value="{$xedSession}" />
+  </xsl:template>
+
   <xsl:template match="/users" mode="headAdditional" priority="10">
     <xsl:variable name="cancelURL">
       <xsl:value-of select="concat($ServletsBaseURL,'XEditor?_xed_submit_return= ')" />
