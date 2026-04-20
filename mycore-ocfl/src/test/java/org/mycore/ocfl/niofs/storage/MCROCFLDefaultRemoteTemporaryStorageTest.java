@@ -25,6 +25,7 @@ import org.mycore.common.digest.MCRDigest;
 import org.mycore.common.digest.MCRMD5Digest;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
 import org.mycore.ocfl.niofs.MCROCFLFileSystemProvider;
+import org.mycore.ocfl.repository.MCROCFLRepository;
 import org.mycore.ocfl.test.MCROCFLSetupExtension;
 import org.mycore.ocfl.test.MCRPermutationExtension;
 import org.mycore.ocfl.test.PermutedParam;
@@ -43,6 +44,8 @@ public class MCROCFLDefaultRemoteTemporaryStorageTest extends MCROCFLStorageTest
     private MCRDigest randomDigest;
 
     private final boolean remote = true;
+    
+    protected MCROCFLRepository repository;
 
     @PermutedParam
     private boolean purge;

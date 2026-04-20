@@ -50,26 +50,26 @@ public abstract class MCROCFLTestCaseHelper {
     /**
      * This ocfl object is created on test startup.
      */
-    public static final String DERIVATE_1 = "junit_derivate_00000001";
+    public final String DERIVATE_1 = "junit_derivate_00000001";
 
-    public static final String DERIVATE_1_OBJECT_ID = MCROCFLObjectIDPrefixHelper.MCRDERIVATE + DERIVATE_1;
+    public final String DERIVATE_1_OBJECT_ID = MCROCFLObjectIDPrefixHelper.MCRDERIVATE + DERIVATE_1;
 
-    public static final MCRVersionedPath WHITE_PNG = MCRVersionedPath.head(DERIVATE_1, "white.png");
+    public final MCRVersionedPath WHITE_PNG = MCRVersionedPath.head(DERIVATE_1, "white.png");
 
-    public static final MCRVersionedPath BLACK_PNG = MCRVersionedPath.head(DERIVATE_1, "black.png");
+    public final MCRVersionedPath BLACK_PNG = MCRVersionedPath.head(DERIVATE_1, "black.png");
 
-    public static final MCRVersionedPath EMPTY_DIRECTORY = MCRVersionedPath.head(DERIVATE_1, "empty");
+    public final MCRVersionedPath EMPTY_DIRECTORY = MCRVersionedPath.head(DERIVATE_1, "empty");
 
-    public static final MCRVersionedPath KEEP_FILE = MCRVersionedPath.head(DERIVATE_1, "empty/.keep");
+    public final MCRVersionedPath KEEP_FILE = MCRVersionedPath.head(DERIVATE_1, "empty/.keep");
 
     /**
      * This ocfl object is NOT created on test startup.
      */
-    public static final String DERIVATE_2 = "junit_derivate_00000002";
+    public final String DERIVATE_2 = "junit_derivate_00000002";
 
-    public static final String DERIVATE_2_OBJECT_ID = MCROCFLObjectIDPrefixHelper.MCRDERIVATE + DERIVATE_2;
+    public final String DERIVATE_2_OBJECT_ID = MCROCFLObjectIDPrefixHelper.MCRDERIVATE + DERIVATE_2;
 
-    public static ObjectVersionId writeFile(MCROCFLRepository repository, String ocflObjectId, String fileName,
+    public ObjectVersionId writeFile(MCROCFLRepository repository, String ocflObjectId, String fileName,
         String data) {
         return repository.updateObject(ObjectVersionId.head(ocflObjectId),
             new VersionInfo().setMessage("write"), (updater) -> {
@@ -81,7 +81,7 @@ public abstract class MCROCFLTestCaseHelper {
             });
     }
 
-    public static void loadDerivate(String derivateId) throws URISyntaxException, IOException {
+    public void loadDerivate(String derivateId) throws URISyntaxException, IOException {
         URL derivateURL = MCROCFLTestCaseHelper.class.getClassLoader().getResource(derivateId);
         if (derivateURL == null) {
             throw new IllegalArgumentException("Unable to locate '" + derivateId + "' folder in resources.");
@@ -91,14 +91,14 @@ public abstract class MCROCFLTestCaseHelper {
         Files.walkFileTree(sourcePath, new CopyFileVisitor(targetPath));
     }
 
-    public static MCRObject createObject(String objectId) {
+    public MCRObject createObject(String objectId) {
         MCRObject object = new MCRObject();
         object.setId(MCRObjectID.getInstance(objectId));
         object.setSchema("noSchema");
         return object;
     }
 
-    public static MCRDerivate createDerivate(String objectId, String derivateId) {
+    public MCRDerivate createDerivate(String objectId, String derivateId) {
         MCRDerivate derivate = new MCRDerivate();
         derivate.setId(MCRObjectID.getInstance(derivateId));
         derivate.setSchema("datamodel-derivate.xsd");
@@ -110,15 +110,15 @@ public abstract class MCROCFLTestCaseHelper {
         return derivate;
     }
 
-    public static MCRDerivate loadObjectAndDerivate(String objectId, String derivateId)
+    public MCRDerivate loadObjectAndDerivate(String objectId, String derivateId)
         throws MCRAccessException, URISyntaxException, IOException {
-        MCRObject object = MCROCFLTestCaseHelper.createObject(objectId);
+        MCRObject object = createObject(objectId);
         MCRDerivate derivate =
-            MCROCFLTestCaseHelper.createDerivate(object.getId().toString(), derivateId);
+            createDerivate(object.getId().toString(), derivateId);
         MCRMetadataManager.create(object);
         MCRTransactionManager.requireTransactions(MCROCFLFileSystemTransaction.class);
         MCRMetadataManager.create(derivate);
-        MCROCFLTestCaseHelper.loadDerivate(derivate.getId().toString());
+        loadDerivate(derivate.getId().toString());
         MCRTransactionManager.commitTransactions(MCROCFLFileSystemTransaction.class);
         return derivate;
     }

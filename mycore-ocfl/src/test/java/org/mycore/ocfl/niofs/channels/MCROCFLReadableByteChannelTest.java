@@ -26,6 +26,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
@@ -45,6 +47,8 @@ import io.ocfl.api.model.OcflObjectVersion;
 public class MCROCFLReadableByteChannelTest {
 
     private static final String TEST_DATA = "This is some test data for the OCFL readable byte channel.";
+    
+    private static DateTimeFormatter FILEEXT_DATEFORMATTER = DateTimeFormatter.ofPattern("'.'yyyyMMdd'_'HHmmssSSS");
 
     protected MCROCFLRepository repository;
 
@@ -58,6 +62,11 @@ public class MCROCFLReadableByteChannelTest {
         ObjectVersionId channelTestId = MCROCFLTestCaseHelper.writeFile(repository, "channelTest", "file", TEST_DATA);
         OcflObjectVersion channelTest = repository.getObject(channelTestId);
         channel = new MCROCFLReadableByteChannel(channelTest.getFile("file"));
+        
+        //neu: String filename = "file" + LocalDateTime.now().format(FILEEXT_DATEFORMATTER);
+        //ObjectVersionId channelTestId = MCROCFLTestCaseHelper.writeFile(repository, "channelTest_"+filename, filename, TEST_DATA);
+        //OcflObjectVersion channelTest = repository.getObject(channelTestId);
+        //channel = new MCROCFLReadableByteChannel(channelTest.getFile(filename));
     }
 
     @TestTemplate

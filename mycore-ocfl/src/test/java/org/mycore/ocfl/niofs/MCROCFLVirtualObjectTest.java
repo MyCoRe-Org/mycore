@@ -25,6 +25,8 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.common.MCRTransactionManager;
@@ -43,6 +45,8 @@ import io.ocfl.api.model.OcflObjectVersion;
 @MyCoReTest
 @ExtendWith({ MCRPermutationExtension.class, MCROCFLSetupExtension.class })
 public class MCROCFLVirtualObjectTest {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     protected MCROCFLRepository repository;
 
@@ -317,18 +321,29 @@ public class MCROCFLVirtualObjectTest {
     }
 
     @TestTemplate
-    public void getFileKey() throws IOException {
+    public void getFileKey() throws IOException, InterruptedException {
         MCRVersionedPath notFoundPng = MCRVersionedPath.head(MCROCFLTestCaseHelper.DERIVATE_1, "notFound.png");
+
+        MCRTransactionManager.beginTransactions();
+        if (!Files.exists(WHITE_PNG)) {
+            Thread.sleep(1);
+            Files.write(WHITE_PNG, new byte[] { 126, 126, 126 });
+        }
+        if (!Files.exists(BLACK_PNG)) {
+            Thread.sleep(1);
+            Files.write(BLACK_PNG, new byte[] { 2, 2, 2 });
+        }
+        MCRTransactionManager.commitTransactions();
 
         Object v1WhitePngFileKey = getFileKey(WHITE_PNG);
         Object v1BlackPngFileKey = getFileKey(BLACK_PNG);
 
         if (remote) {
-            assertNull(v1WhitePngFileKey, "fileKey of original white.png should be null on remote repositories");
-            assertNull(v1BlackPngFileKey, "fileKey of original black.png should be null on remote repositories");
+            assertNull(v1WhitePngFileKey, "fileKey of original white.png should be null on remote repositories: " + WHITE_PNG);
+            assertNull(v1BlackPngFileKey, "fileKey of original black.png should be null on remote repositories :" + BLACK_PNG);
         } else {
-            assertNotNull(v1WhitePngFileKey, "fileKey of original white.png should not be null");
-            assertNotNull(v1BlackPngFileKey, "fileKey of original black.png should not be null");
+            assertNotNull(v1WhitePngFileKey, "fileKey of original white.png should not be null: " + WHITE_PNG);
+            assertNotNull(v1BlackPngFileKey, "fileKey of original black.png should not be null :" + BLACK_PNG);
         }
         assertThrows(NoSuchFileException.class, () -> getFileKey(notFoundPng),
             "fileKey of notFound.png should not exist yet");
@@ -371,7 +386,7 @@ public class MCROCFLVirtualObjectTest {
         MCRTransactionManager.commitTransactions();
 
         // check remote streaming
-        if(remote) {
+        if (remote) {
             // clear remote storage to not copy from there but stream from the OCFL repo
             MCROCFLFileSystemProvider.get().remoteStorage().clear();
             MCRTransactionManager.beginTransactions();
@@ -412,7 +427,7 @@ public class MCROCFLVirtualObjectTest {
         assertEquals(blackSize, Files.size(target), "white.png should have the same size");
 
         // check remote streaming
-        if(remote) {
+        if (remote) {
             // clear remote storage to not copy from there but stream from the OCFL repo
             MCROCFLFileSystemProvider.get().remoteStorage().clear();
             MCRTransactionManager.beginTransactions();
@@ -424,7 +439,11 @@ public class MCROCFLVirtualObjectTest {
     }
 
     private static Object getFileKey(MCRVersionedPath path) throws IOException {
-        return Files.readAttributes(path, BasicFileAttributes.class).fileKey();
+        Object fileKey = Files.readAttributes(path, BasicFileAttributes.class).fileKey();
+        if (fileKey == null) {
+            LOGGER.error("fileKey is null for: " + path.toString());
+        }
+        return fileKey;
     }
 
     private static MCROCFLVirtualObject getVirtualObject() {

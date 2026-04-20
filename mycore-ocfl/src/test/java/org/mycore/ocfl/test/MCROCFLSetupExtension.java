@@ -70,7 +70,7 @@ public class MCROCFLSetupExtension implements BeforeEachCallback, AfterEachCallb
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static MCROCFLRepository repository;
+    private MCROCFLRepository repository;
 
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
@@ -133,6 +133,7 @@ public class MCROCFLSetupExtension implements BeforeEachCallback, AfterEachCallb
         for (String objectId : repository.listObjectIds().toList()) {
             repository.purgeObject(objectId);
         }
+        repository.close();
     }
 
     private boolean isLoadDerivate(ExtensionContext context) {
@@ -174,7 +175,7 @@ public class MCROCFLSetupExtension implements BeforeEachCallback, AfterEachCallb
             field.setAccessible(true);
             field.set(instance, value);
         } catch (NoSuchFieldException noSuchFieldException) {
-            LOGGER.warn("field '{}' not found", fieldName);
+            LOGGER.warn("field '{}' not found on instance of class '{}'", fieldName, clazz.getName());
         }
     }
 

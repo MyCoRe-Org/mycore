@@ -19,8 +19,12 @@
 package org.mycore.test;
 
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,6 +40,7 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.config.MCRConfigurationLoader;
+import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 
 /**
  * JUnit 5 extension for MyCoRe tests.
@@ -47,6 +52,8 @@ import org.mycore.common.config.MCRConfigurationLoader;
 public class MCRTestExtension implements Extension, BeforeEachCallback, AfterEachCallback, BeforeAllCallback,
     AfterAllCallback {
 
+    private static final String MYCORE_TEMP_DIR_PREFIX = "junit-";
+    private static final long MYCORE_TEMP_DIR_MAX_AGE_HOURS = 72;
     public static final String CLASS_PROPERTIES_MAP_PROPERTY = "classProperties";
     private static final String PROPERTIES_MAP_PROPERTY = "properties";
     private static final String PROPERTIES_LOADED_PROPERTY = "propertiesLoaded";
@@ -80,6 +87,7 @@ public class MCRTestExtension implements Extension, BeforeEachCallback, AfterEac
      */
     @Override
     public void beforeAll(ExtensionContext context) throws Exception {
+        cleanUpOldTempDirectories();
         Map<String, String> configProperties = getConfigProperties(context);
         configProperties.clear(); //clear properties from previous test classes
         configProperties.putAll(mycoreProperties);
@@ -190,7 +198,29 @@ public class MCRTestExtension implements Extension, BeforeEachCallback, AfterEac
     }
 
     private Path createTempDirectory() throws IOException {
-        return Files.createTempDirectory("junit-");
+        return Files.createTempDirectory(MYCORE_TEMP_DIR_PREFIX);
+    }
+
+    private void cleanUpOldTempDirectories() throws IOException {
+        FileTime cutoff = FileTime.from(Instant.now().minus(MYCORE_TEMP_DIR_MAX_AGE_HOURS, ChronoUnit.HOURS));
+        Path tempDir = createTempDirectory(); //just to get the current base temp folder
+
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(tempDir.getParent(),
+            entry -> Files.isDirectory(entry)
+                && entry.getFileName().toString().startsWith(MYCORE_TEMP_DIR_PREFIX)
+                && Files.getLastModifiedTime(entry).compareTo(cutoff) < 0)) {
+
+            for (Path child : stream) {
+                try {
+                    Files.walkFileTree(child, new MCRRecursiveDeleter());
+                } catch (IOException e) {
+                    LOGGER.warn("Could not delete temp dir:\n" + e.getMessage());
+                }
+            }
+        }
+        finally{
+            Files.walkFileTree(tempDir, new MCRRecursiveDeleter());
+        }
     }
 
 }

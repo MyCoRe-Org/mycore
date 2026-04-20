@@ -19,6 +19,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.mycore.common.MCRTransactionManager;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
 import org.mycore.ocfl.niofs.MCROCFLInactiveTransactionException;
+import org.mycore.ocfl.repository.MCROCFLRepository;
 import org.mycore.ocfl.test.MCROCFLSetupExtension;
 import org.mycore.ocfl.test.MCRPermutationExtension;
 import org.mycore.ocfl.test.PermutedParam;
@@ -27,6 +28,8 @@ import org.mycore.test.MyCoReTest;
 @MyCoReTest
 @ExtendWith({ MCRPermutationExtension.class, MCROCFLSetupExtension.class })
 public class MCROCFLDefaultTransactionalStorageTest extends MCROCFLStorageTestCase {
+
+    protected MCROCFLRepository repository;
 
     @TempDir
     public Path folder;
