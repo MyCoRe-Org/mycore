@@ -96,14 +96,16 @@ public class MCRURLFunctionsTests {
         "'?foo=bar&os=linux&x=1', os, '?foo=bar&x=1'",
         // param does not exist
         "'?foo=bar', os, '?foo=bar'",
-        // only one param left -> empty query
-        "'?foo=bar', foo, ''",
         // empty query input
         "'', foo, ''",
         // special key
         "'?my-param=os', my-param, ''",
-        // duplicate keys (first removal effect)
-        "'?foo=bar&foo=os', foo, '?foo=os'"
+        // duplicate keys (removal all)
+        "'?foo=bar&foo=os', foo, ''",
+        // fragment
+        "'?foo=bar&foz=baz#frag?', foo, '?foz=baz#frag?'",
+        // keep fragment
+        "'#foo', foo, '#foo'"
     })
     @DisplayName("mcrurl:del-param")
     public void testDelParam(String queryUrl, String param, String expected) throws Exception {

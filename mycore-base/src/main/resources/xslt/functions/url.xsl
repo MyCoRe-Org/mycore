@@ -133,34 +133,34 @@
         </xsl:choose>
     </xsl:function>
 
-  <xsl:function name="mcrurl:del-param" as="xs:string">
-    <xsl:param name="url" as="xs:string?" />
-    <xsl:param name="par" as="xs:string" />
+<xsl:function name="mcrurl:del-param" as="xs:string">
+  <xsl:param name="url" as="xs:string?" />
+  <xsl:param name="par" as="xs:string" />
+  
+  <!-- cleanup url, normalize empty sequence to string -->
+  <xsl:variable name="u" as="xs:string" select="string($url)" />
 
-    <xsl:variable name="u" as="xs:string" select="string($url)" />
+  <!-- detect fragment (#...) -->
+  <xsl:variable name="fragment" as="xs:string"
+      select="if (contains($u, '#')) then concat('#', substring-after($u, '#')) else ''" />
+  <xsl:variable name="url-no-frag" as="xs:string"
+      select="if (contains($u, '#')) then substring-before($u, '#') else $u" />
 
-    <!-- escape param name -->
-    <xsl:variable name="par-esc" as="xs:string" select="replace($par, '([\\.^$|?*+(){}\[\]-])', '\\$1')" />
+  <!-- separate base url and query -->
+  <xsl:variable name="base" as="xs:string"
+      select="if (contains($url-no-frag, '?')) then substring-before($url-no-frag, '?') else $url-no-frag" />
+  <xsl:variable name="query" as="xs:string"
+      select="if (contains($url-no-frag, '?')) then substring-after($url-no-frag, '?') else ''" />
 
-    <!-- remove parameter -->
-    <xsl:variable name="step1" as="xs:string" select="
-      replace(
-        $u,
-        concat('([?&amp;])', $par-esc, '=[^&amp;]*(&amp;)?'),
-        '$1'
-      )
-    " />
+  <!-- keep all parameters with name ≠ $par (also supports empty params)-->
+  <xsl:variable name="kept" as="xs:string*"
+      select="tokenize($query, '&amp;')
+                [. != '']
+                [substring-before(concat(., '='), '=') != $par]" />
 
-    <!-- cleanup dangling separators -->
-    <xsl:variable name="step2" as="xs:string" select="replace($step1, '\?&amp;?', '?')" />
-
-    <xsl:variable name="step3" as="xs:string" select="replace($step2, '[?&amp;]+$', '')" />
-
-    <!-- final safety: remove trailing '?' -->
-    <xsl:sequence select="
-      if (ends-with($step3, '?'))
-      then substring($step3, 1, string-length($step3) - 1)
-      else $step3
-    " />
-  </xsl:function>
+  <!-- build new url -->
+  <xsl:sequence select="concat(
+        if (exists($kept)) then concat($base, '?', string-join($kept, '&amp;')) else $base,
+        $fragment )" />
+</xsl:function>
 </xsl:stylesheet>
