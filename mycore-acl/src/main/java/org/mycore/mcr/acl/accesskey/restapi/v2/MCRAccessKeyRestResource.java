@@ -18,6 +18,13 @@
 
 package org.mycore.mcr.acl.accesskey.restapi.v2;
 
+import static org.mycore.restapi.v2.MCRRestStatusCode.BAD_REQUEST;
+import static org.mycore.restapi.v2.MCRRestStatusCode.CREATED;
+import static org.mycore.restapi.v2.MCRRestStatusCode.NOT_FOUND;
+import static org.mycore.restapi.v2.MCRRestStatusCode.NO_CONTENT;
+import static org.mycore.restapi.v2.MCRRestStatusCode.OK;
+import static org.mycore.restapi.v2.MCRRestStatusCode.UNAUTHORIZED;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -27,6 +34,7 @@ import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyPartialUpdateDto;
 import org.mycore.mcr.acl.accesskey.restapi.v2.access.MCRAccessKeyRestAccessCheckStrategy;
 import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyService;
+import org.mycore.restapi.MCRRestConstants;
 import org.mycore.restapi.annotations.MCRApiDraft;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.mycore.restapi.v2.MCRRestSchemaType;
@@ -60,13 +68,6 @@ import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
-
-import static org.mycore.restapi.v2.MCRRestStatusCode.BAD_REQUEST;
-import static org.mycore.restapi.v2.MCRRestStatusCode.CREATED;
-import static org.mycore.restapi.v2.MCRRestStatusCode.NOT_FOUND;
-import static org.mycore.restapi.v2.MCRRestStatusCode.NO_CONTENT;
-import static org.mycore.restapi.v2.MCRRestStatusCode.OK;
-import static org.mycore.restapi.v2.MCRRestStatusCode.UNAUTHORIZED;
 
 /**
  * A RESTful API for managing access keys. This API provides methods for creating, retrieving, updating,
@@ -125,7 +126,7 @@ public class MCRAccessKeyRestResource {
                     array = @ArraySchema(schema = @Schema(implementation = MCRAccessKeyDto.class))),
             },
             headers = {
-                @Header(name = MCRAccessKeyRestConstants.HEADER_TOTAL_COUNT,
+                @Header(name = MCRRestConstants.HEADER_X_TOTAL_COUNT,
                     schema = @Schema(type = MCRRestSchemaType.INTEGER))
             }),
         @ApiResponse(responseCode = UNAUTHORIZED, description = DESCRIPTION_UNAUTHORIZED,
@@ -162,7 +163,7 @@ public class MCRAccessKeyRestResource {
         } else {
             accessKeyDtos.addAll(accessKeyService.listAllAccessKeys());
         }
-        response.setHeader(MCRAccessKeyRestConstants.HEADER_TOTAL_COUNT, Integer.toString(accessKeyDtos.size()));
+        response.setHeader(MCRRestConstants.HEADER_X_TOTAL_COUNT, Integer.toString(accessKeyDtos.size()));
         return accessKeyDtos.stream().sorted((a1, a2) -> a1.getCreated().compareTo(a2.getCreated())).skip(offset)
             .limit(limit).toList();
     }

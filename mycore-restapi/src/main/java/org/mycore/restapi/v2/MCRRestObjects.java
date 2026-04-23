@@ -51,19 +51,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.jakarta.rs.annotation.JacksonFeatures;
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.headers.Header;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.lang3.reflect.TypeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -97,6 +84,7 @@ import org.mycore.datamodel.objectinfo.MCRObjectQueryResolver;
 import org.mycore.frontend.jersey.MCRCacheControl;
 import org.mycore.frontend.support.MCRObjectLock;
 import org.mycore.media.services.MCRThumbnailGenerator;
+import org.mycore.restapi.MCRRestConstants;
 import org.mycore.restapi.annotations.MCRAccessControlExposeHeaders;
 import org.mycore.restapi.annotations.MCRApiDraft;
 import org.mycore.restapi.annotations.MCRParam;
@@ -107,6 +95,20 @@ import org.mycore.restapi.v2.annotation.MCRRestRequiredPermission;
 import org.mycore.restapi.v2.model.MCRRestObjectIDDate;
 import org.mycore.restapi.v2.service.MCRRestObjectLockService;
 
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.jakarta.rs.annotation.JacksonFeatures;
+
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.headers.Header;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.servlet.ServletContext;
 import jakarta.ws.rs.BadRequestException;
@@ -179,6 +181,10 @@ public class MCRRestObjects {
 
     public static final String PARAM_SORT_BY = "sort_by";
 
+    /**
+     * @deprecated Use {@link org.mycore.restapi.MCRRestConstants#HEADER_X_TOTAL_COUNT} instead.
+     */
+    @Deprecated(forRemoval = true)
     public static final String HEADER_X_TOTAL_COUNT = "X-Total-Count";
 
     public static final List<MCRThumbnailGenerator> THUMBNAIL_GENERATORS = MCRConfiguration2
@@ -270,7 +276,7 @@ public class MCRRestObjects {
     @SuppressWarnings("PMD.ExcessiveParameterList")
     @XmlElementWrapper(name = "mycoreobjects")
     @JacksonFeatures(serializationDisable = { SerializationFeature.WRITE_DATES_AS_TIMESTAMPS })
-    @MCRAccessControlExposeHeaders({ HEADER_X_TOTAL_COUNT, HttpHeaders.LINK })
+    @MCRAccessControlExposeHeaders({ MCRRestConstants.HEADER_X_TOTAL_COUNT, HttpHeaders.LINK })
     public Response listObjects(
         @QueryParam(PARAM_AFTER_ID) MCRObjectID afterID,
         @QueryParam(PARAM_OFFSET) Integer offset,
@@ -346,8 +352,8 @@ public class MCRRestObjects {
         }
 
         Response.ResponseBuilder responseBuilder = Response.ok(new GenericEntity<>(restIdDate) {
-        })
-            .header(HEADER_X_TOTAL_COUNT, count);
+            })
+            .header(MCRRestConstants.HEADER_X_TOTAL_COUNT, count);
 
         if (nextBuilder != null) {
             responseBuilder.link("next", nextBuilder.toString());
@@ -868,7 +874,7 @@ public class MCRRestObjects {
             return Response.noContent().build();
         }
         return Response.temporaryRedirect(
-            uriInfo.resolve(URI.create("classifications/" + state.getRootID() + "/" + state.getId())))
+                uriInfo.resolve(URI.create("classifications/" + state.getRootID() + "/" + state.getId())))
             .build();
     }
 

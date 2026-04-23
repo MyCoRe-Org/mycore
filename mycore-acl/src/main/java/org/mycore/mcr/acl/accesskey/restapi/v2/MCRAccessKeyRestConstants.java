@@ -53,11 +53,6 @@ public final class MCRAccessKeyRestConstants {
      */
     public static final String QUERY_PARAM_LIMIT = "limit";
 
-    /**
-     * Header name for total count info.
-     */
-    public static final String HEADER_TOTAL_COUNT = "X-Total-Count";
-
     private MCRAccessKeyRestConstants() {
 
     }
