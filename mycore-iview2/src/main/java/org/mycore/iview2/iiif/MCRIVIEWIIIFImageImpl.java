@@ -19,6 +19,7 @@
 package org.mycore.iview2.iiif;
 
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.FileSystem;
@@ -189,6 +190,8 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
             Path rootPath = zipFileSystem.getPath("/");
 
             Graphics2D graphics = targetImage.createGraphics();
+            graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                RenderingHints.VALUE_INTERPOLATION_BICUBIC);
             if (rotation.mirrored()) {
                 graphics.scale(-1, 1);
                 graphics.translate(-width, 0);
