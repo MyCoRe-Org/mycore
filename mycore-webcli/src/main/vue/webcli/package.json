@@ -33,7 +33,7 @@
     "jsdom": "^28.1.0",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.57.1",
-    "vite": "^8.0.0",
+    "vite": "^8.0.5",
     "vitest": "^4.1.0",
     "vue-eslint-parser": "^10.4.0",
     "vue-tsc": "^3.2.6"
