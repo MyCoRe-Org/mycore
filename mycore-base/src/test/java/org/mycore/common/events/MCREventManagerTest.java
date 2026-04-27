@@ -43,7 +43,7 @@ public class MCREventManagerTest {
         try {
             assertNull(MCREventManager.obtainTestInstance(), "Instance should be null before initialization");
         } catch (MCRConfigurationException e) {
-            assertEquals("Missing class (class.that.does.not.Exist) configured in property: " +
+            assertEquals("Missing class (class.that.does.not.Exist) configured in: " +
                 "MCR.EventHandler.MCRObject.4.Class", e.getMessage());
         }
     }
