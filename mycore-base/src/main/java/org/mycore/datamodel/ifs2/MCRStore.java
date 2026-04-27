@@ -356,7 +356,7 @@ public class MCRStore {
         if (!path.startsWith(baseDirectory)) {
             throw new IllegalArgumentException(path + " is not in the base directory " + baseDirectory);
         }
-        if(!Files.exists(path)) {
+        if (!Files.exists(path)) {
             LOGGER.warn(() -> "Tried to delete non-existing file: " + path);
             return;
         }
