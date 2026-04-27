@@ -19,9 +19,8 @@
 package org.mycore.pi.urn;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.Date;
-import java.util.Locale;
 import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
@@ -57,7 +56,8 @@ public class MCRURNUtils {
             return null;
         }
 
-        return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.GERMAN).parse(date);
+        Instant instant = Instant.parse(date);
+        return Date.from(instant);
     }
 
 }
