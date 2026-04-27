@@ -16,6 +16,8 @@
 
   <xsl:template match="/users" mode="headAdditional" />
 
+  <xsl:template match="/users" mode="searchFormAdditional" />
+
   <xsl:template match="/users">
     <div class="user-list-users">
       <xsl:if test="@num">
@@ -30,6 +32,7 @@
                 <input class="form-control" type="text" name="search" value="{@search}" />
               </div>
             </div>
+            <xsl:apply-templates select="." mode="searchFormAdditional" />
           </form>
           <xsl:apply-templates select="." mode="headAdditional" />
         </div>
