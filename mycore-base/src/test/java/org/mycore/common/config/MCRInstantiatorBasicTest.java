@@ -20,6 +20,7 @@ package org.mycore.common.config;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mycore.common.config.instantiator.MCRInstanceConfiguration.ofName;
 
 import java.util.function.Supplier;
 
@@ -28,21 +29,21 @@ import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRFactory;
+import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
-public class MCRConfigurableInstanceHelperBasicTest {
+public class MCRInstantiatorBasicTest {
 
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithSingletonFactory.class)
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithSingletonFactory.class)
         })
     public void singletonFactory() {
 
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithSingletonFactory instance = MCRConfigurableInstanceHelper
-            .getInstance(TestClassWithSingletonFactory.class, configuration);
+        TestClassWithSingletonFactory instance = ofName(TestClassWithSingletonFactory.class,
+            "Foo.Class").instantiate();
 
         assertNotNull(instance);
 
@@ -51,13 +52,12 @@ public class MCRConfigurableInstanceHelperBasicTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWitAnnotatedFactory.class)
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWitAnnotatedFactory.class)
         })
     public void annotatedFactory() {
 
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWitAnnotatedFactory instance = MCRConfigurableInstanceHelper
-            .getInstance(TestClassWitAnnotatedFactory.class, configuration);
+        TestClassWitAnnotatedFactory instance = ofName(TestClassWitAnnotatedFactory.class,
+            "Foo.Class").instantiate();
 
         assertNotNull(instance);
 
@@ -66,29 +66,24 @@ public class MCRConfigurableInstanceHelperBasicTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWitAnnotatedFactories.class)
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWitAnnotatedFactories.class)
         })
     public void annotatedFactories() {
 
-        assertThrows(
-            MCRConfigurationException.class,
-            () -> {
-                MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-                MCRConfigurableInstanceHelper.getInstance(TestClassWitAnnotatedFactories.class, configuration);
-            });
+        assertThrows(MCRConfigurationException.class,
+            () -> ofName(TestClassWitAnnotatedFactories.class, "Foo.Class").instantiate());
 
     }
 
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithConstructor.class)
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithConstructor.class)
         })
     public void constructorFactory() {
 
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithConstructor instance = MCRConfigurableInstanceHelper
-            .getInstance(TestClassWithConstructor.class, configuration);
+        TestClassWithConstructor instance = ofName(TestClassWithConstructor.class,
+            "Foo.Class").instantiate();
 
         assertNotNull(instance);
 
@@ -97,32 +92,24 @@ public class MCRConfigurableInstanceHelperBasicTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithoutConstructorOrFactory.class)
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithoutConstructorOrFactory.class)
         })
     public void noConstructorOrFactory() {
 
-        assertThrows(
-            MCRConfigurationException.class,
-            () -> {
-                MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-                MCRConfigurableInstanceHelper.getInstance(Object.class, configuration);
-            });
+        assertThrows(MCRConfigurationException.class,
+            () -> ofName(TestClassWithoutConstructorOrFactory.class, "Foo.Class").instantiate());
 
     }
 
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithMultipleFactories.class)
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithMultipleFactories.class)
         })
     public void multipleFactories() {
 
-        assertThrows(
-            MCRConfigurationException.class,
-            () -> {
-                MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-                MCRConfigurableInstanceHelper.getInstance(Object.class, configuration);
-            });
+        assertThrows(MCRConfigurationException.class,
+            () -> ofName(TestClassWithMultipleFactories.class, "Foo.Class").instantiate());
 
     }
 
@@ -133,9 +120,8 @@ public class MCRConfigurableInstanceHelperBasicTest {
         })
     public void configurationImplicit() {
 
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        ImplicitTestClass instance = MCRConfigurableInstanceHelper.getInstance(ImplicitTestClass.class, configuration,
-            MCRConfigurableInstanceHelper.ADD_IMPLICIT_CLASS_PROPERTIES);
+        ImplicitTestClass instance = ofName(ImplicitTestClass.class,
+            "Foo.Class", MCRInstanceConfiguration.Options.IMPLICIT).instantiate();
 
         assertNotNull(instance);
 
@@ -144,14 +130,13 @@ public class MCRConfigurableInstanceHelperBasicTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithConfigurationProxy.class),
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithConfigurationProxy.class),
             @MCRTestProperty(key = "Foo.Value", string = "Value")
         })
     public void configurationProxy() {
 
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithConfigurationProxy instance = MCRConfigurableInstanceHelper
-            .getInstance(TestClassWithConfigurationProxy.class, configuration);
+        TestClassWithConfigurationProxy instance = ofName(TestClassWithConfigurationProxy.class,
+            "Foo.Class").instantiate();
 
         assertNotNull(instance);
 

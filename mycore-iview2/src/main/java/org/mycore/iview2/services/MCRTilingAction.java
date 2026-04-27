@@ -43,7 +43,7 @@ import jakarta.persistence.EntityTransaction;
  * <p>
  * This class can be extended. Any extending class should provide and implementation for {@link #getMCRImage()}.
  * To get the extending class invoked, one need to define a MyCoRe property, which defaults to:
- * <code>MCR.Module-iview2.MCRTilingActionImpl=org.mycore.iview2.services.MCRTilingAction</code>
+ * <code>MCR.Module-iview2.MCRTilingActionImpl.Class=org.mycore.iview2.services.MCRTilingAction</code>
  * @author Thomas Scheffler (yagee)
  *
  */

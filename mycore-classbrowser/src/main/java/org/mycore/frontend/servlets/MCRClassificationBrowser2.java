@@ -65,7 +65,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
 
     protected MCRQueryAdapter getQueryAdapter(final String fieldName) {
         MCRQueryAdapter adapter = MCRConfiguration2.getInstanceOfOrThrow(MCRQueryAdapter.class,
-            "MCR.Module-classbrowser.QueryAdapter");
+            "MCR.Module-classbrowser.QueryAdapter.Class");
         adapter.setFieldName(fieldName);
         return adapter;
     }

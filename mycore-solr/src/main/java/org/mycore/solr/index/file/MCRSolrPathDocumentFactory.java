@@ -47,7 +47,7 @@ public class MCRSolrPathDocumentFactory {
 
     private static final String ACCUMULATOR_LIST_PROPERTY_NAME = SOLR_CONFIG_PREFIX + "Indexer.File.AccumulatorList";
 
-    private static final String CLASS_PROPERTY = SOLR_CONFIG_PREFIX + "SolrInputDocument.Path.Factory";
+    private static final String CLASS_PROPERTY = SOLR_CONFIG_PREFIX + "SolrInputDocument.Path.Factory.Class";
 
     private static final List<MCRSolrFileIndexAccumulator> ACCUMULATOR_LIST = resolveAccumulators();
 

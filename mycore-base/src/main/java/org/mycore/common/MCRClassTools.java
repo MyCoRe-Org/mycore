@@ -51,20 +51,18 @@ public class MCRClassTools {
 
     /**
      * Loads a class via default ClassLoader or <code>Thread.currentThread().getContextClassLoader()</code>.
-     * @param classname Name of class
+     * @param className Name of class
      * @param <T> Type of Class
      * @return the initialized class
      * @throws ClassNotFoundException if both ClassLoader cannot load the Class
      */
-    public static <T> Class<? extends T> forName(String classname) throws ClassNotFoundException {
-        @SuppressWarnings("unchecked")
-        Class<? extends T> forName;
+    @SuppressWarnings("unchecked")
+    public static <T> Class<? extends T> forName(String className) throws ClassNotFoundException {
         try {
-            forName = (Class<? extends T>) Class.forName(classname);
+            return (Class<? extends T>) Class.forName(className);
         } catch (ClassNotFoundException cnfe) {
-            forName = (Class<? extends T>) Class.forName(classname, true, extendedClassLoader);
+            return (Class<? extends T>) Class.forName(className, true, extendedClassLoader);
         }
-        return forName;
     }
 
     /**

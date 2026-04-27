@@ -20,6 +20,7 @@ package org.mycore.common.config;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mycore.common.config.instantiator.MCRInstanceConfiguration.ofName;
 
 import java.util.function.Supplier;
 
@@ -31,20 +32,19 @@ import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
-public class MCRConfigurableInstanceHelperProxyTest {
+public class MCRInstantiatorProxyTest {
 
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithConfigurationProxy.class),
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithConfigurationProxy.class),
             @MCRTestProperty(key = "Foo.Property1", string = "Value1"),
             @MCRTestProperty(key = "Foo.Property2", string = "Value2")
         })
     public void annotated() {
 
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithConfigurationProxy instance = MCRConfigurableInstanceHelper
-            .getInstance(TestClassWithConfigurationProxy.class, configuration);
+        TestClassWithConfigurationProxy instance = ofName(TestClassWithConfigurationProxy.class,
+            "Foo.Class").instantiate();
 
         assertNotNull(instance);
         assertEquals("Value1-Value2", instance.value());

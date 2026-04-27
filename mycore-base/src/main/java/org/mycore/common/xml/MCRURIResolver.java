@@ -1177,7 +1177,7 @@ public final class MCRURIResolver implements URIResolver {
      */
     static class MCRLayoutTransformerResolver implements URIResolver {
 
-        private static final String TRANSFORMER_FACTORY_PROPERTY = "MCR.Layout.Transformer.Factory";
+        private static final String TRANSFORMER_FACTORY_PROPERTY = "MCR.Layout.Transformer.Factory.Class";
 
         @Override
         public Source resolve(String href, String base) throws TransformerException {

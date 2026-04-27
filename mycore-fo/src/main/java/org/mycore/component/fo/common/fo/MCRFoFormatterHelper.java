@@ -23,7 +23,7 @@ import org.mycore.common.config.MCRConfiguration2;
 /**
  * Returns the XSL-FO formatter instance configured via PROPERTY, for example
  * 
- * MCR.LayoutService.FoFormatter.class=org.mycore.common.fo.MCRFoFormatterFOP
+ * MCR.LayoutService.FoFormatter.Class=org.mycore.common.fo.MCRFoFormatterFOP
  * 
  * (which is the default using Apache FOP)
  * 
@@ -34,7 +34,7 @@ import org.mycore.common.config.MCRConfiguration2;
 public class MCRFoFormatterHelper {
 
     /** The configuration PROPERTY */
-    private static final String PROPERTY = "MCR.LayoutService.FoFormatter.class";
+    private static final String PROPERTY = "MCR.LayoutService.FoFormatter.Class";
 
     /** The singleton */
     private static MCRFoFormatterInterface formatter;
