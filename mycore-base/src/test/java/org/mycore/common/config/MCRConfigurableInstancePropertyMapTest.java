@@ -30,134 +30,78 @@ import org.mycore.common.config.annotation.MCRPropertyMap;
 import org.mycore.test.MyCoReTest;
 
 /**
- * Programmatically created exhaustive list of tests for the following conditions:
+ * Exhaustive list of tests for the following conditions:
  * <ol>
  *   <li>Annotation has <code>required = false</code> or not</li>
- *   <li>Configuration property for instance value is not set, set empty in short form,
+ *   <li>Property value (for a single-element map) is not set, set empty in short form,
  *   set non-empty in short form or set non-empty in long form</li>
  *   <li>Annotation has <code>defaultName = "..."</code> or not</li>
- *   <li>Configuration property for default value is not set, set empty in short form,
+ *   <li>Default property value (for a single-element map) is not set, set empty in short form,
  *   set non-empty in short form or set non-empty in long form </li>
  * </ol>
  * <table style="border-collapse: collapse;">
- *   <caption>Expected results for different conditions</caption>
+ *   <caption><strong>Expected results for different conditions</strong></caption>
  *   <tr>
- *     <th style="border: 1px solid;">Is Required</th>
  *     <th style="border: 1px solid;">Property</th>
  *     <th style="border: 1px solid;">Has Default</th>
  *     <th style="border: 1px solid;">Default Property</th>
- *     <th style="border: 1px solid;">Expected Result</th>
+ *     <th style="border: 1px solid;">Expected Optional Result</th>
+ *     <th style="border: 1px solid;">Expected Required Result</th>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">no</td>
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;">no</td>
  *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;"><code>{}</code></td>
+ *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">no</td>
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;">yes</td>
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;">Exception</td>
+ *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">no</td>
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;">yes</td>
  *     <td style="border: 1px solid;"><code>X=</code></td>
  *     <td style="border: 1px solid;"><code>{}</code></td>
+ *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">no</td>
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;">yes</td>
  *     <td style="border: 1px solid;"><code>X=Y:y,Z:z</code></td>
  *     <td style="border: 1px solid;"><code>{Y=y, Z=z}</code></td>
+ *     <td style="border: 1px solid;"><code>{Y=y, Z=z}</code></td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">no</td>
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;">yes</td>
  *     <td style="border: 1px solid;"><code>X.Y=y</code>, <code>X.Z=z</code></td>
  *     <td style="border: 1px solid;"><code>{Y=y, Z=z}</code></td>
+ *     <td style="border: 1px solid;"><code>{Y=y, Z=z}</code></td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">no</td>
  *     <td style="border: 1px solid;"><code>A=</code></td>
  *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;"><code>{}</code></td>
+ *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">no</td>
  *     <td style="border: 1px solid;"><code>A=B:b,C:c</code></td>
  *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;"><code>{B=b, C=c}</code></td>
+ *     <td style="border: 1px solid;"><code>{B=b, C=c}</code></td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">no</td>
  *     <td style="border: 1px solid;"><code>A.B=b</code>, <code>A.C=c</code></td>
  *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;"><code>{B=b, C=c}</code></td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">no</td>
- *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;">Exception</td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">Exception</td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;"><code>X=</code></td>
- *     <td style="border: 1px solid;">Exception</td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;"><code>X=Y:y,Z:z</code></td>
- *     <td style="border: 1px solid;"><code>{Y=y, Z=z}</code></td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;"><code>X.Y=y</code>, <code>X.Z=z</code></td>
- *     <td style="border: 1px solid;"><code>{Y=y, Z=z}</code></td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;"><code>A=</code></td>
- *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;">Exception</td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;"><code>A=B:b,C:c</code></td>
- *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;"><code>{B=b, C=c}</code></td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;"><code>A.B=b</code>, <code>A.C=c</code></td>
- *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;"><code>{B=b, C=c}</code></td>
  *   </tr>
  * </table>
@@ -228,8 +172,9 @@ public class MCRConfigurableInstancePropertyMapTest {
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
             MCRConfigurableInstanceHelper.getInstance(NotRequiredDefaultSet.class, configuration);
         });
-        assertEquals("Missing default configuration entries like: MCR.Map, MCR.Map.A, MCR.Map.B, ...",
-            exception.getMessage());
+        assertEquals("Default property map, configured in MCR.Map (and its sub-properties)," +
+            " for target field 'map' in configured class " + NotRequiredDefaultSet.class.getName()
+            + " is empty", exception.getMessage());
     }
 
     @Test
@@ -599,8 +544,9 @@ public class MCRConfigurableInstancePropertyMapTest {
             MCRConfigurableInstanceHelper.getInstance(
                 RequiredDefaultNotSet.class, configuration);
         });
-        assertEquals("Missing configuration entries like: Foo.Map, Foo.Map.A, Foo.Map.B, ...",
-            exception.getMessage());
+        assertEquals("Property map, configured in Foo.Map (and its sub-properties)," +
+            " for target field 'map' in configured class " + RequiredDefaultNotSet.class.getName()
+            + " is empty", exception.getMessage());
     }
 
     @Test
@@ -614,8 +560,9 @@ public class MCRConfigurableInstancePropertyMapTest {
             MCRConfigurableInstanceHelper.getInstance(
                 RequiredDefaultNotSet.class, configuration);
         });
-        assertEquals("Missing configuration entries like: Foo.Map, Foo.Map.A, Foo.Map.B, ...",
-            exception.getMessage());
+        assertEquals("Property map, configured in Foo.Map (and its sub-properties)," +
+            " for target field 'map' in configured class " + RequiredDefaultNotSet.class.getName()
+            + " is empty", exception.getMessage());
     }
 
     @Test
@@ -629,8 +576,9 @@ public class MCRConfigurableInstancePropertyMapTest {
             MCRConfigurableInstanceHelper.getInstance(
                 RequiredDefaultNotSet.class, configuration);
         });
-        assertEquals("Missing configuration entries like: Foo.Map, Foo.Map.A, Foo.Map.B, ...",
-            exception.getMessage());
+        assertEquals("Property map, configured in Foo.Map (and its sub-properties)," +
+            " for target field 'map' in configured class " + RequiredDefaultNotSet.class.getName()
+            + " is empty", exception.getMessage());
     }
 
     @Test
@@ -645,8 +593,9 @@ public class MCRConfigurableInstancePropertyMapTest {
             MCRConfigurableInstanceHelper.getInstance(
                 RequiredDefaultNotSet.class, configuration);
         });
-        assertEquals("Missing configuration entries like: Foo.Map, Foo.Map.A, Foo.Map.B, ...",
-            exception.getMessage());
+        assertEquals("Property map, configured in Foo.Map (and its sub-properties)," +
+            " for target field 'map' in configured class " + RequiredDefaultNotSet.class.getName()
+            + " is empty", exception.getMessage());
     }
 
     @Test
@@ -659,8 +608,9 @@ public class MCRConfigurableInstancePropertyMapTest {
             MCRConfigurableInstanceHelper.getInstance(
                 RequiredDefaultSet.class, configuration);
         });
-        assertEquals("Missing default configuration entries like: MCR.Map, MCR.Map.A, MCR.Map.B, ...",
-            exception.getMessage());
+        assertEquals("Default property map, configured in MCR.Map (and its sub-properties)," +
+            " for target field 'map' in configured class " + RequiredDefaultSet.class.getName()
+            + " is empty", exception.getMessage());
     }
 
     @Test
@@ -672,10 +622,11 @@ public class MCRConfigurableInstancePropertyMapTest {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
             MCRConfigurableInstanceHelper.getInstance(
-                    RequiredDefaultSet.class, configuration);
+                RequiredDefaultSet.class, configuration);
         });
-        assertEquals("Missing default configuration entries like: MCR.Map, MCR.Map.A, MCR.Map.B, ...",
-                exception.getMessage());
+        assertEquals("Default property map, configured in MCR.Map (and its sub-properties)," +
+            " for target field 'map' in configured class " + RequiredDefaultSet.class.getName()
+            + " is empty", exception.getMessage());
     }
 
     @Test
@@ -712,10 +663,11 @@ public class MCRConfigurableInstancePropertyMapTest {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
             MCRConfigurableInstanceHelper.getInstance(
-                    RequiredDefaultNotSet.class, configuration);
+                RequiredDefaultNotSet.class, configuration);
         });
-        assertEquals("Missing configuration entries like: Foo.Map, Foo.Map.A, Foo.Map.B, ...",
-                exception.getMessage());
+        assertEquals("Property map, configured in Foo.Map (and its sub-properties)," +
+            " for target field 'map' in configured class " + RequiredDefaultNotSet.class.getName()
+            + " is empty", exception.getMessage());
     }
 
     @Test
@@ -728,10 +680,11 @@ public class MCRConfigurableInstancePropertyMapTest {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
             MCRConfigurableInstanceHelper.getInstance(
-                    RequiredDefaultNotSet.class, configuration);
+                RequiredDefaultNotSet.class, configuration);
         });
-        assertEquals("Missing configuration entries like: Foo.Map, Foo.Map.A, Foo.Map.B, ...",
-                exception.getMessage());
+        assertEquals("Property map, configured in Foo.Map (and its sub-properties)," +
+            " for target field 'map' in configured class " + RequiredDefaultNotSet.class.getName()
+            + " is empty", exception.getMessage());
     }
 
     @Test
@@ -744,10 +697,11 @@ public class MCRConfigurableInstancePropertyMapTest {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
             MCRConfigurableInstanceHelper.getInstance(
-                    RequiredDefaultNotSet.class, configuration);
+                RequiredDefaultNotSet.class, configuration);
         });
-        assertEquals("Missing configuration entries like: Foo.Map, Foo.Map.A, Foo.Map.B, ...",
-                exception.getMessage());
+        assertEquals("Property map, configured in Foo.Map (and its sub-properties)," +
+            " for target field 'map' in configured class " + RequiredDefaultNotSet.class.getName()
+            + " is empty", exception.getMessage());
     }
 
     @Test
@@ -761,10 +715,11 @@ public class MCRConfigurableInstancePropertyMapTest {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
             MCRConfigurableInstanceHelper.getInstance(
-                    RequiredDefaultNotSet.class, configuration);
+                RequiredDefaultNotSet.class, configuration);
         });
-        assertEquals("Missing configuration entries like: Foo.Map, Foo.Map.A, Foo.Map.B, ...",
-                exception.getMessage());
+        assertEquals("Property map, configured in Foo.Map (and its sub-properties)," +
+            " for target field 'map' in configured class " + RequiredDefaultNotSet.class.getName()
+            + " is empty", exception.getMessage());
     }
 
     @Test
@@ -776,10 +731,11 @@ public class MCRConfigurableInstancePropertyMapTest {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
             MCRConfigurableInstanceHelper.getInstance(
-                    RequiredDefaultSet.class, configuration);
+                RequiredDefaultSet.class, configuration);
         });
-        assertEquals("Missing configuration entries like: Foo.Map, Foo.Map.A, Foo.Map.B, ...",
-                exception.getMessage());
+        assertEquals("Property map, configured in Foo.Map (and its sub-properties)," +
+            " for target field 'map' in configured class " + RequiredDefaultSet.class.getName()
+            + " is empty", exception.getMessage());
     }
 
     @Test
@@ -792,10 +748,11 @@ public class MCRConfigurableInstancePropertyMapTest {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
             MCRConfigurableInstanceHelper.getInstance(
-                    RequiredDefaultSet.class, configuration);
+                RequiredDefaultSet.class, configuration);
         });
-        assertEquals("Missing configuration entries like: Foo.Map, Foo.Map.A, Foo.Map.B, ...",
-                exception.getMessage());
+        assertEquals("Property map, configured in Foo.Map (and its sub-properties)," +
+            " for target field 'map' in configured class " + RequiredDefaultSet.class.getName()
+            + " is empty", exception.getMessage());
     }
 
     @Test
@@ -808,10 +765,11 @@ public class MCRConfigurableInstancePropertyMapTest {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
             MCRConfigurableInstanceHelper.getInstance(
-                    RequiredDefaultSet.class, configuration);
+                RequiredDefaultSet.class, configuration);
         });
-        assertEquals("Missing configuration entries like: Foo.Map, Foo.Map.A, Foo.Map.B, ...",
-                exception.getMessage());
+        assertEquals("Property map, configured in Foo.Map (and its sub-properties)," +
+            " for target field 'map' in configured class " + RequiredDefaultSet.class.getName()
+            + " is empty", exception.getMessage());
     }
 
     @Test
@@ -825,10 +783,11 @@ public class MCRConfigurableInstancePropertyMapTest {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
             MCRConfigurableInstanceHelper.getInstance(
-                    RequiredDefaultSet.class, configuration);
+                RequiredDefaultSet.class, configuration);
         });
-        assertEquals("Missing configuration entries like: Foo.Map, Foo.Map.A, Foo.Map.B, ...",
-                exception.getMessage());
+        assertEquals("Property map, configured in Foo.Map (and its sub-properties)," +
+            " for target field 'map' in configured class " + RequiredDefaultSet.class.getName()
+            + " is empty", exception.getMessage());
     }
 
     @Test
