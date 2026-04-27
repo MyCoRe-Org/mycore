@@ -20,6 +20,7 @@ package org.mycore.common.config;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mycore.common.config.instantiator.MCRInstanceConfiguration.ofName;
 
 import java.util.List;
 import java.util.Map;
@@ -41,19 +42,18 @@ import org.mycore.test.MyCoReTest;
         @MCRTestProperty(key = "Default.OneProperty", string = "OneValue"),
         @MCRTestProperty(key = "Default.OtherProperty", string = "OtherValue")
     })
-public class MCRConfigurableInstanceHelperDefaultTest {
+public class MCRInstantiatorDefaultTest {
 
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithNestedClass.class),
-            @MCRTestProperty(key = "Foo.Nested", classNameOf = NestedClass.class)
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithNestedClass.class),
+            @MCRTestProperty(key = "Foo.Nested.Class", classNameOf = NestedClass.class)
         })
     public void nested() {
 
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithNestedClass instance = MCRConfigurableInstanceHelper
-            .getInstance(TestClassWithNestedClass.class, configuration);
+        TestClassWithNestedClass instance = ofName(TestClassWithNestedClass.class,
+            "Foo.Class").instantiate();
 
         assertNotNull(instance);
         assertNotNull(instance.nested);
@@ -65,13 +65,12 @@ public class MCRConfigurableInstanceHelperDefaultTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithImplicitNestedClass.class)
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithImplicitNestedClass.class)
         })
     public void nestedImplicit() {
 
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithImplicitNestedClass instance = MCRConfigurableInstanceHelper
-            .getInstance(TestClassWithImplicitNestedClass.class, configuration);
+        TestClassWithImplicitNestedClass instance = ofName(TestClassWithImplicitNestedClass.class,
+            "Foo.Class").instantiate();
 
         assertNotNull(instance);
         assertNotNull(instance.nested);
@@ -83,15 +82,14 @@ public class MCRConfigurableInstanceHelperDefaultTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithNestedNestedClass.class),
-            @MCRTestProperty(key = "Foo.Nested", classNameOf = TestClassWithNestedClass.class),
-            @MCRTestProperty(key = "Foo.Nested.Nested", classNameOf = NestedClass.class)
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithNestedNestedClass.class),
+            @MCRTestProperty(key = "Foo.Nested.Class", classNameOf = TestClassWithNestedClass.class),
+            @MCRTestProperty(key = "Foo.Nested.Nested.Class", classNameOf = NestedClass.class)
         })
     public void nestedNested() {
 
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithNestedNestedClass instance = MCRConfigurableInstanceHelper
-            .getInstance(TestClassWithNestedNestedClass.class, configuration);
+        TestClassWithNestedNestedClass instance = ofName(TestClassWithNestedNestedClass.class,
+            "Foo.Class").instantiate();
 
         assertNotNull(instance);
         assertNotNull(instance.nested);
@@ -104,15 +102,14 @@ public class MCRConfigurableInstanceHelperDefaultTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithNestedMap.class),
-            @MCRTestProperty(key = "Foo.EntryA", classNameOf = OneKindOfEntry.class),
-            @MCRTestProperty(key = "Foo.EntryB", classNameOf = OtherKindOfEntry.class)
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithNestedMap.class),
+            @MCRTestProperty(key = "Foo.EntryA.Class", classNameOf = OneKindOfEntry.class),
+            @MCRTestProperty(key = "Foo.EntryB.Class", classNameOf = OtherKindOfEntry.class)
         })
     public void nestedMap() {
 
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithNestedMap instance = MCRConfigurableInstanceHelper
-            .getInstance(TestClassWithNestedMap.class, configuration);
+        TestClassWithNestedMap instance = ofName(TestClassWithNestedMap.class,
+            "Foo.Class").instantiate();
 
         assertNotNull(instance);
         assertNotNull(instance.map);
@@ -133,15 +130,14 @@ public class MCRConfigurableInstanceHelperDefaultTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithNestedMapOfImplicitEntries.class),
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithNestedMapOfImplicitEntries.class),
             @MCRTestProperty(key = "Foo.EntryA.Property1", string = "Custom1"),
             @MCRTestProperty(key = "Foo.EntryB.Property2", string = "Custom2"),
         })
     public void nestedMapImplicit() {
 
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithNestedMapOfImplicitEntries instance = MCRConfigurableInstanceHelper
-            .getInstance(TestClassWithNestedMapOfImplicitEntries.class, configuration);
+        TestClassWithNestedMapOfImplicitEntries instance = ofName(TestClassWithNestedMapOfImplicitEntries.class,
+            "Foo.Class").instantiate();
 
         assertNotNull(instance);
         assertNotNull(instance.map);
@@ -164,15 +160,14 @@ public class MCRConfigurableInstanceHelperDefaultTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithNestedList.class),
-            @MCRTestProperty(key = "Foo.23", classNameOf = OneKindOfEntry.class),
-            @MCRTestProperty(key = "Foo.42", classNameOf = OtherKindOfEntry.class)
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithNestedList.class),
+            @MCRTestProperty(key = "Foo.23.Class", classNameOf = OneKindOfEntry.class),
+            @MCRTestProperty(key = "Foo.42.Class", classNameOf = OtherKindOfEntry.class)
         })
     public void nestedList() {
 
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithNestedList instance = MCRConfigurableInstanceHelper
-            .getInstance(TestClassWithNestedList.class, configuration);
+        TestClassWithNestedList instance = ofName(TestClassWithNestedList.class,
+            "Foo.Class").instantiate();
 
         assertNotNull(instance);
         assertNotNull(instance.list);
@@ -193,15 +188,14 @@ public class MCRConfigurableInstanceHelperDefaultTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithNestedListOfImplicitEntries.class),
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithNestedListOfImplicitEntries.class),
             @MCRTestProperty(key = "Foo.23.Property1", string = "Custom1"),
             @MCRTestProperty(key = "Foo.42.Property2", string = "Custom2"),
         })
     public void nestedListImplicit() {
 
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithNestedListOfImplicitEntries instance = MCRConfigurableInstanceHelper
-            .getInstance(TestClassWithNestedListOfImplicitEntries.class, configuration);
+        TestClassWithNestedListOfImplicitEntries instance = ofName(TestClassWithNestedListOfImplicitEntries.class,
+            "Foo.Class").instantiate();
 
         assertNotNull(instance);
         assertNotNull(instance.list);
