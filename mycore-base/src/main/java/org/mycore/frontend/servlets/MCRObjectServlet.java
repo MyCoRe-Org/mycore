@@ -26,7 +26,8 @@ import java.io.Serial;
 import java.util.Optional;
 
 import javax.xml.transform.TransformerException;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRExpandedObjectManager;
@@ -54,6 +55,8 @@ public class MCRObjectServlet extends MCRContentServlet {
 
     @Serial
     private static final long serialVersionUID = 1L;
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String I18N_ERROR_PREFIX = "component.base.error";
 
@@ -92,17 +95,22 @@ public class MCRObjectServlet extends MCRContentServlet {
         }
     }
 
-    private MCRContent requestLocalObject(MCRObjectID mcrid, final HttpServletResponse resp, boolean expanded)
+    private MCRContent requestLocalObject(MCRObjectID mcrId, final HttpServletResponse resp, boolean expanded)
         throws IOException {
-        if (MCRMetadataManager.exists(mcrid)) {
-            MCRBase base = MCRMetadataManager.retrieve(mcrid);
-            if (expanded && base instanceof MCRObject object) {
-                base = MCRExpandedObjectManager.getInstance().getExpandedObject(object);
+        if (MCRMetadataManager.exists(mcrId)) {
+            try {
+                MCRBase base = MCRMetadataManager.retrieve(mcrId);
+                if (expanded && base instanceof MCRObject object) {
+                    base = MCRExpandedObjectManager.getInstance().getExpandedObject(object);
+                }
+                return new MCRBaseContent(base);
+            } catch (Exception e) {
+                LOGGER.error(() -> "Unable to retrieve object " + mcrId
+                    + " from MCRMetadataManager. Fallback: try to return from MCRXMLMetadataManager ", e);
+                return MCRXMLMetadataManager.getInstance().retrieveContent(mcrId);
             }
-
-            return new MCRBaseContent(base);
         }
-        resp.sendError(HttpServletResponse.SC_NOT_FOUND, getErrorI18N(I18N_ERROR_PREFIX, "notFound", mcrid));
+        resp.sendError(HttpServletResponse.SC_NOT_FOUND, getErrorI18N(I18N_ERROR_PREFIX, "notFound", mcrId));
         return null;
     }
 
