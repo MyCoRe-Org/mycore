@@ -19,6 +19,7 @@
 package org.mycore.iview2.iiif;
 
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.FileSystem;
@@ -141,6 +142,7 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
 
             Graphics2D graphics = targetImage.createGraphics();
             try {
+                graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
                 applyRotation(graphics, rotation, rotatedSize, targetSize);
                 applyScale(graphics, region, targetSize, sourceZoomLevel, zoomLevelScale);
                 drawTiles(rootPath, sourceZoomLevel, sourceTiles, graphics);
@@ -166,8 +168,7 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
             (double) targetSize.height() / sourceSize.height());
 
         // We always want to use the the best needed zoom level!
-        return (int) Math.min(
-            Math.max(0, Math.ceil(tiledPictureProps.getZoomlevel() - Math.log(largestScaling) / LOG_HALF)),
+        return (int) Math.clamp(Math.ceil(tiledPictureProps.getZoomlevel() - Math.log(largestScaling) / LOG_HALF), 0,
             tiledPictureProps.getZoomlevel());
     }
 
