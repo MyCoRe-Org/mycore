@@ -97,6 +97,7 @@ import org.mycore.datamodel.objectinfo.MCRObjectQueryResolver;
 import org.mycore.frontend.jersey.MCRCacheControl;
 import org.mycore.frontend.support.MCRObjectLock;
 import org.mycore.media.services.MCRThumbnailGenerator;
+import org.mycore.restapi.MCRRestConstants;
 import org.mycore.restapi.annotations.MCRAccessControlExposeHeaders;
 import org.mycore.restapi.annotations.MCRApiDraft;
 import org.mycore.restapi.annotations.MCRParam;
@@ -145,8 +146,16 @@ public class MCRRestObjects {
 
     public static final String PARAM_AFTER_ID = "after_id";
 
+    /**
+     * @deprecated Use {@link org.mycore.restapi.MCRRestConstants#PARAM_OFFSET} instead.
+     */
+    @Deprecated(forRemoval = true)
     public static final String PARAM_OFFSET = "offset";
 
+    /**
+     * @deprecated Use {@link org.mycore.restapi.MCRRestConstants#PARAM_LIMIT} instead.
+     */
+    @Deprecated(forRemoval = true)
     public static final String PARAM_LIMIT = "limit";
 
     public static final String PARAM_TYPE = "type";
@@ -179,6 +188,10 @@ public class MCRRestObjects {
 
     public static final String PARAM_SORT_BY = "sort_by";
 
+    /**
+     * @deprecated Use {@link org.mycore.restapi.MCRRestConstants#HEADER_X_TOTAL_COUNT} instead.
+     */
+    @Deprecated(forRemoval = true)
     public static final String HEADER_X_TOTAL_COUNT = "X-Total-Count";
 
     public static final List<MCRThumbnailGenerator> THUMBNAIL_GENERATORS = MCRConfiguration2
@@ -220,11 +233,11 @@ public class MCRRestObjects {
                 description = "the id after which the results should be listed. Do not use after_id and offset " +
                     "together."),
             @Parameter(
-                name = PARAM_OFFSET,
+                name = MCRRestConstants.PARAM_OFFSET,
                 description = "dictates the number of rows to skip from the beginning of the returned data before " +
                     "presenting the results. Do not use after_id and offset together."),
             @Parameter(
-                name = PARAM_LIMIT,
+                name = MCRRestConstants.PARAM_LIMIT,
                 description = "limits the number of result returned"),
             @Parameter(
                 name = PARAM_TYPE,
@@ -270,11 +283,11 @@ public class MCRRestObjects {
     @SuppressWarnings("PMD.ExcessiveParameterList")
     @XmlElementWrapper(name = "mycoreobjects")
     @JacksonFeatures(serializationDisable = { SerializationFeature.WRITE_DATES_AS_TIMESTAMPS })
-    @MCRAccessControlExposeHeaders({ HEADER_X_TOTAL_COUNT, HttpHeaders.LINK })
+    @MCRAccessControlExposeHeaders({ MCRRestConstants.HEADER_X_TOTAL_COUNT, HttpHeaders.LINK })
     public Response listObjects(
         @QueryParam(PARAM_AFTER_ID) MCRObjectID afterID,
-        @QueryParam(PARAM_OFFSET) Integer offset,
-        @QueryParam(PARAM_LIMIT) Integer limit,
+        @QueryParam(MCRRestConstants.PARAM_OFFSET) Integer offset,
+        @QueryParam(MCRRestConstants.PARAM_LIMIT) Integer limit,
         @QueryParam(PARAM_TYPE) String type,
         @QueryParam(PARAM_PROJECT) String project,
         @QueryParam(PARAM_NUMBER_GREATER) Integer numberGreater,
@@ -342,12 +355,12 @@ public class MCRRestObjects {
             nextBuilder.replaceQueryParam(PARAM_AFTER_ID, idDates.getLast().getId());
         } else if (query.offset() + query.limit() < count) {
             nextBuilder = uriInfo.getRequestUriBuilder();
-            nextBuilder.replaceQueryParam(PARAM_OFFSET, String.valueOf(query.offset() + limitInt));
+            nextBuilder.replaceQueryParam(MCRRestConstants.PARAM_OFFSET, String.valueOf(query.offset() + limitInt));
         }
 
         Response.ResponseBuilder responseBuilder = Response.ok(new GenericEntity<>(restIdDate) {
         })
-            .header(HEADER_X_TOTAL_COUNT, count);
+            .header(MCRRestConstants.HEADER_X_TOTAL_COUNT, count);
 
         if (nextBuilder != null) {
             responseBuilder.link("next", nextBuilder.toString());

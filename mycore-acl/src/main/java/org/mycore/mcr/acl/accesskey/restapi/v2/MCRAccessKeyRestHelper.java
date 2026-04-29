@@ -26,6 +26,7 @@ import java.util.UUID;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyPartialUpdateDto;
 import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyService;
+import org.mycore.restapi.MCRRestConstants;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.core.Response;
@@ -67,7 +68,7 @@ public final class MCRAccessKeyRestHelper {
         } else {
             accessKeyDtos.addAll(SERVICE.listAllAccessKeys());
         }
-        response.setHeader(MCRAccessKeyRestConstants.HEADER_TOTAL_COUNT, Integer.toString(accessKeyDtos.size()));
+        response.setHeader(MCRRestConstants.HEADER_X_TOTAL_COUNT, Integer.toString(accessKeyDtos.size()));
         return accessKeyDtos.stream().sorted((a1, a2) -> a1.getCreated().compareTo(a2.getCreated())).skip(offset)
             .limit(limit).toList();
     }
