@@ -27,6 +27,7 @@ import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyPartialUpdateDto;
 import org.mycore.mcr.acl.accesskey.restapi.v2.access.MCRAccessKeyRestAccessCheckStrategy;
 import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyService;
+import org.mycore.restapi.MCRRestConstants;
 import org.mycore.restapi.annotations.MCRApiDraft;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.mycore.restapi.v2.MCRRestSchemaType;
@@ -125,7 +126,7 @@ public class MCRAccessKeyRestResource {
                     array = @ArraySchema(schema = @Schema(implementation = MCRAccessKeyDto.class))),
             },
             headers = {
-                @Header(name = MCRAccessKeyRestConstants.HEADER_TOTAL_COUNT,
+                @Header(name = MCRRestConstants.HEADER_X_TOTAL_COUNT,
                     schema = @Schema(type = MCRRestSchemaType.INTEGER))
             }),
         @ApiResponse(responseCode = UNAUTHORIZED, description = DESCRIPTION_UNAUTHORIZED,
@@ -138,11 +139,11 @@ public class MCRAccessKeyRestResource {
     public List<MCRAccessKeyDto> findAccessKeys(
         @Parameter(in = ParameterIn.QUERY, description = "The offset for pagination (default is 0)",
             required = false, schema = @Schema(defaultValue = "0"))
-        @DefaultValue("0") @QueryParam(MCRAccessKeyRestConstants.QUERY_PARAM_OFFSET) int offset,
+        @DefaultValue("0") @QueryParam(MCRRestConstants.PARAM_OFFSET) int offset,
         @Parameter(in = ParameterIn.QUERY,
             description = "The number of results to return, defaults to 128 if not provided", required = false,
             schema = @Schema(defaultValue = "128"))
-        @DefaultValue("128") @QueryParam(MCRAccessKeyRestConstants.QUERY_PARAM_LIMIT) int limit,
+        @DefaultValue("128") @QueryParam(MCRRestConstants.PARAM_LIMIT) int limit,
         @Parameter(in = ParameterIn.QUERY, description = "The reference filter (default is all)", required = false,
             schema = @Schema(defaultValue = ""))
         @DefaultValue("") @QueryParam(MCRAccessKeyRestConstants.QUERY_PARAM_REFERENCE) String reference,
@@ -162,7 +163,7 @@ public class MCRAccessKeyRestResource {
         } else {
             accessKeyDtos.addAll(accessKeyService.listAllAccessKeys());
         }
-        response.setHeader(MCRAccessKeyRestConstants.HEADER_TOTAL_COUNT, Integer.toString(accessKeyDtos.size()));
+        response.setHeader(MCRRestConstants.HEADER_X_TOTAL_COUNT, Integer.toString(accessKeyDtos.size()));
         return accessKeyDtos.stream().sorted((a1, a2) -> a1.getCreated().compareTo(a2.getCreated())).skip(offset)
             .limit(limit).toList();
     }
