@@ -33,6 +33,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -81,6 +85,17 @@ public final class MCRMetadataManager {
 
     public static final String DEFAULT_IMPLEMENTATION_KEY = "Default";
 
+    /**
+     * Property key for the per-object lock acquisition timeout (in seconds) used by
+     * {@link #lock(MCRObjectID)}. When the timeout elapses without acquiring the lock,
+     * an {@link MCRPersistenceException} is thrown.
+     */
+    public static final String LOCK_TIMEOUT_PROPERTY = "MCR.Metadata.Manager.LockTimeoutSeconds";
+
+    private static final int DEFAULT_LOCK_TIMEOUT_SECONDS = 60;
+
+    private static final ConcurrentMap<MCRObjectID, LockEntry> LOCKS = new ConcurrentHashMap<>();
+
     private MCRMetadataManager() {
     }
 
@@ -105,19 +120,20 @@ public final class MCRMetadataManager {
 
         derivateId = assignNewIdIfNecessary(mcrDerivate);
 
-        validateDerivate(mcrDerivate, derivateId);
+        try (MCRObjectLock ignored = lock(derivateId)) {
+            validateDerivate(mcrDerivate, derivateId);
 
-        final MCRObjectID objectId = getObjectIDFromDerivate(mcrDerivate);
-        checkWritePermission(objectId, derivateId);
+            final MCRObjectID objectId = getObjectIDFromDerivate(mcrDerivate);
+            checkWritePermission(objectId, derivateId);
 
-        byte[] objectBackup = retrieveObjectBackup(objectId);
+            byte[] objectBackup = retrieveObjectBackup(objectId);
 
-        setDerivateMetadata(mcrDerivate);
+            setDerivateMetadata(mcrDerivate);
 
-        fireEvent(mcrDerivate, null, MCREvent.EventType.CREATE);
+            fireEvent(mcrDerivate, null, MCREvent.EventType.CREATE);
 
-        createDataInIFS(mcrDerivate, derivateId, objectId, objectBackup);
-
+            createDataInIFS(mcrDerivate, derivateId, objectId, objectBackup);
+        }
     }
 
     private static MCRObjectID assignNewIdIfNecessary(MCRDerivate mcrDerivate) {
@@ -266,17 +282,19 @@ public final class MCRMetadataManager {
         MCRObjectID objectId = Objects.requireNonNull(mcrObject.getId(), "ObjectID must not be null");
 
         checkCreatePrivilege(objectId);
-        // exist the object?
-        if (exists(objectId)) {
-            throw new MCRPersistenceException("The object " + objectId + " already exists, nothing done.");
+        try (MCRObjectLock ignored = lock(objectId)) {
+            // exist the object?
+            if (exists(objectId)) {
+                throw new MCRPersistenceException("The object " + objectId + " already exists, nothing done.");
+            }
+
+            normalizeObject(mcrObject);
+
+            validateObject(mcrObject);
+
+            // handle events
+            fireEvent(mcrObject, null, MCREvent.EventType.CREATE);
         }
-
-        normalizeObject(mcrObject);
-
-        validateObject(mcrObject);
-
-        // handle events
-        fireEvent(mcrObject, null, MCREvent.EventType.CREATE);
     }
 
     public static void checkCreatePrivilege(MCRObjectID objectId) throws MCRAccessException {
@@ -304,24 +322,26 @@ public final class MCRMetadataManager {
         if (!MCRAccessManager.checkDerivateContentPermission(id, PERMISSION_DELETE)) {
             throw new MCRMissingPermissionException("Delete derivate", id.toString(), PERMISSION_DELETE);
         }
-        // mark for deletion
-        MCRMarkManager.getInstance().mark(id, Operation.DELETE);
+        try (MCRObjectLock ignored = lock(id)) {
+            // mark for deletion
+            MCRMarkManager.getInstance().mark(id, Operation.DELETE);
 
-        // delete data from IFS
-        if (mcrDerivate.getDerivate().getInternals() != null) {
-            try {
-                deleteDerivate(id.toString());
-                LOGGER.info("IFS entries for MCRDerivate {} are deleted.", id);
-            } catch (final Exception e) {
-                throw new MCRPersistenceException("Error while delete MCRDerivate " + id + " in IFS", e);
+            // delete data from IFS
+            if (mcrDerivate.getDerivate().getInternals() != null) {
+                try {
+                    deleteDerivate(id.toString());
+                    LOGGER.info("IFS entries for MCRDerivate {} are deleted.", id);
+                } catch (final Exception e) {
+                    throw new MCRPersistenceException("Error while delete MCRDerivate " + id + " in IFS", e);
+                }
             }
+
+            // handle events
+            fireEvent(mcrDerivate, null, MCREvent.EventType.DELETE);
+
+            // remove mark
+            MCRMarkManager.getInstance().remove(id);
         }
-
-        // handle events
-        fireEvent(mcrDerivate, null, MCREvent.EventType.DELETE);
-
-        // remove mark
-        MCRMarkManager.getInstance().remove(id);
     }
 
     /**
@@ -345,17 +365,19 @@ public final class MCRMetadataManager {
 
         checkDeletePermission(id);
 
-        checkForActiveLinks(mcrObject, id);
+        try (MCRObjectLock ignored = lock(id)) {
+            checkForActiveLinks(mcrObject, id);
 
-        markForDeletion(id);
+            markForDeletion(id);
 
-        removeAllChildren(mcrObject);
+            removeAllChildren(mcrObject);
 
-        removeAllDerivates(mcrObject);
+            removeAllDerivates(mcrObject);
 
-        fireEvent(mcrObject, null, MCREvent.EventType.DELETE);
+            fireEvent(mcrObject, null, MCREvent.EventType.DELETE);
 
-        removeMark(id);
+            removeMark(id);
+        }
     }
 
     private static void removeAllChildren(MCRObject mcrObject)
@@ -429,7 +451,6 @@ public final class MCRMetadataManager {
         final MCRDerivate derivate = retrieveMCRDerivate(id);
         delete(derivate);
     }
-
 
     /**
      * Deletes the mcr object with the given <code>id</code>.
@@ -617,21 +638,22 @@ public final class MCRMetadataManager {
             return;
         }
 
-        if (!exists(derivateId)) {
-            create(mcrDerivate);
-            return;
+        try (MCRObjectLock ignored = lock(derivateId)) {
+            if (!exists(derivateId)) {
+                create(mcrDerivate);
+                return;
+            }
+
+            checkUpdatePermission(derivateId);
+
+            Path fileSourceDirectory = handleFileSourceDirectory(mcrDerivate);
+
+            MCRDerivate old = retrieveMCRDerivate(derivateId);
+
+            updateDerivate(mcrDerivate, old);
+
+            updateIFS(fileSourceDirectory, derivateId);
         }
-
-        checkUpdatePermission(derivateId);
-
-        Path fileSourceDirectory = handleFileSourceDirectory(mcrDerivate);
-
-        MCRDerivate old = retrieveMCRDerivate(derivateId);
-
-        updateDerivate(mcrDerivate, old);
-
-        updateIFS(fileSourceDirectory, derivateId);
-
     }
 
     private static Path handleFileSourceDirectory(MCRDerivate mcrDerivate) {
@@ -647,7 +669,6 @@ public final class MCRMetadataManager {
         }
         return null;
     }
-
 
     private static void updateDerivate(MCRDerivate mcrDerivate, MCRDerivate old) throws MCRPersistenceException {
         Date oldDate = old.getService().getDate(DATE_TYPE_CREATEDATE);
@@ -674,7 +695,6 @@ public final class MCRMetadataManager {
         }
     }
 
-
     /**
      * Updates the object or creates it if it does not exist yet.
      *
@@ -690,21 +710,23 @@ public final class MCRMetadataManager {
             return;
         }
 
-        if (!exists(id)) {
-            create(mcrObject);
-            return;
+        try (MCRObjectLock ignored = lock(id)) {
+            if (!exists(id)) {
+                create(mcrObject);
+                return;
+            }
+
+            checkUpdatePermission(id);
+            normalizeObject(mcrObject);
+            validateObject(mcrObject);
+
+            MCRObject old = retrieveMCRObject(id);
+
+            checkModificationDates(mcrObject, old);
+            retainCreatedDateAndFlags(mcrObject, old);
+
+            fireUpdateEvent(mcrObject);
         }
-
-        checkUpdatePermission(id);
-        normalizeObject(mcrObject);
-        validateObject(mcrObject);
-
-        MCRObject old = retrieveMCRObject(id);
-
-        checkModificationDates(mcrObject, old);
-        retainCreatedDateAndFlags(mcrObject, old);
-
-        fireUpdateEvent(mcrObject);
     }
 
     /**
@@ -788,7 +810,6 @@ public final class MCRMetadataManager {
         }
     }
 
-
     /**
      * Updates only the XML part of the derivate.
      *
@@ -869,5 +890,70 @@ public final class MCRMetadataManager {
                 }
                 return null;
             });
+    }
+
+    /**
+     * Acquires the per-object lock for {@code id}, blocking up to the timeout configured by
+     * {@link #LOCK_TIMEOUT_PROPERTY} (default 60s). The returned {@link MCRObjectLock} must be
+     * closed (use try-with-resources). Reentrant: the same thread may acquire the same id any
+     * number of times; only the outermost {@code close()} releases the lock for other threads.
+     *
+     * @param id the object id to lock
+     * @return an AutoCloseable lock handle
+     * @throws MCRPersistenceException if the timeout elapses or the wait is interrupted
+     */
+    public static MCRObjectLock lock(MCRObjectID id) {
+        LockEntry entry = LOCKS.compute(id, (k, v) -> {
+            if (v == null) {
+                v = new LockEntry();
+            }
+            v.refCount++;
+            return v;
+        });
+        boolean acquired = false;
+        try {
+            acquired = entry.lock.tryLock(getLockTimeoutSeconds(), TimeUnit.SECONDS);
+            if (!acquired) {
+                throw new MCRPersistenceException("Lock timeout for " + id);
+            }
+            return new MCRObjectLock(id);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new MCRPersistenceException("Lock interrupted for " + id, e);
+        } finally {
+            if (!acquired) {
+                LOCKS.compute(id, (k, v) -> --v.refCount == 0 ? null : v);
+            }
+        }
+    }
+
+    private static int getLockTimeoutSeconds() {
+        return MCRConfiguration2.getInt(LOCK_TIMEOUT_PROPERTY).orElse(DEFAULT_LOCK_TIMEOUT_SECONDS);
+    }
+
+    private static final class LockEntry {
+        final ReentrantLock lock = new ReentrantLock();
+        int refCount; // guarded per key by ConcurrentHashMap.compute on LOCKS
+    }
+
+    /**
+     * AutoCloseable handle returned by {@link MCRMetadataManager#lock(MCRObjectID)}.
+     * Release by calling {@link #close()}, typically via try-with-resources.
+     */
+    public static final class MCRObjectLock implements AutoCloseable {
+
+        private final MCRObjectID id;
+
+        MCRObjectLock(MCRObjectID id) {
+            this.id = id;
+        }
+
+        @Override
+        public void close() {
+            LOCKS.compute(id, (k, v) -> {
+                v.lock.unlock();
+                return --v.refCount == 0 ? null : v;
+            });
+        }
     }
 }
