@@ -133,9 +133,7 @@ public class MCRMetadataManagerLockTest {
     public void refcountCleansUpAfterRelease() throws Exception {
         for (int i = 0; i < 100; i++) {
             MCRObjectID id = MCRObjectID.getInstance(String.format("MyCoRe_test_%08d", 100 + i));
-            try (MCRObjectLock l = MCRMetadataManager.lock(id)) {
-                // nothing
-            }
+            MCRMetadataManager.lock(id).close();
         }
         Field f = MCRMetadataManager.class.getDeclaredField("LOCKS");
         f.setAccessible(true);
