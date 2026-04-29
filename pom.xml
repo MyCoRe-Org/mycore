@@ -1040,6 +1040,11 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <version>${jackson.version}</version>
       </dependency>
       <dependency>
+        <groupId>com.github.java-json-tools</groupId>
+        <artifactId>json-patch</artifactId>
+        <version>1.13</version>
+      </dependency>
+      <dependency>
         <groupId>com.google.code.gson</groupId>
         <artifactId>gson</artifactId>
         <version>2.13.2</version>
@@ -1744,6 +1749,11 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-tei</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-user-restapi</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -2599,6 +2609,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <module>mycore-solr</module>
     <module>mycore-sword</module>
     <module>mycore-tei</module>
+    <module>mycore-user-restapi</module>
     <module>mycore-user2</module>
     <module>mycore-viewer</module>
     <module>mycore-wcms2</module>
