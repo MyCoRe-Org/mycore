@@ -142,6 +142,21 @@ public class MCRMetadataManagerLockTest {
     }
 
     @Test
+    public void doubleCloseIsNoop() throws Exception {
+        MCRObjectID id = idA();
+        MCRObjectLock l = MCRMetadataManager.lock(id);
+        l.close();
+        l.close();
+        Field f = MCRMetadataManager.class.getDeclaredField("LOCKS");
+        f.setAccessible(true);
+        Map<?, ?> map = (Map<?, ?>) f.get(null);
+        assertEquals(0, map.size(), "second close must not corrupt LOCKS map");
+        try (MCRObjectLock again = MCRMetadataManager.lock(id)) {
+            assertTrue(true);
+        }
+    }
+
+    @Test
     public void mutualExclusionSerialisesAccess() throws Exception {
         MCRObjectID id = idA();
         AtomicInteger inside = new AtomicInteger();

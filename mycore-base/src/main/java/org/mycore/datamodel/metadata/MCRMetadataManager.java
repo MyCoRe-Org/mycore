@@ -944,12 +944,18 @@ public final class MCRMetadataManager {
 
         private final MCRObjectID id;
 
+        private boolean closed;
+
         MCRObjectLock(MCRObjectID id) {
             this.id = id;
         }
 
         @Override
         public void close() {
+            if (closed) {
+                return;
+            }
+            closed = true;
             LOCKS.compute(id, (k, v) -> {
                 v.lock.unlock();
                 return --v.refCount == 0 ? null : v;
