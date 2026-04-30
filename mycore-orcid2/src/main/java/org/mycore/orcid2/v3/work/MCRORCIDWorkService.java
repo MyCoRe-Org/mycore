@@ -42,7 +42,7 @@ import org.mycore.orcid2.exception.MCRORCIDWorkAlreadyExistsException;
 import org.mycore.orcid2.metadata.MCRORCIDMetadataUtils;
 import org.mycore.orcid2.metadata.MCRORCIDPutCodeInfo;
 import org.mycore.orcid2.metadata.MCRORCIDUserInfo;
-import org.mycore.orcid2.util.MCRIdentifier;
+import org.mycore.datamodel.legalentity.MCRIdentifier;
 import org.mycore.orcid2.v3.client.MCRORCIDClientHelper;
 import org.mycore.orcid2.v3.client.MCRORCIDSearchImpl;
 import org.mycore.orcid2.v3.client.MCRORCIDSectionImpl;
