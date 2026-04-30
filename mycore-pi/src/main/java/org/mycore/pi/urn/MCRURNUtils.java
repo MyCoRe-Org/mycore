@@ -19,9 +19,8 @@
 package org.mycore.pi.urn;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.Date;
-import java.util.Locale;
 import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
@@ -53,11 +52,14 @@ public class MCRURNUtils {
             .map(JsonElement::getAsString)
             .orElse(null);
 
+        return parseDNBRegisterDate(date);
+    }
+
+    static Date parseDNBRegisterDate(String date) {
         if (date == null) {
             return null;
         }
-
-        return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.GERMAN).parse(date);
+        return Date.from(Instant.parse(date));
     }
 
 }
