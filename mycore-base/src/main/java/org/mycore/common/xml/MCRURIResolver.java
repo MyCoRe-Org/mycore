@@ -1040,6 +1040,7 @@ public final class MCRURIResolver implements URIResolver {
     private static final class MCRXslStyleResolver implements URIResolver {
 
         public static final String PREFIX = "MCR.URIResolver.XSLStyle.Flavor.";
+        private static final String FLAVOR_PARAMETER = "xslStyleFlavor";
 
         private final Flavor defaultFlavor;
 
@@ -1126,6 +1127,9 @@ public final class MCRURIResolver implements URIResolver {
                 configurationEnd = paramsStart;
             }
 
+            Map<String, String> parameterMap = getParameterMap(parameters);
+            String flavorParameter = parameterMap.remove(FLAVOR_PARAMETER);
+
             //  copy stylesheets from href
             String stylesheetPaths = help.substring(0, configurationEnd);
 
@@ -1139,6 +1143,14 @@ public final class MCRURIResolver implements URIResolver {
                     resolved.setSystemId(targetUri);
                 }
 
+                if (flavorName.isEmpty() && flavorParameter != null && !flavorParameter.isBlank()) {
+                    flavorName = flavorParameter;
+                    flavor = flavors.get(flavorName);
+                    if (flavor == null) {
+                        throw new MCRUsageException("Unknown flavor " + flavorName + " in " + href);
+                    }
+                }
+
                 // prepare transformer
                 String[] stylesheets = augmentStylesheetsPaths(stylesheetPaths.split(","),
                     flavor.xslFolder);
@@ -1147,7 +1159,7 @@ public final class MCRURIResolver implements URIResolver {
 
                 //prepare parameter collector
                 MCRParameterCollector parameterCollector = MCRParameterCollector.ofCurrentSession();
-                parameterCollector.setParameters(getParameterMap(parameters));
+                parameterCollector.setParameters(parameterMap);
 
                 // perform transformation
                 MCRSourceContent content = new MCRSourceContent(resolved);
