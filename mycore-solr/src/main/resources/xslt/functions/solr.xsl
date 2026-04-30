@@ -16,4 +16,13 @@
 
     <xsl:value-of select="format-dateTime($calc,'[Y0001]-[M01]-[D01]')" />
   </xsl:function>
+
+  <xsl:function name="mcrsolr:escape-search-value" as="xs:string?">
+    <xsl:param name="value" as="xs:string?" />
+
+    <xsl:sequence select="
+      if (empty($value)) then ()
+      else replace($value, '([!&amp;|+\-(){}\[\]&quot;~:\\/^])', '\\$1')
+    " />
+  </xsl:function>
 </xsl:stylesheet>
