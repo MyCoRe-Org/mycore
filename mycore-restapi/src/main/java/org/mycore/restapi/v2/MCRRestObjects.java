@@ -410,8 +410,8 @@ public class MCRRestObjects {
     @Operation(
         summary = "Returns MCRObject with the given " + PARAM_MCRID + ".",
         tags = MCRRestUtils.TAG_MYCORE_OBJECT)
-    public Response getObject(@Parameter(example = "mir_mods_00004711") @PathParam(PARAM_MCRID) MCRObjectID id)
-        throws IOException {
+    public Response getObject(@Parameter(example = "mir_mods_00004711") @PathParam(PARAM_MCRID) MCRObjectID id,
+        @QueryParam("expanded") Boolean expandedParm) throws IOException {
         long modified;
         try {
             modified = MCRXMLMetadataManager.getInstance().getLastModified(id);
@@ -427,8 +427,9 @@ public class MCRRestObjects {
         if (cachedResponse.isPresent()) {
             return cachedResponse.get();
         }
-
-        MCRContent mcrContent = new MCRBaseContent(MCRMetadataManager.retrieveMCRExpandedObject(id));
+        boolean expanded = Optional.ofNullable(expandedParm).orElse(true);
+        MCRContent mcrContent = new MCRBaseContent(
+            expanded ? MCRMetadataManager.retrieveMCRExpandedObject(id) : MCRMetadataManager.retrieveMCRObject(id));
         return Response.ok()
             .entity(mcrContent,
                 new Annotation[] { MCRParams.Factory
@@ -445,8 +446,8 @@ public class MCRRestObjects {
     @Operation(
         summary = "Returns metadata section MCRObject with the given " + PARAM_MCRID + ".",
         tags = MCRRestUtils.TAG_MYCORE_OBJECT)
-    public Response getObjectMetadata(@Parameter(example = "mir_mods_00004712") @PathParam(PARAM_MCRID) MCRObjectID id)
-        throws IOException {
+    public Response getObjectMetadata(@Parameter(example = "mir_mods_00004712") @PathParam(PARAM_MCRID) MCRObjectID id,
+        @QueryParam("expanded") Boolean expandedParm) throws IOException {
         long modified = MCRXMLMetadataManager.getInstance().getLastModified(id);
         if (modified < 0) {
             throw new NotFoundException("MCRObject " + id + " not found");
@@ -456,7 +457,9 @@ public class MCRRestObjects {
         if (cachedResponse.isPresent()) {
             return cachedResponse.get();
         }
-        MCRObject mcrObj = MCRMetadataManager.retrieveMCRExpandedObject(id);
+        boolean expanded = Optional.ofNullable(expandedParm).orElse(true);
+        MCRObject mcrObj =
+            expanded ? MCRMetadataManager.retrieveMCRExpandedObject(id) : MCRMetadataManager.retrieveMCRObject(id);
         MCRContent mcrContent = new MCRJDOMContent(mcrObj.getMetadata().createXML());
         return Response.ok()
             .entity(mcrContent,
