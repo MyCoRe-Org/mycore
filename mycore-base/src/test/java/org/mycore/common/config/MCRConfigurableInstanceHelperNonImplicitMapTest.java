@@ -21,11 +21,18 @@ package org.mycore.common.config;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
-import org.junit.jupiter.api.Test;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.annotation.MCRInstanceMap;
@@ -34,7 +41,7 @@ import org.mycore.common.config.annotation.MCRSentinel;
 import org.mycore.test.MyCoReTest;
 
 /**
- * Exhaustive list of tests for the following conditions:
+ * Tests for the following conditions:
  * <ol>
  *   <li>Annotation has <code>required = false</code> or not</li>
  *   <li>Class-property is not set, set to an empty string or set to a fully qualified class name</li>
@@ -62,43 +69,36 @@ import org.mycore.test.MyCoReTest;
  *     <th style="border: 1px solid;">Expected Required Result</th>
  *   </tr>
  *   <tr>
+ *     <td style="border: 1px solid;">-</td>
+ *     <td style="border: 1px solid;">impl. or expl. disabled</td>
+ *     <td style="border: 1px solid;">-</td>
+ *     <td style="border: 1px solid;"><code>{}</code></td>
+ *     <td style="border: 1px solid;">Exception</td>
+ *   </tr>
+ *   <tr>
+ *     <td style="border: 1px solid;">set empty</td>
+ *     <td style="border: 1px solid;">-</td>
+ *     <td style="border: 1px solid;">-</td>
+ *     <td style="border: 1px solid;"><code>{}</code></td>
+ *     <td style="border: 1px solid;">Exception</td>
+ *   </tr>
+ *   <tr>
  *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">none</td>
+ *     <td style="border: 1px solid;">none or impl. enabled</td>
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;"><code>{}</code></td>
  *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">none</td>
+ *     <td style="border: 1px solid;">none or impl. enabled</td>
  *     <td style="border: 1px solid;"><code>A.a=</code></td>
  *     <td style="border: 1px solid;"><code>{}</code></td>
  *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">none</td>
- *     <td style="border: 1px solid;"><code>A.a=Value</code></td>
- *     <td style="border: 1px solid;"><code>{}</code></td>
- *     <td style="border: 1px solid;">Exception</td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">impl. enabled</td>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;"><code>{}</code></td>
- *     <td style="border: 1px solid;">Exception</td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">impl. enabled</td>
- *     <td style="border: 1px solid;"><code>A.a=</code></td>
- *     <td style="border: 1px solid;"><code>{}</code></td>
- *     <td style="border: 1px solid;">Exception</td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">impl. enabled</td>
+ *     <td style="border: 1px solid;">none or impl. enabled</td>
  *     <td style="border: 1px solid;"><code>A.a=Value</code></td>
  *     <td style="border: 1px solid;"><code>{}</code></td>
  *     <td style="border: 1px solid;">Exception</td>
@@ -126,1473 +126,288 @@ import org.mycore.test.MyCoReTest;
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;">set</td>
- *     <td style="border: 1px solid;">none</td>
+ *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;"><code>{A=_}</code></td>
  *     <td style="border: 1px solid;"><code>{A=_}</code></td>
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;">set</td>
- *     <td style="border: 1px solid;">none</td>
+ *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;"><code>A.a=</code></td>
  *     <td style="border: 1px solid;"><code>{A=()}</code></td>
  *     <td style="border: 1px solid;"><code>{A=()}</code></td>
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;">set</td>
- *     <td style="border: 1px solid;">none</td>
+ *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;"><code>A.a=Value</code></td>
  *     <td style="border: 1px solid;"><code>A=(Value)</code></td>
  *     <td style="border: 1px solid;"><code>{A=(Value)}</code></td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">set</td>
- *     <td style="border: 1px solid;">impl. or expl. enabled</td>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;"><code>{A=_}</code></td>
- *     <td style="border: 1px solid;"><code>{A=_}</code></td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">set</td>
- *     <td style="border: 1px solid;">impl. or expl. enabled</td>
- *     <td style="border: 1px solid;"><code>A.a=</code></td>
- *     <td style="border: 1px solid;"><code>{A=()}</code></td>
- *     <td style="border: 1px solid;"><code>{A=()}</code></td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">set</td>
- *     <td style="border: 1px solid;">impl. or expl. enabled</td>
- *     <td style="border: 1px solid;"><code>A.a=Value</code></td>
- *     <td style="border: 1px solid;"><code>{A=(Value)}</code></td>
- *     <td style="border: 1px solid;"><code>{A=(Value)}</code></td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;">impl. or expl. disabled</td>
- *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;"><code>{}</code></td>
- *     <td style="border: 1px solid;">Exception</td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">set empty</td>
- *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;"><code>{}</code></td>
- *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  * </table>
  */
 @MyCoReTest
 public class MCRConfigurableInstanceHelperNonImplicitMapTest {
 
-    public static final String ENABLED = "true";
+    private static final Logger LOGGER = LogManager.getLogger();
+
+    public static final String CONFIGURED_CLASS_PROPERTY = "Foo.Class";
+
+    public static final String NESTED_CLASS_PROPERTY = "Foo.Nested.foo.Class";
+
+    public static final String NESTED_SENTINEL_PROPERTY = "Foo.Nested.foo.Enabled";
+
+    public static final String NESTED_VALUE_PROPERTY = "Foo.Nested.foo.Value";
+
+    private static Stream<Arguments> provideAllParameterCombinations() {
+        List<Arguments> argumentsList = new ArrayList<>();
+        for (Boolean required : List.of(false, true)) {
+            for (ClassProperty classProperty : ClassProperty.values()) {
+                for (Sentinel sentinel : Sentinel.values()) {
+                    for (ValueProperty valueProperty : ValueProperty.values()) {
+                        argumentsList.add(Arguments.of(required, classProperty, sentinel, valueProperty));
+                    }
+                }
+            }
+        }
+        return argumentsList.stream();
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideAllParameterCombinations")
+    @MCRTestConfiguration(properties = {
+        @MCRTestProperty(key = NESTED_CLASS_PROPERTY, empty = true),
+        @MCRTestProperty(key = NESTED_VALUE_PROPERTY, empty = true)
+    })
+    void test(boolean required, ClassProperty classProperty, Sentinel sentinel, ValueProperty valueProperty) {
+
+        // log all parameters
+        LOGGER.info("TEST PARAMETERS");
+        LOGGER.info("required={}", required);
+        LOGGER.info("classProperty={}", classProperty);
+        LOGGER.info("sentinel={}", sentinel);
+        LOGGER.info("valueProperty={}", valueProperty);
+
+        // select class to be configured
+        Class<? extends Configurable> configuredClass;
+        if (required) {
+            configuredClass = switch (sentinel) {
+                case NONE -> RequiredNoSentinel.class;
+                case IMPLICITLY_DISABLED -> RequiredDisablingSentinel.class;
+                default -> RequiredEnablingSentinel.class;
+            };
+        } else {
+            configuredClass = switch (sentinel) {
+                case NONE -> NotRequiredNoSentinel.class;
+                case IMPLICITLY_DISABLED -> NotRequiredDisablingSentinel.class;
+                default -> NotRequiredEnablingSentinel.class;
+            };
+        }
 
-    public static final String DISABLED = "false";
+        // set class property for configured instance
+        MCRConfiguration2.set(CONFIGURED_CLASS_PROPERTY, configuredClass.getName());
 
-    public static final Map<String, Nested> EMPTY = Map.of();
+        // set class property for nested instance
+        // empty string is default via @MCRTestProperty above, may need to overwrite
+        switch (classProperty) {
+            case NOT_SET -> MCRConfiguration2.set(NESTED_CLASS_PROPERTY, (String) null);
+            case SET_NON_EMPTY -> MCRConfiguration2.set(NESTED_CLASS_PROPERTY, Nested.class.getName());
+        }
 
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredNoSentinel.class),
-    })
-    public void notRequiredClassPropertyMissingNoSentinelValuePropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredNoSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredNoSentinel.class, configuration);
-        assertEquals(EMPTY, instance.nestedMap);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredNoSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", empty = true),
-    })
-    public void notRequiredClassPropertyMissingNoSentinelValuePropertyEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredNoSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredNoSentinel.class, configuration);
-        assertEquals(EMPTY, instance.nestedMap);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredNoSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", string = "Value"),
-    })
-    public void notRequiredClassPropertyMissingNoSentinelValuePropertyNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredNoSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredNoSentinel.class, configuration);
-        assertEquals(EMPTY, instance.nestedMap);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredSentinel.class),
-    })
-    public void notRequiredClassPropertyMissingSentinelEnabledValuePropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredSentinel.class, configuration);
-        assertEquals(EMPTY, instance.nestedMap);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", empty = true),
-    })
-    public void notRequiredClassPropertyMissingSentinelEnabledValuePropertyEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredSentinel.class, configuration);
-        assertEquals(EMPTY, instance.nestedMap);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", string = "Value"),
-    })
-    public void notRequiredClassPropertyMissingSentinelEnabledValuePropertyNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredSentinel.class, configuration);
-        assertEquals(EMPTY, instance.nestedMap);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Enabled", string = ENABLED),
-    })
-    public void notRequiredClassPropertyMissingSentinelSetEnabledValuePropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredSentinel.class, configuration);
-        assertEquals(EMPTY, instance.nestedMap);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Enabled", string = ENABLED),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", empty = true),
-    })
-    public void notRequiredClassPropertyMissingSentinelSetEnabledValuePropertyEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredSentinel.class, configuration);
-        assertEquals(EMPTY, instance.nestedMap);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Enabled", string = ENABLED),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", string = "Value"),
-    })
-    public void notRequiredClassPropertyMissingSentinelSetEnabledValuePropertyNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredSentinel.class, configuration);
-        assertEquals(EMPTY, instance.nestedMap);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredDisablingSentinel.class),
-    })
-    public void notRequiredClassPropertyMissingSentinelDisabledValuePropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredDisablingSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredDisablingSentinel.class, configuration);
-        assertEquals(EMPTY, instance.nestedMap);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredDisablingSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", empty = true),
-    })
-    public void notRequiredClassPropertyMissingSentinelDisabledValuePropertyEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredDisablingSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredDisablingSentinel.class, configuration);
-        assertEquals(EMPTY, instance.nestedMap);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredDisablingSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", string = "Value"),
-    })
-    public void notRequiredClassPropertyMissingSentinelDisabledValuePropertyNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredDisablingSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredDisablingSentinel.class, configuration);
-        assertEquals(EMPTY, instance.nestedMap);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Enabled", string = DISABLED),
-    })
-    public void notRequiredClassPropertyMissingSentinelSetDisabledValuePropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredSentinel.class, configuration);
-        assertEquals(EMPTY, instance.nestedMap);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Enabled", string = DISABLED),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", empty = true),
-    })
-    public void notRequiredClassPropertyMissingSentinelSetDisabledValuePropertyEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredSentinel.class, configuration);
-        assertEquals(EMPTY, instance.nestedMap);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Enabled", string = DISABLED),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", string = "Value"),
-    })
-    public void notRequiredClassPropertyMissingSentinelSetDisabledValuePropertyNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredSentinel.class, configuration);
-        assertEquals(EMPTY, instance.nestedMap);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredNoSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", empty = true),
-    })
-    public void notRequiredClassPropertyEmptyNoSentinelValuePropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredNoSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredNoSentinel.class, configuration);
-        assertEquals(EMPTY, instance.nestedMap);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredNoSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", empty = true),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", empty = true),
-    })
-    public void notRequiredClassPropertyEmptyNoSentinelValuePropertyEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredNoSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredNoSentinel.class, configuration);
-        assertEquals(EMPTY, instance.nestedMap);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredNoSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", empty = true),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", string = "Value"),
-    })
-    public void notRequiredClassPropertyEmptyNoSentinelValuePropertyNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredNoSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredNoSentinel.class, configuration);
-        assertEquals(EMPTY, instance.nestedMap);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", empty = true),
-    })
-    public void notRequiredClassPropertyEmptySentinelEnabledValuePropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredSentinel.class, configuration);
-        assertEquals(EMPTY, instance.nestedMap);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", empty = true),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", empty = true),
-    })
-    public void notRequiredClassPropertyEmptySentinelEnabledValuePropertyEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredSentinel.class, configuration);
-        assertEquals(EMPTY, instance.nestedMap);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", empty = true),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", string = "Value"),
-    })
-    public void notRequiredClassPropertyEmptySentinelEnabledValuePropertyNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredSentinel.class, configuration);
-        assertEquals(EMPTY, instance.nestedMap);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", empty = true),
-        @MCRTestProperty(key = "Foo.Nested.foo.Enabled", string = ENABLED),
-    })
-    public void notRequiredClassPropertyEmptySentinelSetEnabledValuePropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredSentinel.class, configuration);
-        assertEquals(EMPTY, instance.nestedMap);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", empty = true),
-        @MCRTestProperty(key = "Foo.Nested.foo.Enabled", string = ENABLED),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", empty = true),
-    })
-    public void notRequiredClassPropertyEmptySentinelSetEnabledValuePropertyEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredSentinel.class, configuration);
-        assertEquals(EMPTY, instance.nestedMap);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", empty = true),
-        @MCRTestProperty(key = "Foo.Nested.foo.Enabled", string = ENABLED),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", string = "Value"),
-    })
-    public void notRequiredClassPropertyEmptySentinelSetEnabledValuePropertyNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredSentinel.class, configuration);
-        assertEquals(EMPTY, instance.nestedMap);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredDisablingSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", empty = true),
-    })
-    public void notRequiredClassPropertyEmptySentinelDisabledValuePropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredDisablingSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredDisablingSentinel.class, configuration);
-        assertEquals(EMPTY, instance.nestedMap);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredDisablingSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", empty = true),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", empty = true),
-    })
-    public void notRequiredClassPropertyEmptySentinelDisabledValuePropertyEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredDisablingSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredDisablingSentinel.class, configuration);
-        assertEquals(EMPTY, instance.nestedMap);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredDisablingSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", empty = true),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", string = "Value"),
-    })
-    public void notRequiredClassPropertyEmptySentinelDisabledValuePropertyNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredDisablingSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredDisablingSentinel.class, configuration);
-        assertEquals(EMPTY, instance.nestedMap);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", empty = true),
-        @MCRTestProperty(key = "Foo.Nested.foo.Enabled", string = DISABLED),
-    })
-    public void notRequiredClassPropertyEmptySentinelSetDisabledValuePropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredSentinel.class, configuration);
-        assertEquals(EMPTY, instance.nestedMap);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", empty = true),
-        @MCRTestProperty(key = "Foo.Nested.foo.Enabled", string = DISABLED),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", empty = true),
-    })
-    public void notRequiredClassPropertyEmptySentinelSetDisabledValuePropertyEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredSentinel.class, configuration);
-        assertEquals(EMPTY, instance.nestedMap);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", empty = true),
-        @MCRTestProperty(key = "Foo.Nested.foo.Enabled", string = DISABLED),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", string = "Value"),
-    })
-    public void notRequiredClassPropertyEmptySentinelSetDisabledValuePropertyNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredSentinel.class, configuration);
-        assertEquals(EMPTY, instance.nestedMap);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredNoSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", classNameOf = Nested.class),
-    })
-    public void notRequiredClassPropertyNotEmptyNoSentinelValuePropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredNoSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredNoSentinel.class, configuration);
-        assertNotNull(instance.nestedMap);
-        assertNull(instance.nestedMap.get("foo").value);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredNoSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", classNameOf = Nested.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", empty = true),
-    })
-    public void notRequiredClassPropertyNotEmptyNoSentinelValuePropertyEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredNoSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredNoSentinel.class, configuration);
-        assertNotNull(instance.nestedMap);
-        assertEquals("", instance.nestedMap.get("foo").value);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredNoSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", classNameOf = Nested.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", string = "Value"),
-    })
-    public void notRequiredClassPropertyNotEmptyNoSentinelValuePropertyNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredNoSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredNoSentinel.class, configuration);
-        assertNotNull(instance.nestedMap);
-        assertEquals("Value", instance.nestedMap.get("foo").value);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", classNameOf = Nested.class),
-    })
-    public void notRequiredClassPropertyNotEmptySentinelEnabledValuePropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredSentinel.class, configuration);
-        assertNotNull(instance.nestedMap);
-        assertNull(instance.nestedMap.get("foo").value);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", classNameOf = Nested.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", empty = true),
-    })
-    public void notRequiredClassPropertyNotEmptySentinelEnabledValuePropertyEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredSentinel.class, configuration);
-        assertNotNull(instance.nestedMap);
-        assertEquals("", instance.nestedMap.get("foo").value);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", classNameOf = Nested.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", string = "Value"),
-    })
-    public void notRequiredClassPropertyNotEmptySentinelEnabledValuePropertyNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredSentinel.class, configuration);
-        assertNotNull(instance.nestedMap);
-        assertEquals("Value", instance.nestedMap.get("foo").value);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", classNameOf = Nested.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Enabled", string = ENABLED),
-    })
-    public void notRequiredClassPropertyNotEmptySentinelSetEnabledValuePropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredSentinel.class, configuration);
-        assertNotNull(instance.nestedMap);
-        assertNull(instance.nestedMap.get("foo").value);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", classNameOf = Nested.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Enabled", string = ENABLED),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", empty = true),
-    })
-    public void notRequiredClassPropertyNotEmptySentinelSetEnabledValuePropertyEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredSentinel.class, configuration);
-        assertNotNull(instance.nestedMap);
-        assertEquals("", instance.nestedMap.get("foo").value);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", classNameOf = Nested.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Enabled", string = ENABLED),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", string = "Value"),
-    })
-    public void notRequiredClassPropertyNotEmptySentinelSetEnabledValuePropertyNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredSentinel.class, configuration);
-        assertNotNull(instance.nestedMap);
-        assertEquals("Value", instance.nestedMap.get("foo").value);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredDisablingSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", classNameOf = Nested.class),
-    })
-    public void notRequiredClassPropertyNotEmptySentinelDisabledValuePropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredDisablingSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredDisablingSentinel.class, configuration);
-        assertEquals(EMPTY, instance.nestedMap);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredDisablingSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", classNameOf = Nested.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", empty = true),
-    })
-    public void notRequiredClassPropertyNotEmptySentinelDisabledValuePropertyEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredDisablingSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredDisablingSentinel.class, configuration);
-        assertEquals(EMPTY, instance.nestedMap);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredDisablingSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", classNameOf = Nested.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", string = "Value"),
-    })
-    public void notRequiredClassPropertyNotEmptySentinelDisabledValuePropertyNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredDisablingSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredDisablingSentinel.class, configuration);
-        assertEquals(EMPTY, instance.nestedMap);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", classNameOf = Nested.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Enabled", string = DISABLED),
-    })
-    public void notRequiredClassPropertyNotEmptySentinelSetDisabledValuePropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredSentinel.class, configuration);
-        assertEquals(EMPTY, instance.nestedMap);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", classNameOf = Nested.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Enabled", string = DISABLED),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", empty = true),
-    })
-    public void notRequiredClassPropertyNotEmptySentinelSetDisabledValuePropertyEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredSentinel.class, configuration);
-        assertEquals(EMPTY, instance.nestedMap);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = NotRequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", classNameOf = Nested.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Enabled", string = DISABLED),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", string = "Value"),
-    })
-    public void notRequiredClassPropertyNotEmptySentinelSetDisabledValuePropertyNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredSentinel.class, configuration);
-        assertEquals(EMPTY, instance.nestedMap);
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredNoSentinel.class),
-    })
-    public void requiredClassPropertyMissingNoSentinelValuePropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredNoSentinel.class, configuration);
-        });
-        assertEquals("Instance map, configured in Foo.Nested (and its sub-properties)," +
-            " for target field 'nestedMap' in configured class " + RequiredNoSentinel.class.getName()
-            + " is empty", exception.getMessage());
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredNoSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", empty = true),
-    })
-    public void requiredClassPropertyMissingNoSentinelValuePropertyEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredNoSentinel.class, configuration);
-        });
-        assertEquals("Instance map, configured in Foo.Nested (and its sub-properties)," +
-            " for target field 'nestedMap' in configured class " + RequiredNoSentinel.class.getName()
-            + " is empty", exception.getMessage());
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredNoSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", string = "Value"),
-    })
-    public void requiredClassPropertyMissingNoSentinelValuePropertyNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredNoSentinel.class, configuration);
-        });
-        assertEquals("Instance map, configured in Foo.Nested (and its sub-properties)," +
-            " for target field 'nestedMap' in configured class " + RequiredNoSentinel.class.getName()
-            + " is empty", exception.getMessage());
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredSentinel.class),
-    })
-    public void requiredClassPropertyMissingSentinelEnabledValuePropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredSentinel.class, configuration);
-        });
-        assertEquals("Instance map, configured in Foo.Nested (and its sub-properties)," +
-            " for target field 'nestedMap' in configured class " + RequiredSentinel.class.getName()
-            + " is empty", exception.getMessage());
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", empty = true),
-    })
-    public void requiredClassPropertyMissingSentinelEnabledValuePropertyEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredSentinel.class, configuration);
-        });
-        assertEquals("Instance map, configured in Foo.Nested (and its sub-properties)," +
-            " for target field 'nestedMap' in configured class " + RequiredSentinel.class.getName()
-            + " is empty", exception.getMessage());
-    }
-
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", string = "Value"),
-    })
-    public void requiredClassPropertyMissingSentinelEnabledValuePropertyNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredSentinel.class, configuration);
-        });
-        assertEquals("Instance map, configured in Foo.Nested (and its sub-properties)," +
-            " for target field 'nestedMap' in configured class " + RequiredSentinel.class.getName()
-            + " is empty", exception.getMessage());
-    }
+        // set sentinel property for nested instance
+        switch (sentinel) {
+            case EXPLICITLY_ENABLED -> MCRConfiguration2.set(NESTED_SENTINEL_PROPERTY, "true");
+            case EXPLICITLY_DISABLED -> MCRConfiguration2.set(NESTED_SENTINEL_PROPERTY, "false");
+        }
 
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Enabled", string = ENABLED),
-    })
-    public void requiredClassPropertyMissingSentinelSetEnabledValuePropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredSentinel.class, configuration);
-        });
-        assertEquals("Instance map, configured in Foo.Nested (and its sub-properties)," +
-            " for target field 'nestedMap' in configured class " + RequiredSentinel.class.getName()
-            + " is empty", exception.getMessage());
-    }
+        // set value property for property of nested instance
+        // empty string is default via @MCRTestProperty above, may need to overwrite
+        switch (valueProperty) {
+            case NOT_SET -> MCRConfiguration2.set(NESTED_VALUE_PROPERTY, (String) null);
+            case SET_NON_EMPTY -> MCRConfiguration2.set(NESTED_VALUE_PROPERTY, "Value");
+        }
 
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Enabled", string = ENABLED),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", empty = true),
-    })
-    public void requiredClassPropertyMissingSentinelSetEnabledValuePropertyEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredSentinel.class, configuration);
-        });
-        assertEquals("Instance map, configured in Foo.Nested (and its sub-properties)," +
-            " for target field 'nestedMap' in configured class " + RequiredSentinel.class.getName()
-            + " is empty", exception.getMessage());
-    }
+        // log all relevant configuration entries
+        LOGGER.info("CONFIGURATION PROPERTIES");
+        Map<String, String> propertiesMap = MCRConfiguration2.getPropertiesMap();
+        LOGGER.info("{}={}", CONFIGURED_CLASS_PROPERTY, get(propertiesMap, CONFIGURED_CLASS_PROPERTY));
+        LOGGER.info("{}={}", NESTED_CLASS_PROPERTY, get(propertiesMap, NESTED_CLASS_PROPERTY));
+        LOGGER.info("{}={}", NESTED_SENTINEL_PROPERTY, get(propertiesMap, NESTED_SENTINEL_PROPERTY));
+        LOGGER.info("{}={}", NESTED_VALUE_PROPERTY, get(propertiesMap, NESTED_VALUE_PROPERTY));
 
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Enabled", string = ENABLED),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", string = "Value"),
-    })
-    public void requiredClassPropertyMissingSentinelSetEnabledValuePropertyNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredSentinel.class, configuration);
-        });
-        assertEquals("Instance map, configured in Foo.Nested (and its sub-properties)," +
-            " for target field 'nestedMap' in configured class " + RequiredSentinel.class.getName()
-            + " is empty", exception.getMessage());
-    }
+        // perform instantiation of configured class
+        Configurable instance = null;
+        MCRConfigurationException exception = null;
+        try {
+            MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName(CONFIGURED_CLASS_PROPERTY);
+            instance = MCRConfigurableInstanceHelper.getInstance(Configurable.class, configuration);
+        } catch (MCRConfigurationException e) {
+            exception = e;
+        }
 
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredDisablingSentinel.class),
-    })
-    public void requiredClassPropertyMissingSentinelDisabledValuePropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredDisablingSentinel.class, configuration);
-        });
-        assertEquals("Instance map, configured in Foo.Nested (and its sub-properties)," +
-            " for target field 'nestedMap' in configured class " + RequiredDisablingSentinel.class.getName()
-            + " is empty", exception.getMessage());
-    }
+        // all the indications a nested class should not be instantiated (or instantiation should be suppressed)
+        boolean shouldNotInstantiateNestedClass = false;
+        shouldNotInstantiateNestedClass |= classProperty == ClassProperty.NOT_SET;
+        shouldNotInstantiateNestedClass |= classProperty == ClassProperty.SET_EMPTY;
+        shouldNotInstantiateNestedClass |= sentinel == Sentinel.IMPLICITLY_DISABLED;
+        shouldNotInstantiateNestedClass |= sentinel == Sentinel.EXPLICITLY_DISABLED;
 
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredDisablingSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", empty = true),
-    })
-    public void requiredClassPropertyMissingSentinelDisabledValuePropertyEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredDisablingSentinel.class, configuration);
-        });
-        assertEquals("Instance map, configured in Foo.Nested (and its sub-properties)," +
-            " for target field 'nestedMap' in configured class " + RequiredDisablingSentinel.class.getName()
-            + " is empty", exception.getMessage());
-    }
+        if (required && shouldNotInstantiateNestedClass) {
 
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredDisablingSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", string = "Value"),
-    })
-    public void requiredClassPropertyMissingSentinelDisabledValuePropertyNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredDisablingSentinel.class, configuration);
-        });
-        assertEquals("Instance map, configured in Foo.Nested (and its sub-properties)," +
-            " for target field 'nestedMap' in configured class " + RequiredDisablingSentinel.class.getName()
-            + " is empty", exception.getMessage());
-    }
+            assertNull(instance);
+            assertNotNull(exception);
 
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Enabled", string = DISABLED),
-    })
-    public void requiredClassPropertyMissingSentinelSetDisabledValuePropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredSentinel.class, configuration);
-        });
-        assertEquals("Instance map, configured in Foo.Nested (and its sub-properties)," +
-            " for target field 'nestedMap' in configured class " + RequiredSentinel.class.getName()
-            + " is empty", exception.getMessage());
-    }
+            assertEquals("Instance map, configured in Foo.Nested (and its sub-properties)," +
+                " for target field 'nestedMap' in configured class " + configuredClass.getName()
+                + " is empty", exception.getMessage());
 
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Enabled", string = DISABLED),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", empty = true),
-    })
-    public void requiredClassPropertyMissingSentinelSetDisabledValuePropertyEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredSentinel.class, configuration);
-        });
-        assertEquals("Instance map, configured in Foo.Nested (and its sub-properties)," +
-            " for target field 'nestedMap' in configured class " + RequiredSentinel.class.getName()
-            + " is empty", exception.getMessage());
-    }
+        } else {
 
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Enabled", string = DISABLED),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", string = "Value"),
-    })
-    public void requiredClassPropertyMissingSentinelSetDisabledValuePropertyNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredSentinel.class, configuration);
-        });
-        assertEquals("Instance map, configured in Foo.Nested (and its sub-properties)," +
-            " for target field 'nestedMap' in configured class " + RequiredSentinel.class.getName()
-            + " is empty", exception.getMessage());
-    }
+            assertNull(exception);
+            assertNotNull(instance);
 
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredNoSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", empty = true),
-    })
-    public void requiredClassPropertyEmptyNoSentinelValuePropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredNoSentinel.class, configuration);
-        });
-        assertEquals("Instance map, configured in Foo.Nested (and its sub-properties)," +
-            " for target field 'nestedMap' in configured class " + RequiredNoSentinel.class.getName()
-            + " is empty", exception.getMessage());
-    }
+            Map<String, Nested> nestedMap = instance.nestedMap();
+            assertNotNull(nestedMap);
 
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredNoSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", empty = true),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", empty = true),
-    })
-    public void requiredClassPropertyEmptyNoSentinelValuePropertyEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredNoSentinel.class, configuration);
-        });
-        assertEquals("Instance map, configured in Foo.Nested (and its sub-properties)," +
-            " for target field 'nestedMap' in configured class " + RequiredNoSentinel.class.getName()
-            + " is empty", exception.getMessage());
-    }
+            if (shouldNotInstantiateNestedClass) {
 
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredNoSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", empty = true),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", string = "Value"),
-    })
-    public void requiredClassPropertyEmptyNoSentinelValuePropertyNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredNoSentinel.class, configuration);
-        });
-        assertEquals("Instance map, configured in Foo.Nested (and its sub-properties)," +
-            " for target field 'nestedMap' in configured class " + RequiredNoSentinel.class.getName()
-            + " is empty", exception.getMessage());
-    }
+                assertTrue(nestedMap.isEmpty());
 
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", empty = true),
-    })
-    public void requiredClassPropertyEmptySentinelEnabledValuePropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredSentinel.class, configuration);
-        });
-        assertEquals("Instance map, configured in Foo.Nested (and its sub-properties)," +
-            " for target field 'nestedMap' in configured class " + RequiredSentinel.class.getName()
-            + " is empty", exception.getMessage());
-    }
+            } else {
 
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", empty = true),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", empty = true),
-    })
-    public void requiredClassPropertyEmptySentinelEnabledValuePropertyEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredSentinel.class, configuration);
-        });
-        assertEquals("Instance map, configured in Foo.Nested (and its sub-properties)," +
-            " for target field 'nestedMap' in configured class " + RequiredSentinel.class.getName()
-            + " is empty", exception.getMessage());
-    }
+                assertEquals(1, nestedMap.size());
+                Nested nested = nestedMap.get("foo");
+                assertNotNull(nested);
 
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", empty = true),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", string = "Value"),
-    })
-    public void requiredClassPropertyEmptySentinelEnabledValuePropertyNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredSentinel.class, configuration);
-        });
-        assertEquals("Instance map, configured in Foo.Nested (and its sub-properties)," +
-            " for target field 'nestedMap' in configured class " + RequiredSentinel.class.getName()
-            + " is empty", exception.getMessage());
-    }
+                switch (valueProperty) {
+                    case NOT_SET -> assertNull(nested.value);
+                    case SET_EMPTY -> assertEquals("", nested.value);
+                    case SET_NON_EMPTY -> assertEquals("Value", nested.value);
+                }
 
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", empty = true),
-        @MCRTestProperty(key = "Foo.Nested.foo.Enabled", string = ENABLED),
-    })
-    public void requiredClassPropertyEmptySentinelSetEnabledValuePropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredSentinel.class, configuration);
-        });
-        assertEquals("Instance map, configured in Foo.Nested (and its sub-properties)," +
-            " for target field 'nestedMap' in configured class " + RequiredSentinel.class.getName()
-            + " is empty", exception.getMessage());
-    }
+            }
 
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", empty = true),
-        @MCRTestProperty(key = "Foo.Nested.foo.Enabled", string = ENABLED),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", empty = true),
-    })
-    public void requiredClassPropertyEmptySentinelSetEnabledValuePropertyEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredSentinel.class, configuration);
-        });
-        assertEquals("Instance map, configured in Foo.Nested (and its sub-properties)," +
-            " for target field 'nestedMap' in configured class " + RequiredSentinel.class.getName()
-            + " is empty", exception.getMessage());
-    }
+        }
 
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", empty = true),
-        @MCRTestProperty(key = "Foo.Nested.foo.Enabled", string = ENABLED),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", string = "Value"),
-    })
-    public void requiredClassPropertyEmptySentinelSetEnabledValuePropertyNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredSentinel.class, configuration);
-        });
-        assertEquals("Instance map, configured in Foo.Nested (and its sub-properties)," +
-            " for target field 'nestedMap' in configured class " + RequiredSentinel.class.getName()
-            + " is empty", exception.getMessage());
     }
 
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredDisablingSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", empty = true),
-    })
-    public void requiredClassPropertyEmptySentinelDisabledValuePropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredDisablingSentinel.class, configuration);
-        });
-        assertEquals("Instance map, configured in Foo.Nested (and its sub-properties)," +
-            " for target field 'nestedMap' in configured class " + RequiredDisablingSentinel.class.getName()
-            + " is empty", exception.getMessage());
+    private static String get(Map<String, String> map, String key) {
+        String value = map.get(key);
+        return value == null ? "null" : "'" + value + "'";
     }
 
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredDisablingSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", empty = true),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", empty = true),
-    })
-    public void requiredClassPropertyEmptySentinelDisabledValuePropertyEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredDisablingSentinel.class, configuration);
-        });
-        assertEquals("Instance map, configured in Foo.Nested (and its sub-properties)," +
-            " for target field 'nestedMap' in configured class " + RequiredDisablingSentinel.class.getName()
-            + " is empty", exception.getMessage());
-    }
+    enum ClassProperty {
 
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredDisablingSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", empty = true),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", string = "Value"),
-    })
-    public void requiredClassPropertyEmptySentinelDisabledValuePropertyNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredDisablingSentinel.class, configuration);
-        });
-        assertEquals("Instance map, configured in Foo.Nested (and its sub-properties)," +
-            " for target field 'nestedMap' in configured class " + RequiredDisablingSentinel.class.getName()
-            + " is empty", exception.getMessage());
-    }
+        NOT_SET,
 
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", empty = true),
-        @MCRTestProperty(key = "Foo.Nested.foo.Enabled", string = DISABLED),
-    })
-    public void requiredClassPropertyEmptySentinelSetDisabledValuePropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredSentinel.class, configuration);
-        });
-        assertEquals("Instance map, configured in Foo.Nested (and its sub-properties)," +
-            " for target field 'nestedMap' in configured class " + RequiredSentinel.class.getName()
-            + " is empty", exception.getMessage());
-    }
+        SET_EMPTY,
 
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", empty = true),
-        @MCRTestProperty(key = "Foo.Nested.foo.Enabled", string = DISABLED),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", empty = true),
-    })
-    public void requiredClassPropertyEmptySentinelSetDisabledValuePropertyEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredSentinel.class, configuration);
-        });
-        assertEquals("Instance map, configured in Foo.Nested (and its sub-properties)," +
-            " for target field 'nestedMap' in configured class " + RequiredSentinel.class.getName()
-            + " is empty", exception.getMessage());
-    }
+        SET_NON_EMPTY
 
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", empty = true),
-        @MCRTestProperty(key = "Foo.Nested.foo.Enabled", string = DISABLED),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", string = "Value"),
-    })
-    public void requiredClassPropertyEmptySentinelSetDisabledValuePropertyNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredSentinel.class, configuration);
-        });
-        assertEquals("Instance map, configured in Foo.Nested (and its sub-properties)," +
-            " for target field 'nestedMap' in configured class " + RequiredSentinel.class.getName()
-            + " is empty", exception.getMessage());
     }
 
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredNoSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", classNameOf = Nested.class),
-    })
-    public void requiredClassPropertyNotEmptyNoSentinelValuePropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredNoSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredNoSentinel.class, configuration);
-        assertNotNull(instance.nestedMap);
-        assertNull(instance.nestedMap.get("foo").value);
-    }
+    enum Sentinel {
 
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredNoSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", classNameOf = Nested.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", empty = true),
-    })
-    public void requiredClassPropertyNotEmptyNoSentinelValuePropertyEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredNoSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredNoSentinel.class, configuration);
-        assertNotNull(instance.nestedMap);
-        assertEquals("", instance.nestedMap.get("foo").value);
-    }
+        NONE,
 
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredNoSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", classNameOf = Nested.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", string = "Value"),
-    })
-    public void requiredClassPropertyNotEmptyNoSentinelValuePropertyNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredNoSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredNoSentinel.class, configuration);
-        assertNotNull(instance.nestedMap);
-        assertEquals("Value", instance.nestedMap.get("foo").value);
-    }
+        IMPLICITLY_ENABLED,
 
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", classNameOf = Nested.class),
-    })
-    public void requiredClassPropertyNotEmptySentinelEnabledValuePropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredSentinel.class, configuration);
-        assertNotNull(instance.nestedMap);
-        assertNull(instance.nestedMap.get("foo").value);
-    }
+        EXPLICITLY_ENABLED,
 
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", classNameOf = Nested.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", empty = true),
-    })
-    public void requiredClassPropertyNotEmptySentinelEnabledValuePropertyEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredSentinel.class, configuration);
-        assertNotNull(instance.nestedMap);
-        assertEquals("", instance.nestedMap.get("foo").value);
-    }
+        IMPLICITLY_DISABLED,
 
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", classNameOf = Nested.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", string = "Value"),
-    })
-    public void requiredClassPropertyNotEmptySentinelEnabledValuePropertyNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredSentinel.class, configuration);
-        assertNotNull(instance.nestedMap);
-        assertEquals("Value", instance.nestedMap.get("foo").value);
-    }
+        EXPLICITLY_DISABLED
 
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", classNameOf = Nested.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Enabled", string = ENABLED),
-    })
-    public void requiredClassPropertyNotEmptySentinelSetEnabledValuePropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredSentinel.class, configuration);
-        assertNotNull(instance.nestedMap);
-        assertNull(instance.nestedMap.get("foo").value);
     }
 
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", classNameOf = Nested.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Enabled", string = ENABLED),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", empty = true),
-    })
-    public void requiredClassPropertyNotEmptySentinelSetEnabledValuePropertyEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredSentinel.class, configuration);
-        assertNotNull(instance.nestedMap);
-        assertEquals("", instance.nestedMap.get("foo").value);
-    }
+    enum ValueProperty {
 
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", classNameOf = Nested.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Enabled", string = ENABLED),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", string = "Value"),
-    })
-    public void requiredClassPropertyNotEmptySentinelSetEnabledValuePropertyNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredSentinel instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredSentinel.class, configuration);
-        assertNotNull(instance.nestedMap);
-        assertEquals("Value", instance.nestedMap.get("foo").value);
-    }
+        NOT_SET,
 
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredDisablingSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", classNameOf = Nested.class),
-    })
-    public void requiredClassPropertyNotEmptySentinelDisabledValuePropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredDisablingSentinel.class, configuration);
-        });
-        assertEquals("Instance map, configured in Foo.Nested (and its sub-properties)," +
-            " for target field 'nestedMap' in configured class " + RequiredDisablingSentinel.class.getName()
-            + " is empty", exception.getMessage());
-    }
+        SET_EMPTY,
 
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredDisablingSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", classNameOf = Nested.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", empty = true),
-    })
-    public void requiredClassPropertyNotEmptySentinelDisabledValuePropertyEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredDisablingSentinel.class, configuration);
-        });
-        assertEquals("Instance map, configured in Foo.Nested (and its sub-properties)," +
-            " for target field 'nestedMap' in configured class " + RequiredDisablingSentinel.class.getName()
-            + " is empty", exception.getMessage());
-    }
+        SET_NON_EMPTY
 
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredDisablingSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", classNameOf = Nested.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", string = "Value"),
-    })
-    public void requiredClassPropertyNotEmptySentinelDisabledValuePropertyNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredDisablingSentinel.class, configuration);
-        });
-        assertEquals("Instance map, configured in Foo.Nested (and its sub-properties)," +
-            " for target field 'nestedMap' in configured class " + RequiredDisablingSentinel.class.getName()
-            + " is empty", exception.getMessage());
     }
 
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", classNameOf = Nested.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Enabled", string = DISABLED),
-    })
-    public void requiredClassPropertyNotEmptySentinelSetDisabledValuePropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredSentinel.class, configuration);
-        });
-        assertEquals("Instance map, configured in Foo.Nested (and its sub-properties)," +
-            " for target field 'nestedMap' in configured class " + RequiredSentinel.class.getName()
-            + " is empty", exception.getMessage());
-    }
+    public interface Configurable {
 
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", classNameOf = Nested.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Enabled", string = DISABLED),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", empty = true),
-    })
-    public void requiredClassPropertyNotEmptySentinelSetDisabledValuePropertyEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredSentinel.class, configuration);
-        });
-        assertEquals("Instance map, configured in Foo.Nested (and its sub-properties)," +
-            " for target field 'nestedMap' in configured class " + RequiredSentinel.class.getName()
-            + " is empty", exception.getMessage());
-    }
+        Map<String, Nested> nestedMap();
 
-    @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Foo", classNameOf = RequiredSentinel.class),
-        @MCRTestProperty(key = "Foo.Nested.foo", classNameOf = Nested.class),
-        @MCRTestProperty(key = "Foo.Nested.foo.Enabled", string = DISABLED),
-        @MCRTestProperty(key = "Foo.Nested.foo.Value", string = "Value"),
-    })
-    public void requiredClassPropertyNotEmptySentinelSetDisabledValuePropertyNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredSentinel.class, configuration);
-        });
-        assertEquals("Instance map, configured in Foo.Nested (and its sub-properties)," +
-            " for target field 'nestedMap' in configured class " + RequiredSentinel.class.getName()
-            + " is empty", exception.getMessage());
     }
 
-    public static class NotRequiredNoSentinel {
+    public static class NotRequiredNoSentinel implements Configurable {
 
         @MCRInstanceMap(name = "Nested", valueClass = Nested.class, required = false)
         public Map<String, Nested> nestedMap;
 
+        @Override
+        public Map<String, Nested> nestedMap() {
+            return nestedMap;
+        }
+
     }
 
-    public static class NotRequiredSentinel {
+    public static class NotRequiredEnablingSentinel implements Configurable {
 
         @MCRInstanceMap(name = "Nested", valueClass = Nested.class, required = false, sentinel = @MCRSentinel)
         public Map<String, Nested> nestedMap;
 
+        @Override
+        public Map<String, Nested> nestedMap() {
+            return nestedMap;
+        }
+
     }
 
-    public static class NotRequiredDisablingSentinel {
+    public static class NotRequiredDisablingSentinel implements Configurable {
 
         @MCRInstanceMap(name = "Nested", valueClass = Nested.class, required = false,
             sentinel = @MCRSentinel(defaultValue = false))
         public Map<String, Nested> nestedMap;
 
+        @Override
+        public Map<String, Nested> nestedMap() {
+            return nestedMap;
+        }
+
     }
 
-    public static class RequiredNoSentinel {
+    public static class RequiredNoSentinel implements Configurable {
 
         @MCRInstanceMap(name = "Nested", valueClass = Nested.class)
         public Map<String, Nested> nestedMap;
 
+        @Override
+        public Map<String, Nested> nestedMap() {
+            return nestedMap;
+        }
+
     }
 
-    public static class RequiredSentinel {
+    public static class RequiredEnablingSentinel implements Configurable {
 
         @MCRInstanceMap(name = "Nested", valueClass = Nested.class, sentinel = @MCRSentinel)
         public Map<String, Nested> nestedMap;
 
+        @Override
+        public Map<String, Nested> nestedMap() {
+            return nestedMap;
+        }
+
     }
 
-    public static class RequiredDisablingSentinel {
+    public static class RequiredDisablingSentinel implements Configurable {
 
-        @MCRInstanceMap(name = "Nested", valueClass = Nested.class, sentinel = @MCRSentinel(defaultValue = false))
+        @MCRInstanceMap(name = "Nested", valueClass = Nested.class,
+            sentinel = @MCRSentinel(defaultValue = false))
         public Map<String, Nested> nestedMap;
+
+        @Override
+        public Map<String, Nested> nestedMap() {
+            return nestedMap;
+        }
 
     }
 
