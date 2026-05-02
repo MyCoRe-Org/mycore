@@ -88,8 +88,8 @@ public class MCRCombinedResourceFilter extends MCRResourceFilterBase {
 
     public static class Factory implements Supplier<MCRCombinedResourceFilter> {
 
-        @MCRInstanceList(name = FILTERS_KEY, valueClass = MCRResourceFilter.class, required = false,
-            sentinel = @MCRSentinel)
+        @MCRSentinel
+        @MCRInstanceList(name = FILTERS_KEY, valueClass = MCRResourceFilter.class, required = false)
         public List<MCRResourceFilter> filters;
 
         @Override

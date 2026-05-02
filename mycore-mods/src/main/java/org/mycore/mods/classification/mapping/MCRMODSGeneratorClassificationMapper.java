@@ -95,7 +95,8 @@ public final class MCRMODSGeneratorClassificationMapper extends MCRGeneratorClas
 
     public static class Factory implements Supplier<MCRMODSGeneratorClassificationMapper> {
 
-        @MCRInstanceMap(name = GENERATORS_KEY, valueClass = Generator.class, required = false, sentinel = @MCRSentinel)
+        @MCRSentinel
+        @MCRInstanceMap(name = GENERATORS_KEY, valueClass = Generator.class, required = false)
         public Map<String, Generator> generators;
 
         @Override

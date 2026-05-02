@@ -597,7 +597,8 @@ public class MCRInstantiatorCollectionTest {
 
     public static class TestClassWithMapWithSentinel {
 
-        @MCRPropertyMap(sentinel = @MCRSentinel(name = "Sentinel"))
+        @MCRSentinel(name = "Sentinel")
+        @MCRPropertyMap
         public Map<String, String> map;
 
     }
@@ -621,7 +622,8 @@ public class MCRInstantiatorCollectionTest {
 
     public static class TestClassWithMapWithPrefixAndSentinel {
 
-        @MCRPropertyMap(name = "Map", sentinel = @MCRSentinel(name = "Sentinel"))
+        @MCRSentinel(name = "Sentinel")
+        @MCRPropertyMap(name = "Map")
         public Map<String, String> map;
 
     }
@@ -649,7 +651,8 @@ public class MCRInstantiatorCollectionTest {
 
     public static class TestClassWithListAndSentinel {
 
-        @MCRPropertyList(sentinel = @MCRSentinel(name = "Sentinel"))
+        @MCRSentinel(name = "Sentinel")
+        @MCRPropertyList
         public List<String> list;
 
     }
@@ -673,7 +676,8 @@ public class MCRInstantiatorCollectionTest {
 
     public static class TestClassWithListWithPrefixAndSentinel {
 
-        @MCRPropertyList(name = "List", sentinel = @MCRSentinel(name = "Sentinel"))
+        @MCRSentinel(name = "Sentinel")
+        @MCRPropertyList(name = "List")
         public List<String> list;
 
     }
