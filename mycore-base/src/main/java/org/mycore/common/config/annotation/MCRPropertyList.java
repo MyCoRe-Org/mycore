@@ -61,11 +61,6 @@ public @interface MCRPropertyList {
      * The default property must be absolute, e.g. <code>MCR.Foo.Bar</code>.
      */
     String defaultName() default "";
-    
-    /**
-     * @return The {@link MCRSentinel} for the configured properties.
-     */
-    MCRSentinel sentinel() default @MCRSentinel(enabled = false);
 
     /**
      * @return The order in which the annotated fields or methods are processed. The higher the value, the later the

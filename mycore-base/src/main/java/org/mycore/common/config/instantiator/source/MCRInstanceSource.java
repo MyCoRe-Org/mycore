@@ -23,6 +23,7 @@ import static org.mycore.common.config.instantiator.MCRInstantiatorUtils.missing
 import static org.mycore.common.config.instantiator.MCRInstantiatorUtils.property;
 
 import org.mycore.common.config.annotation.MCRInstance;
+import org.mycore.common.config.annotation.MCRSentinel;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
@@ -36,8 +37,11 @@ final class MCRInstanceSource extends MCRSourceBase {
 
     private final MCRInstance annotation;
 
-    MCRInstanceSource(MCRInstance annotation) {
+    private final MCRSentinel sentinel;
+
+    MCRInstanceSource(MCRInstance annotation, MCRAnnotationProvider annotationProvider) {
         this.annotation = annotation;
+        this.sentinel = annotationProvider.get(MCRSentinel.class);
     }
 
     @Override
@@ -69,7 +73,7 @@ final class MCRInstanceSource extends MCRSourceBase {
         }
 
         MCRInstanceConfiguration<?> nestedConfiguration = configuration.nested(annotation.valueClass(), name);
-        Object instance = getInstance(target, nestedConfiguration, annotation.sentinel(), "instance");
+        Object instance = getInstance(target, nestedConfiguration, sentinel, "instance");
 
         if (instance == null && annotation.required()) {
             throw missingException(property(configuration, annotation.name()), target, "instance");

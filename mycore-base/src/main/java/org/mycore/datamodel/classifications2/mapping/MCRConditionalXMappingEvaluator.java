@@ -307,12 +307,12 @@ public final class MCRConditionalXMappingEvaluator implements Evaluator {
 
     public static class Factory implements Supplier<MCRConditionalXMappingEvaluator> {
 
-        @MCRInstance(name = STRING_EVALUATOR_KEY, valueClass = Evaluator.class,
-            required = false, sentinel = @MCRSentinel(name = MCRSentinel.DEFAULT_KEY, rejectionValue = true,
-                defaultValue = false))
+        @MCRSentinel(name = MCRSentinel.DEFAULT_KEY, rejectionValue = true, defaultValue = false)
+        @MCRInstance(name = STRING_EVALUATOR_KEY, valueClass = Evaluator.class, required = false)
         public Evaluator stringEvaluator;
 
-        @MCRInstanceMap(name = CONDITIONS_KEY, valueClass = Condition.class, required = false, sentinel = @MCRSentinel)
+        @MCRSentinel
+        @MCRInstanceMap(name = CONDITIONS_KEY, valueClass = Condition.class, required = false)
         public Map<String, Condition> conditions;
 
         @Override

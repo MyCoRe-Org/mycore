@@ -641,8 +641,8 @@ public class MCRInstantiatorNestedTest {
 
     public static class TestClassWithOptionalNestedClassAndSentinel {
 
-        @MCRInstance(name = "Nested", valueClass = NestedClass.class, required = false,
-            sentinel = @MCRSentinel(name = "Sentinel"))
+        @MCRSentinel(name = "Sentinel")
+        @MCRInstance(name = "Nested", valueClass = NestedClass.class, required = false)
         public NestedClass nested;
 
     }
@@ -714,7 +714,8 @@ public class MCRInstantiatorNestedTest {
 
     public static class TestClassWithNestedMapWithSentinel {
 
-        @MCRInstanceMap(valueClass = SimpleEntry.class, sentinel = @MCRSentinel(name = "Sentinel"))
+        @MCRSentinel(name = "Sentinel")
+        @MCRInstanceMap(valueClass = SimpleEntry.class)
         public Map<String, SimpleEntry> map;
 
     }
@@ -731,7 +732,8 @@ public class MCRInstantiatorNestedTest {
 
     public static class TestClassWithNestedMapWithPrefixAndSentinel {
 
-        @MCRInstanceMap(name = "Map", valueClass = SimpleEntry.class, sentinel = @MCRSentinel(name = "Sentinel"))
+        @MCRSentinel(name = "Sentinel")
+        @MCRInstanceMap(name = "Map", valueClass = SimpleEntry.class)
         public Map<String, SimpleEntry> map;
 
     }
@@ -759,7 +761,8 @@ public class MCRInstantiatorNestedTest {
 
     public static class TestClassWithNestedListAndSentinel {
 
-        @MCRInstanceList(valueClass = SimpleEntry.class, sentinel = @MCRSentinel(name = "Sentinel"))
+        @MCRSentinel(name = "Sentinel")
+        @MCRInstanceList(valueClass = SimpleEntry.class)
         public List<SimpleEntry> list;
 
     }
@@ -776,7 +779,8 @@ public class MCRInstantiatorNestedTest {
 
     public static class TestClassWithNestedListWithPrefixAndSentinel {
 
-        @MCRInstanceList(name = "List", valueClass = SimpleEntry.class, sentinel = @MCRSentinel(name = "Sentinel"))
+        @MCRSentinel(name = "Sentinel")
+        @MCRInstanceList(name = "List", valueClass = SimpleEntry.class)
         public List<SimpleEntry> list;
 
     }

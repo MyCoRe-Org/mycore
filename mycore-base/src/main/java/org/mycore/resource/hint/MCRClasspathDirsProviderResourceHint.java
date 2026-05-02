@@ -72,8 +72,8 @@ public final class MCRClasspathDirsProviderResourceHint implements MCRHint<MCRCl
 
     public static class Factory implements Supplier<MCRClasspathDirsProviderResourceHint> {
 
-        @MCRInstance(name = PROVIDER_KEY, valueClass = MCRClasspathDirsProvider.class, required = false,
-            sentinel = @MCRSentinel)
+        @MCRSentinel
+        @MCRInstance(name = PROVIDER_KEY, valueClass = MCRClasspathDirsProvider.class, required = false)
         public MCRClasspathDirsProvider provider;
 
         @Override

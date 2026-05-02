@@ -37,7 +37,7 @@ final class MCRRawPropertiesSource extends MCRSourceBase {
 
     private final String prefix;
 
-    MCRRawPropertiesSource(MCRRawProperties annotation) {
+    MCRRawPropertiesSource(MCRRawProperties annotation, MCRAnnotationProvider annotationProvider) {
         this.annotation = annotation;
         String namePattern = annotation.namePattern();
         if (namePattern.equals("*")) {

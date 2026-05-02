@@ -35,8 +35,11 @@ final class MCRPropertySource extends MCRSourceBase {
 
     private final MCRProperty annotation;
 
-    MCRPropertySource(MCRProperty annotation) {
+    private final MCRSentinel sentinel;
+
+    MCRPropertySource(MCRProperty annotation, MCRAnnotationProvider annotationProvider) {
         this.annotation = annotation;
+        this.sentinel = annotationProvider.get(MCRSentinel.class);
     }
 
     @Override
@@ -106,9 +109,7 @@ final class MCRPropertySource extends MCRSourceBase {
     private String getPropertyValue(String property, String prefix,
         Map<String, String> properties, String description) {
 
-        MCRSentinel sentinel = annotation.sentinel();
-
-        if (sentinel.enabled()) {
+        if (sentinel != null) {
             boolean sentinelValue = sentinel.defaultValue();
             String configuredSentinelValue = properties.get(prefix + "." + sentinel.name());
             if (configuredSentinelValue != null) {

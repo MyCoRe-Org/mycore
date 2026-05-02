@@ -357,7 +357,8 @@ public class MCRInstantiatorImplicitMapTest {
 
     public static class NotRequiredEnablingSentinel implements Configurable {
 
-        @MCRInstanceMap(name = "Nested", valueClass = Nested.class, required = false, sentinel = @MCRSentinel)
+        @MCRSentinel
+        @MCRInstanceMap(name = "Nested", valueClass = Nested.class, required = false)
         public Map<String, Nested> nestedMap;
 
         @Override
@@ -369,8 +370,8 @@ public class MCRInstantiatorImplicitMapTest {
 
     public static class NotRequiredDisablingSentinel implements Configurable {
 
-        @MCRInstanceMap(name = "Nested", valueClass = Nested.class, required = false,
-            sentinel = @MCRSentinel(defaultValue = false))
+        @MCRSentinel(defaultValue = false)
+        @MCRInstanceMap(name = "Nested", valueClass = Nested.class, required = false)
         public Map<String, Nested> nestedMap;
 
         @Override
@@ -394,7 +395,8 @@ public class MCRInstantiatorImplicitMapTest {
 
     public static class RequiredEnablingSentinel implements Configurable {
 
-        @MCRInstanceMap(name = "Nested", valueClass = Nested.class, sentinel = @MCRSentinel)
+        @MCRSentinel
+        @MCRInstanceMap(name = "Nested", valueClass = Nested.class)
         public Map<String, Nested> nestedMap;
 
         @Override
@@ -406,8 +408,8 @@ public class MCRInstantiatorImplicitMapTest {
 
     public static class RequiredDisablingSentinel implements Configurable {
 
-        @MCRInstanceMap(name = "Nested", valueClass = Nested.class,
-            sentinel = @MCRSentinel(defaultValue = false))
+        @MCRSentinel(defaultValue = false)
+        @MCRInstanceMap(name = "Nested", valueClass = Nested.class)
         public Map<String, Nested> nestedMap;
 
         @Override

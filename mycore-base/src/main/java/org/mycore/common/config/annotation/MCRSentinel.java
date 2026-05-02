@@ -54,9 +54,4 @@ public @interface MCRSentinel {
      */
     boolean rejectionValue() default false;
 
-    /**
-     * @return Weather or not the sentinel is enabled.
-     */
-    boolean enabled() default true;
-
 }

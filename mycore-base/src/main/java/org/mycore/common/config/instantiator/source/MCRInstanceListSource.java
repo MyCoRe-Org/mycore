@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.mycore.common.config.annotation.MCRInstanceList;
+import org.mycore.common.config.annotation.MCRSentinel;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
@@ -37,8 +38,11 @@ final class MCRInstanceListSource extends MCRSourceBase {
 
     private final MCRInstanceList annotation;
 
-    MCRInstanceListSource(MCRInstanceList annotation) {
+    private final MCRSentinel sentinel;
+
+    MCRInstanceListSource(MCRInstanceList annotation, MCRAnnotationProvider annotationProvider) {
         this.annotation = annotation;
+        this.sentinel = annotationProvider.get(MCRSentinel.class);
     }
 
     @Override
@@ -73,7 +77,7 @@ final class MCRInstanceListSource extends MCRSourceBase {
         List<Object> instanceList = new ArrayList<>(nestedConfigurationMap.size());
         for (String key : keyList) {
             MCRInstanceConfiguration<?> nestedConfiguration = nestedConfigurationMap.get(key);
-            Object instance = getInstance(target, nestedConfiguration, annotation.sentinel(), "instance list element");
+            Object instance = getInstance(target, nestedConfiguration, sentinel, "instance list element");
             if (instance != null) {
                 instanceList.add(instance);
             }

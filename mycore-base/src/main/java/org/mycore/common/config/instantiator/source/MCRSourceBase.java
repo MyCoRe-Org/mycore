@@ -52,7 +52,7 @@ abstract class MCRSourceBase implements MCRSource {
 
         String property = configuration.name().canonical();
 
-        if (sentinel.enabled()) {
+        if (sentinel != null) {
             boolean sentinelValue = sentinel.defaultValue();
             String configuredSentinelValue = configuration.properties().remove(sentinel.name());
             if (configuredSentinelValue != null) {

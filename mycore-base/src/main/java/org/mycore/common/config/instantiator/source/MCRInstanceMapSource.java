@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.mycore.common.config.annotation.MCRInstanceMap;
+import org.mycore.common.config.annotation.MCRSentinel;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
@@ -35,8 +36,11 @@ final class MCRInstanceMapSource extends MCRSourceBase {
 
     private final MCRInstanceMap annotation;
 
-    MCRInstanceMapSource(MCRInstanceMap annotation) {
+    private final MCRSentinel sentinel;
+
+    MCRInstanceMapSource(MCRInstanceMap annotation, MCRAnnotationProvider annotationProvider) {
         this.annotation = annotation;
+        this.sentinel = annotationProvider.get(MCRSentinel.class);
     }
 
     @Override
@@ -68,7 +72,7 @@ final class MCRInstanceMapSource extends MCRSourceBase {
         Map<String, Object> instanceMap = new HashMap<>();
         for (String key : nestedConfigurationMap.keySet()) {
             MCRInstanceConfiguration<?> nestedConfiguration = nestedConfigurationMap.get(key);
-            Object instance = getInstance(target, nestedConfiguration, annotation.sentinel(), "instance map entry");
+            Object instance = getInstance(target, nestedConfiguration, sentinel, "instance map entry");
             if (instance != null) {
                 instanceMap.put(key, instance);
             }

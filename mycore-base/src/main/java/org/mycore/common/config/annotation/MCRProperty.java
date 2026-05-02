@@ -64,11 +64,6 @@ public @interface MCRProperty {
     String defaultName() default "";
 
     /**
-     * @return The {@link MCRSentinel} for the configured property.
-     */
-    MCRSentinel sentinel() default @MCRSentinel(enabled = false);
-    
-    /**
      * @return The order in which the annotated fields or methods are processed. The higher the value, the later the
      * field or method is processed. All fields are processed first, then all methods are processed.
      */

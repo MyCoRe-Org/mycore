@@ -83,8 +83,8 @@ public class MCRCombinedDerivateDisplayFilter implements MCRDerivateDisplayFilte
 
     public static class Factory implements Supplier<MCRCombinedDerivateDisplayFilter> {
 
-        @MCRInstanceList(name = FILTERS_KEY, valueClass = MCRDerivateDisplayFilter.class, required = false,
-            sentinel = @MCRSentinel)
+        @MCRSentinel
+        @MCRInstanceList(name = FILTERS_KEY, valueClass = MCRDerivateDisplayFilter.class, required = false)
         public List<MCRDerivateDisplayFilter> filters;
 
         @Override

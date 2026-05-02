@@ -29,7 +29,7 @@ final class MCRPostConstructionSource extends MCRSourceBase {
 
     private final MCRPostConstruction annotation;
 
-    MCRPostConstructionSource(MCRPostConstruction annotation) {
+    MCRPostConstructionSource(MCRPostConstruction annotation, MCRAnnotationProvider annotationProvider) {
         this.annotation = annotation;
     }
 

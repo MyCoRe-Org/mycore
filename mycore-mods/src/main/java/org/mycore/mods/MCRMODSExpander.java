@@ -144,8 +144,8 @@ public class MCRMODSExpander extends MCRBasicObjectExpander {
 
     public static class Factory implements Supplier<MCRMODSExpander> {
 
-        @MCRInstance(name = CLASSIFICATION_MAPPER_KEY, valueClass = MCRClassificationMapper.class, required = false,
-            sentinel = @MCRSentinel)
+        @MCRSentinel
+        @MCRInstance(name = CLASSIFICATION_MAPPER_KEY, valueClass = MCRClassificationMapper.class, required = false)
         public MCRClassificationMapper classificationMapper;
 
         @Override
