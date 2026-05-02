@@ -45,8 +45,11 @@ final class MCRPropertyListSource implements MCRSource {
 
     private final MCRPropertyList annotation;
 
-    MCRPropertyListSource(MCRPropertyList annotation) {
+    private final MCRSentinel sentinel;
+
+    MCRPropertyListSource(MCRPropertyList annotation, MCRAnnotationProvider annotationProvider) {
         this.annotation = annotation;
+        this.sentinel = annotationProvider.get(MCRSentinel.class);
     }
 
     @Override
@@ -126,7 +129,6 @@ final class MCRPropertyListSource implements MCRSource {
         MCRTarget target, Map<String, String> properties, String description) {
 
         AtomicBoolean hasRelevantProperty = new AtomicBoolean(false);
-        MCRSentinel sentinel = annotation.sentinel();
 
         Map<String, String> rawPropertyMap = new HashMap<>();
         String keyPrefix = prefix + delimiter;
@@ -149,7 +151,7 @@ final class MCRPropertyListSource implements MCRSource {
         List<String> keyList = orderedKeys(property, target, rawPropertyMap, description);
         for (String key : keyList) {
             String value = rawPropertyMap.get(key);
-            if (sentinel.enabled()) {
+            if (sentinel != null) {
                 boolean sentinelValue = sentinel.defaultValue();
                 String configuredSentinelValue = properties.get(keyPrefix + key + "." + sentinel.name());
                 if (configuredSentinelValue != null) {

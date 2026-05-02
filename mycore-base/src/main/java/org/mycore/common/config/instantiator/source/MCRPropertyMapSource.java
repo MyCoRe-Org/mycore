@@ -43,8 +43,11 @@ final class MCRPropertyMapSource implements MCRSource {
 
     private final MCRPropertyMap annotation;
 
-    MCRPropertyMapSource(MCRPropertyMap annotation) {
+    private final MCRSentinel sentinel;
+
+    MCRPropertyMapSource(MCRPropertyMap annotation, MCRAnnotationProvider annotationProvider) {
         this.annotation = annotation;
+        this.sentinel = annotationProvider.get(MCRSentinel.class);
     }
 
     @Override
@@ -124,7 +127,6 @@ final class MCRPropertyMapSource implements MCRSource {
         Map<String, String> properties, String description) {
 
         AtomicBoolean hasRelevantProperty = new AtomicBoolean(false);
-        MCRSentinel sentinel = annotation.sentinel();
 
         Map<String, String> shortFormMap = Map.of();
         String shortFormProperty = properties.get(prefix);
@@ -152,7 +154,7 @@ final class MCRPropertyMapSource implements MCRSource {
 
         for (String key : rawPropertyMap.keySet()) {
             String value = rawPropertyMap.get(key);
-            if (sentinel.enabled()) {
+            if (sentinel != null) {
                 boolean sentinelValue = sentinel.defaultValue();
                 String configuredSentinelValue = properties.get(keyPrefix + key + "." + sentinel.name());
                 if (configuredSentinelValue != null) {

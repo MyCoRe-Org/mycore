@@ -357,7 +357,8 @@ public class MCRInstantiatorImplicitListTest {
 
     public static class NotRequiredEnablingSentinel implements Configurable {
 
-        @MCRInstanceList(name = "Nested", valueClass = Nested.class, required = false, sentinel = @MCRSentinel)
+        @MCRSentinel
+        @MCRInstanceList(name = "Nested", valueClass = Nested.class, required = false)
         public List<Nested> nestedList;
 
         @Override
@@ -369,8 +370,8 @@ public class MCRInstantiatorImplicitListTest {
 
     public static class NotRequiredDisablingSentinel implements Configurable {
 
-        @MCRInstanceList(name = "Nested", valueClass = Nested.class, required = false,
-            sentinel = @MCRSentinel(defaultValue = false))
+        @MCRSentinel(defaultValue = false)
+        @MCRInstanceList(name = "Nested", valueClass = Nested.class, required = false)
         public List<Nested> nestedList;
 
         @Override
@@ -394,7 +395,8 @@ public class MCRInstantiatorImplicitListTest {
 
     public static class RequiredEnablingSentinel implements Configurable {
 
-        @MCRInstanceList(name = "Nested", valueClass = Nested.class, sentinel = @MCRSentinel)
+        @MCRSentinel
+        @MCRInstanceList(name = "Nested", valueClass = Nested.class)
         public List<Nested> nestedList;
 
         @Override
@@ -406,7 +408,8 @@ public class MCRInstantiatorImplicitListTest {
 
     public static class RequiredDisablingSentinel implements Configurable {
 
-        @MCRInstanceList(name = "Nested", valueClass = Nested.class, sentinel = @MCRSentinel(defaultValue = false))
+        @MCRSentinel(defaultValue = false)
+        @MCRInstanceList(name = "Nested", valueClass = Nested.class)
         public List<Nested> nestedList;
 
         @Override

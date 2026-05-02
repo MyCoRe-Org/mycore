@@ -40,8 +40,11 @@ final class MCRInstanceSource implements MCRSource {
 
     private final MCRInstance annotation;
 
-    MCRInstanceSource(MCRInstance annotation) {
+    private final MCRSentinel sentinel;
+
+    MCRInstanceSource(MCRInstance annotation, MCRAnnotationProvider annotationProvider) {
         this.annotation = annotation;
+        this.sentinel = annotationProvider.get(MCRSentinel.class);
     }
 
     @Override
@@ -76,8 +79,6 @@ final class MCRInstanceSource implements MCRSource {
         if (name.isEmpty()) {
             throw emptyNameException(target);
         }
-
-        MCRSentinel sentinel = annotation.sentinel();
 
         MCRInstanceConfiguration<?> nestedConfiguration = configuration.nested(annotation.valueClass(), name);
         Object instance = createInstance(target, nestedConfiguration, sentinel, "instance");
