@@ -218,6 +218,10 @@ public class MCRPasswordCheckManagerTest {
         }
 
         assertInstanceOf(MCRConfigurationException.class, e);
+        
+        System.out.println(" --- " + e.getMessage());
+        e.printStackTrace(System.out);
+        
         assertTrue(e.getMessage().contains("Detected incompatible value change"));
 
     }

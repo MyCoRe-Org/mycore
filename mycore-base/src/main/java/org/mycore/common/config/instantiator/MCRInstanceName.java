@@ -16,10 +16,9 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.common.config;
+package org.mycore.common.config.instantiator;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -107,11 +106,11 @@ public final class MCRInstanceName {
 
     public enum Suffix {
 
-        NONE(null, Collections.emptyList()),
+        NONE(null, List.of("")),
 
-        UPPER_CASE("Class", Arrays.asList("Class", "class")),
+        UPPER_CASE("Class", List.of("Class", "class")),
 
-        LOWER_CASE("class", Arrays.asList("Class", "class"));
+        LOWER_CASE("class", List.of("Class", "class"));
 
         private static final Suffix[] REPRESENTED_VALUES = Arrays.stream(values())
             .filter(suffix -> suffix.representation != null)
@@ -137,15 +136,14 @@ public final class MCRInstanceName {
         public String appendTo(String string) {
             if (representation == null) {
                 return string;
-            } else {
-                if (string.isEmpty()) {
-                    return representation;
-                } else {
-                    return string + "." + representation;
-
-                }
             }
+            if (string.isEmpty()) {
+                return representation;
+            }
+            return string + "." + representation;
+
         }
+
     }
 
 }
