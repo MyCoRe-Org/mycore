@@ -33,7 +33,7 @@ import com.google.gson.Gson;
 @MCRTestConfiguration(
     properties = {
         @MCRTestProperty(key = "MCR.Metadata.DefaultLang", string = "de"),
-        @MCRTestProperty(key = "MCR.Category.DAO", classNameOf = CategoryDAOMock.class)
+        @MCRTestProperty(key = "MCR.Category.DAO.Class", classNameOf = CategoryDAOMock.class)
     })
 @MyCoReTest
 public class MCRCategoryJsonTest {

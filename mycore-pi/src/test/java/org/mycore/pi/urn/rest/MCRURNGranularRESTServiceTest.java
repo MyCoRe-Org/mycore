@@ -82,7 +82,7 @@ import org.mycore.test.MyCoReTest;
     @MCRTestProperty(key = "MCR.IFS2.Store.mycore_derivate.SlotLayout", string = "4-2-2"),
     @MCRTestProperty(key = "MCR.EventHandler.MCRDerivate.020.Class", classNameOf = MCRXMLMetadataEventHandler.class),
     @MCRTestProperty(key = "MCR.EventHandler.MCRDerivate.030.Class", classNameOf = MCRLinkTableEventHandler.class),
-    @MCRTestProperty(key = "MCR.PI.Generator.UUID", classNameOf = MCRUUIDURNGenerator.class),
+    @MCRTestProperty(key = "MCR.PI.Generator.UUID.Class", classNameOf = MCRUUIDURNGenerator.class),
     @MCRTestProperty(key = "MCR.PI.Generator.UUID.Namespace", string = "frontend-"),
     @MCRTestProperty(key = "MCR.PI.DNB.Credentials.Login", string = "test"),
     @MCRTestProperty(key = "MCR.PI.DNB.Credentials.Password", string = "test")
@@ -110,6 +110,7 @@ public class MCRURNGranularRESTServiceTest {
         object = createObject();
         derivate = createDerivate(object.getId());
         MCRMetadataManager.create(object);
+
         MCRMetadataManager.create(derivate);
 
         List<MCRPath> fileList = new ArrayList<>();

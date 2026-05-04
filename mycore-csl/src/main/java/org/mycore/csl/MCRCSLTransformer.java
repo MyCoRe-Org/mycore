@@ -48,7 +48,7 @@ public class MCRCSLTransformer extends MCRParameterizedTransformer {
 
     public static final String DEFAULT_STYLE = "nature";
 
-    public static final String ITEM_PROVIDER = "ItemProviderClass";
+    public static final String ITEM_PROVIDER = "ItemProvider.Class";
 
     private static final String CONFIG_PREFIX = "MCR.ContentTransformer.";
 

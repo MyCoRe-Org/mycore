@@ -55,17 +55,17 @@ import org.mycore.test.MyCoReTest;
     @MCRTestProperty(key = "MCR.Metadata.Type.mock", string = "true"),
     @MCRTestProperty(key = "MCR.Metadata.Type.unregisterd", string = "true"),
     @MCRTestProperty(key = "MCR.PI.Resolvers", classNameOf = MCRMockResolver.class),
-    @MCRTestProperty(key = "MCR.PI.Service." + MCRPIManagerTest.MOCK_SERVICE,
+    @MCRTestProperty(key = "MCR.PI.Service." + MCRPIManagerTest.MOCK_SERVICE + ".Class",
         classNameOf = MCRMockIdentifierService.class),
     @MCRTestProperty(key = "MCR.PI.Service." + MCRPIManagerTest.MOCK_SERVICE + ".Generator",
         string = MCRPIManagerTest.MOCK_PID_GENERATOR),
     @MCRTestProperty(key = "MCR.PI.Service." + MCRPIManagerTest.MOCK_SERVICE + ".MetadataService",
         string = MCRPIManagerTest.MOCK_METADATA_SERVICE),
-    @MCRTestProperty(key = "MCR.PI.MetadataService." + MCRPIManagerTest.MOCK_METADATA_SERVICE,
+    @MCRTestProperty(key = "MCR.PI.MetadataService." + MCRPIManagerTest.MOCK_METADATA_SERVICE + ".Class",
         classNameOf = MCRMockMetadataService.class),
     @MCRTestProperty(key = "MCR.PI.MetadataService." + MCRPIManagerTest.MOCK_METADATA_SERVICE + "."
         + MCRMockMetadataService.TEST_PROPERTY, string = MCRMockMetadataService.TEST_PROPERTY_VALUE),
-    @MCRTestProperty(key = "MCR.PI.Generator." + MCRPIManagerTest.MOCK_PID_GENERATOR,
+    @MCRTestProperty(key = "MCR.PI.Generator." + MCRPIManagerTest.MOCK_PID_GENERATOR + ".Class",
         classNameOf = MCRMockIdentifierGenerator.class),
     @MCRTestProperty(key = "MCR.PI.Generator." + MCRPIManagerTest.MOCK_PID_GENERATOR + "."
         + MCRMockIdentifierGenerator.TEST_PROPERTY, string = MCRMockIdentifierGenerator.TEST_PROPERTY_VALUE),
@@ -113,7 +113,7 @@ public class MCRPIManagerTest {
 
         MCRObject mcrObject = buildMockObject();
         registrationService.register(mcrObject, null);
-
+        
         MCRPI mcrpi = MCRPIManager.getInstance().get(MOCK_SERVICE, mcrObject.getId().toString(), null);
         assertNotNull(mcrpi);
     }
@@ -183,7 +183,7 @@ public class MCRPIManagerTest {
 
     private MCRMockIdentifier generatePIFor(MCRObjectID mycoreID) {
         MCRMockIdentifierGenerator mcrUuidUrnGenerator = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRMockIdentifierGenerator.class, "MCR.PI.Generator." + MOCK_PID_GENERATOR);
+            MCRMockIdentifierGenerator.class, "MCR.PI.Generator." + MOCK_PID_GENERATOR + ".Class");
         MCRObject mcrObject = new MCRObject();
         mcrObject.setId(mycoreID);
         return mcrUuidUrnGenerator.generate(mcrObject, "");

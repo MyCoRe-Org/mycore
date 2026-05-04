@@ -24,7 +24,7 @@ import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * Entry point for mycore jersey configuration. Loads the {@link MCRJerseyConfiguration} defined in
- * 'MCR.Jersey.Configuration' or the default {@link MCRJerseyDefaultConfiguration}.
+ * 'MCR.Jersey.Configuration.Class' or the default {@link MCRJerseyDefaultConfiguration}.
  * 
  * @author Matthias Eichner
  */
@@ -34,7 +34,7 @@ public class MCRJerseyResourceConfig extends ResourceConfig {
         super();
         LogManager.getLogger().info("Loading jersey resource config...");
         MCRJerseyConfiguration configuration = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRJerseyDefaultConfiguration.class, "MCR.Jersey.Configuration");
+            MCRJerseyDefaultConfiguration.class, "MCR.Jersey.Configuration.Class");
         try {
             configuration.configure(this);
         } catch (Exception exc) {
