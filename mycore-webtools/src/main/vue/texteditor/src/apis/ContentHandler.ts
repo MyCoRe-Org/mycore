@@ -1,6 +1,6 @@
 export interface ContentHandler {
 
-  load(path: string): Promise<Content>;
+  load(path: string, options?: LoadOptions): Promise<Content>;
 
   save(path: string, content: Content): Promise<void>;
 
@@ -20,6 +20,12 @@ export interface ContentHandler {
   lock(path: string): Promise<LockResult>
 
   unlock(path: string): Promise<LockResult>
+
+}
+
+export interface LoadOptions {
+
+  expanded?: boolean;
 
 }
 
