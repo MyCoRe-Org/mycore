@@ -142,7 +142,8 @@ public final class MCRUserInformationResolver {
 
     public static class Factory implements Supplier<MCRUserInformationResolver> {
 
-        @MCRInstanceMap(name = PROVIDERS_KEY, valueClass = MCRUserInformationProvider.class, sentinel = @MCRSentinel)
+        @MCRSentinel
+        @MCRInstanceMap(name = PROVIDERS_KEY, valueClass = MCRUserInformationProvider.class)
         public Map<String, MCRUserInformationProvider> providers;
 
         @Override

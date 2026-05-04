@@ -101,7 +101,8 @@ public final class MCRDefaultGeneratorClassificationMapper extends MCRGeneratorC
 
     public static class Factory implements Supplier<MCRDefaultGeneratorClassificationMapper> {
 
-        @MCRInstanceMap(name = GENERATORS_KEY, valueClass = Generator.class, required = false, sentinel = @MCRSentinel)
+        @MCRSentinel
+        @MCRInstanceMap(name = GENERATORS_KEY, valueClass = Generator.class, required = false)
         public Map<String, Generator> generators;
 
         @Override

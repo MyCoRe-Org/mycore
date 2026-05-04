@@ -114,8 +114,8 @@ public final class MCRDefaultXMappingClassificationGenerator extends MCRXMapping
 
     public static class Factory implements Supplier<MCRDefaultXMappingClassificationGenerator> {
 
-        @MCRInstance(name = EVALUATOR_KEY, valueClass = Evaluator.class, required = false,
-            sentinel = @MCRSentinel(name = MCRSentinel.DEFAULT_KEY, rejectionValue = true, defaultValue = false))
+        @MCRSentinel(name = MCRSentinel.DEFAULT_KEY, rejectionValue = true, defaultValue = false)
+        @MCRInstance(name = EVALUATOR_KEY, valueClass = Evaluator.class, required = false)
         public Evaluator evaluator;
 
         @MCRProperty(name = ON_MISSING_MAPPED_CATEGORY_KEY)

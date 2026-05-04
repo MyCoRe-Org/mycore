@@ -88,8 +88,8 @@ public class MCRCombinedResourceLocator extends MCRResourceLocatorBase {
 
     public static class Factory implements Supplier<MCRCombinedResourceLocator> {
 
-        @MCRInstanceList(name = LOCATORS_KEY, valueClass = MCRResourceLocator.class, required = false,
-            sentinel = @MCRSentinel)
+        @MCRSentinel
+        @MCRInstanceList(name = LOCATORS_KEY, valueClass = MCRResourceLocator.class, required = false)
         public List<MCRResourceLocator> locators;
 
         @Override

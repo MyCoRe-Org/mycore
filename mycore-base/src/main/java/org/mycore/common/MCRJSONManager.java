@@ -107,8 +107,8 @@ public final class MCRJSONManager {
 
     public static class Factory implements Supplier<MCRJSONManager> {
 
-        @MCRInstanceMap(name = TYPE_ADAPTERS_KEY, valueClass = MCRJSONTypeAdapter.class, required = false,
-            sentinel = @MCRSentinel)
+        @MCRSentinel
+        @MCRInstanceMap(name = TYPE_ADAPTERS_KEY, valueClass = MCRJSONTypeAdapter.class, required = false)
         public Map<String, MCRJSONTypeAdapter<?>> typeAdapters;
 
         @Override

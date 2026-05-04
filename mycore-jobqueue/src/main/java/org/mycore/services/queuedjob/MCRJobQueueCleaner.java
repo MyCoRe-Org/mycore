@@ -183,7 +183,8 @@ public final class MCRJobQueueCleaner {
 
     public static class Factory implements Supplier<MCRJobQueueCleaner> {
 
-        @MCRInstanceMap(name = SELECTORS_KEY, valueClass = MCRJobSelector.class, sentinel = @MCRSentinel)
+        @MCRSentinel
+        @MCRInstanceMap(name = SELECTORS_KEY, valueClass = MCRJobSelector.class)
         public Map<String, MCRJobSelector> selectors;
 
         @MCRProperty(name = ENABLED_KEY)

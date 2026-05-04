@@ -173,7 +173,8 @@ public final class MCRPasswordCheckManager {
 
     public static class Factory implements Supplier<MCRPasswordCheckManager> {
 
-        @MCRInstanceMap(name = STRATEGIES_KEY, valueClass = MCRPasswordCheckStrategy.class, sentinel = @MCRSentinel)
+        @MCRSentinel
+        @MCRInstanceMap(name = STRATEGIES_KEY, valueClass = MCRPasswordCheckStrategy.class)
         public Map<String, MCRPasswordCheckStrategy> strategies;
 
         @MCRProperty(name = SELECTED_STRATEGY_KEY)

@@ -94,8 +94,8 @@ public class MCRCombinedResourceSelector extends MCRResourceSelectorBase {
 
     public static class Factory implements Supplier<MCRCombinedResourceSelector> {
 
-        @MCRInstanceList(name = SELECTORS_KEY, valueClass = MCRResourceSelector.class, required = false,
-            sentinel = @MCRSentinel)
+        @MCRSentinel
+        @MCRInstanceList(name = SELECTORS_KEY, valueClass = MCRResourceSelector.class, required = false)
         public List<MCRResourceSelector> selectors;
 
         @Override
