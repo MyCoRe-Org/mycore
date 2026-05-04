@@ -178,7 +178,7 @@ public final class MCRURIResolver implements URIResolver {
     public static MCRURIResolver obtainInstance() {
         return SHARED_INSTANCE;
     }
-    
+
     public static Map<String, String> getParameterMap(String key) {
         String[] param;
         StringTokenizer tok = new StringTokenizer(key, "&");
@@ -511,22 +511,26 @@ public final class MCRURIResolver implements URIResolver {
                 params = Collections.emptyMap();
             }
 
-            MCRObjectID mcrid = MCRObjectID.getInstance(id);
+            MCRObjectID mcrId = MCRObjectID.getInstance(id);
             try {
-                MCRXMLMetadataManager xmlmm = MCRXMLMetadataManager.getInstance();
-
                 MCRContent content;
                 if (params.containsKey("r")) {
-                    content = xmlmm.retrieveContent(mcrid, params.get("r"));
+                    content = MCRXMLMetadataManager.getInstance().retrieveContent(mcrId, params.get("r"));
                 } else {
-                    if (mcrid.getTypeId().equals(MCRDerivate.OBJECT_TYPE) ||
+                    if (mcrId.getTypeId().equals(MCRDerivate.OBJECT_TYPE) ||
                         (params.containsKey("expanded") && params.get("expanded").equals("false"))) {
-                        content = xmlmm.retrieveContent(mcrid);
+                        content = MCRXMLMetadataManager.getInstance().retrieveContent(mcrId);
                     } else {
-                        MCRObject expanded = MCRMetadataManager.retrieveMCRObject(mcrid);
-                        MCRExpandedObject expandedObject =
-                            MCRExpandedObjectManager.getInstance().getExpandedObject(expanded);
-                        content = new MCRBaseContent(expandedObject);
+                        try {
+                            MCRObject mcrObject = MCRMetadataManager.retrieveMCRObject(mcrId);
+                            MCRExpandedObject expandedObject =
+                                MCRExpandedObjectManager.getInstance().getExpandedObject(mcrObject);
+                            content = new MCRBaseContent(expandedObject);
+                        } catch (Exception e) {
+                            LOGGER.error(() -> "Could not retrieve MCRObject with ID " + mcrId
+                                + ". Try to use fallback with MCRXMLMetadataManager.", e);
+                            content = MCRXMLMetadataManager.getInstance().retrieveContent(mcrId);
+                        }
                     }
                 }
                 if (content == null) {
