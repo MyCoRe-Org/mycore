@@ -15,6 +15,7 @@
   <xsl:variable name="xedSession" select="mcrurl:get-param($RequestURL, '_xed_subselect_session')" />
 
   <xsl:template match="/users" mode="searchFormAdditional" priority="10">
+    <input type="hidden" name="XSL.Style" value="subselect" />
     <input type="hidden" name="_xed_subselect_session" value="{$xedSession}" />
   </xsl:template>
 
