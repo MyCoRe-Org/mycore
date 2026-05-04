@@ -193,7 +193,7 @@ class MCRConfigurableInstanceHelper {
             return superClass.cast(instance);
         } else {
             throw new MCRConfigurationException("Instance of class " + instance.getClass().getName()
-                + " is incompatible with intended super class " + superClass.getName() + "'"
+                + " is incompatible with intended super class " + superClass.getName()
                 + (name != null ? " in configured class " + name : ""));
         }
     }
@@ -254,7 +254,7 @@ class MCRConfigurableInstanceHelper {
 
     private static MCRConfigurationException incompatibilityException(String property, Target<?> target,
         Class<?> annotationValueClass, Object instance) {
-        throw new MCRConfigurationException("Instance of class " + instance.getClass().getName()
+        return new MCRConfigurationException("Instance of class " + instance.getClass().getName()
             + "', configured in " + property + ", is incompatible with annotation value class "
             + annotationValueClass.getName() + " for target " + targetTypeName(target)
             + " '" + target.name() + "' in configured class " + target.declaringClass().getName());
@@ -262,7 +262,7 @@ class MCRConfigurableInstanceHelper {
 
     private static MCRConfigurationException missingException(String property, Target<?> target,
         String description) {
-        throw new MCRConfigurationException(
+        return new MCRConfigurationException(
             capitalize(description) + ", configured in " + property + " (and its sub-properties)," +
                 " for target " + targetTypeName(target) + " '" + target.name() + "' in configured class "
                 + target.declaringClass().getName()
@@ -270,7 +270,7 @@ class MCRConfigurableInstanceHelper {
     }
 
     private static MCRConfigurationException emptyException(String property, Target<?> target, String description) {
-        throw new MCRConfigurationException(
+        return new MCRConfigurationException(
             capitalize(description) + ", configured in " + property + " (and its sub-properties)," +
                 " for target " + targetTypeName(target) + " '" + target.name() + "' in configured class "
                 + target.declaringClass().getName()
@@ -278,7 +278,7 @@ class MCRConfigurableInstanceHelper {
     }
 
     private static MCRConfigurationException emptyRawException(String property, Target<?> target, String description) {
-        throw new MCRConfigurationException(
+        return new MCRConfigurationException(
             capitalize(description) + ", configured in " + property + "," +
                 " for target " + targetTypeName(target) + " '" + target.name() + "' in configured class "
                 + target.declaringClass().getName()
@@ -290,7 +290,7 @@ class MCRConfigurableInstanceHelper {
         return new MCRConfigurationException(
             capitalize(description) + ", configured in " + property + " (and its sub-properties)," +
                 " for target " + targetTypeName(target) + " '" + target.name() + "' in configured class "
-                + target.declaringClass().getName() + " is has element with non-integer key " + key,
+                + target.declaringClass().getName() + " has element with non-integer key " + key,
             exception);
     }
 
@@ -1038,7 +1038,7 @@ class MCRConfigurableInstanceHelper {
                 }
                 if (sentinelValue == sentinel.rejectionValue()) {
                     if (LOGGER.isInfoEnabled()) {
-                        LOGGER.info("[SENTINEL] Ignoring {} {} and all sup-properties",
+                        LOGGER.info("[SENTINEL] Ignoring {} {} and all sub-properties",
                             description, property);
                     }
                     return null;
@@ -1179,7 +1179,7 @@ class MCRConfigurableInstanceHelper {
                         sentinelValue = Boolean.parseBoolean(configurationValue);
                     }
                     if (sentinelValue == sentinel.rejectionValue()) {
-                        LOGGER.info("[SENTINEL] Ignoring {} entry {}.{} and all sup-properties",
+                        LOGGER.info("[SENTINEL] Ignoring {} entry {}.{} and all sub-properties",
                             description, property, key);
                         continue;
                     }
