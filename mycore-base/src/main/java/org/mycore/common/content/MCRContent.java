@@ -33,11 +33,18 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.CopyOption;
+import java.nio.file.FileStore;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.AclEntry;
+import java.nio.file.attribute.AclFileAttributeView;
+import java.nio.file.attribute.PosixFileAttributeView;
+import java.nio.file.attribute.PosixFilePermission;
 import java.util.Base64;
+import java.util.List;
+import java.util.Set;
 
 import javax.xml.transform.Source;
 
@@ -246,7 +253,33 @@ public abstract class MCRContent {
         if (!Files.isWritable(dir)) {
             throw new IOException("Target directory is not writable: " + dir);
         }
+
+        // store current permissions of target file
+        // usually: ACLs for Windows and POSIX permissions for UNIX
+        List<AclEntry> aclEntries = null;
+        Set<PosixFilePermission> posixPermissions = null;
+        FileStore fileStore = Files.getFileStore(target);
+        if (fileStore.supportsFileAttributeView(AclFileAttributeView.class)) {
+            aclEntries = Files.getFileAttributeView(target, AclFileAttributeView.class).getAcl();
+        }
+        if (fileStore.supportsFileAttributeView(PosixFileAttributeView.class)) {
+            posixPermissions = Files.getPosixFilePermissions(target);
+        }
+        if (LOGGER.isWarnEnabled() && (aclEntries == null && posixPermissions == null)) {
+            LOGGER.warn("No supported file permissions (ACLs, POSIX) were found when recrating {} with new content;"
+                + " new version of file will have default file permissions", target::toAbsolutePath);
+        }
+
         Path tmp = Files.createTempFile(dir, target.getFileName().toString(), ".tmp");
+
+        // apply stored permissions to tmp file; will be preserved during the move operation below
+        if (aclEntries != null) {
+            Files.getFileAttributeView(tmp, AclFileAttributeView.class).setAcl(aclEntries);
+        }
+        if (posixPermissions != null) {
+            Files.setPosixFilePermissions(tmp, posixPermissions);
+        }
+
         try {
             final int chunkSize = 128 * 1024;
             try (InputStream in = getInputStream();
@@ -273,6 +306,7 @@ public abstract class MCRContent {
                 LOGGER.error("Failed to delete temporary file at {}", tmp, e);
             }
         }
+
     }
 
     /**
