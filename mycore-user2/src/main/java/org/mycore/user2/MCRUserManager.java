@@ -447,7 +447,10 @@ public class MCRUserManager {
                             attributeNamePattern, attributeValuePattern)))
             .setFirstResult(offset)
             .setMaxResults(limit)
-            .getResultList();
+            .getResultList()
+            .stream()
+            .map(MCRUserManager::setRoles)
+            .toList();
     }
 
     /**
