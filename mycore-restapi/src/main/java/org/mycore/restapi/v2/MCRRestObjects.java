@@ -411,7 +411,7 @@ public class MCRRestObjects {
         summary = "Returns MCRObject with the given " + PARAM_MCRID + ".",
         tags = MCRRestUtils.TAG_MYCORE_OBJECT)
     public Response getObject(@Parameter(example = "mir_mods_00004711") @PathParam(PARAM_MCRID) MCRObjectID id,
-        @QueryParam("expanded") Boolean expandedParm) throws IOException {
+        @QueryParam("expanded") Boolean expandedParam) throws IOException {
         long modified;
         try {
             modified = MCRXMLMetadataManager.getInstance().getLastModified(id);
@@ -427,7 +427,7 @@ public class MCRRestObjects {
         if (cachedResponse.isPresent()) {
             return cachedResponse.get();
         }
-        boolean expanded = Optional.ofNullable(expandedParm).orElse(true);
+        boolean expanded = Optional.ofNullable(expandedParam).orElse(true);
         MCRContent mcrContent = new MCRBaseContent(
             expanded ? MCRMetadataManager.retrieveMCRExpandedObject(id) : MCRMetadataManager.retrieveMCRObject(id));
         return Response.ok()
