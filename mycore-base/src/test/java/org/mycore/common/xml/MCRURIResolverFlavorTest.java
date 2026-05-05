@@ -46,9 +46,47 @@ public class MCRURIResolverFlavorTest {
     }
 
     @Test
+    public void testSaxonFlavorViaParameter() {
+
+        Element resolved = MCRURIResolver.obtainInstance()
+            .resolve("xslStyle:reflection?xslStyleFlavor=xslt:buildxml:_rootName_=test");
+        assert resolved != null;
+
+        String id = resolved.getAttributeValue("id");
+        String version = resolved.getAttributeValue("version");
+        String vendor = resolved.getAttributeValue("vendor");
+        String vendorUrl = resolved.getAttributeValue("vendor-url");
+
+        assertEquals("xslt", id);
+        assertEquals("3.0", version);
+        assertEquals("Saxonica", vendor);
+        assertEquals("http://www.saxonica.com/", vendorUrl);
+
+    }
+
+    @Test
     public void testXalanFlavor() {
 
         Element resolved = MCRURIResolver.obtainInstance().resolve("xslStyle:reflection#xsl:buildxml:_rootName_=test");
+        assert resolved != null;
+
+        String id = resolved.getAttributeValue("id");
+        String version = resolved.getAttributeValue("version");
+        String vendor = resolved.getAttributeValue("vendor");
+        String vendorUrl = resolved.getAttributeValue("vendor-url");
+
+        assertEquals("xsl", id);
+        assertEquals("1.0", version);
+        assertEquals("Apache Software Foundation", vendor);
+        assertEquals("http://xml.apache.org/xalan-j", vendorUrl);
+
+    }
+
+    @Test
+    public void testXalanFlavorViaParameter() {
+
+        Element resolved = MCRURIResolver.obtainInstance()
+            .resolve("xslStyle:reflection?xslStyleFlavor=xsl:buildxml:_rootName_=test");
         assert resolved != null;
 
         String id = resolved.getAttributeValue("id");
