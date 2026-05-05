@@ -24,6 +24,7 @@ import static org.mycore.solr.MCRSolrConstants.SOLR_QUERY_XML_PROTOCOL_VERSION;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -53,6 +54,7 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.StreamingOutput;
 import jakarta.ws.rs.core.UriInfo;
 
 @Path("/")
@@ -106,31 +108,32 @@ public class MCRSolrProxyResource {
         String writerType = solrParams.get("wt", "json");
         queryRequest.setResponseParser(new InputStreamResponseParser(writerType));
 
+        NamedList<Object> solrResponse;
         try {
-            NamedList<Object> solrResponse = solrIndex.getClient().request(queryRequest);
-            try (InputStream is = (InputStream) solrResponse.get("stream")) {
-                byte[] responseBytes = is.readAllBytes();
-
-                Response.ResponseBuilder responseBuilder;
-                if (solrResponse.get("responseStatus") != null) {
-                    Integer responseStatus = (Integer) solrResponse.get("responseStatus");
-                    responseBuilder = Response.status(responseStatus);
-                } else {
-                    responseBuilder = Response.ok();
-                }
-
-                String contentType = getContentType(writerType);
-                return responseBuilder
-                    .entity(responseBytes)
-                    .type(contentType)
-                    .build();
-            }
+            solrResponse = solrIndex.getClient().request(queryRequest);
         } catch (SolrServerException | IOException e) {
             LOGGER.error("Error while processing Solr query request", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                 .entity("Error while processing query request: " + e.getMessage())
                 .build();
         }
+
+        InputStream solrStream = (InputStream) solrResponse.get("stream");
+        StreamingOutput streamingOutput = new SolrStreamingOutput(solrStream);
+
+        Response.ResponseBuilder responseBuilder;
+        if (solrResponse.get("responseStatus") != null) {
+            Integer responseStatus = (Integer) solrResponse.get("responseStatus");
+            responseBuilder = Response.status(responseStatus);
+        } else {
+            responseBuilder = Response.ok();
+        }
+
+        String contentType = getContentType(writerType);
+        return responseBuilder
+            .entity(streamingOutput)
+            .type(contentType)
+            .build();
     }
 
     private ModifiableSolrParams buildSolrParams(MultivaluedMap<String, String> queryParameters) {
@@ -172,5 +175,14 @@ public class MCRSolrProxyResource {
             case "javabin" -> "application/octet-stream";
             default -> "application/octet-stream";
         };
+    }
+
+    private record SolrStreamingOutput(InputStream solrStream) implements StreamingOutput {
+        @Override
+        public void write(OutputStream output) throws IOException {
+            try (InputStream in = solrStream) {
+                in.transferTo(output);
+            }
+        }
     }
 }
