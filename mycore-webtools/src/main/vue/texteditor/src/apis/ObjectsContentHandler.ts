@@ -1,6 +1,6 @@
 import {BaseContentHandler} from "@/apis/BaseContentHandler";
 import {getAuthorizationHeader} from "@/apis/Auth";
-import type {Content, LockResult} from "@/apis/ContentHandler.ts";
+import type {Content, LoadOptions, LockResult} from "@/apis/ContentHandler.ts";
 
 /**
  * Content handler for MyCoRe objects, derivates and their file contents.
@@ -23,10 +23,12 @@ export class ObjectsContentHandler extends BaseContentHandler {
    * Loads and prettifies the XML for the given object, derivate or file path.
    *
    * @param path - The resource path as described in the class documentation.
+   * @param options optional loading options
    */
-  async load(path: string): Promise<Content> {
+  async load(path: string, options?: LoadOptions): Promise<Content> {
     const authorizationHeader = await getAuthorizationHeader(this.mcrApplicationBaseURL);
-    const response = await fetch(`${this.mcrApplicationBaseURL}api/v2/objects/${path}`, {
+    const expanded = options?.expanded ?? false;
+    const response = await fetch(`${this.mcrApplicationBaseURL}api/v2/objects/${path}?expanded=${expanded}`, {
       method: "GET",
       headers: {
         "Authorization": authorizationHeader

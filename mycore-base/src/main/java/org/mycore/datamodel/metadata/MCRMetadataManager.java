@@ -330,47 +330,91 @@ public final class MCRMetadataManager {
      * @param mcrObject
      *            the object to be deleted
      * @throws MCRPersistenceException
-     *            if persistence problem occurs
+     *            if a persistence problem occurs
      * @throws MCRActiveLinkException
-     *            object couldn't  be deleted because its linked somewhere
+     *            object couldn't be deleted because its linked somewhere
      * @throws MCRAccessException
      *            if delete permission is missing
      */
     public static void delete(final MCRObject mcrObject)
         throws MCRPersistenceException, MCRActiveLinkException, MCRAccessException {
         MCRObjectID id = mcrObject.getId();
+        delete(id, mcrObject);
+    }
+
+    /**
+     * Deletes the {@link MCRObject} identified by the given {@link MCRObjectID}.
+     *
+     * <p>The deletion process performs the following steps:
+     * <ul>
+     *   <li>Checks delete permission</li>
+     *   <li>Ensures no active links reference the object</li>
+     *   <li>Marks the object for deletion</li>
+     *   <li>Deletes all child objects recursively</li>
+     *   <li>Deletes all associated derivates</li>
+     *   <li>Fires a DELETE event</li>
+     *   <li>Removes the deletion mark</li>
+     * </ul>
+     * If the provided {@code mcrObject} is {@code null}, the object will be retrieved from persistence
+     * for event handling. If retrieval fails, a fallback {@link MCRObject} instance with only the given
+     * {@link MCRObjectID} is created to ensure the DELETE event can still be fired.
+     *
+     * @param id
+     *            the ID of the object to delete, must not be {@code null}
+     * @param mcrObject
+     *            the object instance to delete; if {@code null}, it will be retrieved for event handling
+     *
+     * @throws MCRPersistenceException
+     *            if a persistence error occurs or the ID is {@code null}
+     * @throws MCRActiveLinkException
+     *            if the object is still referenced by other objects
+     * @throws MCRAccessException
+     *            if delete permission is missing
+     */
+    private static void delete(final MCRObjectID id, MCRObject mcrObject)
+        throws MCRPersistenceException, MCRActiveLinkException, MCRAccessException {
         if (id == null) {
             throw new MCRPersistenceException("The MCRObjectID is null.");
         }
 
         checkDeletePermission(id);
 
-        checkForActiveLinks(mcrObject, id);
+        checkForActiveLinks(id);
 
         markForDeletion(id);
 
-        removeAllChildren(mcrObject);
+        removeAllChildren(id);
 
-        removeAllDerivates(mcrObject);
+        removeAllDerivates(id);
 
+        if (mcrObject == null) {
+            try {
+                mcrObject = retrieveMCRObject(id);
+            } catch (MCRPersistenceException e) {
+                LOGGER.error(() -> "Error while deleting " + id + ". Unable to retrieve MCRObject from disk. Create " +
+                    "empty mycoreobject for event handling as fallback.", e);
+                mcrObject = new MCRObject();
+                mcrObject.setId(id);
+            }
+        }
         fireEvent(mcrObject, null, MCREvent.EventType.DELETE);
 
         removeMark(id);
     }
 
-    private static void removeAllChildren(MCRObject mcrObject)
+    private static void removeAllChildren(MCRObjectID id)
         throws MCRPersistenceException, MCRAccessException, MCRActiveLinkException {
-        for (MCRObjectID childId : getChildren(mcrObject.getId())) {
+        for (MCRObjectID childId : getChildren(id)) {
             if (!exists(childId)) {
-                LOGGER.warn("Unable to remove not existing object {} of parent {}", () -> childId, mcrObject::getId);
+                LOGGER.warn("Unable to remove not existing object {} of parent {}", () -> childId, () -> id);
                 continue;
             }
             deleteMCRObject(childId);
         }
     }
 
-    private static void removeAllDerivates(MCRObject mcrObject) throws MCRPersistenceException, MCRAccessException {
-        for (MCRObjectID derivateID : getDerivateIds(mcrObject.getId())) {
+    private static void removeAllDerivates(MCRObjectID id) throws MCRPersistenceException, MCRAccessException {
+        for (MCRObjectID derivateID : getDerivateIds(id)) {
             if (exists(derivateID)) {
                 deleteMCRDerivate(derivateID);
             } else {
@@ -386,9 +430,9 @@ public final class MCRMetadataManager {
         }
     }
 
-    private static void checkForActiveLinks(MCRObject mcrObject, MCRObjectID id) throws MCRActiveLinkException {
-        final Collection<String> sources = MCRLinkTableManager.getInstance().getSourceOf(mcrObject.mcrId,
-            MCRLinkTableManager.ENTRY_TYPE_REFERENCE);
+    private static void checkForActiveLinks(MCRObjectID id) throws MCRActiveLinkException {
+        final Collection<String> sources =
+            MCRLinkTableManager.getInstance().getSourceOf(id, MCRLinkTableManager.ENTRY_TYPE_REFERENCE);
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Sources size:{}", sources.size());
         }
@@ -430,7 +474,6 @@ public final class MCRMetadataManager {
         delete(derivate);
     }
 
-
     /**
      * Deletes the mcr object with the given <code>id</code>.
      *
@@ -444,8 +487,7 @@ public final class MCRMetadataManager {
      */
     public static void deleteMCRObject(final MCRObjectID id)
         throws MCRPersistenceException, MCRActiveLinkException, MCRAccessException {
-        final MCRObject object = retrieveMCRObject(id);
-        delete(object);
+        delete(id, null);
     }
 
     /**
@@ -648,7 +690,6 @@ public final class MCRMetadataManager {
         return null;
     }
 
-
     private static void updateDerivate(MCRDerivate mcrDerivate, MCRDerivate old) throws MCRPersistenceException {
         Date oldDate = old.getService().getDate(DATE_TYPE_CREATEDATE);
         mcrDerivate.getService().setDate(DATE_TYPE_CREATEDATE, oldDate);
@@ -673,7 +714,6 @@ public final class MCRMetadataManager {
             }
         }
     }
-
 
     /**
      * Updates the object or creates it if it does not exist yet.
@@ -787,7 +827,6 @@ public final class MCRMetadataManager {
             }
         }
     }
-
 
     /**
      * Updates only the XML part of the derivate.

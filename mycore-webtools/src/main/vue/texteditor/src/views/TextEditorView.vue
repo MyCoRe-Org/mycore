@@ -8,7 +8,8 @@ import {useRouter} from "vue-router";
 
 const props = defineProps<{
   type: string,
-  id: string
+  id: string,
+  expanded: boolean
 }>();
 const model = ref<Content>({
   data: "",
@@ -106,7 +107,9 @@ const load = async () => {
     return;
   }
   try {
-    const content: Content = await contentHandler.load(props.id);
+    const content: Content = await contentHandler.load(props.id, {
+      expanded: props.expanded
+    });
     model.value.data = content.data;
     model.value.type = content.type;
     originalModel = content.data;

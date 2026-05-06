@@ -146,7 +146,10 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
             // this is handled by handleAncestorUpdated
             return;
         }
-
+        if (!MCRMetadataManager.exists(linkedID)) {
+            LOGGER.warn("Skip SOLR link update for missing linked object {}", linkedID);
+            return;
+        }
         addById(linkedID);
     }
 
@@ -157,6 +160,10 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void handleDerivateLinkUpdated(MCREvent evt, MCRDerivate updatedDerivate, MCRObjectID linkedID) {
+        if (!MCRMetadataManager.exists(linkedID)) {
+            LOGGER.warn("Skip SOLR derivate link update for missing linked object {}", linkedID);
+            return;
+        }
         addById(linkedID);
     }
 
