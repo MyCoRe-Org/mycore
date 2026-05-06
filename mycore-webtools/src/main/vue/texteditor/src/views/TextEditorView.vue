@@ -6,7 +6,8 @@ import type {Content, ContentHandler, LockResult} from "@/apis/ContentHandler.ts
 
 const props = defineProps<{
   type: string,
-  id: string
+  id: string,
+  expanded: boolean
 }>();
 let model: Ref<Content> = ref({
   data: "",
@@ -67,7 +68,9 @@ const load = async () => {
     return;
   }
   try {
-    const content: Content = await contentHandler.load(props.id);
+    const content: Content = await contentHandler.load(props.id, {
+      expanded: props.expanded
+    });
     model.value.data = content.data;
     model.value.type = content.type;
     originalModel = content.data;

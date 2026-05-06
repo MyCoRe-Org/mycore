@@ -1,6 +1,6 @@
 import {BaseContentHandler} from "@/apis/BaseContentHandler";
 import {getAuthorizationHeader} from "@/apis/Auth";
-import type {Content} from "@/apis/ContentHandler.ts";
+import type {Content, LoadOptions} from "@/apis/ContentHandler.ts";
 
 export class ClassificationsContentHandler extends BaseContentHandler {
 
@@ -8,7 +8,7 @@ export class ClassificationsContentHandler extends BaseContentHandler {
     super(webApplicationBaseURL);
   }
 
-  async load(classificationId: string): Promise<Content> {
+  async load(classificationId: string, options?: LoadOptions): Promise<Content> {
     const response = await fetch(`${this.mcrApplicationBaseURL}api/v2/classifications/${classificationId}`);
     const xml = await response.text();
     const prettifiedXml = this.prettifyXml(xml);
