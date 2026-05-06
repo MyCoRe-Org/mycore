@@ -63,7 +63,7 @@ class MCRUserServiceTest {
     }
 
     @Test
-    void createUser_shouldReturnDetail() {
+    void createUserShouldReturnDetail() {
         MCRCreateUserRequest request = buildCreateUserRequest("alice", "foo");
         MCRUser domainUser = mock(MCRUser.class);
         MCRUserDetail expectedDetail = mock(MCRUserDetail.class);
@@ -86,7 +86,7 @@ class MCRUserServiceTest {
     }
 
     @Test
-    void createUser_shouldThrowAlreadyExists_whenUserExists() {
+    void createUserShouldThrowAlreadyExistsWhenUserExists() {
         MCRCreateUserRequest request = buildCreateUserRequest("alice", "foo");
 
         try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class)) {
@@ -97,7 +97,7 @@ class MCRUserServiceTest {
     }
 
     @Test
-    void createUser_shouldThrowValidationException_whenMCRExceptionOccurs() {
+    void createUserShouldThrowValidationExceptionWhenMCRExceptionOccurs() {
         MCRCreateUserRequest request = buildCreateUserRequest("alice", "foo");
         MCRUser domainUser = mock(MCRUser.class);
 
@@ -117,7 +117,7 @@ class MCRUserServiceTest {
     }
 
     @Test
-    void getUserSummary_shouldReturnMappedSummary() {
+    void getUserSummaryShouldReturnMappedSummary() {
         MCRUser user = mock(MCRUser.class);
         MCRUserSummary summary = mock(MCRUserSummary.class);
 
@@ -131,7 +131,7 @@ class MCRUserServiceTest {
     }
 
     @Test
-    void getUserSummary_shouldThrowNotFound_whenUserMissing() {
+    void getUserSummaryShouldThrowNotFoundWhenUserMissing() {
         try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class)) {
             mgr.when(() -> MCRUserManager.getUser("unknown")).thenReturn(null);
 
@@ -140,7 +140,7 @@ class MCRUserServiceTest {
     }
 
     @Test
-    void getUserDetail_shouldReturnMappedDetail() {
+    void getUserDetailShouldReturnMappedDetail() {
         MCRUser user = mock(MCRUser.class);
         MCRUserDetail detail = mock(MCRUserDetail.class);
         List<MCRUser> ownedUsers = List.of();
@@ -156,7 +156,7 @@ class MCRUserServiceTest {
     }
 
     @Test
-    void getUserStandard_shouldReturnMappedStandard() {
+    void getUserStandardShouldReturnMappedStandard() {
         MCRUser user = mock(MCRUser.class);
         MCRUserStandard standard = mock(MCRUserStandard.class);
 
@@ -170,7 +170,7 @@ class MCRUserServiceTest {
     }
 
     @Test
-    void listStandard_shouldReturnPagedResultsWithTotal() {
+    void listStandardShouldReturnPagedResultsWithTotal() {
         MCRUserService.MCRUserFilter filter = new MCRUserService.MCRUserFilter("a*", "local", null, null);
         MCRUser u0 = mock(MCRUser.class);
         MCRUser u1 = mock(MCRUser.class);
@@ -197,7 +197,7 @@ class MCRUserServiceTest {
     }
 
     @Test
-    void listStandard_shouldSkipUsersBeforeOffset() {
+    void listStandardShouldSkipUsersBeforeOffset() {
         MCRUserService.MCRUserFilter filter = new MCRUserService.MCRUserFilter(null, null, null, null);
         MCRUser u2 = mock(MCRUser.class);
         MCRUserStandard s2 = mock(MCRUserStandard.class);
@@ -220,7 +220,7 @@ class MCRUserServiceTest {
     }
 
     @Test
-    void listSummary_shouldReturnEmptyPage_whenNoUsersExist() {
+    void listSummaryShouldReturnEmptyPageWhenNoUsersExist() {
         MCRUserService.MCRUserFilter filter = new MCRUserService.MCRUserFilter(null, null, null, null);
 
         try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class)) {
@@ -238,7 +238,7 @@ class MCRUserServiceTest {
     }
 
     @Test
-    void updateUser_shouldApplyUpdateAndReturnDetail() {
+    void updateUserShouldApplyUpdateAndReturnDetail() {
         MCRUpdateUserRequest request = mock(MCRUpdateUserRequest.class);
         MCRUser existing = mock(MCRUser.class);
         MCRUser updated = mock(MCRUser.class);
@@ -263,7 +263,7 @@ class MCRUserServiceTest {
     }
 
     @Test
-    void updateUser_shouldThrowNotFound_whenUserMissing() {
+    void updateUserShouldThrowNotFoundWhenUserMissing() {
         try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class)) {
             mgr.when(() -> MCRUserManager.getUser("ghost")).thenReturn(null);
 
@@ -275,7 +275,7 @@ class MCRUserServiceTest {
     }
 
     @Test
-    void updateUser_shouldThrowValidationException_whenMCRExceptionOccurs() {
+    void updateUserShouldThrowValidationExceptionWhenMCRExceptionOccurs() {
         MCRUpdateUserRequest request = mock(MCRUpdateUserRequest.class);
         MCRUser existing = mock(MCRUser.class);
         MCRUser updated = mock(MCRUser.class);
@@ -294,7 +294,7 @@ class MCRUserServiceTest {
     }
 
     @Test
-    void deleteUser_shouldDeleteUser() {
+    void deleteUserShouldDeleteUser() {
         MCRUser user = mock(MCRUser.class);
 
         try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class)) {
@@ -307,7 +307,7 @@ class MCRUserServiceTest {
     }
 
     @Test
-    void deleteUser_shouldDeleteExistingUser() {
+    void deleteUserShouldDeleteExistingUser() {
         try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class)) {
             mgr.when(() -> MCRUserManager.getUser("ghost")).thenReturn(null);
 

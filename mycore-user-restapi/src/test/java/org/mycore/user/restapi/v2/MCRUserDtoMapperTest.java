@@ -54,7 +54,7 @@ public class MCRUserDtoMapperTest {
     }
 
     @Test
-    void toDomain_shouldMapBasicFields() {
+    void toDomainShouldMapBasicFields() {
         MCRCreateUserRequest request = new MCRCreateUserRequest(
             "john", "John Doe", "john@example.com",
             null, null, false, null,
@@ -69,7 +69,7 @@ public class MCRUserDtoMapperTest {
     }
 
     @Test
-    void toDomain_shouldAssignRoles() {
+    void toDomainShouldAssignRoles() {
         MCRCreateUserRequest request = new MCRCreateUserRequest(
             "john", null, null,
             null, null, false, null,
@@ -84,7 +84,7 @@ public class MCRUserDtoMapperTest {
     }
 
     @Test
-    void toDomain_shouldResolveOwner() {
+    void toDomainShouldResolveOwner() {
         MCRUser owner = buildUser("admin");
 
         MCRCreateUserRequest request = new MCRCreateUserRequest(
@@ -99,7 +99,7 @@ public class MCRUserDtoMapperTest {
     }
 
     @Test
-    void toSummary_shouldMapUserIdAndRealName() {
+    void toSummaryShouldMapUserIdAndRealName() {
         MCRUser user = buildUser("john");
         user.setRealName("John Doe");
 
@@ -110,7 +110,7 @@ public class MCRUserDtoMapperTest {
     }
 
     @Test
-    void toSummary_shouldHandleNullRealName() {
+    void toSummaryShouldHandleNullRealName() {
         MCRUser user = buildUser("john");
 
         MCRUserSummary summary = mapper.toSummary(user);
@@ -119,7 +119,7 @@ public class MCRUserDtoMapperTest {
     }
 
     @Test
-    void toStandard_shouldMapAllFields() {
+    void toStandardShouldMapAllFields() {
         MCRUser user = buildUser("john");
         user.setRealName("John Doe");
         user.setEMail("john@example.com");
@@ -139,7 +139,7 @@ public class MCRUserDtoMapperTest {
     }
 
     @Test
-    void toStandard_shouldHandleNullValidUntil() {
+    void toStandardShouldHandleNullValidUntil() {
         MCRUser user = buildUser("john");
 
         MCRUserStandard standard = mapper.toStandard(user);
@@ -148,7 +148,7 @@ public class MCRUserDtoMapperTest {
     }
 
     @Test
-    void toStandard_shouldHandleNullOwner() {
+    void toStandardShouldHandleNullOwner() {
         MCRUser user = buildUser("john");
 
         MCRUserStandard standard = mapper.toStandard(user);
@@ -157,7 +157,7 @@ public class MCRUserDtoMapperTest {
     }
 
     @Test
-    void toStandard_shouldMapOwner() {
+    void toStandardShouldMapOwner() {
         MCRUser owner = buildUser("admin");
         MCRUser user = buildUser("john");
         user.setOwner(owner);
@@ -168,7 +168,7 @@ public class MCRUserDtoMapperTest {
     }
 
     @Test
-    void toStandard_shouldMapAttributes() {
+    void toStandardShouldMapAttributes() {
         MCRUser user = buildUser("john");
         user.setUserAttribute("foo", "bar");
 
@@ -180,7 +180,7 @@ public class MCRUserDtoMapperTest {
     }
 
     @Test
-    void toDetail_shouldMapAllFields() {
+    void toDetailShouldMapAllFields() {
         MCRUser user = buildUser("john");
         user.setRealName("John Doe");
         user.setEMail("john@example.com");
@@ -200,7 +200,7 @@ public class MCRUserDtoMapperTest {
     }
 
     @Test
-    void toDetail_shouldMapOwnedUsers() {
+    void toDetailShouldMapOwnedUsers() {
         MCRUser user = buildUser("admin");
         MCRUser owned = buildUser("editor");
 
@@ -211,7 +211,7 @@ public class MCRUserDtoMapperTest {
     }
 
     @Test
-    void toDetail_shouldHandleNullLastLogin() {
+    void toDetailShouldHandleNullLastLogin() {
         MCRUser user = buildUser("john");
 
         MCRUserDetail detail = mapper.toDetail(user, List.of());
@@ -220,7 +220,7 @@ public class MCRUserDtoMapperTest {
     }
 
     @Test
-    void applyUpdate_shouldReplaceRoles() {
+    void applyUpdateShouldReplaceRoles() {
         MCRUser user = buildUser("john");
         user.assignRole("editor");
 
@@ -236,7 +236,7 @@ public class MCRUserDtoMapperTest {
     }
 
     @Test
-    void applyUpdate_shouldReplaceAttributes() {
+    void applyUpdateShouldReplaceAttributes() {
         MCRUser user = buildUser("john");
         user.setUserAttribute("old", "value");
 

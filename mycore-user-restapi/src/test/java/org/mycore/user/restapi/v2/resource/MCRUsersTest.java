@@ -85,7 +85,7 @@ class MCRUsersTest {
     }
 
     @Test
-    void createUser_shouldReturn201WithLocation() throws Exception {
+    void createUserShouldReturn201WithLocation() throws Exception {
         MCRCreateUserRequest dto = buildCreateUserRequest("alice");
         MCRUserDetail detail = mock(MCRUserDetail.class);
         when(detail.id()).thenReturn("alice");
@@ -99,7 +99,7 @@ class MCRUsersTest {
     }
 
     @Test
-    void getUser_shouldCallGetStandard_whenNoDetailLevel() {
+    void getUserShouldCallGetStandardWhenNoDetailLevel() {
         MCRUserStandard standard = mock(MCRUserStandard.class);
         when(userService.getUserStandard("alice")).thenReturn(standard);
 
@@ -110,7 +110,7 @@ class MCRUsersTest {
     }
 
     @Test
-    void getUser_shouldCallGetSummary_whenDetailLevelIsSummary() {
+    void getUserShouldCallGetSummaryWhenDetailLevelIsSummary() {
         MCRUserSummary summary = mock(MCRUserSummary.class);
         when(userService.getUserSummary("alice")).thenReturn(summary);
         when(request.getAcceptableMediaTypes()).thenReturn(List.of(buildMediaType("SUMMARY")));
@@ -122,7 +122,7 @@ class MCRUsersTest {
     }
 
     @Test
-    void getUser_shouldCallGetDetail_whenDetailLevelIsDetailed() {
+    void getUserShouldCallGetDetailWhenDetailLevelIsDetailed() {
         MCRUserDetail detail = mock(MCRUserDetail.class);
         when(userService.getUserDetail("alice")).thenReturn(detail);
         when(request.getAcceptableMediaTypes()).thenReturn(List.of(buildMediaType("DETAILED")));
@@ -134,7 +134,7 @@ class MCRUsersTest {
     }
 
     @Test
-    void listUsers_shouldCallListStandard_withCorrectFilter() {
+    void listUsersShouldCallListStandardWithCorrectFilter() {
         MCRUserService.MCRUserPage<MCRUserStandard> page = new MCRUserService.MCRUserPage<>(List.of(), 0);
         when(userService.listStandard(any(), eq(0), eq(100))).thenReturn(page);
         when(request.getAcceptableMediaTypes()).thenReturn(List.of(MediaType.APPLICATION_JSON_TYPE));
@@ -149,7 +149,7 @@ class MCRUsersTest {
     }
 
     @Test
-    void listUsers_shouldReturnTotalCountHeader() {
+    void listUsersShouldReturnTotalCountHeader() {
         MCRUserService.MCRUserPage<MCRUserStandard> page = new MCRUserService.MCRUserPage<>(List.of(), 42);
         when(userService.listStandard(any(), eq(0), eq(100))).thenReturn(page);
         when(request.getAcceptableMediaTypes()).thenReturn(List.of(MediaType.APPLICATION_JSON_TYPE));
@@ -160,7 +160,7 @@ class MCRUsersTest {
     }
 
     @Test
-    void listUsers_shouldCallListSummary_whenDetailLevelIsSummary() {
+    void listUsersShouldCallListSummaryWhenDetailLevelIsSummary() {
         MCRUserService.MCRUserPage<MCRUserSummary> page = new MCRUserService.MCRUserPage<>(List.of(), 0);
         when(userService.listSummary(any(), eq(0), eq(100))).thenReturn(page);
         when(request.getAcceptableMediaTypes()).thenReturn(List.of(buildMediaType("SUMMARY")));
@@ -172,7 +172,7 @@ class MCRUsersTest {
     }
 
     @Test
-    void listUsers_shouldCallListDetail_whenDetailLevelIsDetailed() {
+    void listUsersShouldCallListDetailWhenDetailLevelIsDetailed() {
         MCRUserService.MCRUserPage<MCRUserDetail> page = new MCRUserService.MCRUserPage<>(List.of(), 0);
         when(userService.listDetail(any(), eq(0), eq(100))).thenReturn(page);
         when(request.getAcceptableMediaTypes()).thenReturn(List.of(buildMediaType("DETAILED")));
@@ -184,7 +184,7 @@ class MCRUsersTest {
     }
 
     @Test
-    void updateUser_shouldReturn204() {
+    void updateUserShouldReturn204() {
         MCRUpdateUserRequest dto = buildUpdateUserRequest();
         Response response = resource.updateUser("alice", dto);
 
@@ -193,7 +193,7 @@ class MCRUsersTest {
     }
 
     @Test
-    void patchUser_shouldReturn204() throws Exception {
+    void patchUserShouldReturn204() throws Exception {
         String patchJson = "[{\"op\":\"replace\",\"path\":\"/name\",\"value\":\"Bob\"}]";
         ObjectMapper realMapper = new ObjectMapper()
             .registerModule(new JavaTimeModule());
@@ -220,7 +220,7 @@ class MCRUsersTest {
     }
 
     @Test
-    void deleteUser_shouldReturn204() {
+    void deleteUserShouldReturn204() {
         Response response = resource.deleteUser("alice");
 
         assertEquals(204, response.getStatus());
