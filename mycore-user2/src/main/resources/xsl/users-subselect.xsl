@@ -21,6 +21,7 @@
   </xsl:variable>
 
   <xsl:template match="/users" mode="searchFormAdditional" priority="10">
+    <input type="hidden" name="XSL.Style" value="subselect" />
     <input type="hidden" name="_xed_subselect_session" value="{$xedSession}" />
   </xsl:template>
 
