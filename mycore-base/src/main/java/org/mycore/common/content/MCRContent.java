@@ -33,11 +33,18 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.CopyOption;
+import java.nio.file.FileStore;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.AclEntry;
+import java.nio.file.attribute.AclFileAttributeView;
+import java.nio.file.attribute.PosixFileAttributeView;
+import java.nio.file.attribute.PosixFilePermission;
 import java.util.Base64;
+import java.util.List;
+import java.util.Set;
 
 import javax.xml.transform.Source;
 
@@ -222,6 +229,35 @@ public abstract class MCRContent {
         }
     }
 
+    private static Path prepareTempFile(Path sourceFile, Path parentDir) throws IOException {
+        // store current permissions of target file
+        // usually: ACLs for Windows and POSIX permissions for UNIX
+        List<AclEntry> aclEntries = null;
+        Set<PosixFilePermission> posixPermissions = null;
+        FileStore fileStore = Files.getFileStore(sourceFile);
+        if (fileStore.supportsFileAttributeView(AclFileAttributeView.class)) {
+            aclEntries = Files.getFileAttributeView(sourceFile, AclFileAttributeView.class).getAcl();
+        }
+        if (fileStore.supportsFileAttributeView(PosixFileAttributeView.class)) {
+            posixPermissions = Files.getPosixFilePermissions(sourceFile);
+        }
+        if (LOGGER.isWarnEnabled() && (aclEntries == null && posixPermissions == null)) {
+            LOGGER.warn("No supported file permissions (ACLs, POSIX) were found when recrating {} with new content;"
+                + " new version of file will have default file permissions", sourceFile::toAbsolutePath);
+        }
+
+        Path tmp = Files.createTempFile(parentDir, sourceFile.getFileName().toString(), ".tmp");
+
+        // apply stored permissions to tmp file; will be preserved during the move operation below
+        if (aclEntries != null) {
+            Files.getFileAttributeView(tmp, AclFileAttributeView.class).setAcl(aclEntries);
+        }
+        if (posixPermissions != null) {
+            Files.setPosixFilePermissions(tmp, posixPermissions);
+        }
+        return tmp;
+    }
+
     /**
      * Safely writes the data from the {@link #getInputStream()} to the specified target file.
      * A temporary file is created in the same directory as the target, the data is written
@@ -246,7 +282,9 @@ public abstract class MCRContent {
         if (!Files.isWritable(dir)) {
             throw new IOException("Target directory is not writable: " + dir);
         }
-        Path tmp = Files.createTempFile(dir, target.getFileName().toString(), ".tmp");
+
+        Path tmp = prepareTempFile(target, dir);
+
         try {
             final int chunkSize = 128 * 1024;
             try (InputStream in = getInputStream();
@@ -276,6 +314,7 @@ public abstract class MCRContent {
                 LOGGER.error("Failed to delete temporary file at {}", tmp, e);
             }
         }
+
     }
 
     /**
