@@ -47,7 +47,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * given base id. The cache file is located in the data directory of MyCoRe and is named "id_cache" and contains one
  * file for each base id. The file contains the last generated id as a string.
  */
-public class MCRFileBaseCacheObjectIDGenerator implements MCRObjectIDGenerator {
+public class MCRFileBaseCacheObjectIDGenerator implements MCRTrackingObjectIDGenerator {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -64,7 +64,7 @@ public class MCRFileBaseCacheObjectIDGenerator implements MCRObjectIDGenerator {
         synchronized (MCRFileBaseCacheObjectIDGenerator.class) {
             if (!Files.exists(cacheFile)) {
                 try {
-                   return Files.createFile(cacheFile);
+                    return Files.createFile(cacheFile);
                 } catch (IOException e) {
                     throw new MCRException("Could not create " + cacheFile.toAbsolutePath(), e);
                 }
@@ -126,14 +126,61 @@ public class MCRFileBaseCacheObjectIDGenerator implements MCRObjectIDGenerator {
         int idLengthInBytes = MCRObjectID.formatID(baseId, 1).getBytes(StandardCharsets.UTF_8).length;
         try (
             FileChannel channel = FileChannel.open(cacheFile, StandardOpenOption.WRITE,
-                StandardOpenOption.SYNC, StandardOpenOption.CREATE);){
+                StandardOpenOption.SYNC, StandardOpenOption.CREATE);) {
             ByteBuffer buffer = ByteBuffer.allocate(idLengthInBytes);
             channel.position(0);
-            writeNewID(MCRObjectID.getInstance(MCRObjectID.formatID(baseId, next-1)), buffer, channel, cacheFile);
+            writeNewID(MCRObjectID.getInstance(MCRObjectID.formatID(baseId, next - 1)), buffer, channel, cacheFile);
         } catch (FileNotFoundException e) {
             throw new MCRException("Could not create " + cacheFile.toAbsolutePath(), e);
         } catch (IOException e) {
             throw new MCRException("Could not open " + cacheFile.toAbsolutePath(), e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * If the cache file for the base ID of {@code id} is missing, empty or contains an ID lower
+     * than {@code id}, the cache file is updated to {@code id}. Otherwise the call is a no-op.
+     */
+    @Override
+    public void recordID(MCRObjectID id) {
+        String baseId = id.getBase();
+        Path cacheFile = getCacheFilePath(baseId);
+
+        ReentrantReadWriteLock lock = locks.computeIfAbsent(baseId, k -> new ReentrantReadWriteLock());
+        ReentrantReadWriteLock.WriteLock writeLock = lock.writeLock();
+
+        try {
+            writeLock.lock();
+            try (
+                FileChannel channel = FileChannel.open(cacheFile, StandardOpenOption.READ, StandardOpenOption.WRITE,
+                    StandardOpenOption.SYNC);
+                FileLock fileLock = channel.lock()) {
+
+                int idLengthInBytes = MCRObjectID.formatID(baseId, 1).getBytes(StandardCharsets.UTF_8).length;
+                ByteBuffer buffer = ByteBuffer.allocate(idLengthInBytes);
+                buffer.clear();
+                channel.position(0);
+                int bytesRead = channel.read(buffer);
+                if (bytesRead > 0 && bytesRead != idLengthInBytes) {
+                    throw new MCRException("Content has different id length " + cacheFile.toAbsolutePath());
+                }
+                if (bytesRead == idLengthInBytes) {
+                    buffer.flip();
+                    MCRObjectID cached = readObjectIDFromBuffer(idLengthInBytes, buffer);
+                    if (cached.getNumberAsInteger() >= id.getNumberAsInteger()) {
+                        return;
+                    }
+                }
+                writeNewID(id, buffer, channel, cacheFile);
+            } catch (FileNotFoundException e) {
+                throw new MCRException("Could not create " + cacheFile.toAbsolutePath(), e);
+            } catch (IOException e) {
+                throw new MCRException("Could not open " + cacheFile.toAbsolutePath(), e);
+            }
+        } finally {
+            writeLock.unlock();
         }
     }
 
@@ -228,8 +275,8 @@ public class MCRFileBaseCacheObjectIDGenerator implements MCRObjectIDGenerator {
 
         try (Stream<Path> list = Files.list(cacheDir);) {
             List<String> baseIdList = list.filter(Files::isRegularFile)
-                    .map(Path::getFileName).map(Path::toString)
-                    .collect(Collectors.toList());
+                .map(Path::getFileName).map(Path::toString)
+                .collect(Collectors.toList());
             return baseIdList;
         } catch (IOException e) {
             throw new MCRException("Could not detect cache files!", e);

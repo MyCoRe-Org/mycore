@@ -53,6 +53,7 @@ import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.common.MCRMarkManager;
 import org.mycore.datamodel.common.MCRMarkManager.Operation;
 import org.mycore.datamodel.common.MCRObjectIDGenerator;
+import org.mycore.datamodel.common.MCRTrackingObjectIDGenerator;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.share.MCRMetadataShareAgent;
 import org.mycore.datamodel.metadata.share.MCRMetadataShareAgentFactory;
@@ -80,8 +81,8 @@ public final class MCRMetadataManager {
 
     private static final MCRXMLMetadataManager XML_MANAGER = MCRXMLMetadataManager.instance();
 
-    private static final MCRObjectIDGenerator MCROBJECTID_GENERATOR
-        = MCRConfiguration2.getSingleInstanceOf("MCR.Metadata.ObjectID.Generator.Class",
+    private static final MCRObjectIDGenerator MCROBJECTID_GENERATOR =
+        MCRConfiguration2.getSingleInstanceOf("MCR.Metadata.ObjectID.Generator.Class",
             MCRDefaultObjectIDGenerator.class).get();
 
     private MCRMetadataManager() {
@@ -90,6 +91,19 @@ public final class MCRMetadataManager {
 
     public static MCRObjectIDGenerator getMCRObjectIDGenerator() {
         return MCROBJECTID_GENERATOR;
+    }
+
+    /**
+     * If the configured {@link MCRObjectIDGenerator} implements {@link MCRTrackingObjectIDGenerator},
+     * notify it that the given ID has been assigned externally (i.e. not via
+     * {@link MCRObjectIDGenerator#getNextFreeId(String, int)}). This keeps the generator's internal
+     * "last used ID" state in sync with the actual store, so that subsequent calls to
+     * {@code getNextFreeId} cannot return colliding IDs.
+     */
+    private static void recordIDIfTracking(MCRObjectID id) {
+        if (MCROBJECTID_GENERATOR instanceof MCRTrackingObjectIDGenerator tracking) {
+            tracking.recordID(id);
+        }
     }
 
     /**
@@ -192,6 +206,8 @@ public final class MCRMetadataManager {
             derivateId = MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(derivateId.getBase());
             mcrDerivate.setId(derivateId);
             LOGGER.info("Assigned new derivate id {}", derivateId);
+        } else {
+            recordIDIfTracking(derivateId);
         }
 
         try {
@@ -334,6 +350,8 @@ public final class MCRMetadataManager {
             if (Objects.equals(mcrObject.getLabel(), oldId.toString())) {
                 mcrObject.setLabel(objectId.toString());
             }
+        } else {
+            recordIDIfTracking(objectId);
         }
 
         // create this object in datastore
