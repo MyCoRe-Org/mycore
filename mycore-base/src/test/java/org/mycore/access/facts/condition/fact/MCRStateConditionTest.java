@@ -35,7 +35,6 @@ import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -52,7 +51,7 @@ public class MCRStateConditionTest {
     @BeforeEach
     public void setUp() throws Exception {
 
-        MCRCategoryDAO instance = MCRCategoryDAOFactory.obtainInstance();
+        MCRCategoryDAO instance = MCRCategoryDAO.obtainInstance();
         MCRCategoryImpl state = new MCRCategoryImpl();
         state.setRootID("state");
         state.setRootID("state");

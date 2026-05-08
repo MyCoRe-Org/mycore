@@ -26,15 +26,15 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.QueryRequest;
+import org.apache.solr.client.solrj.request.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.oai.pmh.Set;
-import org.mycore.solr.MCRSolrCoreManager;
+import org.mycore.solr.MCRSolrIndexRegistryManager;
 import org.mycore.solr.MCRSolrUtils;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
@@ -63,10 +63,11 @@ class MCROAIQuerySetResolver extends MCROAISetResolver<String, SolrDocument> {
             idsInSet = Collections.emptySet();
             return;
         }
-        SolrClient solrClient = MCRSolrCoreManager.getMainSolrClient();
+        SolrClient solrClient = MCRSolrIndexRegistryManager.requireMainIndex().getClient();
         QueryResponse response;
         try {
             QueryRequest queryRequest = new QueryRequest(getQuery());
+            queryRequest.setPath(getRequestHandlerPath());
             MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(queryRequest,
                 MCRSolrAuthenticationLevel.SEARCH);
             response = queryRequest.process(solrClient);
@@ -95,10 +96,11 @@ class MCROAIQuerySetResolver extends MCROAISetResolver<String, SolrDocument> {
         solrQuery.setFilterQueries(query);
         solrQuery.setFields("id");
         solrQuery.setRows(getResult().size());
-        // request handler
-        solrQuery.setRequestHandler(
-            MCRConfiguration2.getString(getConfigPrefix() + "Search.RequestHandler").orElse("/select"));
         return solrQuery;
+    }
+
+    private String getRequestHandlerPath() {
+        return MCRConfiguration2.getString(getConfigPrefix() + "Search.RequestHandler").orElse("/select");
     }
 
 }

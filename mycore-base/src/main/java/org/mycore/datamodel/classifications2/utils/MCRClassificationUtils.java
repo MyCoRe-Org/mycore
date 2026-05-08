@@ -38,12 +38,11 @@ import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 
 /**
  * This class contains helper methods to handle mycore classifications.
- * 
+ *
  * @author Matthias Eichner
  */
 public class MCRClassificationUtils {
@@ -53,7 +52,7 @@ public class MCRClassificationUtils {
     /**
      * Returns the classification as string. Returns null if the
      * classification does not exists.
-     * 
+     *
      * @param classId the classification root id
      * @return the classification as string
      */
@@ -65,13 +64,13 @@ public class MCRClassificationUtils {
     /**
      * Returns the classification as a jdom document. Returns null if the
      * classification does not exists.
-     * 
+     *
      * @param classId the classification root id
      * @return the classification as jdom document
      */
     public static Document asDocument(String classId) {
         MCRCategoryID categoryId = new MCRCategoryID(classId);
-        MCRCategory classification = MCRCategoryDAOFactory.obtainInstance().getRootCategory(categoryId, -1);
+        MCRCategory classification = MCRCategoryDAO.obtainInstance().getRootCategory(categoryId, -1);
         if (classification == null) {
             return null;
         }
@@ -81,7 +80,7 @@ public class MCRClassificationUtils {
     /**
      * Imports a classification from the given path. If the classification
      * already exists, it will be replaced.
-     * 
+     *
      * @param pathToClassification path to the classification
      * @throws IOException could not read from file
      * @throws MCRException xml parsing went wrong
@@ -97,7 +96,7 @@ public class MCRClassificationUtils {
     /**
      * Imports a classification from the given input stream. If the classification
      * already exists, it will be replaced.
-     * 
+     *
      * @param inputStream the classification stream
      * @throws MCRException xml parsing went wrong
      * @throws URISyntaxException unable to transform the xml to a {@link MCRCategory}
@@ -105,7 +104,7 @@ public class MCRClassificationUtils {
      */
     public static void fromStream(InputStream inputStream)
         throws MCRException, URISyntaxException, MCRAccessException, IOException {
-        MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.obtainInstance();
+        MCRCategoryDAO categoryDAO = MCRCategoryDAO.obtainInstance();
         Document jdom;
         try {
             jdom = MCRXMLParserFactory.getParser().parseXML(new MCRStreamContent(inputStream));

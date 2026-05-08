@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mycoreclass xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="MCRClassification.xsd" ID="derivate_types">
+  <label xml:lang="de" text="Dateibereichtyp" />
+  <label xml:lang="en" text="Type of file area" />
+  <categories>
+    <category ID="content">
+      <label xml:lang="de" text="Inhalt" />
+      <label xml:lang="en" text="Content" />
+    </category>
+    <category ID="thumbnail">
+      <label xml:lang="de" text="Vorschaubild" />
+      <label xml:lang="en" text="Thumbnail" />
+    </category>
+    <category ID="abstract">
+      <label xml:lang="de" text="Zusammenfassung" />
+      <label xml:lang="en" text="Abstract" />
+    </category>
+    <category ID="toc">
+      <label xml:lang="de" text="Inhaltsverzeichnis" />
+      <label xml:lang="en" text="Table of Contents" />
+    </category>
+  </categories>
+</mycoreclass>

@@ -117,19 +117,11 @@ public final class MCRProcessableFactory {
     /**
      * Helper class glueing a thread pool and a collection together.
      */
-    private static class MCRProcessableThreadPoolExecutorHelper implements MCRProcessableExecutor {
-
-        private final ExecutorService executor;
-
-        private final MCRProcessableCollection collection;
+    private record MCRProcessableThreadPoolExecutorHelper(ExecutorService executor,
+        MCRProcessableCollection collection) implements MCRProcessableExecutor {
 
         MCRProcessableThreadPoolExecutorHelper(ExecutorService delegate) {
             this(delegate, null);
-        }
-
-        MCRProcessableThreadPoolExecutorHelper(ExecutorService delegate, MCRProcessableCollection collection) {
-            this.executor = delegate;
-            this.collection = collection;
         }
 
         /*
@@ -157,11 +149,6 @@ public final class MCRProcessableFactory {
                 });
             }
             return supplier;
-        }
-
-        @Override
-        public ExecutorService getExecutor() {
-            return this.executor;
         }
 
     }

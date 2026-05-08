@@ -16,12 +16,11 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:fn="http://www.w3.org/2005/xpath-functions"
-                xmlns:mods="http://www.loc.gov/mods/v3"
-                xmlns:cr="http://www.crossref.org/schema/4.4.1"
-                xmlns:xlink="http://www.w3.org/1999/xlink"
-                version="3.0"
->
+<xsl:stylesheet version="3.0"
+  xmlns:cr="http://www.crossref.org/schema/4.4.1"
+  xmlns:mods="http://www.loc.gov/mods/v3"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  exclude-result-prefixes="#all">
 
   <!--
   Book

@@ -45,13 +45,17 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRXlink;
 import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRParameterizedTransformer;
 import org.mycore.common.xml.MCRLayoutService;
+import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRExpandedObject;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectStructure;
 import org.mycore.datamodel.metadata.MCRXMLConstants;
@@ -168,11 +172,12 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
     }
 
     private void sendObject(MCRObjectID id, MCRServletJob job, T container) throws Exception {
-        MCRContent content = MCRXMLMetadataManager.getInstance().retrieveContent(id);
+        MCRExpandedObject object = MCRMetadataManager.retrieveMCRExpandedObject(id);
+        MCRContent content = new MCRJDOMContent(object.createXML());
         if (content == null) {
             throw new FileNotFoundException("Could not find object: " + id);
         }
-        long lastModified = MCRXMLMetadataManager.getInstance().getLastModified(id);
+        long lastModified = MCRXMLMetadataManager.obtainInstance().getLastModified(id);
         HttpServletRequest req = job.getRequest();
         byte[] metaDataContent = getMetaDataContent(content, req);
         sendMetadataCompressed("metadata.xml", metaDataContent, lastModified, container);
@@ -184,11 +189,12 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
 
         for (Element el : li) {
             if (el.getAttributeValue(MCRXMLConstants.INHERITED).equals("0")) {
-                String ownerID = el.getAttributeValue(MCRXlink.HREF, XLINK_NAMESPACE);
-                MCRObjectID derId = MCRObjectID.getInstance(ownerID);
+                String derivateIdString = el.getAttributeValue(MCRXlink.HREF, XLINK_NAMESPACE);
+                MCRObjectID derivateId = MCRObjectID.getInstance(derivateIdString);
                 // here the access check is tested only against the derivate
-                if (MCRAccessManager.checkDerivateContentPermission(derId, PERMISSION_READ)) {
-                    sendDerivate(derId, null, container);
+                if (MCRAccessManager.checkDerivateContentPermission(derivateId, PERMISSION_READ)
+                    && MCRXMLFunctions.isDerivateDisplayEnabled(derivateIdString, "compress")) {
+                    sendDerivate(derivateId, null, container);
                 }
             }
         }

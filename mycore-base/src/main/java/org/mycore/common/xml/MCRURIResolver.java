@@ -54,7 +54,7 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPathExpressionException;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
@@ -76,6 +76,7 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.annotation.MCRFactory;
 import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
@@ -88,7 +89,6 @@ import org.mycore.common.xsl.MCRLazyStreamSource;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
@@ -105,6 +105,7 @@ import org.mycore.datamodel.metadata.MCRXMLConstants;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.MCRPathXML;
 import org.mycore.frontend.MCRLayoutUtilities;
+import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.resource.MCRResourceHelper;
 import org.mycore.resource.MCRResourcePath;
 import org.mycore.services.http.MCRURLQueryParameter;
@@ -144,8 +145,6 @@ public final class MCRURIResolver implements URIResolver {
 
     private MCRResolverProvider extResolver;
 
-    private static final MCRURIResolver SHARED_INSTANCE = new MCRURIResolver();
-
     public MCRURIResolver() {
         reinitialize();
     }
@@ -175,10 +174,15 @@ public final class MCRURIResolver implements URIResolver {
         }
     }
 
+    @MCRFactory
     public static MCRURIResolver obtainInstance() {
-        return SHARED_INSTANCE;
+        return LazyInstanceHolder.SHARED_INSTANCE;
     }
-    
+
+    public static MCRURIResolver createInstance() {
+        return new MCRURIResolver();
+    }
+
     public static Map<String, String> getParameterMap(String key) {
         String[] param;
         StringTokenizer tok = new StringTokenizer(key, "&");
@@ -190,6 +194,30 @@ public final class MCRURIResolver implements URIResolver {
                 param.length >= 2 ? URLDecoder.decode(param[1], StandardCharsets.UTF_8) : "");
         }
         return params;
+    }
+
+    /**
+     * creates the default boolean response of a MyCoRe URIResolver.
+     * This is an element with text body: &lt;boolean&gt;true|false&lt;boolean&gt;
+     * @param value the boolean value that should be returned
+     * @return a JDOMSource
+     */
+    public static Source createBooleanResponse(boolean value) {
+        Element root = new Element("boolean");
+        root.setText(Boolean.toString(value));
+        return new JDOMSource(root);
+    }
+
+    /**
+     * creates the default String response of a MyCoRe URIResolver.
+     * This is an element with text body: &lt;string&gt;texte&lt;string&gt;
+     * @param text the String text that should be returned
+     * @return a JDOMSource
+     */
+    public static Source createStringResponse(String text) {
+        Element root = new Element("string");
+        root.setText(text);
+        return new JDOMSource(root);
     }
 
     static URI resolveURI(String href, String base) {
@@ -236,11 +264,13 @@ public final class MCRURIResolver implements URIResolver {
         supportedSchemes.put("i18n", new MCRI18NResolver());
         supportedSchemes.put("checkPermissionChain", new MCRCheckPermissionChainResolver());
         supportedSchemes.put("checkPermission", new MCRCheckPermissionResolver());
+        supportedSchemes.put("checkDerivateDisplayEnabled", new MCRCheckDerivateDisplayEnabledResolver());
         MCRRESTResolver restResolver = new MCRRESTResolver();
         supportedSchemes.put("http", restResolver);
         supportedSchemes.put("https", restResolver);
         supportedSchemes.put("file", new MCRFileResolver());
         supportedSchemes.put("cache", new MCRCachingResolver());
+        supportedSchemes.put("websiteWriteProtection", new MCRWebsiteWriteProtectionResolver());
         return supportedSchemes;
     }
 
@@ -513,7 +543,7 @@ public final class MCRURIResolver implements URIResolver {
 
             MCRObjectID mcrid = MCRObjectID.getInstance(id);
             try {
-                MCRXMLMetadataManager xmlmm = MCRXMLMetadataManager.getInstance();
+                MCRXMLMetadataManager xmlmm = MCRXMLMetadataManager.obtainInstance();
 
                 MCRContent content;
                 if (params.containsKey("r")) {
@@ -769,7 +799,7 @@ public final class MCRURIResolver implements URIResolver {
 
         static {
             try {
-                dao = MCRCategoryDAOFactory.obtainInstance();
+                dao = MCRCategoryDAO.obtainInstance();
                 categoryCache = new MCRCache<>(
                     MCRConfiguration2.getInt(CONFIG_PREFIX + "Classification.CacheSize").orElse(1000),
                     "URIResolver categories");
@@ -795,7 +825,7 @@ public final class MCRURIResolver implements URIResolver {
         }
 
         private static long getSystemLastModified() {
-            long xmlLastModified = MCRXMLMetadataManager.getInstance().getLastModified();
+            long xmlLastModified = MCRXMLMetadataManager.obtainInstance().getLastModified();
             long classLastModified = dao.getLastModified();
             return Math.max(xmlLastModified, classLastModified);
         }
@@ -1010,6 +1040,7 @@ public final class MCRURIResolver implements URIResolver {
     private static final class MCRXslStyleResolver implements URIResolver {
 
         public static final String PREFIX = "MCR.URIResolver.XSLStyle.Flavor.";
+        private static final String FLAVOR_PARAMETER = "xslStyleFlavor";
 
         private final Flavor defaultFlavor;
 
@@ -1096,6 +1127,9 @@ public final class MCRURIResolver implements URIResolver {
                 configurationEnd = paramsStart;
             }
 
+            Map<String, String> parameterMap = getParameterMap(parameters);
+            String flavorParameter = parameterMap.remove(FLAVOR_PARAMETER);
+
             //  copy stylesheets from href
             String stylesheetPaths = help.substring(0, configurationEnd);
 
@@ -1109,6 +1143,14 @@ public final class MCRURIResolver implements URIResolver {
                     resolved.setSystemId(targetUri);
                 }
 
+                if (flavorName.isEmpty() && flavorParameter != null && !flavorParameter.isBlank()) {
+                    flavorName = flavorParameter;
+                    flavor = flavors.get(flavorName);
+                    if (flavor == null) {
+                        throw new MCRUsageException("Unknown flavor " + flavorName + " in " + href);
+                    }
+                }
+
                 // prepare transformer
                 String[] stylesheets = augmentStylesheetsPaths(stylesheetPaths.split(","),
                     flavor.xslFolder);
@@ -1117,7 +1159,7 @@ public final class MCRURIResolver implements URIResolver {
 
                 //prepare parameter collector
                 MCRParameterCollector parameterCollector = MCRParameterCollector.ofCurrentSession();
-                parameterCollector.setParameters(getParameterMap(parameters));
+                parameterCollector.setParameters(parameterMap);
 
                 // perform transformation
                 MCRSourceContent content = new MCRSourceContent(resolved);
@@ -1271,9 +1313,9 @@ public final class MCRURIResolver implements URIResolver {
             final String baseURI = getParentDirectoryResourceURI(base);
             // set xslt folder
             final String xslFolder;
-            if (StringUtils.startsWith(baseURI, "resource:xsl/")) {
+            if (Strings.CS.startsWith(baseURI, "resource:xsl/")) {
                 xslFolder = "xsl";
-            } else if (StringUtils.startsWith(baseURI, "resource:xslt/")) {
+            } else if (Strings.CS.startsWith(baseURI, "resource:xslt/")) {
                 xslFolder = "xslt";
             } else {
                 xslFolder = MCRConfiguration2.getStringOrThrow(PROPERTY_XSL_FOLDER);
@@ -1453,8 +1495,11 @@ public final class MCRURIResolver implements URIResolver {
                     case "abbrev" -> MCRCoreVersion.getAbbrev();
                     case "branch" -> MCRCoreVersion.getBranch();
                     case "version" -> MCRCoreVersion.getVersion();
+                    case "completeVersion" -> MCRCoreVersion.getCompleteVersion();
                     case "revision" -> MCRCoreVersion.getRevision();
-                    default -> MCRCoreVersion.getCompleteVersion();
+                    default -> throw new IllegalArgumentException(
+                        "Invalid parameter for MCRVersionResolver: " + versionType);
+
                 });
             return new JDOMSource(versionElement);
         }
@@ -1502,6 +1547,32 @@ public final class MCRURIResolver implements URIResolver {
         }
     }
 
+    /**
+     * Resolver for MCRWebsiteWriteProtection. Returns an XML with the following format:
+     * <code>
+     *   &lt;message  active="true|false"&gt;Message to display when write protection is active&lt;/message&gt;
+     * </code>
+     */
+    private static final class MCRWebsiteWriteProtectionResolver implements URIResolver {
+
+        @Override
+        public Source resolve(String href, String base) throws TransformerException {
+            boolean active = MCRWebsiteWriteProtection.isActive();
+            org.w3c.dom.Document message;
+            try {
+                message = MCRWebsiteWriteProtection.getMessage();
+            } catch (JDOMException e) {
+                throw new TransformerException(e);
+            }
+            if (message.getDocumentElement() == null) {
+                //fallback to default message if no message is set
+                message.appendChild(message.createElement("message"));
+            }
+            message.getDocumentElement().setAttribute("active", String.valueOf(active));
+            return new DOMSource(message);
+        }
+    }
+
     private static final class MCRVersionInfoResolver implements URIResolver {
 
         @Override
@@ -1509,7 +1580,7 @@ public final class MCRURIResolver implements URIResolver {
             String id = href.substring(href.indexOf(':') + 1);
             LOGGER.debug("Reading version info of MCRObject with ID {}", id);
             MCRObjectID mcrId = MCRObjectID.getInstance(id);
-            MCRXMLMetadataManager metadataManager = MCRXMLMetadataManager.getInstance();
+            MCRXMLMetadataManager metadataManager = MCRXMLMetadataManager.obtainInstance();
             try {
                 List<? extends MCRAbstractMetadataVersion<?>> versions = metadataManager.listRevisions(mcrId);
                 if (versions != null && !versions.isEmpty()) {
@@ -1564,7 +1635,7 @@ public final class MCRURIResolver implements URIResolver {
             MCRObjectID mcrId = MCRObjectID.getInstance(parts[parts.length - 1]);
             LOGGER.info("Resolving deleted object {}", mcrId);
             try {
-                MCRContent lastPresentVersion = MCRXMLMetadataManager.getInstance().retrieveContent(mcrId);
+                MCRContent lastPresentVersion = MCRXMLMetadataManager.obtainInstance().retrieveContent(mcrId);
                 if (lastPresentVersion == null) {
                     LOGGER.warn("Could not resolve deleted object {}", mcrId);
                     return new JDOMSource(MCRObjectFactory.getSampleObject(mcrId));
@@ -1618,7 +1689,7 @@ public final class MCRURIResolver implements URIResolver {
             String propertyName = "MCR.URIResolver.redirect." + configsuffix;
             String propValue = MCRConfiguration2.getStringOrThrow(propertyName);
             LOGGER.info("Redirect {} to {}", href, propValue);
-            return SHARED_INSTANCE.resolve(propValue, base);
+            return obtainInstance().resolve(propValue, base);
         }
     }
 
@@ -1785,9 +1856,33 @@ public final class MCRURIResolver implements URIResolver {
                 default -> throw new IllegalArgumentException(
                     "Invalid format of uri for retrieval of checkPermission: " + href);
             };
-            Element root = new Element("boolean");
-            root.setText(Boolean.toString(permission));
-            return new JDOMSource(root);
+            return createBooleanResponse(permission);
+        }
+    }
+
+    private static final class MCRCheckDerivateDisplayEnabledResolver implements URIResolver {
+        /**
+         * returns the boolean value for the given derivate and intent.
+         * <p>
+         * Syntax: <code>checkDerivateDisplayEnabled:{id}:{intent}</code>
+         *
+         * @param href
+         *            URI in the syntax above
+         * @param base
+         *            not used
+         * @return the root element "boolean" of the XML document with content string true of false
+         * @see javax.xml.transform.URIResolver
+         */
+        @Override
+        public Source resolve(String href, String base) {
+            final String[] split = href.split(":");
+            boolean result = switch (split.length) {
+                case 2 -> true;
+                case 3 -> MCRXMLFunctions.isDerivateDisplayEnabled(split[1], split[2]);
+                default -> throw new IllegalArgumentException(
+                    "Invalid format of uri for retrieval of checkDerivateDisplayEnabled: " + href);
+            };
+            return createBooleanResponse(result);
         }
     }
 
@@ -1838,6 +1933,10 @@ public final class MCRURIResolver implements URIResolver {
 
             return new JDOMSource(resolvedXML);
         }
+    }
+
+    private static final class LazyInstanceHolder {
+        public static final MCRURIResolver SHARED_INSTANCE = createInstance();
     }
 
 }

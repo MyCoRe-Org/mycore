@@ -234,10 +234,10 @@ public class MCRJobThreadStarter implements Runnable, Closeable {
         try {
             if (processableExecutor != null) {
                 LOGGER.debug("Shutdown executor jobs.");
-                processableExecutor.getExecutor().shutdown();
+                processableExecutor.executor().shutdown();
                 try {
                     LOGGER.debug("Await termination of executor jobs.");
-                    processableExecutor.getExecutor().awaitTermination(60, TimeUnit.SECONDS);
+                    processableExecutor.executor().awaitTermination(60, TimeUnit.SECONDS);
                     LOGGER.debug("All jobs finished.");
                 } catch (InterruptedException e) {
                     LOGGER.debug("Could not wait 60 seconds...", e);
@@ -253,7 +253,7 @@ public class MCRJobThreadStarter implements Runnable, Closeable {
      */
     @Override
     public void close() {
-        if (processableExecutor != null && !processableExecutor.getExecutor().isShutdown()) {
+        if (processableExecutor != null && !processableExecutor.executor().isShutdown()) {
             LOGGER.info("We are in a hurry, closing service right now");
             this.jobExecutor.shutdownNow();
             try {

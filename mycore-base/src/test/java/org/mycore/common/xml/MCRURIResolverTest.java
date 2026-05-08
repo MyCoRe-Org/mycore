@@ -30,7 +30,7 @@ import java.nio.file.Path;
 
 import javax.xml.transform.Source;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
@@ -99,13 +99,13 @@ public class MCRURIResolverTest {
         Source xslSource = MCRURIResolver.obtainInstance()
             .resolve("xslImport:xsl-import:functions/xsl-2.xsl", xslResourceUrl);
         assertNotNull(xslSource);
-        assertTrue(StringUtils.endsWith(xslSource.getSystemId(), "/xsl/functions/xsl-1.xsl"));
+        assertTrue(Strings.CS.endsWith(xslSource.getSystemId(), "/xsl/functions/xsl-1.xsl"));
 
         String xsltResourceUrl = MCRResourceHelper.getResourceUrl("/xslt/functions/xsl-2.xsl").toString();
         Source xsltSource = MCRURIResolver.obtainInstance()
             .resolve("xslImport:xsl-import:functions/xsl-2.xsl", xsltResourceUrl);
         assertNotNull(xsltSource);
-        assertTrue(StringUtils.endsWith(xsltSource.getSystemId(), "/xslt/functions/xsl-1.xsl"));
+        assertTrue(Strings.CS.endsWith(xsltSource.getSystemId(), "/xslt/functions/xsl-1.xsl"));
 
     }
 

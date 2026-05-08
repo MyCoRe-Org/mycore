@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <xsl:stylesheet version="3.0"
   xmlns="http://www.w3.org/TR/REC-html40"
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:common="http://www.orcid.org/ns/common"
   xmlns:fn="http://www.w3.org/2005/xpath-functions"
-  xmlns:mcrstring="http://www.mycore.de/xslt/stringutils"
+  xmlns:mcrstringutils="http://www.mycore.de/xslt/stringutils"
   xmlns:mods="http://www.loc.gov/mods/v3"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:work="http://www.orcid.org/ns/work"
-  xmlns:common="http://www.orcid.org/ns/common">
+  exclude-result-prefixes="#all">
 
   <xsl:include href="resource:xslt/functions/stringutils.xsl"/>
 
@@ -21,7 +22,7 @@
   </xsl:template>
 
   <xsl:template match="mods:mods">
-    <work:work xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.orcid.org/ns/work record_3.0/work-3.0.xsd">
+    <work:work xsi:schemaLocation="http://www.orcid.org/ns/work record_3.0/work-3.0.xsd">
       <xsl:call-template name="workTitle" />
       <xsl:call-template name="journal-title" />
       <xsl:apply-templates select="mods:abstract" />
@@ -92,7 +93,7 @@
 
   <xsl:template match="mods:abstract[fn:string-length(text()) &gt; 0]">
     <work:short-description>
-      <xsl:value-of select="mcrstring:shorten(text(), ($short-description-max-length - 1), '…')"/>
+      <xsl:value-of select="mcrstringutils:shorten(text(), ($short-description-max-length - 1), '…')"/>
     </work:short-description>
   </xsl:template>
 
@@ -283,7 +284,7 @@
         </xsl:choose>
       </xsl:variable>
       <work:credit-name>
-        <xsl:value-of select="mcrstring:shorten(normalize-space($creditname), ($string-150-max-length - 1), '…')" />
+        <xsl:value-of select="mcrstringutils:shorten(normalize-space($creditname), ($string-150-max-length - 1), '…')" />
       </work:credit-name>
     </xsl:if>
   </xsl:template>

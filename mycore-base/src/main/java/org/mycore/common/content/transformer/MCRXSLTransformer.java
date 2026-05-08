@@ -91,7 +91,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
     private static final long CHECK_PERIOD = MCRConfiguration2.getLong("MCR.LayoutService.LastModifiedCheckPeriod")
         .orElse(60_000L);
 
-    private static final Class<? extends TransformerFactory> DEFAULT_FACTORY_CLASS = MCRConfiguration2
+    protected static final Class<? extends TransformerFactory> DEFAULT_FACTORY_CLASS = MCRConfiguration2
         .<TransformerFactory>getClass("MCR.LayoutService.TransformerFactoryClass")
         .orElseGet(TransformerFactory.newInstance()::getClass);
 
@@ -189,6 +189,10 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
                 long lastModified = templateSources[i].getLastModified();
                 if (templates[i] == null || modified[i] < lastModified || !useCache) {
                     SAXSource source = templateSources[i].getSource();
+                    if (source == null) {
+                        throw new TransformerConfigurationException(
+                            "XSLT Stylesheet could not be found: " + templateSources[i].getKey());
+                    }
                     templates[i] = tFactory.newTemplates(source);
                     if (templates[i] == null) {
                         throw new TransformerConfigurationException(
@@ -208,7 +212,20 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
 
     @Override
     public String getMimeType() throws TransformerException, SAXException, ParserConfigurationException {
-        return getOutputProperties().getProperty("media-type", "text/xml");
+        Properties outputProperties = getOutputProperties();
+        String mediaType = outputProperties.getProperty("media-type");
+        if (mediaType != null && !mediaType.isBlank()) {
+            return mediaType;
+        }
+
+        String method = outputProperties.getProperty("method", "xml");
+        return switch (method) {
+            case "html" -> "text/html";
+            case "text" -> "text/plain";
+            case "xhtml" -> "application/xhtml+xml";
+            case "json" -> "application/json";
+            default -> "text/xml";
+        };
     }
 
     @Override

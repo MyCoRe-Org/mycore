@@ -18,11 +18,12 @@
 
 package org.mycore.solr.auth;
 
-import org.apache.solr.client.solrj.SolrRequest;
-
 import java.net.http.HttpRequest;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+
+import org.apache.solr.client.solrj.SolrRequest;
+import org.apache.solr.client.solrj.impl.HttpSolrClientBuilderBase;
 
 /**
  * Authentication implementation that adds <code>Authorization</code> headers with
@@ -38,6 +39,11 @@ public abstract class MCRSolrBasicAuthenticatorBase implements MCRSolrAuthentica
     @Override
     public final void applyAuthentication(HttpRequest.Builder request) {
         request.header("Authorization", "Basic " + getEncodedAuthString());
+    }
+
+    @Override
+    public void applyAuthentication(HttpSolrClientBuilderBase<?, ?> clientBuilder) {
+        clientBuilder.withBasicAuthCredentials(getUsername(), getPassword());
     }
 
     private String getEncodedAuthString() {

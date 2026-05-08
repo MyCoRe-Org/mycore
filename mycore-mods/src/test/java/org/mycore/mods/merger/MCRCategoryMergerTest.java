@@ -27,7 +27,6 @@ import java.net.URISyntaxException;
 
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,7 +34,7 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRTransactionManager;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategory;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.test.MCRJPAExtension;
@@ -61,7 +60,7 @@ public class MCRCategoryMergerTest {
         SAXBuilder saxBuilder = new SAXBuilder();
         InputStream categoryStream = classLoader.getResourceAsStream(TEST_DIRECTORY + categoryFileName);
         MCRCategory category = MCRXMLTransformer.getCategory(saxBuilder.build(categoryStream));
-        MCRCategoryDAOFactory.obtainInstance().addCategory(null, category);
+        MCRCategoryDAO.obtainInstance().addCategory(null, category);
     }
 
     @Test

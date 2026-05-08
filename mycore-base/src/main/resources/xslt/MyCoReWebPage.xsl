@@ -2,15 +2,12 @@
 <!DOCTYPE xsl:stylesheet [
   <!ENTITY html-output SYSTEM "xsl/xsl-output-html.fragment">
 ]>
+<xsl:stylesheet version="3.0"
+  xmlns:mcri18n="http://www.mycore.de/xslt/i18n"
+  xmlns:mcrwebpage="http://www.mycore.de/MyCoReWebPage"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  exclude-result-prefixes="#all">
 
-<!-- ============================================== -->
-<!-- $Revision: 1.25 $ $Date: 2007-12-06 16:17:45 $ -->
-<!-- ============================================== -->
-
-<xsl:stylesheet version="3.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:mcri18n="http://www.mycore.de/xslt/i18n"
-                xmlns:mcrwebpage="http://www.mycore.de/MyCoReWebPage"
->
   &html-output;
 
   <xsl:include href="MyCoReLayout.xsl" />

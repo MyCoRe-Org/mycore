@@ -29,6 +29,10 @@ public class MCRUploadServerException extends MCRUploadException {
         super(messageKey);
     }
 
+    public MCRUploadServerException(String messageKey, String... translationParams) {
+        super(messageKey, translationParams);
+    }
+
     public MCRUploadServerException(String messageKey, Throwable throwable) {
         super(messageKey, throwable);
     }

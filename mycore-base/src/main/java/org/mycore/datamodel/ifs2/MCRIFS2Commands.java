@@ -87,7 +87,7 @@ public class MCRIFS2Commands extends MCRAbstractCommands {
     }
 
     private static void initMetadataStores() {
-        final MCRXMLMetadataManager metadataManager = MCRXMLMetadataManager.getInstance();
+        final MCRXMLMetadataManager metadataManager = MCRXMLMetadataManager.obtainInstance();
         metadataManager.getObjectBaseIds().forEach(id -> {
             final String[] parts = id.split("_");
             metadataManager.getHighestStoredID(parts[0], parts[1]);
@@ -129,7 +129,7 @@ public class MCRIFS2Commands extends MCRAbstractCommands {
     public static void writeMD5SumFile(String targetFile, String ifsStoreId) throws IOException {
         initFileStores();
         final MCRStore store = MCRStoreCenter.getInstance().getStore(ifsStoreId);
-        if (!(store instanceof MCRFileStore)) {
+        if (!(store instanceof MCRFileStore fileStore)) {
             throw new MCRException("Store " + ifsStoreId + " is not found or is not a file store.");
         }
         Path targetPath = Paths.get(targetFile);
@@ -139,7 +139,6 @@ public class MCRIFS2Commands extends MCRAbstractCommands {
         try (BufferedWriter bw = Files.newBufferedWriter(targetPath, StandardCharsets.UTF_8,
             StandardOpenOption.CREATE)) {
             final MessageFormat md5FileFormat = new MessageFormat("{0}  {1}\n", Locale.ROOT);
-            MCRFileStore fileStore = (MCRFileStore) store;
             fileStore.getStoredIDs()
                 .sorted()
                 .mapToObj(fileStore::retrieve)

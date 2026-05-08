@@ -74,17 +74,17 @@ import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRSourceContent;
+import org.mycore.common.xml.derivate.MCRDerivateDisplayFilter;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
-import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.common.MCRLinkType;
+import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRExpandedObject;
 import org.mycore.datamodel.metadata.MCRExpandedObjectStructure;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
@@ -107,6 +107,9 @@ import jakarta.ws.rs.core.UriBuilder;
  * @author René Adler (eagle)
  */
 public class MCRXMLFunctions {
+
+    public static final String DERIVATE_DISPLAY_FILTER_PROPERTY = "MCR.Derivate.DisplayFilter.Class";
+
     private static final String TAG_START = "\\<\\w+((\\s+\\w+(\\s*\\=\\s*(?:\".*?\"|'.*?'|[^'\"\\>\\s]+))?)+"
         + "\\s*|\\s*)\\>";
 
@@ -123,7 +126,11 @@ public class MCRXMLFunctions {
         .compile("(" + TAG_START + "((.*?[^\\<]))" + TAG_END + ")|(" + TAG_SELF_CLOSING + ")|(" + HTML_ENTITY + ")",
             Pattern.DOTALL);
 
+    private static final MCRDerivateDisplayFilter DERIVATE_DISPLAY_FILTER = MCRConfiguration2
+        .getInstanceOfOrThrow(MCRDerivateDisplayFilter.class, DERIVATE_DISPLAY_FILTER_PROPERTY);
+
     private static final Logger LOGGER = LogManager.getLogger();
+
     private static volatile MimetypesFileTypeMap mimetypeMap;
 
     public static Node document(String uri) throws JDOMException, IOException, TransformerException {
@@ -375,6 +382,40 @@ public class MCRXMLFunctions {
     @Deprecated(forRemoval = true)
     public static boolean isDisplayedEnabledDerivate(String derivateId) {
         return MCRAccessManager.checkDerivateDisplayPermission(derivateId);
+    }
+
+    /**
+     * Returns, weather the derivate identified by the given derivate ID
+     * should be included when displaying derivates for the given intent
+     * (which is controlled by the configured {@link MCRDerivateDisplayFilter},
+     * set by configuration property {@link MCRXMLFunctions#DERIVATE_DISPLAY_FILTER_PROPERTY}).
+     * <p>
+     * This check is independent of weather the derivate is allowed to be accessed,
+     * which can be ascertained, depending on context, by, for example,
+     * {@link MCRAccessManager#checkDerivateDisplayPermission(String)}
+     * {@link MCRAccessManager#checkDerivateContentPermission(MCRObjectID, String)}
+     * or {@link MCRAccessManager#checkPermission(MCRObjectID, String)}.
+     */
+    public static boolean isDerivateDisplayEnabled(String derivateId, String intent) {
+        MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivateId));
+        return isDerivateDisplayEnabled(derivate, intent);
+    }
+
+    /**
+     * Returns, weather the derivate identified by the given derivate ID
+     * should be included when displaying derivates for the given intent
+     * (which is controlled by the configured {@link MCRDerivateDisplayFilter},
+     * set by configuration property {@link MCRXMLFunctions#DERIVATE_DISPLAY_FILTER_PROPERTY}).
+     * <p>
+     * This check is independent of weather the derivate is allowed to be accessed,
+     * which can be ascertained, depending on context, by, for example,
+     * {@link MCRAccessManager#checkDerivateDisplayPermission(String)}
+     * {@link MCRAccessManager#checkDerivateContentPermission(MCRObjectID, String)}
+     * or {@link MCRAccessManager#checkPermission(MCRObjectID, String)}.
+     */
+    public static boolean isDerivateDisplayEnabled(MCRDerivate derivate, String intent) {
+        Boolean excludeDerivate = DERIVATE_DISPLAY_FILTER.isDisplayEnabled(derivate, intent);
+        return !Objects.equals(excludeDerivate, false);
     }
 
     /**
@@ -643,7 +684,7 @@ public class MCRXMLFunctions {
             MCRCategoryID categID = MCRCategoryID.ofString(categoryId);
             MCRObjectID mcrObjectID = MCRObjectID.getInstance(objectId);
             MCRCategLinkReference reference = new MCRCategLinkReference(mcrObjectID);
-            return MCRCategLinkServiceHolder.INSTANCE.isInCategory(reference, categID);
+            return MCRCategLinkService.obtainInstance().isInCategory(reference, categID);
         } catch (MCRException e) {
             LOGGER.error("Error while checking if object is in category", e);
             return false;
@@ -661,13 +702,13 @@ public class MCRXMLFunctions {
     public static boolean hasParentCategory(String classificationId, String categoryId) {
         MCRCategoryID categID = new MCRCategoryID(classificationId, categoryId);
         //root category has level 0
-        return !categID.isRootID() && MCRCategoryDAOFactory.obtainInstance().getCategory(categID, 0).getLevel() > 1;
+        return !categID.isRoot() && MCRCategoryDAO.obtainInstance().getCategory(categID, 0).getLevel() > 1;
     }
 
     public static String getDisplayName(String classificationId, String categoryId) {
         try {
             MCRCategoryID categID = new MCRCategoryID(classificationId, categoryId);
-            MCRCategoryDAO dao = MCRCategoryDAOFactory.obtainInstance();
+            MCRCategoryDAO dao = MCRCategoryDAO.obtainInstance();
             MCRCategory category = dao.getCategory(categID, 0);
             return Optional.ofNullable(category)
                 .map(MCRCategory::getCurrentLabel)
@@ -695,11 +736,11 @@ public class MCRXMLFunctions {
     public static String getDisplayName(String classificationId, String categoryId, String lang) {
         try {
             MCRCategoryID categID = new MCRCategoryID(classificationId, categoryId);
-            MCRCategoryDAO dao = MCRCategoryDAOFactory.obtainInstance();
+            MCRCategoryDAO dao = MCRCategoryDAO.obtainInstance();
             MCRCategory category = dao.getCategory(categID, 0);
             Optional<MCRLabel> label = category.getLabel(lang);
             return label.isEmpty() ? getDisplayName(classificationId, categoryId)
-                                   : label.get().getText();
+                : label.get().getText();
         } catch (MCRException e) {
             LOGGER.error("Could not determine display name for classification id {} and category id {}",
                 classificationId, categoryId, e);
@@ -726,7 +767,7 @@ public class MCRXMLFunctions {
         MCRCategory category = null;
         try {
             MCRCategoryID categID = MCRCategoryID.ofString(classificationId + ":" + categoryId);
-            MCRCategoryDAO dao = MCRCategoryDAOFactory.obtainInstance();
+            MCRCategoryDAO dao = MCRCategoryDAO.obtainInstance();
             category = dao.getCategory(categID, 0);
         } catch (MCRException e) {
             LOGGER.error("Could not determine state for classification id {} and category id {}", classificationId,
@@ -973,16 +1014,10 @@ public class MCRXMLFunctions {
         return new SetNodeList(distinctNodeSet);
     }
 
-    private static final class MCRCategLinkServiceHolder {
-        public static final MCRCategLinkService INSTANCE = MCRCategLinkServiceFactory.obtainInstance();
-    }
+    private record SetNodeList(Object[] objects) implements NodeList {
 
-    private static final class SetNodeList implements NodeList {
-
-        private final Object[] objects;
-
-        SetNodeList(Set<Node> set) {
-            objects = set.toArray();
+        private SetNodeList(Set<Node> objects) {
+            this(objects.toArray());
         }
 
         @Override
@@ -995,4 +1030,5 @@ public class MCRXMLFunctions {
             return objects.length;
         }
     }
+
 }

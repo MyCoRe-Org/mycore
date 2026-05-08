@@ -53,7 +53,7 @@ public class MCRMetadataExtensionTest {
         assertTrue(Files.isDirectory(storeBaseDir), "Store base dir should be a directory");
         assertTrue(storeBaseDir.getFileName().toString().startsWith("mcr-store"),
             "Store base dir should start with 'mcr-store'");
-        assertFalse(MCRXMLMetadataManager.getInstance().exists(MCRObjectID.getInstance("MyCoRe_test_00004711")),
+        assertFalse(MCRXMLMetadataManager.obtainInstance().exists(MCRObjectID.getInstance("MyCoRe_test_00004711")),
             "MCRXMLMetadataManager should be available but the object should not exist");
     }
 

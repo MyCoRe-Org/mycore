@@ -2,9 +2,11 @@
 
 <!-- XSL to display data of a login user -->
 
-<xsl:stylesheet version="3.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:mcrurl="http://www.mycore.de/xslt/url"
-                xmlns:mcri18n="http://www.mycore.de/xslt/i18n" exclude-result-prefixes="xsl mcrurl mcri18n">
+<xsl:stylesheet version="3.0"
+  xmlns:mcri18n="http://www.mycore.de/xslt/i18n"
+  xmlns:mcrurl="http://www.mycore.de/xslt/url"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  exclude-result-prefixes="#all">
 
   <xsl:include href="MyCoReLayout.xsl" />
   <xsl:include href="classificationBrowser.xsl" />

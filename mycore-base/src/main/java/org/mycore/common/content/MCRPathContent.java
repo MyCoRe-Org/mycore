@@ -98,7 +98,7 @@ public class MCRPathContent extends MCRContent implements MCRSeekableChannelCont
             return getETag(fAttrs);
         } else if (attrs == null) {
             try {
-                MCRFileAttributes mcrattrs = Files.readAttributes(path, MCRFileAttributes.class);
+                MCRFileAttributes<?> mcrattrs = Files.readAttributes(path, MCRFileAttributes.class);
                 return getETag(mcrattrs);
             } catch (UnsupportedOperationException ignored) {
                 //no support for MCRFileAttributes

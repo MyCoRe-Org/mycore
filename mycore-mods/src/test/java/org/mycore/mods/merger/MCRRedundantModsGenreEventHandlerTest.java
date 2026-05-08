@@ -30,13 +30,11 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
@@ -54,7 +52,7 @@ public class MCRRedundantModsGenreEventHandlerTest {
 
     @BeforeEach
     public void setUp() throws Exception {
-        MCRCategoryDAO categoryDao = MCRCategoryDAOFactory.obtainInstance();
+        MCRCategoryDAO categoryDao = MCRCategoryDAO.obtainInstance();
         categoryDao.addCategory(null, MCRXMLTransformer.getCategory(loadXml("genre.xml")));
         categoryDao.addCategory(null, MCRXMLTransformer.getCategory(loadXml("genre2.xml")));
     }
@@ -162,7 +160,6 @@ public class MCRRedundantModsGenreEventHandlerTest {
     public void redundantGenresInModsAndRelatedItemNoInteraction() throws Exception {
         Element mods = loadMods("modsGenresInAndOutsideRelatedItem.xml");
         List<Element> genresOutside = mods.getChildren("genre", MODS_NAMESPACE);
-
 
         assertEquals(1, genresOutside.size());
         assertEquals("intern:x-1", getTypeFromAttributeAndCategoryIdFromValueUri(genresOutside.getFirst()));

@@ -34,7 +34,7 @@
     "grunt-tslint": "^5.0.2",
     "grunt-typedoc": "^0.2.4",
     "jquery": "3.5.1",
-    "serve-static": "^1.9.2",
+    "serve-static": "^1.16.0",
     "tslint": "^5.0.0"
   },
   "dependencies": {

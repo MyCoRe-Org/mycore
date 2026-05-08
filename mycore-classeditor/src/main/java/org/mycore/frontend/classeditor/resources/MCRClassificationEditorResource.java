@@ -46,10 +46,8 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRJSONManager;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
-import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.utils.MCRClassificationUtils;
 import org.mycore.frontend.classeditor.access.MCRClassificationWritePermission;
@@ -58,7 +56,7 @@ import org.mycore.frontend.classeditor.json.MCRJSONCategory;
 import org.mycore.frontend.classeditor.json.MCRJSONCategoryHelper;
 import org.mycore.frontend.classeditor.wrapper.MCRCategoryListWrapper;
 import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
-import org.mycore.solr.MCRSolrCoreManager;
+import org.mycore.solr.MCRSolrIndexRegistryManager;
 import org.mycore.solr.MCRSolrUtils;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
@@ -108,9 +106,9 @@ import jakarta.ws.rs.core.UriInfo;
  */
 @Path("classifications")
 public class MCRClassificationEditorResource {
-    private static final MCRCategoryDAO CATEGORY_DAO = MCRCategoryDAOFactory.obtainInstance();
+    private static final MCRCategoryDAO CATEGORY_DAO = MCRCategoryDAO.obtainInstance();
 
-    private static final MCRCategLinkService CATEG_LINK_SERVICE = MCRCategLinkServiceFactory.obtainInstance();
+    private static final MCRCategLinkService CATEG_LINK_SERVICE = MCRCategLinkService.obtainInstance();
 
     protected static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_MANAGER =
         MCRSolrAuthenticationManager.obtainInstance();
@@ -263,7 +261,7 @@ public class MCRClassificationEditorResource {
     @Path("filter/{text}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response filter(@PathParam("text") String text) {
-        SolrClient solrClient = MCRSolrClassificationUtil.getCore().getClient();
+        SolrClient solrClient = MCRSolrClassificationUtil.getIndexList().getFirst().getClient();
         ModifiableSolrParams p = new ModifiableSolrParams();
         p.set("q", "allMeta:" + "*" + MCRSolrUtils.escapeSearchValue(text) + "*");
         p.set("fl", "id,ancestors");
@@ -289,7 +287,7 @@ public class MCRClassificationEditorResource {
     public Response retrieveLinkedObjects(@PathParam("id") String id, @QueryParam("start") Integer start,
         @QueryParam("rows") Integer rows) throws SolrServerException, IOException {
         // do solr query
-        SolrClient solrClient = MCRSolrCoreManager.getMainSolrClient();
+        SolrClient solrClient = MCRSolrIndexRegistryManager.requireMainIndex().getClient();
         ModifiableSolrParams params = new ModifiableSolrParams();
         params.set("start", start != null ? start : 0);
         params.set("rows", rows != null ? rows : 50);
@@ -460,7 +458,7 @@ public class MCRClassificationEditorResource {
         public void run() {
             MCRCategoryID categoryID = category.getId();
             if (CATEGORY_DAO.exist(categoryID)) {
-                if (categoryID.isRootID()
+                if (categoryID.isRoot()
                     && !MCRAccessManager.checkPermission(categoryID.getRootID(), PERMISSION_DELETE)) {
                     throw new WebApplicationException(Status.UNAUTHORIZED);
                 }
@@ -496,7 +494,7 @@ public class MCRClassificationEditorResource {
         public void run() {
             MCRCategoryID mcrCategoryID = category.getId();
             boolean isAdded = isAdded(jsonObject);
-            if (isAdded && MCRCategoryDAOFactory.obtainInstance().exist(mcrCategoryID)) {
+            if (isAdded && MCRCategoryDAO.obtainInstance().exist(mcrCategoryID)) {
                 // an added category already exist -> throw conflict error
                 throw new WebApplicationException(
                     Response.status(Status.CONFLICT).entity(buildJsonError("duplicateID", mcrCategoryID)).build());

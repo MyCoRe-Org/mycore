@@ -123,6 +123,10 @@ public class MCRPersistentIdentifierEventHandler extends MCRJanitorEventHandlerB
             // pi services only handle normal objects, not derivates
             return;
         }
+        if (!MCRMetadataManager.exists(linked)) {
+            LOGGER.warn("Skip PI link update for {} with missing linked object {}", updatedObject, linked);
+            return;
+        }
         MCRObject obj = MCRMetadataManager.retrieveMCRExpandedObject(linked);
         detectServices(obj, (service, registrationInfo) -> {
             try {

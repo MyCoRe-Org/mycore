@@ -20,6 +20,7 @@ package org.mycore.frontend.xeditor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -200,6 +201,24 @@ public class MCRXEditorTransformerTest {
     public void testSelect() throws IOException, TransformerException, JDOMException,
         SAXException, JaxenException {
         testTransformation("testSelect-editor.xml", "testSelect-source.xml", "testSelect-transformed.xml");
+    }
+
+    @Test
+    @MCRTestConfiguration(properties = {
+        @MCRTestProperty(key = "MCR.Test.PostProcessor",
+            string = "org.mycore.frontend.xeditor.MCRTestPostProcessor")
+    })
+    public void testPostProcessorClassResolution() throws IOException, TransformerException, JDOMException,
+        SAXException, JaxenException {
+        MCREditorSession session = buildEditorSession("testBasicInputComponents-source.xml");
+        MCRParameterCollector pc = new MCRParameterCollector(false);
+        pc.setParameter("input", "testBasicInputComponents-source.xml");
+
+        MCRContent input = MCRSourceContent
+            .createInstance("resource:testPostProcessorClassResolution-editor.xml");
+        new MCRXEditorTransformer(session, pc).transform(input);
+
+        assertInstanceOf(MCRTestPostProcessor.class, session.getPostProcessor());
     }
 
 }

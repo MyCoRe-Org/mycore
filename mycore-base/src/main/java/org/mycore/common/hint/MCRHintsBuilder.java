@@ -91,16 +91,7 @@ public final class MCRHintsBuilder {
 
     }
 
-    private static final class Entry<T> {
-
-        private final MCRHintKey<T> key;
-
-        private final T value;
-
-        private Entry(MCRHintKey<T> hintKey, T hintValue) {
-            this.key = hintKey;
-            this.value = hintValue;
-        }
+    private record Entry<T>(MCRHintKey<T> key, T value) {
 
         public String formattedValue() {
             return key.format(value);

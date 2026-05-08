@@ -28,7 +28,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRException;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 
@@ -37,7 +37,7 @@ import com.google.gson.JsonObject;
 /**
  * This class holds all information of a metadata object.
  * For persistence operations see methods of {@link MCRMetadataManager}.
- *  
+ *
  * @author Jens Kupferschmidt
  * @author Mathias Hegner
  * @author Thomas Scheffler (yagee)
@@ -69,7 +69,7 @@ public class MCRObject extends MCRBase {
      * <ul>
      * <li>MCR.XMLParser.Class</li>
      * </ul>
-     * 
+     *
      * @exception MCRException
      *                general Exception of MyCoRe
      */
@@ -103,7 +103,7 @@ public class MCRObject extends MCRBase {
     /**
      * This method returns the instance of the MCRObjectMetadata class. If there
      * was no MCRObjectMetadata found, null will be returned.
-     * 
+     *
      * @return the instance of the MCRObjectMetadata class
      */
     public MCRObjectMetadata getMetadata() {
@@ -113,7 +113,7 @@ public class MCRObject extends MCRBase {
     /**
      * This method return the instance of the MCRObjectStructure class. If this
      * was not found, null was returned.
-     * 
+     *
      * @return the instance of the MCRObjectStructure class
      */
     public MCRObjectStructure getStructure() {
@@ -123,7 +123,7 @@ public class MCRObject extends MCRBase {
     /**
      * This methode return the object label. If this is not set, null was
      * returned.
-     * 
+     *
      * @return the lable as a string
      */
     public String getLabel() {
@@ -132,7 +132,7 @@ public class MCRObject extends MCRBase {
 
     /**
      * This method set the object label.
-     * 
+     *
      * @param label
      *            the object label
      */
@@ -151,7 +151,7 @@ public class MCRObject extends MCRBase {
      * The given DOM was convert into an internal view of metadata. This are the
      * object ID and the object label, also the blocks structure, flags and
      * metadata.
-     * 
+     *
      * @exception MCRException
      *                general Exception of MyCoRe
      */
@@ -177,7 +177,7 @@ public class MCRObject extends MCRBase {
 
     /**
      * This method creates a XML stream for all object data.
-     * 
+     *
      * @exception MCRException
      *                if the content of this class is not valid
      * @return a JDOM Document with the XML data of the object as byte array
@@ -202,19 +202,19 @@ public class MCRObject extends MCRBase {
     /**
      * Creates the JSON representation of this object. Extends the {@link MCRBase#createJSON()}
      * method with the following content:
-     * 
+     *
      * <pre>
      *   {
      *     id: "mycore_project_00000001",
      *     version: "3.0"
      *     label: "my mycore object",
-     *     
+     *
      *     structure: {@link MCRObjectStructure#createJSON},
      *     metadata: {@link MCRObjectMetadata#createJSON},
      *     service: {@link MCRObjectService#createJSON},
      *   }
      * </pre>
-     * 
+     *
      * @return a json gson representation of this object
      */
     @Override
@@ -261,7 +261,7 @@ public class MCRObject extends MCRBase {
      *  <li>the structure part is null or invalid</li>
      *  <li>the metadata part is null or invalid</li>
      *  </ul>
-     * 
+     *
      * @throws MCRException the MCRObject is invalid
      */
     @Override
@@ -309,7 +309,7 @@ public class MCRObject extends MCRBase {
                 if (inf instanceof MCRMetaClassification classification) {
                     String classID = classification.getClassId();
                     String categID = classification.getCategId();
-                    boolean exists = MCRCategoryDAOFactory.obtainInstance().exist(new MCRCategoryID(classID, categID));
+                    boolean exists = MCRCategoryDAO.obtainInstance().exist(new MCRCategoryID(classID, categID));
                     if (exists) {
                         continue;
                     }

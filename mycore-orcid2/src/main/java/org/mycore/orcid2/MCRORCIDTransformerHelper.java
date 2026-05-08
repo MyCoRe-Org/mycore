@@ -52,7 +52,10 @@ public class MCRORCIDTransformerHelper {
         }
         final Element mods = modsCollection.getChild("mods", MCRConstants.MODS_NAMESPACE);
         // Remove mods:extension containing the original BibTeX:
-        mods.removeChildren("extension", MCRConstants.MODS_NAMESPACE);
+        if (mods != null) {
+            mods.removeChildren("extension", MCRConstants.MODS_NAMESPACE);
+        }
+
         return mods;
     }
 }

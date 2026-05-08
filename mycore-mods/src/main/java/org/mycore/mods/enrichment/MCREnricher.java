@@ -21,7 +21,6 @@ package org.mycore.mods.enrichment;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -175,26 +174,27 @@ public class MCREnricher {
 
         for (StringTokenizer st = new StringTokenizer(dsConfig, DELIMITERS, true); st.hasMoreTokens();) {
             String token = st.nextToken(DELIMITERS).trim();
-            if (token.isEmpty()) {
-                continue;
-            } else if (Objects.equals(token, "(")) {
-                withinGroup = true;
-            } else if (Objects.equals(token, ")")) {
-                withinGroup = false;
-            } else {
-                MCRDataSourceCall call = id2call.get(token);
-                if (call.wasSuccessful()) {
-                    call.getResults().forEach(result -> {
-                        LOGGER.info(() -> "merging data from " + token);
-                        merge(publication, result);
-                        debugger.debugResolved(token, result);
-                        debugger.debugPublication("afterMerge", publication);
-                    });
-                    call.clearResults();
+            switch (token) {
+                case "" -> {
+                    continue;
+                }
+                case "(" -> withinGroup = true;
+                case ")" -> withinGroup = false;
+                default -> {
+                    MCRDataSourceCall call = id2call.get(token);
+                    if (call.wasSuccessful()) {
+                        call.getResults().forEach(result -> {
+                            LOGGER.info(() -> "merging data from " + token);
+                            merge(publication, result);
+                            debugger.debugResolved(token, result);
+                            debugger.debugPublication("afterMerge", publication);
+                        });
+                        call.clearResults();
 
-                    if (withinGroup) {
-                        st.nextToken(")"); // skip forward to end of group
-                        withinGroup = false;
+                        if (withinGroup) {
+                            st.nextToken(")"); // skip forward to end of group
+                            withinGroup = false;
+                        }
                     }
                 }
             }

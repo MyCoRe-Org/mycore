@@ -190,7 +190,7 @@ public final class MCRImageTiler implements Runnable, Closeable {
                 }
             }
         }
-        if (job != null && !tilingServe.getExecutor().isShutdown()) {
+        if (job != null && !tilingServe.executor().isShutdown()) {
             LOGGER.info("Creating:{}", job::getPath);
             tilingServe.submit(getTilingAction(job));
         } else {
@@ -256,10 +256,10 @@ public final class MCRImageTiler implements Runnable, Closeable {
         try {
             if (tilingServe != null) {
                 LOGGER.debug("Shutdown tiling executor jobs.");
-                tilingServe.getExecutor().shutdown();
+                tilingServe.executor().shutdown();
                 try {
                     LOGGER.debug("Await termination of tiling executor jobs.");
-                    tilingServe.getExecutor().awaitTermination(60, TimeUnit.SECONDS);
+                    tilingServe.executor().awaitTermination(60, TimeUnit.SECONDS);
                     LOGGER.debug("All jobs finished.");
                 } catch (InterruptedException e) {
                     LOGGER.debug("Could not wait 60 seconds...", e);
@@ -275,11 +275,11 @@ public final class MCRImageTiler implements Runnable, Closeable {
      */
     @Override
     public void close() {
-        if (tilingServe != null && !tilingServe.getExecutor().isShutdown()) {
+        if (tilingServe != null && !tilingServe.executor().isShutdown()) {
             LOGGER.info("We are in a hurry, closing tiling service right now");
-            tilingServe.getExecutor().shutdownNow();
+            tilingServe.executor().shutdownNow();
             try {
-                tilingServe.getExecutor().awaitTermination(60, TimeUnit.SECONDS);
+                tilingServe.executor().awaitTermination(60, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
                 LOGGER.debug("Could not wait  60 seconds...", e);
             }

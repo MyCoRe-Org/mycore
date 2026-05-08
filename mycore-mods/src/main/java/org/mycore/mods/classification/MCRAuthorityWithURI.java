@@ -24,7 +24,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.w3c.dom.Element;
@@ -33,7 +32,7 @@ import org.w3c.dom.Element;
  * Authority information that is represented by authorityURI and valueURI. Such authority info comes from a vocabulary
  * that is not registered at the Library of Congress, but maintained by an external authority like the MyCoRe
  * application.
- * 
+ *
  * @author Frank Lützenkirchen
  */
 class MCRAuthorityWithURI extends MCRAuthorityInfo {
@@ -45,7 +44,7 @@ class MCRAuthorityWithURI extends MCRAuthorityInfo {
 
     static final String CLASS_URI_PART = "classifications/";
 
-    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.obtainInstance();
+    private static final MCRCategoryDAO DAO = MCRCategoryDAO.obtainInstance();
 
     /**
      * xml:lang value of category or classification <label> for MODS @authorityURI or @valueURI.

@@ -28,7 +28,7 @@ import org.mycore.common.config.MCRConfiguration2;
  * must implement this interface. Which database actually will be used can then
  * be configured by reading the value <code>MCR.Persistence.Rule.Store.Class</code>
  * from mycore.properties.access
- * 
+ *
  * @author Arne Seifert
  */
 public abstract class MCRRuleStore {
@@ -52,12 +52,7 @@ public abstract class MCRRuleStore {
     public abstract int getNextFreeRuleID(String prefix);
 
     public static MCRRuleStore obtainInstance() {
-        return LazyInstanceHolder.SHARED_INSTANCE;
-    }
-
-    private static final class LazyInstanceHolder {
-        public static final MCRRuleStore SHARED_INSTANCE = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRRuleStore.class, "MCR.Persistence.Rule.Store.Class");
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRRuleStore.class, "MCR.Persistence.Rule.Store.Class");
     }
 
 }

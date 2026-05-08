@@ -25,15 +25,13 @@ import jakarta.servlet.ServletContextListener;
 
 public final class MCRServletContextHolder implements ServletContextListener {
 
-    private static final MCRServletContextHolder SINGLETON_INSTANCE = new MCRServletContextHolder();
-
     private Optional<ServletContext> context = Optional.empty();
 
     private MCRServletContextHolder() {
     }
 
     public static MCRServletContextHolder getInstance() {
-        return SINGLETON_INSTANCE;
+        return LazyInstanceHolder.SINGLETON_INSTANCE;
     }
 
     public Optional<ServletContext> get() {
@@ -42,6 +40,10 @@ public final class MCRServletContextHolder implements ServletContextListener {
 
     void set(ServletContext context) {
         this.context = Optional.ofNullable(context);
+    }
+
+    private static final class LazyInstanceHolder {
+        public static final MCRServletContextHolder SINGLETON_INSTANCE = new MCRServletContextHolder();
     }
 
 }

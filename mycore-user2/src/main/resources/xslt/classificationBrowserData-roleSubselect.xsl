@@ -3,10 +3,10 @@
 <!-- XSL to transform XML output from MCRClassificationBrowser servlet to HTML for client browser, which is loaded by AJAX. The browser sends data of all child categories 
   of the requested node. -->
 
-<xsl:stylesheet version="3.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:mcrurl="http://www.mycore.de/xslt/url"
-                exclude-result-prefixes="xsl mcrurl"
->
+<xsl:stylesheet version="3.0"
+  xmlns:mcrurl="http://www.mycore.de/xslt/url"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  exclude-result-prefixes="#all">
 
   <xsl:output method="xml" omit-xml-declaration="yes" />
 

@@ -41,7 +41,8 @@ public class MCRPostProcessorTransformerHelper extends MCRTransformerHelperBase 
 
     @Override
     void handle(MCRTransformerHelperCall call) {
-        String clazz = call.getAttributeValueOrDefault(ATTR_CLASS, null);
+        String rawClazz = call.getAttributeValueOrDefault(ATTR_CLASS, null);
+        String clazz = rawClazz != null ? replaceXPaths(rawClazz) : null;
         if (clazz != null) {
             try {
                 MCRXEditorPostProcessor instance = ((MCRXEditorPostProcessor) MCRClassTools.forName(clazz)

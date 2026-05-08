@@ -43,7 +43,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.mycore.common.MCRConstants;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
-import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
+import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -177,7 +177,7 @@ public final class MCRPathXML {
         root.setAttribute("extension", getFileExtension(fileName));
         root.setAttribute("returnId", MCRMetadataManager
             .getObjectId(MCRObjectID.getInstance(path.getOwner())).toString());
-        Collection<MCRCategoryID> linksFromReference = MCRCategLinkServiceFactory.obtainInstance()
+        Collection<MCRCategoryID> linksFromReference = MCRCategLinkService.obtainInstance()
             .getLinksFromReference(new MCRCategLinkReference(path));
         for (MCRCategoryID category : linksFromReference) {
             Element catEl = new Element("category");

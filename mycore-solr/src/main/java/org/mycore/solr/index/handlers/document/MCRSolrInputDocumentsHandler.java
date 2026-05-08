@@ -25,12 +25,12 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.impl.ConcurrentUpdateHttp2SolrClient;
+import org.apache.solr.client.solrj.impl.ConcurrentUpdateBaseSolrClient;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrInputDocument;
 import org.mycore.solr.MCRSolrConstants;
-import org.mycore.solr.MCRSolrCoreType;
+import org.mycore.solr.MCRSolrIndexType;
 import org.mycore.solr.index.MCRSolrIndexHandler;
 import org.mycore.solr.index.handlers.MCRSolrAbstractIndexHandler;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatistic;
@@ -47,9 +47,9 @@ public class MCRSolrInputDocumentsHandler extends MCRSolrAbstractIndexHandler {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public MCRSolrInputDocumentsHandler(Collection<SolrInputDocument> documents, MCRSolrCoreType coreType) {
+    public MCRSolrInputDocumentsHandler(Collection<SolrInputDocument> documents, MCRSolrIndexType coreType) {
         this.documents = documents;
-        setCoreType(coreType);
+        setIndexType(coreType);
     }
 
     /* (non-Javadoc)
@@ -72,7 +72,7 @@ public class MCRSolrInputDocumentsHandler extends MCRSolrAbstractIndexHandler {
         int totalCount = documents.size();
         LOGGER.info("Handling {} documents", totalCount);
         for (SolrClient client : getClients()) {
-            if (client instanceof ConcurrentUpdateHttp2SolrClient) {
+            if (client instanceof ConcurrentUpdateBaseSolrClient) {
                 LOGGER.info("Detected ConcurrentUpdateSolrClient. Split up batch update.");
                 splitDocuments();
                 //for statistics:
@@ -106,7 +106,7 @@ public class MCRSolrInputDocumentsHandler extends MCRSolrAbstractIndexHandler {
         subHandlerList = new ArrayList<>(documents.size());
         for (SolrInputDocument document : documents) {
             MCRSolrInputDocumentHandler subHandler = new MCRSolrInputDocumentHandler(() -> document,
-                String.valueOf(document.getFieldValue("id")), getCoreType());
+                String.valueOf(document.getFieldValue("id")), getIndexType());
             subHandler.setCommitWithin(getCommitWithin());
             this.subHandlerList.add(subHandler);
         }

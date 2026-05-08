@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xed:template xmlns:xed="http://www.mycore.de/xeditor" xmlns:mcruser="http://www.mycore.de/components/mcruser"
+<xed:template xmlns:xed="http://www.mycore.de/xeditor" xmlns:xeduser="http://www.mycore.de/components/mcruser"
               xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
   <xsl:param name="MCR.User.Local.PasswordPattern" select="[\S]{6,}"/>
@@ -21,7 +21,7 @@
   </xed:template>
 
   <xed:template id="editor4newReadUser">
-    <mcruser:template name="textInput" xpath="@name" id="userName" i18n="component.user2.admin.userAccount" i18n.error="component.user2.admin.inputhints.username"
+    <xeduser:template name="textInput" xpath="@name" id="userName" i18n="component.user2.admin.userAccount" i18n.error="component.user2.admin.inputhints.username"
       required="true" maxlength="16" />
     <xed:bind xpath="@realm" default="local" />
     <xed:include ref="passwords" />
@@ -33,7 +33,7 @@
   </xed:template>
 
   <xed:template id="editor4changeReadUser">
-    <mcruser:template name="textInput" xpath="@name" id="userName" i18n="component.user2.admin.userAccount" i18n.error="component.user2.admin.inputhints.username"
+    <xeduser:template name="textInput" xpath="@name" id="userName" i18n="component.user2.admin.userAccount" i18n.error="component.user2.admin.inputhints.username"
       required="true" maxlength="43" />
     <xed:bind xpath="@realm" default="local" />
     <xed:include ref="passwordHint" />
@@ -63,13 +63,13 @@
   </xed:template>
 
   <xed:template id="editor4admins">
-    <mcruser:template name="checkboxList" inline="true" xpath="@locked" id="locked">
+    <xeduser:template name="checkboxList" inline="true" xpath="@locked" id="locked">
       <option value="true" i18n="component.user2.admin.user.locked.true" />
-    </mcruser:template>
-    <mcruser:template name="checkboxList" inline="true" xpath="@disabled" id="disabled">
+    </xeduser:template>
+    <xeduser:template name="checkboxList" inline="true" xpath="@disabled" id="disabled">
       <option value="true" i18n="component.user2.admin.user.disabled" />
-    </mcruser:template>
-    <mcruser:template name="textInput" xpath="validUntil" id="validUntil" i18n="component.user2.admin.user.validUntil" i18n.error="component.user2.admin.inputhints.date"
+    </xeduser:template>
+    <xeduser:template name="textInput" xpath="validUntil" id="validUntil" i18n="component.user2.admin.user.validUntil" i18n.error="component.user2.admin.inputhints.date"
       validate="true" type="datetime" format="yyyy-MM-dd;yyyy-MM-dd'T'HH:mm:ss'Z'" maxlength="20" />
 
     <xed:include ref="owner" />
@@ -77,15 +77,15 @@
   </xed:template>
 
   <xed:template id="buttons">
-    <mcruser:template name="submitButton" i18n="component.user2.button.save" target="servlet" href="MCRUserServlet" />
-    <mcruser:template name="cancelButton" i18n="component.user2.button.cancel" />
+    <xeduser:template name="submitButton" i18n="component.user2.button.save" target="servlet" href="MCRUserServlet" />
+    <xeduser:template name="cancelButton" i18n="component.user2.button.cancel" />
   </xed:template>
 
   <xed:template id="buttons.password">
     <xed:if test="string-length(@realm)=0 or @realm='local'">
-      <mcruser:template name="submitButton" i18n="component.user2.button.save" target="servlet" href="MCRUserServlet" />
+      <xeduser:template name="submitButton" i18n="component.user2.button.save" target="servlet" href="MCRUserServlet" />
     </xed:if>
-    <mcruser:template name="cancelButton" i18n="component.user2.button.cancel" />
+    <xeduser:template name="cancelButton" i18n="component.user2.button.cancel" />
   </xed:template>
 
   <!-- editor elements -->
@@ -96,9 +96,9 @@
         <xed:output i18n="component.user2.admin.userAccount" />
       </label>
       <div class="col-12 col-md-9 row">
-        <mcruser:template name="textInput" xpath="@name" id="userName" inline="true" colsize="sm" colwidth="9"
+        <xeduser:template name="textInput" xpath="@name" id="userName" inline="true" colsize="sm" colwidth="9"
           i18n.error="component.user2.admin.inputhints.username" required="true" matches="[a-z0-9\._-]*" maxlength="43" />
-        <mcruser:template name="selectInput" xpath="@realm" default="local" id="realmId" inline="true" colsize="sm" colwidth="3"
+        <xeduser:template name="selectInput" xpath="@realm" default="local" id="realmId" inline="true" colsize="sm" colwidth="3"
           uri="xslStyle:items2options:xslStyle:realms2items:realm:all" />
       </div>
     </div>
@@ -110,9 +110,9 @@
         <xed:output i18n="component.user2.admin.userAccount" />
       </label>
       <div class="col-12 col-md-9 row">
-        <mcruser:template name="textInput" xpath="@name" id="userName" disabled="true" inline="true" colsize="sm" colwidth="9"
+        <xeduser:template name="textInput" xpath="@name" id="userName" disabled="true" inline="true" colsize="sm" colwidth="9"
           i18n.error="component.user2.admin.inputhints.username" required="true" maxlength="43" />
-        <mcruser:template name="selectInput" xpath="@realm" default="local" id="realmId" disabled="true" inline="true" colsize="sm" colwidth="3"
+        <xeduser:template name="selectInput" xpath="@realm" default="local" id="realmId" disabled="true" inline="true" colsize="sm" colwidth="3"
           uri="xslStyle:items2options:xslStyle:realms2items:realm:all" />
       </div>
     </div>
@@ -121,9 +121,9 @@
   <xed:template id="passwords">
     <xed:choose>
       <xed:when test="string-length(@realm)=0 or @realm='local'">
-        <mcruser:template name="passwordInput" xpath="password" id="password" i18n="component.user2.admin.password" i18n.error="component.user2.admin.inputhints.password"
+        <xeduser:template name="passwordInput" xpath="password" id="password" i18n="component.user2.admin.password" i18n.error="component.user2.admin.inputhints.password"
           required="true" />
-        <mcruser:template name="passwordInput" xpath="password2" id="password2" i18n="component.user2.admin.passwordRepeat" i18n.error="component.user2.admin.inputhints.password"
+        <xeduser:template name="passwordInput" xpath="password2" id="password2" i18n="component.user2.admin.passwordRepeat" i18n.error="component.user2.admin.inputhints.password"
           required="true" />
 
         <xed:bind xpath="password">
@@ -152,15 +152,15 @@
   </xed:template>
 
   <xed:template id="passwordHint">
-    <mcruser:template name="textInput" xpath="password/@hint" id="hint" i18n="component.user2.admin.passwordHint" maxlength="255" />
+    <xeduser:template name="textInput" xpath="password/@hint" id="hint" i18n="component.user2.admin.passwordHint" maxlength="255" />
   </xed:template>
 
   <xed:template id="realName">
-    <mcruser:template name="textInput" xpath="realName" id="realNameInput" i18n="component.user2.admin.realName" maxlength="255" />
+    <xeduser:template name="textInput" xpath="realName" id="realNameInput" i18n="component.user2.admin.realName" maxlength="255" />
   </xed:template>
 
   <xed:template id="email">
-    <mcruser:template name="textInput" xpath="eMail" id="emailInput" i18n="component.user2.admin.email" i18n.error="component.user2.admin.email.syntax"
+    <xeduser:template name="textInput" xpath="eMail" id="emailInput" i18n="component.user2.admin.email" i18n.error="component.user2.admin.email.syntax"
       validate="true" matches="\S+@\S+\.\S+" maxlength="255" />
   </xed:template>
 
@@ -173,7 +173,7 @@
         <xed:repeat xpath="owner" min="1" max="1">
           <div class="row">
             <div class="col-8">
-              <mcruser:template name="submitButton" id="ownerSelect" i18n="component.user2.button.select" target="subselect"
+              <xeduser:template name="submitButton" id="ownerSelect" i18n="component.user2.button.select" target="subselect"
                 href="MCRUserServlet?XSL.Style=subselect" />
               <xed:output value="@name" />
               <xed:output value="' ['" />
@@ -209,7 +209,7 @@
           <div class="col-12 col-md-9">
             <div class="row">
               <div class="col-8">
-                <mcruser:template name="submitButton" id="roleSelect" i18n="component.user2.button.select" target="subselect" href="MCRRoleServlet" />
+                <xeduser:template name="submitButton" id="roleSelect" i18n="component.user2.button.select" target="subselect" href="MCRRoleServlet" />
                 <xed:output value="@name" />
                 <xed:output value="' ['" />
                 <xed:choose>
@@ -259,7 +259,7 @@
               </xed:bind>
             </div>
           </div>
-          <mcruser:template name="textInput" xpath="@value" id="attrValue" disabled="false" inline="true" colsize="sm"
+          <xeduser:template name="textInput" xpath="@value" id="attrValue" disabled="false" inline="true" colsize="sm"
                             colwidth="3"
                             i18n.error="component.user2.admin.inputhints.attrVal" required="false" maxlength="255"/>
           <div class="col-sm-3">

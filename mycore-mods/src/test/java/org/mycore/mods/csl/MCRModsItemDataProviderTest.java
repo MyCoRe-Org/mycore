@@ -38,79 +38,85 @@ public class MCRModsItemDataProviderTest {
     @Test
     public void testProcessModsPart() throws IOException, JDOMException {
 
-        final String testData = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-            "<mycoreobject xmlns:xlink=\"http://www.w3.org/1999/xlink\" " +
-            "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"" +
-            " xsi:noNamespaceSchemaLocation=\"datamodel-mods.xsd\" ID=\"bibthk_mods_00001066\">\n" +
-            "  <metadata>\n" +
-            "    <def.modsContainer class=\"MCRMetaXML\" heritable=\"false\" notinherit=\"true\">\n" +
-            "      <modsContainer inherited=\"0\">\n" +
-            "        <mods:mods xmlns:mods=\"http://www.loc.gov/mods/v3\">\n" +
-            "          <mods:relatedItem xlink:href=\"bibthk_mods_00001057\" type=\"host\">\n" +
-            "            <mods:part>\n" +
-            "              <mods:detail type=\"volume\">\n" +
-            "                <mods:number>80</mods:number>\n" +
-            "              </mods:detail>\n" +
-            "              <mods:extent unit=\"pages\">\n" +
-            "                <mods:start>711</mods:start>\n" +
-            "                <mods:end>718</mods:end>\n" +
-            "              </mods:extent>\n" +
-            "            </mods:part>\n" +
-            "          </mods:relatedItem>\n" +
-            "        </mods:mods>\n" +
-            "      </modsContainer>\n" +
-            "    </def.modsContainer>\n" +
-            "  </metadata>\n" +
-            "</mycoreobject>\n";
+        final String testData = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <mycoreobject xmlns:xlink="http://www.w3.org/1999/xlink" \
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"\
+                 xsi:noNamespaceSchemaLocation="datamodel-mods.xsd" ID="bibthk_mods_00001066">
+                  <metadata>
+                    <def.modsContainer class="MCRMetaXML" heritable="false" notinherit="true">
+                      <modsContainer inherited="0">
+                        <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+                          <mods:relatedItem xlink:href="bibthk_mods_00001057" type="host">
+                            <mods:part>
+                              <mods:detail type="volume">
+                                <mods:number>80</mods:number>
+                              </mods:detail>
+                              <mods:extent unit="pages">
+                                <mods:start>711</mods:start>
+                                <mods:end>718</mods:end>
+                              </mods:extent>
+                            </mods:part>
+                          </mods:relatedItem>
+                        </mods:mods>
+                      </modsContainer>
+                    </def.modsContainer>
+                  </metadata>
+                </mycoreobject>
+                """;
 
-        final String testData2 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-            "<mycoreobject xmlns:xlink=\"http://www.w3.org/1999/xlink\" " +
-            "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"" +
-            " xsi:noNamespaceSchemaLocation=\"datamodel-mods.xsd\" ID=\"bibthk_mods_00001056\">\n" +
-            "  <metadata>\n" +
-            "    <def.modsContainer class=\"MCRMetaXML\" heritable=\"false\" notinherit=\"true\">\n" +
-            "      <modsContainer inherited=\"0\">\n" +
-            "        <mods:mods xmlns:mods=\"http://www.loc.gov/mods/v3\">\n" +
-            "<mods:relatedItem type=\"series\">\n" +
-            "<mods:titleInfo>\n" +
-            "<mods:title>Security and Cryptology</mods:title>\n" +
-            "</mods:titleInfo>\n" +
-            "<mods:part>\n" +
-            "<mods:detail type=\"volume\">\n" +
-            "<mods:number>11875</mods:number>\n" +
-            "</mods:detail>\n" +
-            "</mods:part>\n" +
-            "</mods:relatedItem>" +
-            "        </mods:mods>\n" +
-            "      </modsContainer>\n" +
-            "    </def.modsContainer>\n" +
-            "  </metadata>\n" +
-            "</mycoreobject>\n";
+        final String testData2 = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <mycoreobject xmlns:xlink="http://www.w3.org/1999/xlink" \
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"\
+                 xsi:noNamespaceSchemaLocation="datamodel-mods.xsd" ID="bibthk_mods_00001056">
+                  <metadata>
+                    <def.modsContainer class="MCRMetaXML" heritable="false" notinherit="true">
+                      <modsContainer inherited="0">
+                        <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+                <mods:relatedItem type="series">
+                <mods:titleInfo>
+                <mods:title>Security and Cryptology</mods:title>
+                </mods:titleInfo>
+                <mods:part>
+                <mods:detail type="volume">
+                <mods:number>11875</mods:number>
+                </mods:detail>
+                </mods:part>
+                </mods:relatedItem>\
+                        </mods:mods>
+                      </modsContainer>
+                    </def.modsContainer>
+                  </metadata>
+                </mycoreobject>
+                """;
 
-        final String testData3 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-            "<mycoreobject xmlns:xlink=\"http://www.w3.org/1999/xlink\" " +
-            "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"" +
-            " xsi:noNamespaceSchemaLocation=\"datamodel-mods.xsd\" ID=\"ilm_mods_00001817\">\n" +
-            "  <metadata>\n" +
-            "    <def.modsContainer class=\"MCRMetaXML\" heritable=\"false\" notinherit=\"true\">\n" +
-            "      <modsContainer inherited=\"0\">\n" +
-            "        <mods:mods xmlns:mods=\"http://www.loc.gov/mods/v3\">\n" +
-            "<mods:relatedItem type=\"host\">\n" +
-            "<mods:titleInfo>\n" +
-            "<mods:title>Advances in Engineering Research and Application</mods:title>\n" +
-            "</mods:titleInfo>\n" +
-            "<mods:part>\n" +
-            "<mods:extent unit=\"pages\">\n" +
-            "<mods:start>v</mods:start>\n" +
-            "<mods:end>vi</mods:end>\n" +
-            "</mods:extent>\n" +
-            "</mods:part>\n" +
-            "</mods:relatedItem>" +
-            "        </mods:mods>\n" +
-            "      </modsContainer>\n" +
-            "    </def.modsContainer>\n" +
-            "  </metadata>\n" +
-            "</mycoreobject>\n";
+        final String testData3 = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <mycoreobject xmlns:xlink="http://www.w3.org/1999/xlink" \
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"\
+                 xsi:noNamespaceSchemaLocation="datamodel-mods.xsd" ID="ilm_mods_00001817">
+                  <metadata>
+                    <def.modsContainer class="MCRMetaXML" heritable="false" notinherit="true">
+                      <modsContainer inherited="0">
+                        <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+                <mods:relatedItem type="host">
+                <mods:titleInfo>
+                <mods:title>Advances in Engineering Research and Application</mods:title>
+                </mods:titleInfo>
+                <mods:part>
+                <mods:extent unit="pages">
+                <mods:start>v</mods:start>
+                <mods:end>vi</mods:end>
+                </mods:extent>
+                </mods:part>
+                </mods:relatedItem>\
+                        </mods:mods>
+                      </modsContainer>
+                    </def.modsContainer>
+                  </metadata>
+                </mycoreobject>
+                """;
 
         CSLItemData build1 = testModsPart(testData);
         CSLItemData build2 = testModsPart(testData2);
@@ -174,35 +180,37 @@ public class MCRModsItemDataProviderTest {
 
     @Test
     public void testCollectionTitle() throws IOException, JDOMException {
-        final String testData = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-            "<mycoreobject xmlns:xlink=\"http://www.w3.org/1999/xlink\" " +
-            "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"" +
-            " xsi:noNamespaceSchemaLocation=\"datamodel-mods.xsd\" ID=\"bibthk_mods_00011370\">\n" +
-            "  <metadata>\n" +
-            "    <def.modsContainer class=\"MCRMetaXML\" heritable=\"false\" notinherit=\"true\">\n" +
-            "      <modsContainer inherited=\"0\">\n" +
-            "        <mods:mods xmlns:mods=\"http://www.loc.gov/mods/v3\">\n" +
-            "          <mods:typeOfResource>text</mods:typeOfResource>\n" +
-            "          <mods:titleInfo>\n" +
-            "            <mods:title>MILeS 2023</mods:title>\n" +
-            "            <mods:subTitle>Proceedings of Learning Systems</mods:subTitle>\n" +
-            "          </mods:titleInfo>\n" +
-            "          <mods:genre authorityURI=\"http://bibliografie.th-koeln.de/classifications/ubogenre\"\n" +
-            "                      valueURI=\"http://bibliografie.th-koeln.de/classifications/ubogenre#proceedings\"\n" +
-            "                      type=\"intern\" />\n" +
-            "          <mods:relatedItem xlink:href=\"bibthk_mods_00007211\" type=\"host\">\n" +
-            "            <mods:genre authorityURI=\"http://bibliografie.th-koeln.de/classifications/ubogenre\"\n" +
-            "                        valueURI=\"http://bibliografie.th-koeln.de/classifications/ubogenre#series\"\n" +
-            "                        type=\"intern\" />\n" +
-            "            <mods:titleInfo displayLabel=\"Short form of the title\" type=\"abbreviated\">\n" +
-            "              <mods:title>CEUR Workshop Proceedings</mods:title>\n" +
-            "            </mods:titleInfo>\n" +
-            "          </mods:relatedItem>\n" +
-            "        </mods:mods>\n" +
-            "      </modsContainer>\n" +
-            "    </def.modsContainer>\n" +
-            "  </metadata>\n" +
-            "</mycoreobject>\n";
+        final String testData = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <mycoreobject xmlns:xlink="http://www.w3.org/1999/xlink" \
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"\
+                 xsi:noNamespaceSchemaLocation="datamodel-mods.xsd" ID="bibthk_mods_00011370">
+                  <metadata>
+                    <def.modsContainer class="MCRMetaXML" heritable="false" notinherit="true">
+                      <modsContainer inherited="0">
+                        <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+                          <mods:typeOfResource>text</mods:typeOfResource>
+                          <mods:titleInfo>
+                            <mods:title>MILeS 2023</mods:title>
+                            <mods:subTitle>Proceedings of Learning Systems</mods:subTitle>
+                          </mods:titleInfo>
+                          <mods:genre authorityURI="http://bibliografie.th-koeln.de/classifications/ubogenre"
+                                      valueURI="http://bibliografie.th-koeln.de/classifications/ubogenre#proceedings"
+                                      type="intern" />
+                          <mods:relatedItem xlink:href="bibthk_mods_00007211" type="host">
+                            <mods:genre authorityURI="http://bibliografie.th-koeln.de/classifications/ubogenre"
+                                        valueURI="http://bibliografie.th-koeln.de/classifications/ubogenre#series"
+                                        type="intern" />
+                            <mods:titleInfo displayLabel="Short form of the title" type="abbreviated">
+                              <mods:title>CEUR Workshop Proceedings</mods:title>
+                            </mods:titleInfo>
+                          </mods:relatedItem>
+                        </mods:mods>
+                      </modsContainer>
+                    </def.modsContainer>
+                  </metadata>
+                </mycoreobject>
+                """;
 
         MCRModsItemDataProvider midp = new MCRModsItemDataProvider();
         Document testDataDoc = new SAXBuilder().build(new StringReader(testData));

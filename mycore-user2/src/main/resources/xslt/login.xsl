@@ -28,10 +28,12 @@
 | Last changes: 2012-03-16
 + -->
 
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xlink="http://www.w3.org/1999/xlink"
-                xmlns:mcri18n="http://www.mycore.de/xslt/i18n"
-                exclude-result-prefixes="xlink mcri18n"
->
+<xsl:stylesheet version="1.0"
+  xmlns:mcri18n="http://www.mycore.de/xslt/i18n"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  exclude-result-prefixes="mcri18n xlink xsl">
+
     &html-output;
 
     <xsl:include href="MyCoReLayout.xsl" />

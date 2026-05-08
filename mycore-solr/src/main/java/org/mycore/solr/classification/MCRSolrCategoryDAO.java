@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.SortedSet;
 
 import org.mycore.datamodel.classifications2.MCRCategory;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
@@ -32,7 +32,7 @@ import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
 /**
  * Extends the default category dao with solr support. Every create/write/delete operation
  * on a classification/category results in a solr reindex additionally.
- * 
+ *
  * @author Matthias Eichner
  */
 public class MCRSolrCategoryDAO extends MCRCategoryDAOImpl {
@@ -74,7 +74,7 @@ public class MCRSolrCategoryDAO extends MCRCategoryDAOImpl {
 
     @Override
     public void deleteCategory(MCRCategoryID id) {
-        MCRCategory category = MCRCategoryDAOFactory.obtainInstance().getCategory(id, 0);
+        MCRCategory category = MCRCategoryDAO.obtainInstance().getCategory(id, 0);
         MCRCategory parent = category.getParent();
         super.deleteCategory(id);
         MCRSolrClassificationUtil.solrDelete(id, parent);

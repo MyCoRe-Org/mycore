@@ -50,6 +50,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HexFormat;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -597,6 +598,14 @@ public class MCRUtils {
         String[] more = Stream.of(resolve).skip(1).toArray(String[]::new);
         final Path resolvePath = basePath.getFileSystem().getPath(resolve[0], more);
         return safeResolve(basePath, resolvePath);
+    }
+
+    /**
+     * checks the current operating system
+     * @return true, if it is a Windows system
+     */
+    public static boolean isWindowsOS() {
+        return System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("win");
     }
 
     /**

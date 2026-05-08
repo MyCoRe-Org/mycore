@@ -152,7 +152,7 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
      * @throws MCRUsageException if the Category is not a root classification
      */
     protected String buildFilePath(MCRCategoryID mcrid) {
-        if (!mcrid.isRootID()) {
+        if (!mcrid.isRoot()) {
             throw new IllegalArgumentException("Only root categories are allowed: " + mcrid);
         }
         return ROOT_FOLDER + mcrid + ".xml";

@@ -328,13 +328,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
         }
     }
 
-    private static class MCRJWTUserInformation implements MCRUserInformation {
-
-        private final DecodedJWT jwt;
-
-        MCRJWTUserInformation(DecodedJWT token) {
-            this.jwt = token;
-        }
+    private record MCRJWTUserInformation(DecodedJWT jwt) implements MCRUserInformation {
 
         @Override
         public String getUserID() {

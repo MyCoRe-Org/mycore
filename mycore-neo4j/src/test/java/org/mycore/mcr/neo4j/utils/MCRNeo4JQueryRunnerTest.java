@@ -26,27 +26,27 @@ public class MCRNeo4JQueryRunnerTest {
         MCRNeo4JQueryRunner.translateAndMapProperties(metaDataList, "key", List.of("value1", "value2"), "de");
         assertFalse(metaDataList.isEmpty());
         assertEquals(1, metaDataList.size());
-        assertEquals("key", metaDataList.get(0).title());
-        assertEquals("value1", metaDataList.get(0).content().get(0));
-        assertEquals("value2", metaDataList.get(0).content().get(1));
-        assertEquals(2, metaDataList.get(0).content().size());
+        assertEquals("key", metaDataList.getFirst().title());
+        assertEquals("value1", metaDataList.getFirst().content().get(0));
+        assertEquals("value2", metaDataList.getFirst().content().get(1));
+        assertEquals(2, metaDataList.getFirst().content().size());
 
         metaDataList.clear();
         MCRNeo4JQueryRunner.translateAndMapProperties(metaDataList, "key", List.of("value1"), "de");
         assertFalse(metaDataList.isEmpty());
         assertEquals(1, metaDataList.size());
-        assertEquals("key", metaDataList.get(0).title());
-        assertEquals("value1", metaDataList.get(0).content().get(0));
-        assertEquals(1, metaDataList.get(0).content().size());
+        assertEquals("key", metaDataList.getFirst().title());
+        assertEquals("value1", metaDataList.getFirst().content().getFirst());
+        assertEquals(1, metaDataList.getFirst().content().size());
 
         metaDataList.clear();
         MCRNeo4JQueryRunner.translateAndMapProperties(metaDataList, "key", List.of("TestClassification_-_junit_1"),
             "de");
         assertFalse(metaDataList.isEmpty());
         assertEquals(1, metaDataList.size());
-        assertEquals("key", metaDataList.get(0).title());
-        assertEquals("junit_1 (de)", metaDataList.get(0).content().get(0));
-        assertEquals(1, metaDataList.get(0).content().size());
+        assertEquals("key", metaDataList.getFirst().title());
+        assertEquals("junit_1 (de)", metaDataList.getFirst().content().getFirst());
+        assertEquals(1, metaDataList.getFirst().content().size());
 
         metaDataList.clear();
         MCRNeo4JQueryRunner.translateAndMapProperties(metaDataList, "key",
@@ -54,11 +54,11 @@ public class MCRNeo4JQueryRunnerTest {
             "de");
         assertFalse(metaDataList.isEmpty());
         assertEquals(1, metaDataList.size());
-        assertEquals("key", metaDataList.get(0).title());
-        assertEquals("junit_1 (de)", metaDataList.get(0).content().get(0));
+        assertEquals("key", metaDataList.getFirst().title());
+        assertEquals("junit_1 (de)", metaDataList.getFirst().content().get(0));
         // second category has no de label
-        assertEquals("", metaDataList.get(0).content().get(1));
-        assertEquals(2, metaDataList.get(0).content().size());
+        assertEquals("", metaDataList.getFirst().content().get(1));
+        assertEquals(2, metaDataList.getFirst().content().size());
 
         // check for English labels
         metaDataList.clear();
@@ -67,10 +67,10 @@ public class MCRNeo4JQueryRunnerTest {
             "en");
         assertFalse(metaDataList.isEmpty());
         assertEquals(1, metaDataList.size());
-        assertEquals("key", metaDataList.get(0).title());
-        assertEquals("junit_1 (en)", metaDataList.get(0).content().get(0));
-        assertEquals("junit_2 (en)", metaDataList.get(0).content().get(1));
-        assertEquals(2, metaDataList.get(0).content().size());
+        assertEquals("key", metaDataList.getFirst().title());
+        assertEquals("junit_1 (en)", metaDataList.getFirst().content().get(0));
+        assertEquals("junit_2 (en)", metaDataList.getFirst().content().get(1));
+        assertEquals(2, metaDataList.getFirst().content().size());
     }
 
 

@@ -162,13 +162,14 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
         final Map<String, MCRORCIDUser> toPublish = new HashMap<>(userOrcidPairFromFlag);
         toPublish.putAll(userOrcidPairFromObject);
         toPublish.keySet().removeAll(toDelete.keySet());
+        final T work = transformObject(new MCRJDOMContent(filteredObject.createXML()));
+        toPublish.keySet().removeAll(listRelatedOrcidIdentifiers(work));
         if (toDelete.isEmpty() && toPublish.isEmpty()) {
             LOGGER.info("Nothing to delete or publish. Skipping {}...", objectID);
             tryCollectAndSaveExternalPutCodes(filteredObject);
             return;
         }
         try {
-            final T work = transformObject(new MCRJDOMContent(filteredObject.createXML()));
             final Set<MCRIdentifier> identifiers = listTrustedIdentifiers(work);
             if (!toDelete.isEmpty()) {
                 deleteWorks(toDelete, identifiers, flagContent);
@@ -494,4 +495,12 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
      */
     @SuppressWarnings("TypeParameterUnusedInFormals")
     abstract protected <T> T transformObject(MCRJDOMContent object);
+
+    /**
+     * Returns all ORCID iDs of related persons for work.
+     *
+     * @param work the work
+     * @return list over ORCID iD elements
+     */
+    abstract protected List<String> listRelatedOrcidIdentifiers(T work);
 }

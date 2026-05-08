@@ -34,7 +34,7 @@ import com.fasterxml.jackson.databind.node.ValueNode;
  * <p>
  * If the property "StripNamespace" is set to true, the namespace of the key is removed before mapping.
  * If the property "MultiValueField" is set to true, the values are added as multi value fields, otherwise the values
- * will be concatenated to a single string with newlines.
+ * will be concatenated to a single stringc with newlines.
  *
  * @author Sebastian Hofmann
  */

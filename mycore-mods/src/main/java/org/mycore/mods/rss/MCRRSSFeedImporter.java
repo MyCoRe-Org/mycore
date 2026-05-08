@@ -37,8 +37,8 @@ import java.util.regex.PatternSyntaxException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.request.QueryRequest;
+import org.apache.solr.client.solrj.request.SolrQuery;
 import org.apache.solr.common.SolrDocumentList;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -55,7 +55,7 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mods.MCRMODSWrapper;
-import org.mycore.solr.MCRSolrCoreManager;
+import org.mycore.solr.MCRSolrIndexRegistryManager;
 import org.mycore.solr.MCRSolrUtils;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
@@ -220,7 +220,7 @@ public class MCRRSSFeedImporter {
     }
 
     private boolean isAlreadyStored(String publicationID) {
-        SolrClient solrClient = MCRSolrCoreManager.getMainSolrClient();
+        SolrClient solrClient = MCRSolrIndexRegistryManager.requireMainIndex().getClient();
         SolrQuery query = new SolrQuery();
         query.setQuery(field2queryID + ":" + MCRSolrUtils.escapeSearchValue(publicationID));
         query.setRows(0);

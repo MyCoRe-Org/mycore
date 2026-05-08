@@ -34,7 +34,7 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategory;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.util.concurrent.MCRReadWriteGuard;
@@ -89,7 +89,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
     }
 
     private void initChildren() {
-        setChildrenUnlocked(MCRCategoryDAOFactory.obtainInstance().getChildren(id));
+        setChildrenUnlocked(MCRCategoryDAO.obtainInstance().getChildren(id));
     }
 
     protected void setChildrenUnlocked(List<MCRCategory> children) {
@@ -113,7 +113,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
 
     @Override
     public MCRCategory getRoot() {
-        if (getId().isRootID()) {
+        if (getId().isRoot()) {
             return this;
         }
         if (root == null && getParent() != null) {
@@ -136,7 +136,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
     public boolean hasChildren() {
         return childGuard
             .read(() -> Optional.ofNullable(children).map(c -> !c.isEmpty()))
-            .orElse(MCRCategoryDAOFactory.obtainInstance().hasChildren(id));
+            .orElse(MCRCategoryDAO.obtainInstance().hasChildren(id));
     }
 
     @Override
@@ -146,7 +146,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
 
     @Override
     public final boolean isClassification() {
-        return getId().isRootID();
+        return getId().isRoot();
     }
 
     @Override

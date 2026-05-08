@@ -18,9 +18,10 @@
 
 package org.mycore.solr.auth;
 
-import org.apache.solr.client.solrj.SolrRequest;
-
 import java.net.http.HttpRequest;
+
+import org.apache.solr.client.solrj.SolrRequest;
+import org.apache.solr.client.solrj.impl.HttpSolrClientBuilderBase;
 
 /**
  * Interface for adding authentication to Solr requests.
@@ -40,5 +41,11 @@ public interface MCRSolrAuthenticator {
      * @param request the request to add the authentication to
      */
     void applyAuthentication(HttpRequest.Builder request);
+
+    /**
+     * Add authentication to a Solr client.
+     * @param clientBuilder the client builder to add the authentication to
+     */
+    void applyAuthentication(HttpSolrClientBuilderBase<?, ?> clientBuilder);
 
 }

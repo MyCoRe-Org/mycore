@@ -31,7 +31,6 @@ public final class MCRExpandedObjectCache {
 
     private static final Logger LOGGER = LogManager.getLogger();
     private static final String CACHE_ROOT_PATH_PROPERTY = "MCR.ObjectExpander.Cache.Path";
-    private static volatile MCRExpandedObjectCache instance;
     private Map<MCRObjectID, ReentrantReadWriteLock> idLocks = new ConcurrentHashMap<>();
 
     private MCRExpandedObjectCache() {
@@ -39,26 +38,12 @@ public final class MCRExpandedObjectCache {
     }
 
     public static MCRExpandedObjectCache getInstance() {
-        if (instance == null) {
-            synchronized (MCRExpandedObjectCache.class) {
-                if (instance == null) {
-                    instance = new MCRExpandedObjectCache();
-                }
-            }
-        }
-        return instance;
+        return LazyInstanceHolder.SINGLETON_INSTANCE;
     }
 
-    // false negative: https://github.com/pmd/pmd/issues/4516
-    @SuppressWarnings("PMD.UnusedLocalVariable")
     private static MCRExpandedObject readExpandedObject(Path expandedObjectPath) {
-        try (FileChannel channel =
-            FileChannel.open(expandedObjectPath, StandardOpenOption.READ, StandardOpenOption.WRITE,
-                StandardOpenOption.SYNC);
-            FileLock fl = channel.lock()) {
-            byte[] fileContent = new byte[(int) channel.size()];
-            ByteBuffer buffer = ByteBuffer.wrap(fileContent);
-            channel.read(buffer);
+        try {
+            byte[] fileContent = Files.readAllBytes(expandedObjectPath);
             SAXBuilder saxBuilder = new SAXBuilder();
             Document jdom = saxBuilder.build(new ByteArrayInputStream(fileContent));
             return new MCRExpandedObject(jdom);
@@ -162,6 +147,10 @@ public final class MCRExpandedObjectCache {
      */
     public Path getCacheRootPath() {
         return MCRConfiguration2.getOrThrow(CACHE_ROOT_PATH_PROPERTY, Paths::get);
+    }
+
+    private static final class LazyInstanceHolder {
+        public static final MCRExpandedObjectCache SINGLETON_INSTANCE = new MCRExpandedObjectCache();
     }
 
 }

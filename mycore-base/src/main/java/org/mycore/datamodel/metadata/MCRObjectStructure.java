@@ -32,25 +32,18 @@ import org.mycore.common.MCRException;
 import com.google.gson.JsonObject;
 
 /**
- * This class implements code for the inheritance of metadata of linked objects
- * and the linking of derivates onto an MCRObject. These links are described by
- * the <em>MCRMetaLink</em> class. For links to another object, there are
- * "locators" in use only, and the href variable gives the ID of the linked
- * object, while the label and title attributes can be used freely. Subtag name = "
- * &lt;child&gt;" means a child link from a "parent" object (collected in the
- * "children" and "parents" section of the "structure" part, respectively). The
- * child inherits all heritable metadata of the parent. If the parent itself is
- * a child of another parent, the heritable metadata of this "grand parent" is
- * inherited by the child as well. This mechanism recursively traces the full
- * inheritance hierarchy. So if the grand parent itself has a parent, this grand
- * parent parent's heritable metadata will be inherited and so on. Note, that it
- * is impossible to inherit metadata from multiple parents. In cases of multiple
- * inheritance request, an exception is thrown. A child link cannot occur twice
- * from the same object to the same href (preventing from doubled links). Not
- * supported by this class are links from or to a defined place of a document
- * (inner structure and combination of inner and outer structures of the
- * objects). This will possibly be done in a later extension of
- * <em>MCRMetaLink</em> and <em>MCRObjectStructure</em>.
+ * Represents the {@code <structure>} section of a MyCoRe object.
+ * <p>
+ * This class stores the optional parent reference and the persisted
+ * order of child objects. It can populate this state from XML and serialize it
+ * back to XML or JSON.
+ * <p>
+ * The children order is a user-defined ordering hint. It is stored separately
+ * from the actual child links and may therefore contain stale or incomplete
+ * references if the child set changes independently.
+ * <p>
+ * Expanded structure data such as child and derivate links is handled by
+ * {@link MCRExpandedObjectStructure}.
  *
  * @author Mathias Hegner
  * @author Jens Kupferschmidt
@@ -72,8 +65,7 @@ public class MCRObjectStructure {
     private List<MCRObjectID> childrenOrder = new ArrayList<>();
 
     /**
-     * This method clean the data lists parent, children and derivates of this
-     * class.
+     * Resets this structure to an empty state.
      */
     public void clear() {
         parent = null;
@@ -81,18 +73,18 @@ public class MCRObjectStructure {
     }
 
     /**
-     * The method returns the parent link.
+     * Returns the parent link.
      *
-     * @return MCRMetaLinkID the corresponding link
+     * @return the parent link, or {@code null} if no parent is set
      */
     public final MCRMetaParentID getParent() {
         return parent;
     }
 
     /**
-     * The method return the parent reference as a MCRObjectID.
+     * Returns the parent object ID.
      *
-     * @return the parent MCRObjectID or null if there is no parent present
+     * @return the parent object ID, or {@code null} if no parent is set
      */
     public final MCRObjectID getParentID() {
         if (parent == null) {
@@ -102,11 +94,9 @@ public class MCRObjectStructure {
     }
 
     /**
-     * This method set the parent value from a given MCRMetaLinkID.
+     * Sets the parent link.
      *
-     * @param parent
-     *            the MCRMetaLinkID to set
-     *
+     * @param parent the parent link to set
      */
     public final void setParent(MCRMetaParentID parent) {
         this.parent = parent;
@@ -121,21 +111,16 @@ public class MCRObjectStructure {
     }
 
     /**
-     * Removes the parent reference. Use this method with care!
+     * Removes the parent reference.
      */
     public final void removeParent() {
         parent = null;
     }
 
-
-
     /**
-     * While the preceding methods dealt with the structure's copy in memory
-     * only, the following three will affect the operations to or from datastore
-     * too. Thereby <em>setFromDOM</em> will read the structure data from an
-     * XML input stream (the "structure" entry).
+     * Populates this structure from a {@code <structure>} XML element.
      *
-     * @param element the structure node list
+     * @param element the structure element to read
      */
     public void setFromDOM(Element element) {
         clear();
@@ -160,12 +145,10 @@ public class MCRObjectStructure {
     }
 
     /**
-     * <em>createXML</em> is the inverse of setFromDOM and converts the
-     * structure's memory copy into XML.
+     * Serializes this structure to a {@code <structure>} XML element.
      *
-     * @exception MCRException
-     *                if the content of this class is not valid
-     * @return the structure XML
+     * @return the serialized structure element
+     * @throws MCRException if this structure is not valid
      */
     public Element createXML() throws MCRException {
         try {
@@ -174,27 +157,28 @@ public class MCRObjectStructure {
             throw new MCRException("The content is not valid.", exc);
         }
 
-        Element elm = new Element(XML_NAME);
+        Element structure = new Element(XML_NAME);
 
         if (parent != null) {
-            Element elmm = new Element(PARENTS_ELEMENT_NAME);
-            elmm.setAttribute("class", "MCRMetaLinkID");
-            elmm.addContent(parent.createXML());
-            elm.addContent(elmm);
+            Element parents = new Element(PARENTS_ELEMENT_NAME);
+            parents.setAttribute("class", MCRMetaLinkID.class.getSimpleName());
+            parents.addContent(parent.createXML());
+            structure.addContent(parents);
         }
 
         if (!childrenOrder.isEmpty()) {
             Element childrenOrderElement = new Element(CHILDREN_ORDER_ELEMENT_NAME);
+            childrenOrderElement.setAttribute("class", MCRMetaLinkID.class.getSimpleName());
             for (MCRObjectID child : childrenOrder) {
                 Element childElement = new Element(CHILD_ELEMENT_NAME);
                 childElement.setAttribute("href", child.toString(), MCRConstants.XLINK_NAMESPACE);
                 childElement.setAttribute("type", "locator", MCRConstants.XLINK_NAMESPACE);
                 childrenOrderElement.addContent(childElement);
             }
-            elm.addContent(childrenOrderElement);
+            structure.addContent(childrenOrderElement);
         }
 
-        return elm;
+        return structure;
     }
 
     /**
@@ -206,7 +190,7 @@ public class MCRObjectStructure {
      *   }
      * </pre>
      *
-     * @return a json gson representation of this structure
+     * @return a JSON representation of this structure
      */
     public JsonObject createJSON() {
         JsonObject structure = new JsonObject();
@@ -216,7 +200,7 @@ public class MCRObjectStructure {
     }
 
     /**
-     * The method print all informations about this MCRObjectStructure.
+     * Logs the current structure state for debugging.
      */
     public void debug() {
         if (LOGGER.isDebugEnabled()) {
@@ -227,10 +211,9 @@ public class MCRObjectStructure {
     }
 
     /**
-     * <em>isValid</em> checks whether all of the MCRMetaLink's in the link
-     * vectors are valid or not.
+     * Checks whether this structure is valid.
      *
-     * @return boolean true, if structure is valid
+     * @return {@code true} if this structure is valid, otherwise {@code false}
      */
     public final boolean isValid() {
         try {
@@ -243,12 +226,9 @@ public class MCRObjectStructure {
     }
 
     /**
-     * Validates this MCRObjectStructure. This method throws an exception if:
-     *  <ul>
-     *  <li>the parent is not null but invalid</li>
-     *  </ul>
+     * Validates this structure.
      *
-     * @throws MCRException the MCRObjectStructure is invalid
+     * @throws MCRException if the configured parent link is invalid
      */
     public void validate() throws MCRException {
         if (parent != null) {
@@ -261,19 +241,22 @@ public class MCRObjectStructure {
     }
 
     /**
-     * Returns the list of children order. This list is used to store the order of the children. The list can contain
-     * ObjectIDs which are not children anymore or can miss children which are not in the list. This is because the
-     * children order is not updated when the children are changed. The list is used to store the order which was
-     * set by the user.
-     * @return the list of children order
+     * Returns the persisted child order.
+     *
+     * <p>This list stores the order set by the user. It is not synchronized
+     * automatically with the current child links and may therefore contain IDs
+     * that are no longer children or omit children that were added later.</p>
+     *
+     * @return the persisted child order
      */
     public List<MCRObjectID> getChildrenOrder() {
         return childrenOrder;
     }
 
     /**
-     * Sets the list of children order. This list is used to store the order of the children.
-     * @param childrenOrder the list of children order
+     * Sets the persisted child order.
+     *
+     * @param childrenOrder the child order to persist
      */
     public void setChildrenOrder(List<MCRObjectID> childrenOrder) {
         this.childrenOrder = childrenOrder;
@@ -297,6 +280,7 @@ public class MCRObjectStructure {
         }
         final MCRObjectStructure other = (MCRObjectStructure) obj;
         return Objects.equals(childrenOrder, other.childrenOrder)
-                && Objects.equals(parent, other.parent);
+            && Objects.equals(parent, other.parent);
     }
+
 }

@@ -122,17 +122,9 @@ public class MCRProcessingEndpoint extends MCRAbstractEndpoint {
         SESSIONS.put(session.getId(), sessionListener);
     }
 
-    private static class SessionListener implements MCRProcessableRegistryListener, MCRProcessableCollectionListener,
-        MCRProcessableStatusListener, MCRProgressableListener {
-
-        private final Session session;
-
-        private final MCRProcessableWebsocketSender sender;
-
-        SessionListener(Session session, MCRProcessableWebsocketSender sender) {
-            this.session = session;
-            this.sender = sender;
-        }
+    private record SessionListener(Session session, MCRProcessableWebsocketSender sender)
+        implements MCRProcessableRegistryListener, MCRProcessableCollectionListener, MCRProcessableStatusListener,
+        MCRProgressableListener {
 
         @Override
         public void onProgressChange(MCRProgressable source, Integer oldProgress, Integer newProgress) {

@@ -34,7 +34,7 @@ import java.util.regex.Pattern;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.mycore.common.MCRXlink;
-import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
+import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
@@ -59,7 +59,7 @@ public class MCRCategoryTransformer {
     public static Document getMetaDataDocument(MCRCategory cl, boolean withCounter) {
         Map<MCRCategoryID, Number> countMap = null;
         if (withCounter) {
-            countMap = MCRCategLinkServiceFactory.obtainInstance().countLinks(cl, false);
+            countMap = MCRCategLinkService.obtainInstance().countLinks(cl, false);
         }
         return MetaDataElementFactory.getDocument(cl, countMap);
     }
@@ -75,7 +75,7 @@ public class MCRCategoryTransformer {
     public static Element getMetaDataElement(MCRCategory category, boolean withCounter) {
         Map<MCRCategoryID, Number> countMap = null;
         if (withCounter) {
-            countMap = MCRCategLinkServiceFactory.obtainInstance().countLinks(category, false);
+            countMap = MCRCategLinkService.obtainInstance().countLinks(category, false);
         }
         return MetaDataElementFactory.getElement(category, countMap);
     }
@@ -217,15 +217,15 @@ public class MCRCategoryTransformer {
              */
             if (countMatcher.find()) {
                 if (countMatcher.group(1) == null) {
-                    countMap = MCRCategLinkServiceFactory.obtainInstance().countLinks(cl, false);
+                    countMap = MCRCategLinkService.obtainInstance().countLinks(cl, false);
                 } else {
                     // group(2) contains objectType
                     String objectType = countMatcher.group(2);
-                    countMap = MCRCategLinkServiceFactory.obtainInstance().countLinksForType(cl, objectType, false);
+                    countMap = MCRCategLinkService.obtainInstance().countLinksForType(cl, objectType, false);
                 }
             }
             if (!emptyLeaves) {
-                linkedMap = MCRCategLinkServiceFactory.obtainInstance().checkForLinks(cl);
+                linkedMap = MCRCategLinkService.obtainInstance().checkForLinks(cl);
             }
 
             root = new Element("items");

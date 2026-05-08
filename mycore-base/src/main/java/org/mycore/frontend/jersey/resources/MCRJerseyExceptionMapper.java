@@ -80,7 +80,10 @@ public class MCRJerseyExceptionMapper implements ExceptionMapper<Exception> {
         MCRTransactionManager.setRollbackOnly();
         if (headers.getAcceptableMediaTypes().contains(MediaType.TEXT_HTML_TYPE)) {
             // try to return a html error page
-            if (!MCRSessionMgr.isLocked() && !MCRTransactionManager.hasActiveTransactions()) {
+            if (!MCRSessionMgr.isLocked()) {
+                if (MCRTransactionManager.hasActiveTransactions()) {
+                    MCRTransactionManager.rollbackTransactions();
+                }
                 MCRSessionMgr.getCurrentSession();
                 MCRTransactionManager.beginTransactions();
             }

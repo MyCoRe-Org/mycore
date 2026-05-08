@@ -1,9 +1,10 @@
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:mods="http://www.loc.gov/mods/v3"
-                xmlns:cr="http://www.crossref.org/schema/4.4.1"
-                xmlns:jats="http://www.ncbi.nlm.nih.gov/JATS1"
-                version="3.0"
->
+<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet version="3.0"
+  xmlns:cr="http://www.crossref.org/schema/4.4.1"
+  xmlns:jats="http://www.ncbi.nlm.nih.gov/JATS1"
+  xmlns:mods="http://www.loc.gov/mods/v3"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  exclude-result-prefixes="#all">
 
   <xsl:variable name="marcrelator" select="document('classification:metadata:-1:children:marcrelator')"/>
 

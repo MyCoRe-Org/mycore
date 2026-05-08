@@ -83,6 +83,9 @@ public abstract class MCRContentServlet extends MCRServlet {
         final HttpServletRequest request = job.getRequest();
         final HttpServletResponse response = job.getResponse();
         final MCRContent content = getContent(request, response);
+        if (content == null && (response.isCommitted() || response.getStatus() >= HttpServletResponse.SC_BAD_REQUEST)) {
+            return;
+        }
         boolean serveContent = MCRServletContentHelper.isServeContent(request);
         try {
             MCRServletContentHelper.serveContent(content, request, response, getServletContext(), getConfig(),

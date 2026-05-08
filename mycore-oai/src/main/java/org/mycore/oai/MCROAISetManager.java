@@ -37,7 +37,7 @@ import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.xml.MCRURIResolver;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.oai.classmapping.MCRClassificationAndSetMapper;
 import org.mycore.oai.pmh.Description;
 import org.mycore.oai.pmh.OAIDataList;
@@ -172,7 +172,7 @@ public class MCROAISetManager {
         }
         // cache
         // check if classification changed
-        long lastModified = MCRCategoryDAOFactory.obtainInstance().getLastModified();
+        long lastModified = MCRCategoryDAO.obtainInstance().getLastModified();
         if (lastModified != this.classLastModified) {
             this.classLastModified = lastModified;
             synchronized (this.cachedSetList) {

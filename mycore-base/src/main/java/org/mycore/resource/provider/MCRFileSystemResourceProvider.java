@@ -27,9 +27,9 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.Level;
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.config.annotation.MCRPropertyList;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
 
@@ -52,8 +52,7 @@ import org.mycore.common.log.MCRTreeMessage;
  * [...].Class=org.mycore.resource.provider.MCRFileSystemResourceProvider
  * [...].Coverage=Lorem ipsum dolor sit amet
  * [...].Mode=RESOURCES
- * [...].BaseDirs.10=/base/dir/foo
- * [...].BaseDirs.20=/base/dir/bar
+ * [...].BaseDirs=/base/dir/foo,/base/dir/bar
  * </code></pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRFileSystemResourceProvider.Factory.class)
@@ -93,13 +92,13 @@ public final class MCRFileSystemResourceProvider extends MCRFileSystemResourcePr
         @MCRProperty(name = MODE_KEY)
         public String mode;
 
-        @MCRProperty(name = BASE_DIRS_KEY)
-        public String baseDirs;
+        @MCRPropertyList(name = BASE_DIRS_KEY, required = false)
+        public List<String> baseDirs;
 
         @Override
         public MCRFileSystemResourceProvider get() {
             MCRResourceProviderMode mode = MCRResourceProviderMode.valueOf(this.mode);
-            List<Path> baseDirs = MCRConfiguration2.splitValue(this.baseDirs).map(Paths::get).toList();
+            List<Path> baseDirs = this.baseDirs.stream().map(Paths::get).toList();
             return new MCRFileSystemResourceProvider(coverage, mode, baseDirs);
         }
 

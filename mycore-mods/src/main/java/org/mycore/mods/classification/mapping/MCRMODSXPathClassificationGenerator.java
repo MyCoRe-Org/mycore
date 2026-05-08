@@ -23,9 +23,8 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 import org.jdom2.Parent;
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
-import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.config.annotation.MCRPropertyList;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.mapping.MCRGeneratorClassificationMapperBase.Generator;
 import org.mycore.datamodel.classifications2.mapping.MCRXPathClassificationGeneratorBase;
@@ -90,16 +89,12 @@ public final class MCRMODSXPathClassificationGenerator extends MCRXPathClassific
 
     public static class Factory implements Supplier<MCRMODSXPathClassificationGenerator> {
 
-        @MCRProperty(name = CLASSIFICATION_IDS_KEY, required = false)
-        public String classificationIds;
+        @MCRPropertyList(name = CLASSIFICATION_IDS_KEY, required = false)
+        public List<String> classificationIds;
 
         @Override
         public MCRMODSXPathClassificationGenerator get() {
-            return new MCRMODSXPathClassificationGenerator(getClassificationsIds());
-        }
-
-        private List<String> getClassificationsIds() {
-            return MCRConfiguration2.splitValue(classificationIds == null ? "" : classificationIds).toList();
+            return new MCRMODSXPathClassificationGenerator(classificationIds);
         }
 
     }

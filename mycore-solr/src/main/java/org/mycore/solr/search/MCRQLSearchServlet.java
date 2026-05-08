@@ -26,7 +26,7 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.request.SolrQuery;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.jdom2.Document;
 import org.jdom2.output.XMLOutputter;

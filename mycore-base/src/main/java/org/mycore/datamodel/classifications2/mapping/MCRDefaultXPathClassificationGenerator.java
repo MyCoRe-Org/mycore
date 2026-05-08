@@ -24,9 +24,8 @@ import java.util.function.Supplier;
 
 import org.jdom2.Document;
 import org.jdom2.Parent;
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
-import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.config.annotation.MCRPropertyList;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.mapping.MCRGeneratorClassificationMapperBase.Generator;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -88,16 +87,12 @@ public final class MCRDefaultXPathClassificationGenerator extends MCRXPathClassi
 
     public static class Factory implements Supplier<MCRDefaultXPathClassificationGenerator> {
 
-        @MCRProperty(name = CLASSIFICATION_IDS_KEY, required = false)
-        public String classificationIds;
+        @MCRPropertyList(name = CLASSIFICATION_IDS_KEY, required = false)
+        public List<String> classificationIds;
 
         @Override
         public MCRDefaultXPathClassificationGenerator get() {
-            return new MCRDefaultXPathClassificationGenerator(getClassificationsIds());
-        }
-
-        private List<String> getClassificationsIds() {
-            return MCRConfiguration2.splitValue(classificationIds == null ? "" : classificationIds).toList();
+            return new MCRDefaultXPathClassificationGenerator(classificationIds);
         }
 
     }

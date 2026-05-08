@@ -104,17 +104,11 @@ public class MCRXMLParserImpl implements MCRXMLParser {
      *
      * @author Thomas Scheffler (yagee)
      */
-    private static class AbsoluteToRelativeResolver implements EntityResolver2 {
-
-        private final EntityResolver2 fallback;
+    private record AbsoluteToRelativeResolver(EntityResolver2 fallback) implements EntityResolver2 {
 
         private static final Logger LOGGER = LogManager.getLogger();
 
         private static final URI BASE_DIR_URI = Paths.get("").toAbsolutePath().toUri();
-
-        AbsoluteToRelativeResolver(EntityResolver2 fallback) {
-            this.fallback = fallback;
-        }
 
         @Override
         public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {

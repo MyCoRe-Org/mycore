@@ -33,7 +33,6 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
-import org.mycore.common.config.annotation.MCRFactory;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.digest.MCRMD5Digest;
 import org.mycore.services.http.MCRURLQueryParameter;
@@ -59,6 +58,8 @@ public final class MCROAuthClient {
 
     private static final String CLIENT_PROPERTY = "MCR.ORCID.OAuth";
 
+    private static final String CLASS_PROPERTY = CLIENT_PROPERTY + ".Class";
+
     private final Settings settings;
 
     private final Client client;
@@ -68,14 +69,12 @@ public final class MCROAuthClient {
         this.client = ClientBuilder.newClient();
     }
 
-    @MCRFactory
     public static MCROAuthClient obtainInstance() {
-        return LazyInstanceHolder.SHARED_INSTANCE;
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCROAuthClient.class, CLASS_PROPERTY);
     }
 
     public static MCROAuthClient createInstance() {
-        String classProperty = CLIENT_PROPERTY + ".Class";
-        return MCRConfiguration2.getInstanceOfOrThrow(MCROAuthClient.class, classProperty);
+        return MCRConfiguration2.getInstanceOfOrThrow(MCROAuthClient.class, CLASS_PROPERTY);
     }
 
     public String getClientID() {
@@ -192,7 +191,6 @@ public final class MCROAuthClient {
         return MCRUtils.toHexString(digest);
     }
 
-
     public record Settings(
         String baseUrl,
         String clientId,
@@ -230,10 +228,6 @@ public final class MCROAuthClient {
 
         }
 
-    }
-
-    private static final class LazyInstanceHolder {
-        public static final MCROAuthClient SHARED_INSTANCE = createInstance();
     }
 
 }

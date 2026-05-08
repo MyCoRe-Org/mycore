@@ -1,13 +1,13 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="3.0"
-                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:mods="http://www.loc.gov/mods/v3"
-                xmlns:xlink="http://www.w3.org/1999/xlink"
-                xmlns:fn="http://www.w3.org/2005/xpath-functions"
-                xmlns:map="http://www.w3.org/2005/xpath-functions/map"
-                xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                xmlns:mcrmods="http://www.mycore.de/xslt/mods"
-                exclude-result-prefixes="mods fn xs">
+  xmlns:fn="http://www.w3.org/2005/xpath-functions"
+  xmlns:mcrmods="http://www.mycore.de/xslt/mods"
+  xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  exclude-result-prefixes="#all">
+
   <xsl:variable name="supportedElements" select="map{'accessCondition':(), 'area':(), 'cartographics':(), 'city':(),
         'citySection':(), 'classification':(), 'continent':(), 'country':(), 'county':(), 'descriptionStandard':(),
         'extraTerrestrialArea':(), 'form':(), 'frequency':(), 'genre':(), 'geographic':(), 'geographicCode':(), 'hierarchicalGeographic':(),

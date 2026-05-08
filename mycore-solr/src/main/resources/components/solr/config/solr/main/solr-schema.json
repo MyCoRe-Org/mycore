@@ -219,6 +219,161 @@
   },
   {
     "add-field-type": {
+      "name": "text_es",
+      "class": "solr.TextField",
+      "positionIncrementGap": "100",
+      "analyzer": {
+        "tokenizer": {
+          "class": "solr.StandardTokenizerFactory"
+        },
+        "filters": [
+          {
+            "class": "solr.LowerCaseFilterFactory"
+          },
+          {
+            "class": "solr.StopFilterFactory",
+            "words": "lang/stopwords_es.txt",
+            "ignoreCase": "true"
+          },
+          {
+            "class": "solr.SpanishLightStemFilterFactory"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "add-field-type": {
+      "name": "text_fr",
+      "class": "solr.TextField",
+      "positionIncrementGap": "100",
+      "analyzer": {
+        "tokenizer": {
+          "class": "solr.StandardTokenizerFactory"
+        },
+        "filters": [
+          {
+            "class": "solr.LowerCaseFilterFactory"
+          },
+          {
+            "class": "solr.StopFilterFactory",
+            "words": "lang/stopwords_fr.txt",
+            "ignoreCase": "true"
+          },
+          {
+            "class": "solr.FrenchLightStemFilterFactory"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "add-field-type": {
+      "name": "text_it",
+      "class": "solr.TextField",
+      "positionIncrementGap": "100",
+      "analyzer": {
+        "tokenizer": {
+          "class": "solr.StandardTokenizerFactory"
+        },
+        "filters": [
+          {
+            "class": "solr.LowerCaseFilterFactory"
+          },
+          {
+            "class": "solr.StopFilterFactory",
+            "words": "lang/stopwords_it.txt",
+            "ignoreCase": "true"
+          },
+          {
+            "class": "solr.ItalianLightStemFilterFactory"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "add-field-type": {
+      "name": "text_ru",
+      "class": "solr.TextField",
+      "positionIncrementGap": "100",
+      "analyzer": {
+        "tokenizer": {
+          "class": "solr.StandardTokenizerFactory"
+        },
+        "filters": [
+          {
+            "class": "solr.LowerCaseFilterFactory"
+          },
+          {
+            "class": "solr.StopFilterFactory",
+            "words": "lang/stopwords_ru.txt",
+            "ignoreCase": "true"
+          },
+          {
+            "class": "solr.RussianLightStemFilterFactory"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "add-field-type": {
+      "name": "text_ru_latin",
+      "class": "solr.TextField",
+      "positionIncrementGap": "100",
+      "analyzer": {
+        "tokenizer": {
+          "class": "solr.StandardTokenizerFactory"
+        },
+        "filters": [
+          {
+            "class": "solr.ICUTransformFilterFactory",
+            "id": "Any-Latin; NFD; [:NonspacingMark:] Remove; NFC"
+          },
+          {
+            "class": "solr.LowerCaseFilterFactory"
+          },
+          {
+            "class": "solr.StopFilterFactory",
+            "words": "lang/stopwords_ru.txt",
+            "ignoreCase": "true"
+          },
+          {
+            "class": "solr.RussianLightStemFilterFactory"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "add-field-type": {
+      "name": "text_tr",
+      "class": "solr.TextField",
+      "positionIncrementGap": "100",
+      "analyzer": {
+        "tokenizer": {
+          "class": "solr.StandardTokenizerFactory"
+        },
+        "filters": [
+          {
+            "class": "solr.TurkishLowerCaseFilterFactory"
+          },
+          {
+            "class": "solr.StopFilterFactory",
+            "words": "lang/stopwords_tr.txt",
+            "ignoreCase": "false"
+          },
+          {
+            "class": "solr.SnowballPorterFilterFactory",
+            "language": "Turkish"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "add-field-type": {
       "name": "text_wc",
       "class": "solr.TextField",
       "stored": false,

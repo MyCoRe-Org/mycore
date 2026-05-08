@@ -102,7 +102,7 @@ public class MCRCategoryDTO {
         cat.setInternalID(internalID);
         cat.setURI(uri);
         cat.setId(id);
-        if (cat.getId().isRootID()) {
+        if (cat.getId().isRoot()) {
             cat.setRoot(cat);
         }
         cat.setLeft(leftValue);

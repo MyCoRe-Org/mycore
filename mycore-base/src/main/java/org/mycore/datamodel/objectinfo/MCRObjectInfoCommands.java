@@ -52,7 +52,7 @@ public class MCRObjectInfoCommands {
         help = "reads all objects and creates the corresponding objectinfo",
         order = 10)
     public static List<String> createAllObjectInfo() {
-        MCRXMLMetadataManager mm = MCRXMLMetadataManager.getInstance();
+        MCRXMLMetadataManager mm = MCRXMLMetadataManager.obtainInstance();
         return mm.getObjectBaseIds()
             .stream().filter(b -> !b.endsWith(MCRDerivate.OBJECT_TYPE))
             .map(b -> "create objectinfo for base " + b)
@@ -63,7 +63,7 @@ public class MCRObjectInfoCommands {
         help = "reads all objects with base id {0} and creates the corresponding objectinfo")
     public static List<String> createObjectInfoForBase(String baseId) {
         String[] idParts = baseId.split("_");
-        MCRXMLMetadataManager mm = MCRXMLMetadataManager.getInstance();
+        MCRXMLMetadataManager mm = MCRXMLMetadataManager.obtainInstance();
         if (idParts[1].equals(MCRDerivate.OBJECT_TYPE)) {
             return List.of();
         }
@@ -89,7 +89,7 @@ public class MCRObjectInfoCommands {
                 LogManager.getLogger().info(() -> "objectinfo for object " + idStr + " created.");
 
             } else {
-                List<? extends MCRAbstractMetadataVersion<?>> versions = MCRXMLMetadataManager.getInstance()
+                List<? extends MCRAbstractMetadataVersion<?>> versions = MCRXMLMetadataManager.obtainInstance()
                     .listRevisions(id);
                 if (versions == null || versions.isEmpty()) {
                     // we do not know if the object ever existed

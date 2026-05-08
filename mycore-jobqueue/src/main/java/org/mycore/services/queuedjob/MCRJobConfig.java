@@ -87,6 +87,22 @@ public interface MCRJobConfig {
     Boolean activated();
 
     /**
+     * The multiplier used for exponential backoff when retrying failed jobs. The actual delay before a retry is
+     * calculated as {@code timeTillReset * multiplier^(tries-1)}. A multiplier of 1 (default) means no exponential
+     * backoff, i.e. the delay is constant. A multiplier of 2 means the delay doubles with each retry.
+     * @param action the action
+     * @return the optional multiplier
+     */
+    Optional<Integer> retryDelayMultiplier(Class<? extends MCRJobAction> action);
+
+    /**
+     * The default multiplier used for exponential backoff when retrying failed jobs.
+     * @return the multiplier
+     * @see #retryDelayMultiplier(Class)
+     */
+    Integer retryDelayMultiplier();
+
+    /**
      * Returns the list of {@link MCRJobStatusListener} for the given action.
      * @param action the action
      * @return the list of listeners

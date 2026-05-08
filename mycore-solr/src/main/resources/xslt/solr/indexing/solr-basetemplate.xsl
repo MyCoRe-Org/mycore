@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="3.0" 
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+<xsl:stylesheet version="3.0"
+  xmlns:fn="http://www.w3.org/2005/xpath-functions"
   xmlns:xlink="http://www.w3.org/1999/xlink"
-  xmlns:mods="http://www.loc.gov/mods/v3"
-  xmlns:fn="http://www.w3.org/2005/xpath-functions">
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  exclude-result-prefixes="#all">
   
   <!-- should really be last stylesheet to be imported -->
   <xsl:import href="xslImport:solr-document:solr/indexing/solr-basetemplate.xsl" />

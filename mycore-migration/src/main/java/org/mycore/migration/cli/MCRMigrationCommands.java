@@ -98,7 +98,7 @@ public class MCRMigrationCommands {
             + " (default: NeverAddChildrenOrderStrategy) to decide if <children> should become <childrenOrder>.",
         order = 30)
     public static void migrateNormalizedObject(String mcrObjectIDStr) throws IOException, JDOMException {
-        MCRXMLMetadataManager mm = MCRXMLMetadataManager.getInstance();
+        MCRXMLMetadataManager mm = MCRXMLMetadataManager.obtainInstance();
 
         // TODO: check if child order needs to be migrated
 
@@ -137,10 +137,10 @@ public class MCRMigrationCommands {
             + " (default: NeverAddChildrenOrderStrategy) to decide if <children> should become <childrenOrder>.",
         order = 30)
     public static void migrateNormalizedObjects() throws SVNException, IOException, JDOMException {
-        Collection<String> objectBaseIds = MCRXMLMetadataManager.getInstance().getObjectBaseIds();
+        Collection<String> objectBaseIds = MCRXMLMetadataManager.obtainInstance().getObjectBaseIds();
         objectBaseIds.removeIf(id -> id.endsWith("_derivate"));
         for (String baseId : objectBaseIds) {
-            MCRXMLMetadataManager.getInstance().getHighestStoredID(baseId); //init store
+            MCRXMLMetadataManager.obtainInstance().getHighestStoredID(baseId); //init store
             MCRStore store = MCRStoreManager.getStore(baseId);
             LOGGER.info(() -> "MCR store " + baseId + " has been initialized: " + store.getClass().getName());
             if (store instanceof MCRVersioningMetadataStore versioningStore) {
@@ -154,7 +154,7 @@ public class MCRMigrationCommands {
         help = "Create missing servflags for createdby and modifiedby. (MCR-786)",
         order = 20)
     public static List<String> addServFlags() {
-        SortedSet<String> ids = new TreeSet<>(MCRXMLMetadataManager.getInstance().listIDs());
+        SortedSet<String> ids = new TreeSet<>(MCRXMLMetadataManager.obtainInstance().listIDs());
         List<String> cmds = new ArrayList<>(ids.size());
         for (String id : ids) {
             cmds.add("migrate author servflags for " + id);
@@ -171,7 +171,7 @@ public class MCRMigrationCommands {
         MCRBase obj = MCRMetadataManager.retrieve(objectID);
         MCRObjectService service = obj.getService();
         if (!service.isFlagTypeSet(MCRObjectService.FLAG_TYPE_CREATEDBY)) { //the egg
-            List<? extends MCRAbstractMetadataVersion<?>> versions = MCRXMLMetadataManager.getInstance()
+            List<? extends MCRAbstractMetadataVersion<?>> versions = MCRXMLMetadataManager.obtainInstance()
                 .listRevisions(objectID);
             String createUser;
             String modifyUser;
@@ -226,7 +226,7 @@ public class MCRMigrationCommands {
         MCRObjectID objectID = MCRObjectID.getInstance(id);
 
         // find derivate links
-        Document xml = MCRXMLMetadataManager.getInstance().retrieveXML(objectID);
+        Document xml = MCRXMLMetadataManager.obtainInstance().retrieveXML(objectID);
         Element mcrObjectXML = xml.getRootElement();
         XPathExpression<Element> expression = XPathFactory.instance().compile(xpath, Filters.element());
         List<Element> derivateLinkElements = expression.evaluate(mcrObjectXML);
@@ -272,7 +272,7 @@ public class MCRMigrationCommands {
         // store the mcr object if its changed
         if (changedObject) {
             // we use MCRXMLMetadataMananger because we don't want to validate the old mcr object
-            MCRXMLMetadataManager.getInstance().update(objectID, xml, new Date());
+            MCRXMLMetadataManager.obtainInstance().update(objectID, xml, new Date());
             // manually fire update event
             MCRObject newObject = MCRMetadataManager.retrieveMCRObject(objectID);
             newObject.setImportMode(true);

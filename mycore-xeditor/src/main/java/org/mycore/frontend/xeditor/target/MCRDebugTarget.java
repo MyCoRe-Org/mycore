@@ -120,7 +120,7 @@ public class MCRDebugTarget implements MCREditorTarget {
     }
 
     private void addAsFirstStepToOutput(Object step) {
-        outputSteps.add(0, step);
+        outputSteps.addFirst(step);
     }
 
     private void sendDebugOutput() throws IOException {

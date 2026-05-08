@@ -28,7 +28,7 @@
     "eslint-plugin-vue": "^9.32.0",
     "font-awesome": "^4.7.0",
     "prettier": "^3.4.2",
-    "rollup": "^2.25.0",
+    "rollup": "^2.80.0",
     "rollup-plugin-external-globals": "^0.13.0",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.21.0",

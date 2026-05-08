@@ -34,6 +34,7 @@ import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRTransactionManager;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.MCRUserInformationResolver;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -132,7 +133,7 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
         if (getRegistrationPredicate().test(obj)) {
             this.addJob(PiJobAction.REGISTER,
                 createJobContextParams(PiJobAction.REGISTER, obj, identifier, additional));
-            return new MCRPIServiceDates(new Date(), null);
+            return new MCRPIServiceDates(null, new Date());
         }
         return new MCRPIServiceDates(null, null);
     }
@@ -295,20 +296,23 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
         String jobApiUser = this.getProperties().get(JOB_API_USER_PROPERTY);
         // try to remain compatible with values configured before MCR-3033
         if (jobApiUser != null && !jobApiUser.contains(":")) {
-            String userProviderKey = MCRUserInformationResolver.PROVIDERS_KEY + ".user";
+            String userProviderClassKey = MCRUserInformationResolver.RESOLVER_PROPERTY + "."
+                + MCRUserInformationResolver.PROVIDERS_KEY + ".user.Class";
+            String userProviderSentinelKey = MCRUserInformationResolver.RESOLVER_PROPERTY + "."
+                + MCRUserInformationResolver.PROVIDERS_KEY + ".user.Enabled";
             String userProviderClass = "org.mycore.user2.MCRUserProvider";
-            if (this.getProperties().get(userProviderKey).equals(userProviderClass)) {
+            if (userProviderClass.equals(MCRConfiguration2.getString(userProviderClassKey).orElse(null)) &&
+                !"false".equalsIgnoreCase(MCRConfiguration2.getString(userProviderSentinelKey).orElse(null))) {
                 LOGGER.warn(() -> "JobApiUser references username '" + jobApiUser
                     + "' directly. Switching to 'user:" + jobApiUser
-                    + "' using the compatible user information provider "
-                    + userProviderClass + " configured in "
-                    + userProviderKey);
+                    + "' using the user information provider for database users, "
+                    + userProviderClass + ", configured in " + userProviderClassKey);
                 return "user:" + jobApiUser;
             } else {
                 LOGGER.error(() -> "JobApiUser references username '" + jobApiUser
-                    + "' directly. Unable to switch to compatible user information provider "
-                    + userProviderClass + " since it is not configured in "
-                    + userProviderKey);
+                    + "' directly. Unable to switch to user information provider for database users, "
+                    + userProviderClass + ", because it is not configured in " + userProviderClassKey
+                    + " (or it is disabled in " + userProviderSentinelKey + ")");
                 throw new MCRConfigurationException("Invalid JobApiUser: " + jobApiUser);
             }
         }

@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.Serial;
 import java.nio.file.Files;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Locale;
 
 import org.apache.logging.log4j.LogManager;
@@ -116,15 +117,16 @@ public class MCRMETSServlet extends MCRServlet {
 
         try {
             job.getRequest().setAttribute("XSL.derivateID", derivate);
-            String objectid = MCRLinkTableManager.getInstance().getSourceOf(derivate).iterator().next();
+            Iterator<String> sourceIterator = MCRLinkTableManager.getInstance().getSourceOf(derivate).iterator();
+            String objectId = sourceIterator.hasNext() ? sourceIterator.next() : null;
 
-            if (objectid == null || objectid.length() == 0) {
+            if (objectId == null || objectId.isEmpty()) {
                 MCRDerivate derObj = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivate));
                 MCRObjectID ownerID = derObj.getOwnerID();
-                objectid = ownerID.toString();
+                objectId = ownerID.toString();
             }
 
-            job.getRequest().setAttribute("XSL.objectID", objectid);
+            job.getRequest().setAttribute("XSL.objectID", objectId);
         } catch (Exception x) {
             LOGGER.warn("Unable to set \"XSL.objectID\" attribute to current request", x);
         }

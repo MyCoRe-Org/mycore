@@ -351,13 +351,12 @@ public class MCRTransactionManagerTest {
         BaseTransaction.resetCounter();
     }
 
-    private static class TransactionLoaderMock implements MCRTransactionManager.TransactionLoader {
-
-        private final List<Class<? extends MCRPersistenceTransaction>> transactionClasses;
+    private record TransactionLoaderMock(List<Class<? extends MCRPersistenceTransaction>> transactionClasses)
+        implements MCRTransactionManager.TransactionLoader {
 
         @SafeVarargs
-        TransactionLoaderMock(Class<? extends MCRPersistenceTransaction>... transactionClasses) {
-            this.transactionClasses = Arrays.stream(transactionClasses).toList();
+        private TransactionLoaderMock(Class<? extends MCRPersistenceTransaction>... transactionClasses) {
+            this(Arrays.stream(transactionClasses).toList());
         }
 
         @Override

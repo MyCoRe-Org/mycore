@@ -23,9 +23,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.SortedSet;
 
+import org.mycore.common.config.MCRConfiguration2;
+
 /**
  * Interface of the Data Access Object for Classifications.
- * 
+ *
  * @author Thomas Scheffler (yagee)
  * @since 2.0
  */
@@ -34,7 +36,7 @@ public interface MCRCategoryDAO {
     /**
      * Adds a category as child of another category.
      * When parentID is null a root category will be created.
-     * 
+     *
      * @param parentID
      *            ID of the parent category
      * @param category
@@ -46,7 +48,7 @@ public interface MCRCategoryDAO {
     /**
      * Adds a category as child of another category.
      * When parentID is null a root category will be created.
-     * 
+     *
      * @param parentID
      *            ID of the parent category
      * @param category
@@ -59,7 +61,7 @@ public interface MCRCategoryDAO {
 
     /**
      * Deletes a category with all child categories.
-     * 
+     *
      * @param id
      *            ID of Category to be removed
      */
@@ -67,7 +69,7 @@ public interface MCRCategoryDAO {
 
     /**
      * Tells if a given category exists.
-     * 
+     *
      * @param id
      *            ID of Category
      * @return true if category is present
@@ -76,7 +78,7 @@ public interface MCRCategoryDAO {
 
     /**
      * Retrieve all Categories tagged by a specific label in a specific lang.
-     * 
+     *
      * @param baseID
      *            base Category which subtree is searched for the label.
      * @param lang
@@ -89,7 +91,7 @@ public interface MCRCategoryDAO {
 
     /**
      * Retrieve all Categories tagged by a specific label in a specific lang.
-     * 
+     *
      * @param lang
      *            language attribute of the label
      * @param text
@@ -108,7 +110,7 @@ public interface MCRCategoryDAO {
 
     /**
      * Returns MCRCategory with this id and childLevel levels of subcategories.
-     * 
+     *
      * @param id
      *            ID of category
      * @param childLevel
@@ -120,7 +122,7 @@ public interface MCRCategoryDAO {
 
     /**
      * Returns the list of child categories for the specified category.
-     * 
+     *
      * @param id
      *            ID of category
      * @return list of child category
@@ -130,7 +132,7 @@ public interface MCRCategoryDAO {
     /**
      * Returns the parent of the given category and its parent and so on. The
      * last element in the list is the root category (the classification)
-     * 
+     *
      * @param id
      *            ID of Category
      * @return list of parents
@@ -139,14 +141,14 @@ public interface MCRCategoryDAO {
 
     /**
      * Returns all category IDs that do not have a parent category.
-     * 
+     *
      * @return list of category IDs
      */
     List<MCRCategoryID> getRootCategoryIDs();
 
     /**
      * Returns all categories that do not have a parent category.
-     * 
+     *
      * @return list of category IDs
      */
     List<MCRCategory> getRootCategories();
@@ -154,10 +156,10 @@ public interface MCRCategoryDAO {
     /**
      * Returns the root Category with ancestor axis of the specified category
      * and childLevel levels of subcategories.
-     * 
+     *
      * You can say it is the combination of getParents(MCRCategoryID) and
      * getCategory(MCRCategoryID, int).
-     * 
+     *
      * @param baseID
      *            Category with relative level set to "0".
      * @param childLevel
@@ -170,7 +172,7 @@ public interface MCRCategoryDAO {
 
     /**
      * Tells if a given category contains subcategories.
-     * 
+     *
      * @param id
      *            ID of Category
      * @return true if subcategories are present
@@ -179,9 +181,9 @@ public interface MCRCategoryDAO {
 
     /**
      * Moves a Category from one subtree in a classification to a new parent.
-     * 
+     *
      * All subcategories remain children of the moved category.
-     * 
+     *
      * @param id
      *            ID of the Category which should be moved
      * @param newParentID
@@ -192,7 +194,7 @@ public interface MCRCategoryDAO {
     /**
      * Moves a Category from one subtree in a classification to a new parent as
      * the <code>index</code>th child.
-     * 
+     *
      * @param id
      *            ID of the Category which should be moved
      * @param newParentID
@@ -204,7 +206,7 @@ public interface MCRCategoryDAO {
 
     /**
      * Removes a label from a Category.
-     * 
+     *
      * @param id
      *            ID of the category
      * @param lang
@@ -216,14 +218,14 @@ public interface MCRCategoryDAO {
     /**
      * Replaces a <code>MCRCategory</code> by a new version of the same
      * category.
-     * 
+     *
      * This replacment includes all subcategories and labels. So former
      * subcategories and labels not present in <code>newCategory</code> will
      * be removed while new ones will be inserted.
-     * 
+     *
      * If you can use the other methods defined by this interface as they ought
      * to be more optimized.
-     * 
+     *
      * @param newCategory
      *            new version of MCRCategory
      * @throws IllegalArgumentException
@@ -235,7 +237,7 @@ public interface MCRCategoryDAO {
 
     /**
      * Sets or updates a label from a Category.
-     * 
+     *
      * @param id
      *            ID of the category
      * @param label
@@ -246,7 +248,7 @@ public interface MCRCategoryDAO {
 
     /**
      * Sets a new set of labels from a Category.
-     * 
+     *
      * @param id
      *            ID of the category
      * @param labels
@@ -257,7 +259,7 @@ public interface MCRCategoryDAO {
 
     /**
      * Sets or updates the URI from a Category.
-     * 
+     *
      * @param id
      *            ID of the category
      * @param uri
@@ -274,10 +276,15 @@ public interface MCRCategoryDAO {
 
     /**
      * Gets the last modified timestamp for the given root id. If there is no timestamp at the moment -1 is returned.
-     * 
+     *
      * @param root ID of root category
-     * 
+     *
      * @return the last modified timestamp (if any) or -1
      */
     long getLastModified(String root);
+
+    static MCRCategoryDAO obtainInstance() {
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRCategoryDAO.class, "MCR.Category.DAO");
+    }
+
 }

@@ -60,7 +60,8 @@ public class MCRAccessManager {
 
     @SuppressWarnings("unchecked")
     public static <T extends MCRAccessInterface> T getAccessImpl() {
-        return (T) MCRConfiguration2.getInstanceOfOrThrow(MCRAccessInterface.class, "MCR.Access.Class");
+        return (T) MCRConfiguration2.getSingleInstanceOfOrThrow(MCRAccessInterface.class,
+            "MCR.Access.Class");
     }
 
     private static MCRAccessCheckStrategy getAccessStrategy() {
@@ -70,9 +71,10 @@ public class MCRAccessManager {
         Optional<String> optStrategy = MCRConfiguration2.getString("MCR.Access.Strategy.Class");
         Optional<String> optAccessImpl = MCRConfiguration2.getString("MCR.Access.Class");
         if (optStrategy.isPresent() && optAccessImpl.isPresent() && optStrategy.get().equals(optAccessImpl.get())) {
-            return MCRConfiguration2.getInstanceOfOrThrow(MCRAccessCheckStrategy.class, "MCR.Access.Class");
+            return getAccessImpl();
         } else {
-            return MCRConfiguration2.getInstanceOfOrThrow(MCRAccessCheckStrategy.class, "MCR.Access.Strategy.Class");
+            return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRAccessCheckStrategy.class,
+                "MCR.Access.Strategy.Class");
         }
     }
 

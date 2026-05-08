@@ -23,6 +23,8 @@ import java.util.Date;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.Access;
+import jakarta.persistence.AccessType;
 import org.mycore.common.MCRException;
 
 import jakarta.persistence.Basic;
@@ -35,6 +37,7 @@ import jakarta.persistence.Table;
 
 @Entity(name = MCRDBStoredChangeSet.ENTITY_NAME)
 @Table(name = MCRDBStoredChangeSet.ENTITY_NAME)
+@Access(AccessType.FIELD)
 @NamedQueries({
     @NamedQuery(name = "Count.ALTOCS.Unapplied",
         query = "select count(u) from " + MCRDBStoredChangeSet.ENTITY_NAME + " u "

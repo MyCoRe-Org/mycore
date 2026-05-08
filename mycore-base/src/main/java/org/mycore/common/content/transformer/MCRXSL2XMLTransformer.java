@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 
 import org.jdom2.Content;
@@ -54,7 +55,7 @@ import org.xml.sax.XMLReader;
 public class MCRXSL2XMLTransformer extends MCRXSLTransformer {
 
     private static final MCRCache<String, MCRXSL2XMLTransformer> INSTANCE_CACHE = new MCRCache<>(100,
-        "MCRXSLTransformer instance cache");
+        "MCRXSL2XMLTransformer instance cache");
 
     public MCRXSL2XMLTransformer() {
         super();
@@ -64,11 +65,24 @@ public class MCRXSL2XMLTransformer extends MCRXSLTransformer {
         super(stylesheets);
     }
 
+    public MCRXSL2XMLTransformer(Class<? extends TransformerFactory> factoryClass) {
+        super(factoryClass);
+    }
+
+    public MCRXSL2XMLTransformer(Class<? extends TransformerFactory> factoryClass, String... stylesheets) {
+        super(factoryClass, stylesheets);
+    }
+
     public static MCRXSL2XMLTransformer obtainInstance(String... stylesheets) {
+        return obtainInstance(DEFAULT_FACTORY_CLASS, stylesheets);
+    }
+
+    public static MCRXSL2XMLTransformer obtainInstance(Class<? extends TransformerFactory> factoryClass,
+        String... stylesheets) {
         String key = stylesheets.length == 1 ? stylesheets[0] : Arrays.toString(stylesheets);
         MCRXSL2XMLTransformer instance = INSTANCE_CACHE.get(key);
         if (instance == null) {
-            instance = new MCRXSL2XMLTransformer(stylesheets);
+            instance = new MCRXSL2XMLTransformer(factoryClass, stylesheets);
             INSTANCE_CACHE.put(key, instance);
         }
         return instance;

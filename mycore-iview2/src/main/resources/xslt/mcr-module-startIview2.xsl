@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
-<xsl:stylesheet version="3.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:mcrderivate="http://www.mycore.de/xslt/derivate"
->
-
+<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet version="3.0"
+  xmlns:mcrderivate="http://www.mycore.de/xslt/derivate"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  exclude-result-prefixes="#all">
 
   <xsl:template name="iview2.getSupport">
     <xsl:param name="derivID" />

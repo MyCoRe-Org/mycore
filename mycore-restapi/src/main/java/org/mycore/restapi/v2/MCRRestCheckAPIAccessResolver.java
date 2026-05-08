@@ -21,10 +21,9 @@ package org.mycore.restapi.v2;
 import javax.xml.transform.Source;
 import javax.xml.transform.URIResolver;
 
-import org.jdom2.Element;
-import org.jdom2.transform.JDOMSource;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.restapi.v2.access.MCRRestAccessManager;
 
 public class MCRRestCheckAPIAccessResolver implements URIResolver {
@@ -49,9 +48,7 @@ public class MCRRestCheckAPIAccessResolver implements URIResolver {
             final String permission = hrefParts[2];
             final MCRAccessInterface acl = MCRAccessManager.getAccessImpl();
             final boolean isPermitted = MCRRestAccessManager.checkRestAPIAccess(acl, permission, hrefParts[1]);
-            final Element resultElement = new Element("boolean");
-            resultElement.setText(Boolean.toString(isPermitted));
-            return new JDOMSource(resultElement);
+            return MCRURIResolver.createBooleanResponse(isPermitted);
         }
         throw new IllegalArgumentException("Invalid format of uri for retrieval of checkRestAPIAccess: " + href);
     }

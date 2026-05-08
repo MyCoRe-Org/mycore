@@ -22,15 +22,16 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
-import org.mycore.solr.MCRSolrCore;
-import org.mycore.solr.MCRSolrCoreManager;
-import org.mycore.solr.MCRSolrUtils;
+import org.mycore.solr.MCRSolrIndex;
+import org.mycore.solr.MCRSolrIndexRegistryManager;
+import org.mycore.solr.cloud.collection.MCRSolrCloudCollection;
 import org.mycore.solr.cloud.collection.MCRSolrCollectionHelper;
 import org.mycore.solr.cloud.configsets.MCRSolrConfigSetHelper;
 import org.mycore.solr.cloud.configsets.MCRSolrConfigSetProvider;
@@ -47,12 +48,15 @@ public class MCRSolrCloudCommands {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @MCRCommand(
-        syntax = "show remote config sets",
-        help = "displays the names of the config sets on the remote Solr server",
+        syntax = "show remote config sets of {0}",
+        help = "displays the names of the config sets on the remote Solr server for the collection {0}",
         order = 10)
-    public static void listRemoteConfig() throws URISyntaxException, IOException, SolrServerException {
+    public static void listRemoteConfig(String collectionName) throws URISyntaxException,
+        IOException, SolrServerException {
+
+        MCRSolrCloudCollection collection = obtainCollection(collectionName);
         List<String> configSetNames = MCRSolrConfigSetHelper
-            .getRemoteConfigSetNames(MCRSolrCoreManager.getMainSolrCore());
+            .getRemoteConfigSetNames(collection);
 
         for (String configSetName : configSetNames) {
             LOGGER.info("Remote ConfigSet: {}", configSetName);
@@ -78,24 +82,23 @@ public class MCRSolrCloudCommands {
 
     @MCRCommand(
         syntax = "delete remote config set for {0}",
-        help = "looks up in the mycore.properties which config set is used for the core {0} and deletes it from the " +
-            "remote Solr server",
+        help = "looks up in the mycore.properties which config set is used for the index with id"
+            + " {0} and deletes it from the remote Solr server",
         order = 30)
-    public static void deleteRemoteConfig(String localCoreName) throws URISyntaxException {
-        MCRSolrCore core = MCRSolrCoreManager.get(localCoreName)
-            .orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(localCoreName));
-        MCRSolrConfigSetHelper.deleteConfigSetFromRemoteSolrServer(core);
+    public static void deleteRemoteConfig(String indexID) throws URISyntaxException {
+        MCRSolrCloudCollection collection = obtainCollection(indexID);
+        MCRSolrConfigSetHelper.deleteConfigSetFromRemoteSolrServer(collection);
     }
 
     @MCRCommand(
         syntax = "upload local config set for {0}",
-        help = "looks up in the mycore.properties which config set is used for the core {0} and uploads it to the" +
-            "remote Solr server",
+        help = "looks up in the mycore.properties which config set is used for the index with id "
+            + "{0} and uploads it to the remote Solr server",
         order = 40)
-    public static void uploadLocalConfig(String coreName) throws URISyntaxException, SolrServerException, IOException {
-        MCRSolrCore core = MCRSolrCoreManager.get(coreName)
-            .orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(coreName));
-        String localConfigSetName = core.getConfigSet();
+    public static void uploadLocalConfig(String collectionName)
+        throws URISyntaxException, SolrServerException, IOException {
+        MCRSolrCloudCollection collection = obtainCollection(collectionName);
+        String localConfigSetName = collection.getCreationConfiguration().configSetTemplate();
 
         MCRSolrConfigSetProvider configSet = MCRSolrConfigSetHelper.getLocalConfigSets().get(localConfigSetName);
         if (configSet == null) {
@@ -103,32 +106,53 @@ public class MCRSolrCloudCommands {
             return;
         }
 
-        MCRSolrConfigSetHelper.transferConfigSetToRemoteSolrServer(core);
+        MCRSolrConfigSetHelper.transferConfigSetToRemoteSolrServer(collection);
     }
 
     @MCRCommand(
         syntax = "create collection for core {0}",
         help = "creates a new collection in the remote Solr server using the config set defined in the " +
-            "mycore.properties",
+            "mycore.properties for the index with id {0}",
         order = 60)
-    public static void createCollection(String localCoreName)
-        throws URISyntaxException, SolrServerException, IOException {
-        MCRSolrCore core = MCRSolrCoreManager.get(localCoreName)
-            .orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(localCoreName));
-
-        MCRSolrCollectionHelper.createCollection(core);
+    public static void createCollection(String collectionName)
+        throws SolrServerException, IOException {
+        MCRSolrCloudCollection collection = obtainCollection(collectionName);
+        MCRSolrCollectionHelper.createCollection(collection);
     }
 
     @MCRCommand(
         syntax = "remove collection for core {0}",
-        help = "remove a collection in the remote Solr server using the config set defined in the " +
-            "mycore.properties",
+        help = "removes a collection in the remote Solr server for the index with id {0}",
         order = 70)
-    public static void removeCollection(String collectionName) throws URISyntaxException, SolrServerException,
+    public static void removeCollection(String collectionName) throws SolrServerException,
         IOException {
-        MCRSolrCore core = MCRSolrCoreManager.get(collectionName)
-            .orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(collectionName));
-        MCRSolrCollectionHelper.removeCollection(core);
+        MCRSolrCloudCollection collection = obtainCollection(collectionName);
+        MCRSolrCollectionHelper.removeCollection(collection);
+    }
+
+    /**
+     * Helper method to obtain a {@link MCRSolrCloudCollection} for a given collection name.
+     * The collection name is looked up in the {@link MCRSolrIndexRegistryManager} and checked if it is an
+     * instance of {@link MCRSolrCloudCollection}.
+     *
+     * @param collectionName the name of the collection to obtain
+     * @return the {@link MCRSolrCloudCollection} for the given collection name
+     * @throws IllegalArgumentException if no index is found for the given collection name or
+     * if the index is not a SolrCloud collection
+     */
+    private static MCRSolrCloudCollection obtainCollection(
+        String collectionName) {
+        Optional<MCRSolrIndex> optionalIndex = MCRSolrIndexRegistryManager.obtainRegistry().getIndex(collectionName);
+
+        if (optionalIndex.isEmpty()) {
+            throw new IllegalArgumentException("No index found for collection name " + collectionName);
+        }
+
+        MCRSolrIndex index = optionalIndex.get();
+        if (!(index instanceof MCRSolrCloudCollection collection)) {
+            throw new IllegalArgumentException("Index " + collectionName + " is not a SolrCloud collection.");
+        }
+        return collection;
     }
 
 }

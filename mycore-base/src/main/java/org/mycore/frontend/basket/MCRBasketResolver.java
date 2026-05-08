@@ -43,8 +43,14 @@ public class MCRBasketResolver implements URIResolver {
                 String id = tokens[2];
 
                 MCRBasketEntry entry = basket.get(id);
-                entry.resolveContent();
-                Element xml = new MCRBasketXMLBuilder(true).buildXML(entry);
+                Element xml;
+                if (entry == null) {
+                    xml = new Element("entry");
+                    xml.setAttribute("id", id);
+                } else {
+                    entry.resolveContent();
+                    xml = new MCRBasketXMLBuilder(true).buildXML(entry);
+                }
                 Document doc = new Document(xml);
                 return new JDOMSource(doc);
             } else {

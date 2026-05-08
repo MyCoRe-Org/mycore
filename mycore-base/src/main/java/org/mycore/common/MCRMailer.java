@@ -403,7 +403,7 @@ public class MCRMailer extends MCRServlet {
                 if (hasMultipleMessageParts) {
                     multipart.addBodyPart(toAlternativeMimeBodyPart(mail.msgParts));
                 } else {
-                    multipart.addBodyPart(toMimeBodyPart(mail.msgParts.get(0)));
+                    multipart.addBodyPart(toMimeBodyPart(mail.msgParts.getFirst()));
                 }
             }
             if (hasParts) {
@@ -413,7 +413,7 @@ public class MCRMailer extends MCRServlet {
             }
             message.setContent(multipart);
         } else if (hasMessageParts) {
-            MessagePart messagePart = mail.msgParts.get(0);
+            MessagePart messagePart = mail.msgParts.getFirst();
             message.setText(messagePart.message, ENCODING, messagePart.type.subtype);
         }
 

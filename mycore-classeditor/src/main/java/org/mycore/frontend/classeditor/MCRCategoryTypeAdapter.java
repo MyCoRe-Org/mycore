@@ -34,7 +34,6 @@ import java.util.SortedSet;
 
 import org.mycore.common.MCRJSONTypeAdapter;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
-import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
@@ -119,7 +118,7 @@ public class MCRCategoryTypeAdapter extends MCRJSONTypeAdapter<MCRJSONCategory> 
 
     private MCRCategLinkService getLinkService() {
         if (linkService == null) {
-            return MCRCategLinkServiceFactory.obtainInstance();
+            return MCRCategLinkService.obtainInstance();
         }
         return linkService;
     }

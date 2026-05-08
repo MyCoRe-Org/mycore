@@ -24,19 +24,18 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.w3c.dom.Element;
 
 /**
  * Authority information that is represented by authority ID and code value. Such authority info comes from a
  * standardized vocabulary registered at the Library of Congress.
- * 
+ *
  * @author Frank Lützenkirchen
  */
 class MCRAuthorityAndCode extends MCRAuthorityInfo {
 
-    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.obtainInstance();
+    private static final MCRCategoryDAO DAO = MCRCategoryDAO.obtainInstance();
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -59,7 +58,7 @@ class MCRAuthorityAndCode extends MCRAuthorityInfo {
     public static MCRAuthorityAndCode parseXML(Element modsElement) {
         String authority = modsElement.getAttribute(ELEMENT_AUTHORITY);
         String type = modsElement.getAttribute("type");
-        String code = MCRMODSClassificationSupport.getText(modsElement).trim();
+        String code = getText(modsElement).trim();
         return getAuthorityInfo(authority, type, code);
     }
 

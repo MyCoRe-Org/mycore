@@ -27,7 +27,6 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRObject;
 
@@ -76,7 +75,7 @@ public abstract class MCRGeneratorClassificationMapperBase implements MCRClassif
 
         removeExistingMappings(object);
 
-        MCRCategoryDAO dao = MCRCategoryDAOFactory.obtainInstance();
+        MCRCategoryDAO dao = MCRCategoryDAO.obtainInstance();
 
         Set<Mapping> mappings = new LinkedHashSet<>();
         generators.forEach((name, generator) -> {

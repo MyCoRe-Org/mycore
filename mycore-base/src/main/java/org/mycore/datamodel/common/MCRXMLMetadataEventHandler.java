@@ -129,7 +129,7 @@ public class MCRXMLMetadataEventHandler extends MCREventHandlerBase {
     }
 
     private void handleStoreEvent(MCREvent evt, MCRBase obj) {
-        MCRXMLMetadataManager manager = MCRXMLMetadataManager.getInstance();
+        MCRXMLMetadataManager manager = MCRXMLMetadataManager.obtainInstance();
         MCREvent.EventType eventType = evt.getEventType();
         MCRObjectID id = obj.getId();
         try {

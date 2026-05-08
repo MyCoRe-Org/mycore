@@ -18,6 +18,8 @@
 
 package org.mycore.solr.index.handlers;
 
+import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -32,14 +34,12 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.solr.MCRSolrCoreType;
+import org.mycore.solr.MCRSolrIndexType;
 import org.mycore.solr.index.MCRSolrIndexHandler;
 import org.mycore.solr.index.file.MCRSolrPathDocumentFactory;
 import org.mycore.solr.index.handlers.document.MCRSolrInputDocumentHandler;
 import org.mycore.solr.index.handlers.stream.MCRSolrFileIndexHandler;
 import org.mycore.solr.index.strategy.MCRSolrIndexStrategyManager;
-
-import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -49,11 +49,9 @@ public abstract class MCRSolrIndexHandlerFactory {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCRSolrIndexHandlerFactory SHARED_INSTANCE = MCRConfiguration2
-        .getInstanceOfOrThrow(MCRSolrIndexHandlerFactory.class, SOLR_CONFIG_PREFIX + "IndexHandler.Factory");
-
     public static MCRSolrIndexHandlerFactory obtainInstance() {
-        return SHARED_INSTANCE;
+        return MCRConfiguration2.getInstanceOfOrThrow(MCRSolrIndexHandlerFactory.class,
+            SOLR_CONFIG_PREFIX + "IndexHandler.Factory");
     }
 
     public abstract MCRSolrIndexHandler getIndexHandler(MCRContent content, MCRObjectID id);
@@ -62,12 +60,12 @@ public abstract class MCRSolrIndexHandlerFactory {
 
     public MCRSolrIndexHandler getIndexHandler(MCRObjectID... ids) throws IOException {
         if (ids.length == 1) {
-            MCRContent content = MCRXMLMetadataManager.getInstance().retrieveContent(ids[0]);
+            MCRContent content = MCRXMLMetadataManager.obtainInstance().retrieveContent(ids[0]);
             return getIndexHandler(content, ids[0]);
         }
         Map<MCRObjectID, MCRContent> contentMap = new HashMap<>();
         for (MCRObjectID id : ids) {
-            MCRContent content = MCRXMLMetadataManager.getInstance().retrieveContent(id);
+            MCRContent content = MCRXMLMetadataManager.obtainInstance().retrieveContent(id);
             contentMap.put(id, content);
         }
         return getIndexHandler(contentMap);
@@ -106,8 +104,8 @@ public abstract class MCRSolrIndexHandlerFactory {
         } else {
             indexHandler = new MCRSolrInputDocumentHandler(
                 () -> MCRSolrPathDocumentFactory.obtainInstance().getDocument(file, attrs), file.toString(),
-                MCRSolrCoreType.MAIN);
-            indexHandler.setCoreType(MCRSolrCoreType.MAIN);
+                MCRSolrIndexType.MAIN);
+            indexHandler.setIndexType(MCRSolrIndexType.MAIN);
         }
         long end = System.currentTimeMillis();
         indexHandler.getStatistic().addTime(end - start);

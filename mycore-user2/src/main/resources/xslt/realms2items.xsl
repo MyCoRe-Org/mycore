@@ -2,7 +2,10 @@
 
 <!-- Converts realms.xml to a list of items for use in user-editor.xml form -->
 
-<xsl:stylesheet version="3.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" exclude-result-prefixes="xsl">
+<xsl:stylesheet version="3.0"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  exclude-result-prefixes="#all">
+
   <xsl:output indent="no" method="xml" encoding="UTF-8" />
 
   <xsl:template match="/realms">

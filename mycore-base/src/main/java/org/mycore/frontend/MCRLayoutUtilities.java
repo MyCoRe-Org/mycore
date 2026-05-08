@@ -81,9 +81,8 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListenableFutureTask;
 
 /**
- *
- * Xalan extention for navigation.xsl
- *
+ * This class provides utility methods for navigation.xml, including access
+ * verification and navigation handling.
  */
 public class MCRLayoutUtilities {
     // strategies for access verification

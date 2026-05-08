@@ -22,7 +22,6 @@ import java.io.File;
 import java.net.URL;
 import java.security.CodeSource;
 import java.security.ProtectionDomain;
-import java.util.Locale;
 
 import org.apache.logging.log4j.LogManager;
 import org.mycore.common.MCRUtils;
@@ -90,19 +89,15 @@ public class MCRConfigurationDir {
             return new File(mcrHome);
         }
         //Windows Vista onwards:
-        String localAppData = isWindows() ? System.getenv("LOCALAPPDATA") : null;
+        String localAppData = MCRUtils.isWindowsOS() ? System.getenv("LOCALAPPDATA") : null;
         //on every other platform
         String userDir = System.getProperty("user.home");
         String parentDir = localAppData != null ? localAppData : userDir;
         return new File(parentDir, getConfigBaseName());
     }
 
-    private static boolean isWindows() {
-        return System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("windows");
-    }
-
     private static String getConfigBaseName() {
-        return isWindows() ? "MyCoRe" : ".mycore";
+        return MCRUtils.isWindowsOS() ? "MyCoRe" : ".mycore";
     }
 
     private static String getSource(Class<MCRConfigurationDir> clazz) {

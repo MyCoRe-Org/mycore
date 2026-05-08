@@ -18,14 +18,14 @@
 
 package org.mycore.mods.classification;
 
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.w3c.dom.Element;
 
 /**
  * Authority information that is a static mapping for mods:typeOfResource. This element is always mapped to a
  * classification with the ID typeOfResource.
- * 
+ *
  * @author Frank Lützenkirchen
  */
 class MCRTypeOfResource extends MCRAuthorityInfo {
@@ -53,7 +53,7 @@ class MCRTypeOfResource extends MCRAuthorityInfo {
             return null;
         }
         String name = modsElement.getLocalName();
-        String code = MCRMODSClassificationSupport.getText(modsElement).trim();
+        String code = getText(modsElement).trim();
         return getTypeOfResource(name, code);
     }
 
@@ -98,6 +98,6 @@ class MCRTypeOfResource extends MCRAuthorityInfo {
     }
 
     public static boolean isClassificationPresent() {
-        return MCRCategoryDAOFactory.obtainInstance().exist(new MCRCategoryID(TYPE_OF_RESOURCE));
+        return MCRCategoryDAO.obtainInstance().exist(new MCRCategoryID(TYPE_OF_RESOURCE));
     }
 }

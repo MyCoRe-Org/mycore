@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Attribute;
@@ -126,14 +127,14 @@ public class MCRNeo4JParser implements MCRNeo4JMetaParser {
                         final String lang = entries.getKey();
                         final List<String> text = entries.getValue();
                         final String key;
-                        if (StringUtils.equals(lang, LANG_UNSET)) {
+                        if (Strings.CS.equals(lang, LANG_UNSET)) {
                             key = k;
                         } else {
                             key = k + "_" + lang;
                         }
 
                         final String cleaned = text.stream()
-                            .map(value -> StringUtils.replace(value, "'", ""))
+                            .map(value -> Strings.CS.replace(value, "'", ""))
                             .collect(Collectors.joining("', '", "['", "']"));
                         sbNode.append(", a.").append(key).append('=').append(cleaned);
                     }

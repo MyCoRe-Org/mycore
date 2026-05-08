@@ -155,7 +155,7 @@ public class MCRRestDerivates {
     @XmlElementWrapper(name = MCRObjectStructure.ELEMENT_DERIVATE_OBJECTS)
     public Response listDerivates()
         throws IOException {
-        long modified = MCRXMLMetadataManager.getInstance().getLastModified(mcrId);
+        long modified = MCRXMLMetadataManager.obtainInstance().getLastModified(mcrId);
         if (modified < 0) {
             throw MCRErrorResponse.ofStatusCode(Response.Status.NOT_FOUND.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCROBJECT_NOT_FOUND)
@@ -189,13 +189,13 @@ public class MCRRestDerivates {
     public Response getDerivate(@Parameter(example = "mir_derivate_00004711") @PathParam(PARAM_DERID) MCRObjectID derid)
         throws IOException {
         validateDerivateRelation(mcrId, derid);
-        long modified = MCRXMLMetadataManager.getInstance().getLastModified(derid);
+        long modified = MCRXMLMetadataManager.obtainInstance().getLastModified(derid);
         Date lastModified = new Date(modified);
         Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request, lastModified);
         if (cachedResponse.isPresent()) {
             return cachedResponse.get();
         }
-        MCRContent mcrContent = MCRXMLMetadataManager.getInstance().retrieveContent(derid);
+        MCRContent mcrContent = MCRXMLMetadataManager.obtainInstance().retrieveContent(derid);
         return Response.ok()
             .entity(mcrContent,
                 new Annotation[] { MCRParams.Factory

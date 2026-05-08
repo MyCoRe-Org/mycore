@@ -51,7 +51,6 @@ import org.mycore.datamodel.classifications2.MCRCategLinkReference_;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRCategoryLink;
 
@@ -81,7 +80,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         MCRConfiguration2.getInt("MCR.Classifications.LinkServiceImpl.CategCache.Size").orElse(1000),
         "MCRCategLinkService category cache");
 
-    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.obtainInstance();
+    private static final MCRCategoryDAO DAO = MCRCategoryDAO.obtainInstance();
 
     @Override
     public Map<MCRCategoryID, Number> countLinks(MCRCategory parent, boolean childrenOnly) {
@@ -280,7 +279,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
             return checkLinksForClassifications();
         }
 
-        MCRCategoryImpl rootImpl = (MCRCategoryImpl) MCRCategoryDAOFactory.obtainInstance()
+        MCRCategoryImpl rootImpl = (MCRCategoryImpl) MCRCategoryDAO.obtainInstance()
             .getCategory(category.getRoot().getId(), -1);
         if (rootImpl == null) {
             //Category does not exist, so it has no links

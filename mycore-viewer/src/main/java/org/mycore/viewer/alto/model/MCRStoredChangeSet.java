@@ -22,10 +22,13 @@ import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import jakarta.persistence.Access;
+import jakarta.persistence.AccessType;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Transient;
 
 @MappedSuperclass
+@Access(AccessType.FIELD)
 public class MCRStoredChangeSet extends MCRStoredAltoChangeSetMetadata {
 
     @Transient

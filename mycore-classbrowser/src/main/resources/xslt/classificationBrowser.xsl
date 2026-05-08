@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <!--
   XSL to include a classification browser into any MyCoReWebPage.
@@ -26,8 +26,10 @@
     />
  -->
 
-<xsl:stylesheet version="3.0" xmlns:mcrproperty="http://www.mycore.de/xslt/property"
-                xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet version="3.0"
+  xmlns:mcrproperty="http://www.mycore.de/xslt/property"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  exclude-result-prefixes="#all">
 
   <xsl:param name="MCR.Ajax.LoadingImage" />
   <xsl:param name="MCR.classbrowser.Servlet" select="'ClassificationBrowser'"/>

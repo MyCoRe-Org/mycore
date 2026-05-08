@@ -82,7 +82,7 @@ import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.content.MCRStringContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
 import org.mycore.datamodel.common.MCRActiveLinkException;
@@ -410,11 +410,11 @@ public class MCRRestObjects {
     @Operation(
         summary = "Returns MCRObject with the given " + PARAM_MCRID + ".",
         tags = MCRRestUtils.TAG_MYCORE_OBJECT)
-    public Response getObject(@Parameter(example = "mir_mods_00004711") @PathParam(PARAM_MCRID) MCRObjectID id)
-        throws IOException {
+    public Response getObject(@Parameter(example = "mir_mods_00004711") @PathParam(PARAM_MCRID) MCRObjectID id,
+        @QueryParam("expanded") Boolean expandedParam) throws IOException {
         long modified;
         try {
-            modified = MCRXMLMetadataManager.getInstance().getLastModified(id);
+            modified = MCRXMLMetadataManager.obtainInstance().getLastModified(id);
         } catch (IOException io) {
             throw MCRErrorResponse.ofStatusCode(Response.Status.NOT_FOUND.getStatusCode())
                 .withCause(io)
@@ -427,8 +427,9 @@ public class MCRRestObjects {
         if (cachedResponse.isPresent()) {
             return cachedResponse.get();
         }
-
-        MCRContent mcrContent = new MCRBaseContent(MCRMetadataManager.retrieveMCRExpandedObject(id));
+        boolean expanded = Optional.ofNullable(expandedParam).orElse(true);
+        MCRContent mcrContent = new MCRBaseContent(
+            expanded ? MCRMetadataManager.retrieveMCRExpandedObject(id) : MCRMetadataManager.retrieveMCRObject(id));
         return Response.ok()
             .entity(mcrContent,
                 new Annotation[] { MCRParams.Factory
@@ -445,9 +446,9 @@ public class MCRRestObjects {
     @Operation(
         summary = "Returns metadata section MCRObject with the given " + PARAM_MCRID + ".",
         tags = MCRRestUtils.TAG_MYCORE_OBJECT)
-    public Response getObjectMetadata(@Parameter(example = "mir_mods_00004712") @PathParam(PARAM_MCRID) MCRObjectID id)
-        throws IOException {
-        long modified = MCRXMLMetadataManager.getInstance().getLastModified(id);
+    public Response getObjectMetadata(@Parameter(example = "mir_mods_00004712") @PathParam(PARAM_MCRID) MCRObjectID id,
+        @QueryParam("expanded") Boolean expandedParm) throws IOException {
+        long modified = MCRXMLMetadataManager.obtainInstance().getLastModified(id);
         if (modified < 0) {
             throw new NotFoundException("MCRObject " + id + " not found");
         }
@@ -456,7 +457,9 @@ public class MCRRestObjects {
         if (cachedResponse.isPresent()) {
             return cachedResponse.get();
         }
-        MCRObject mcrObj = MCRMetadataManager.retrieveMCRExpandedObject(id);
+        boolean expanded = Optional.ofNullable(expandedParm).orElse(true);
+        MCRObject mcrObj =
+            expanded ? MCRMetadataManager.retrieveMCRExpandedObject(id) : MCRMetadataManager.retrieveMCRObject(id);
         MCRContent mcrContent = new MCRJDOMContent(mcrObj.getMetadata().createXML());
         return Response.ok()
             .entity(mcrContent,
@@ -566,7 +569,7 @@ public class MCRRestObjects {
     @MCRRestRequiredPermission(MCRAccessManager.PERMISSION_HISTORY_VIEW)
     public Response getObjectVersions(@Parameter(example = "mir_mods_00004713") @PathParam(PARAM_MCRID) MCRObjectID id)
         throws IOException {
-        long modified = MCRXMLMetadataManager.getInstance().getLastModified(id);
+        long modified = MCRXMLMetadataManager.obtainInstance().getLastModified(id);
         if (modified < 0) {
             throw MCRErrorResponse.ofStatusCode(Response.Status.NOT_FOUND.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCROBJECT_NOT_FOUND)
@@ -578,11 +581,11 @@ public class MCRRestObjects {
         if (cachedResponse.isPresent()) {
             return cachedResponse.get();
         }
-        List<? extends MCRAbstractMetadataVersion<?>> versions = MCRXMLMetadataManager.getInstance().listRevisions(id);
+        List<? extends MCRAbstractMetadataVersion<?>> versions =
+            MCRXMLMetadataManager.obtainInstance().listRevisions(id);
         return Response.ok()
             .entity(new GenericEntity<>(versions, TypeUtils.parameterize(List.class, MCRAbstractMetadataVersion.class)))
-            .lastModified(lastModified)
-            .build();
+            .lastModified(lastModified).build();
     }
 
     @GET
@@ -598,7 +601,7 @@ public class MCRRestObjects {
     public Response getObjectVersion(@Parameter(example = "mir_mods_00004714") @PathParam(PARAM_MCRID) MCRObjectID id,
         @PathParam("revision") String revision)
         throws IOException {
-        MCRContent mcrContent = MCRXMLMetadataManager.getInstance().retrieveContent(id, revision);
+        MCRContent mcrContent = MCRXMLMetadataManager.obtainInstance().retrieveContent(id, revision);
         if (mcrContent == null) {
             throw MCRErrorResponse.ofStatusCode(Response.Status.NOT_FOUND.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCROBJECT_REVISION_NOT_FOUND)
@@ -823,7 +826,7 @@ public class MCRRestObjects {
         if (!state.isEmpty()) {
             MCRCategoryID categState = new MCRCategoryID(
                 MCRConfiguration2.getString("MCR.Metadata.Service.State.Classification.ID").orElse("state"), state);
-            if (!MCRCategoryDAOFactory.obtainInstance().exist(categState)) {
+            if (!MCRCategoryDAO.obtainInstance().exist(categState)) {
                 throw MCRErrorResponse.ofStatusCode(Response.Status.BAD_REQUEST.getStatusCode())
                     .withErrorCode(MCRErrorCodeConstants.MCROBJECT_INVALID_STATE)
                     .withMessage("Category " + categState + " not found")

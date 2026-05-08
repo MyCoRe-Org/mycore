@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="3.0" xmlns:mods="http://www.loc.gov/mods/v3" 
-  xmlns:xlink="http://www.w3.org/1999/xlink"
+<xsl:stylesheet version="3.0"
   xmlns:mcracl="http://www.mycore.de/xslt/acl"
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-  
-  <xsl:param name="WebApplicationBaseURL" />
-  <!-- Duplicate: <xsl:param name="ServletsBaseURL" select="''" /> -->
+  xmlns:mcrderivate="http://www.mycore.de/xslt/derivate"
+  xmlns:mods="http://www.loc.gov/mods/v3"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  exclude-result-prefixes="#all">
   
   <xsl:variable name="relacode" select="document('resource:relacode.xml')/relacode" />
   <xsl:key name="relacode" match="code" use="@key" />
 
   <xsl:variable name="ifs">
-    <xsl:for-each select="mycoreobject/structure/derobjects/derobject[mcracl:check-permission(@xlink:href,'read')]">
+    <xsl:for-each select="mycoreobject/structure/derobjects/derobject[mcracl:check-permission(@xlink:href,'read') and mcrderivate:is-display-enabled(@xlink:href,'enhance')]">
       <der id="{@xlink:href}">
         <xsl:copy-of select="document(concat('xslStyle:mcr_directory-recursive:ifs:',@xlink:href,'/'))" />
       </der>

@@ -155,10 +155,10 @@ public class MCROCFLJournal<E> implements Closeable {
         }
 
         // 3. Atomically replace the old journal with the new one
+        this.close();
         Files.move(tempJournalFile, journalFile, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
 
         // 4. Re-open the writer on the new, compacted journal file
-        this.close();
         this.journalWriter = Files.newBufferedWriter(journalFile, StandardCharsets.UTF_8,
             StandardOpenOption.CREATE, StandardOpenOption.APPEND);
     }

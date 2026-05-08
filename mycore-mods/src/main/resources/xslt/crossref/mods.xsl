@@ -1,8 +1,9 @@
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:mods="http://www.loc.gov/mods/v3"
-                xmlns:cr="http://www.crossref.org/schema/4.4.1"
-                version="3.0"
->
+<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet version="3.0"
+  xmlns:cr="http://www.crossref.org/schema/4.4.1"
+  xmlns:mods="http://www.loc.gov/mods/v3"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  exclude-result-prefixes="#all">
 
   <xsl:include href="crossref-helper-4.4.1.xsl"/>
   <xsl:include href="mods2journal.xsl"/>

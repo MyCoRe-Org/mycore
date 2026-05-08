@@ -18,9 +18,10 @@
 
 package org.mycore.common.events;
 
+import org.mycore.common.MCRScopedSession;
+import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.common.MCRUserInformation;
 
 /**
  * A EventHandler which runs as {@link MCRSystemUserInformation#JANITOR}.
@@ -29,15 +30,12 @@ public class MCRJanitorEventHandlerBase extends MCREventHandlerBase {
 
     @Override
     public void doHandleEvent(MCREvent evt) {
-        MCRUserInformation prevUserInformation = MCRSessionMgr.getCurrentSession().getUserInformation();
-        try {
-            MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.GUEST);
-            MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.JANITOR);
-            super.doHandleEvent(evt);
-        } finally {
-            MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.GUEST);
-            MCRSessionMgr.getCurrentSession().setUserInformation(prevUserInformation);
+        MCRSession session = MCRSessionMgr.getCurrentSession();
+        if (!(session instanceof MCRScopedSession scopedSession)) {
+            throw new IllegalStateException("require an instance of MCRScopedSession");
         }
+        scopedSession.doAs(new MCRScopedSession.ScopedValues(MCRSystemUserInformation.JANITOR),
+            () -> super.doHandleEvent(evt));
     }
 
 }

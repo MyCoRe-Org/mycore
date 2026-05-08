@@ -57,15 +57,12 @@ public record MCRURLQueryParameter(String name, String value) {
      */
     public static MCRURLQueryParameter ofEncodedString(String encodedString) {
         String[] parts = encodedString.split("=");
-        switch (parts.length) {
-            case 1:
-                return new MCRURLQueryParameter(URLDecoder.decode(parts[0], StandardCharsets.UTF_8), "");
-            case 2:
-                return new MCRURLQueryParameter(URLDecoder.decode(parts[0], StandardCharsets.UTF_8),
+        return switch (parts.length) {
+            case 1 -> new MCRURLQueryParameter(URLDecoder.decode(parts[0], StandardCharsets.UTF_8), "");
+            case 2 -> new MCRURLQueryParameter(URLDecoder.decode(parts[0], StandardCharsets.UTF_8),
                     URLDecoder.decode(parts[1], StandardCharsets.UTF_8));
-            default:
-                throw new IllegalArgumentException("Could not parse parameter: " + encodedString);
-        }
+            default -> throw new IllegalArgumentException("Could not parse parameter: " + encodedString);
+        };
     }
 
     /**

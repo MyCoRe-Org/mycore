@@ -21,6 +21,7 @@ package org.mycore.frontend.classeditor.resources;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.List;
@@ -40,11 +41,12 @@ import org.mycore.common.MCRJSONManager;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.datamodel.classifications2.MCRCategory;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRXMLMetadataEventHandler;
 import org.mycore.datamodel.ifs2.MCRMetadataStore;
 import org.mycore.datamodel.ifs2.MCRStoreManager;
+import org.mycore.datamodel.ifs2.test.MCRJimfsTestStoreConfig;
 import org.mycore.frontend.classeditor.json.MCRJSONCategory;
 import org.mycore.frontend.classeditor.mocks.CategoryDAOMock;
 import org.mycore.frontend.classeditor.mocks.CategoryLinkServiceMock;
@@ -87,18 +89,23 @@ public class MCRClassificationEditorResourceTest {
             MCRSessionHookFilter.class,
             MultiPartFeature.class));
 
+        String name = MCRClassificationEditorResourceTest.class.getSimpleName();
         try {
-            MCRStoreManager.createStore("ClasseditorTempStore", MCRMetadataStore.class);
-        } catch (ReflectiveOperationException e) {
-            LOGGER.error("while creating store ClasseditorTempStore", e);
-        }
+            MCRStoreManager.computeStoreIfAbsent(name, () -> {
+                try {
+                    MCRJimfsTestStoreConfig config = new MCRJimfsTestStoreConfig(name);
+                    return MCRStoreManager.buildStore(config, MCRMetadataStore.class);
+                } catch (ReflectiveOperationException | IOException e) {
+                    LOGGER.error("Error while creating store: ", e);
+                    fail();
+                    return null;
+                }
+            });
 
-        try {
             /* its important to set the daomock via this method because the factory could be called
              * by a previous test. In this case a class cast exception occur because MCRCategoryDAOImpl
              * was loaded. */
-            MCRCategoryDAOFactory.set(CategoryDAOMock.class);
-            categDAO = (CategoryDAOMock) MCRCategoryDAOFactory.obtainInstance();
+            categDAO = (CategoryDAOMock) MCRCategoryDAO.obtainInstance();
             categDAO.init();
         } catch (Exception exc) {
             fail();

@@ -29,24 +29,23 @@ import org.mycore.access.facts.fact.MCRCategoryIDFact;
 import org.mycore.access.facts.fact.MCRObjectIDFact;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
-import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * This implementation checks if the given object belongs to a certain classification entry.
- * 
+ *
  * As default the object is read from the fact "objid".
  * Using the attribute 'idfact' another fact containing an object id can be specified
- * 
+ *
  * Example:
  * &lt;category idfact='the_other_object' fact='published'&gt;state:published&lt;/category&gt;
- * 
+ *
  * This rule will check if the object already stored as fact 'the_other_object' belongs to
  * the category 'state:published'.
  * If true, a fact 'published' will be stored in the facts holder.
- * 
- * 
+ *
+ *
  * @author Robert Stephan
  *
  */
@@ -72,7 +71,7 @@ public class MCRCategoryCondition extends MCRAbstractFactCondition<MCRCategoryID
             MCRObjectID objectID = idc.get().getValue();
             if (objectID != null) {
                 MCRCategoryID categoryID = MCRCategoryID.ofString(getTerm());
-                MCRCategLinkService linkService = MCRCategLinkServiceFactory.obtainInstance();
+                MCRCategLinkService linkService = MCRCategLinkService.obtainInstance();
                 if (linkService.isInCategory(new MCRCategLinkReference(objectID), categoryID)) {
                     MCRCategoryIDFact result = new MCRCategoryIDFact(getFactName(), getTerm());
                     result.setValue(categoryID);

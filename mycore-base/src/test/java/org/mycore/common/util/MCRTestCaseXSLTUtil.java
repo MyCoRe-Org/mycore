@@ -28,7 +28,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Content;
@@ -95,6 +95,21 @@ public class MCRTestCaseXSLTUtil {
     }
 
     /**
+     * Transforms a dummy XML document using the given XSL stylesheet from the classpath.
+     * <p>
+     * This is a convenience method that internally creates a default test XML document
+     * (via {@code prepareTestDocument("dummy")}) and delegates to the main transform method.
+     *
+     * @param xsl the XSL stylesheet file used for parsing
+     * @param parameters the XSL transformation parameters
+     * @return the resulting transformed XML document
+     * @throws TransformerException if the XSL transformation fails
+     */
+    public static Document transform(String xsl, Map<String, Object> parameters) throws TransformerException {
+        return transform(prepareTestDocument("dummy"), xsl, parameters);
+    }
+
+    /**
      * Transforms the XML document using the given XSL stylesheet from classpath with the given parameters.
      *
      * @param xml        the XML document to parse
@@ -129,7 +144,7 @@ public class MCRTestCaseXSLTUtil {
     private static void log(Message message) {
         // error codes from https://www.w3.org/2005/xqt-errors/:
         // XTMM9000, XTMM9001 are messages; other codes are warnings/errors
-        if (StringUtils.equalsAny(message.getErrorCode().getLocalName(), ERROR_XTMM9000, ERROR_XTMM9001)) {
+        if (Strings.CS.equalsAny(message.getErrorCode().getLocalName(), ERROR_XTMM9000, ERROR_XTMM9001)) {
             LOGGER.info(message.getContent());
         } else {
             LOGGER.error(message.getContent());

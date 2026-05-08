@@ -26,7 +26,6 @@ import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.classifications2.mapping.MCRConditionalXMappingEvaluator.Condition;
@@ -51,7 +50,7 @@ public final class MCRMODSParentGenreClassificationMappingCondition implements C
 
     public MCRMODSParentGenreClassificationMappingCondition() {
 
-        MCRCategoryDAO dao = MCRCategoryDAOFactory.obtainInstance();
+        MCRCategoryDAO dao = MCRCategoryDAO.obtainInstance();
         MCRCategory genresCategory = dao.getRootCategory(new MCRCategoryID("mir_genres"), 0);
 
         if (genresCategory == null) {
