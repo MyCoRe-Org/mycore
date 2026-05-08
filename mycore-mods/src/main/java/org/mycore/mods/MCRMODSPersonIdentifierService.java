@@ -51,8 +51,6 @@ public class MCRMODSPersonIdentifierService implements MCRLegalEntityService {
 
     public static final String MODSPERSON_ATTR_NAME = "id_modsperson";
 
-    public static final String USERID = "userid";
-
     public static final String MODS_NAME = "name";
 
     public static final String MODS_NAMEIDENTIFIER = "nameIdentifier";
@@ -135,7 +133,7 @@ public class MCRMODSPersonIdentifierService implements MCRLegalEntityService {
      * @return a nullable Optional that might contain a modsperson
      */
     private Optional<MCRObject> findModspersonByUsername(MCRIdentifier userId) {
-        if (userId == null || !USERID.equals(userId.getType())) {
+        if (userId == null || !MCRIdentifier.USER_ID_TYPE.equals(userId.getType())) {
             return Optional.empty();
         }
         MCRUser user = MCRUserManager.getUser(userId.getValue());

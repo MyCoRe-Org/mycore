@@ -76,7 +76,7 @@ public class MCRUserIdentifierService implements MCRLegalEntityService {
         if (userId == null) {
             return Optional.empty();
         }
-        if (!"userid".equals(userId.getType())) {
+        if (!MCRIdentifier.USER_ID_TYPE.equals(userId.getType())) {
             return Optional.empty();
         }
         MCRUser user = MCRUserManager.getUser(userId.getValue());

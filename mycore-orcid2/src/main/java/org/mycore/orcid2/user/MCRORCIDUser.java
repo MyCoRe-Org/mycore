@@ -69,7 +69,7 @@ public class MCRORCIDUser {
     /**
      * ORCID iD user attribute name.
      */
-    public static final String ATTR_ORCID_ID = ATTR_ID_PREFIX + "orcid";
+    public static final String ATTR_ORCID_ID = ATTR_ID_PREFIX + MCRIdentifier.ORCID_ID_TYPE;
 
     private final MCRUser user;
 
@@ -114,8 +114,8 @@ public class MCRORCIDUser {
         if (!MCRORCIDValidationHelper.validateORCID(orcid)) {
             throw new MCRORCIDException("Invalid ORCID iD");
         }
-        final MCRIdentifier newOrcid = new MCRIdentifier("orcid", orcid);
-        final MCRIdentifier userid = new MCRIdentifier("userid", user.getUserID());
+        final MCRIdentifier newOrcid = new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, orcid);
+        final MCRIdentifier userid = new MCRIdentifier(MCRIdentifier.USER_ID_TYPE, user.getUserID());
 
         legalEntityService.addIdentifier(userid, newOrcid);
     }
@@ -125,9 +125,10 @@ public class MCRORCIDUser {
      * @return ORCID iDs as set
      */
     public Set<String> getORCIDs() {
-        final MCRIdentifier userid = new MCRIdentifier("userid", user.getUserID());
+        final MCRIdentifier userid = new MCRIdentifier(MCRIdentifier.USER_ID_TYPE, user.getUserID());
         Set<MCRIdentifier> orcidIdentifiers =  legalEntityService.findAllIdentifiers(userid);
-        return orcidIdentifiers.stream().filter(identifiers -> identifiers.getType().equals("orcid"))
+        return orcidIdentifiers.stream()
+            .filter(identifiers -> identifiers.getType().equals(MCRIdentifier.ORCID_ID_TYPE))
             .map(MCRIdentifier::getValue).collect(Collectors.toSet());
     }
 
@@ -246,7 +247,7 @@ public class MCRORCIDUser {
      * @return Set of MCRIdentifier
      */
     public Set<MCRIdentifier> getIdentifiers() {
-        final MCRIdentifier userId = new MCRIdentifier("userid", user.getUserID());
+        final MCRIdentifier userId = new MCRIdentifier(MCRIdentifier.USER_ID_TYPE, user.getUserID());
         return legalEntityService.findAllIdentifiers(userId);
     }
 

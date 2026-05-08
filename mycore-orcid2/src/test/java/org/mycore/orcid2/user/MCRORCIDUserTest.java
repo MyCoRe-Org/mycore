@@ -138,7 +138,7 @@ public class MCRORCIDUserTest {
         userMock.getAttributes().add(new MCRUserAttribute("id_orcid", ORCID));
         Set<MCRIdentifier> identifiers = orcidUser.getIdentifiers();
         assertEquals(Set.of(new MCRIdentifier("test", "test"),
-        new MCRIdentifier("orcid", ORCID)), identifiers);
+        new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID)), identifiers);
     }
 
     private String stripPrefix(String name) {

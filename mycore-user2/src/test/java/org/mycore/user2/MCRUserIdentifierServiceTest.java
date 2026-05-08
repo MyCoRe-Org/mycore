@@ -61,10 +61,10 @@ public class MCRUserIdentifierServiceTest {
     @Test
     public final void testFindAllIdentifiers() {
         Set<MCRIdentifier> allIdentifiers = service.findAllIdentifiers(
-            new MCRIdentifier("userid", user.getUserID()));
-        Set<MCRIdentifier> expected = Set.of(new MCRIdentifier("orcid", ORCID_1),
-            new MCRIdentifier("orcid", ORCID_2),
-            new MCRIdentifier("orcid", ORCID_3),
+            new MCRIdentifier(MCRIdentifier.USER_ID_TYPE, user.getUserID()));
+        Set<MCRIdentifier> expected = Set.of(new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_1),
+            new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_2),
+            new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_3),
             new MCRIdentifier("scopus", SCOPUS));
         assertEquals(expected, allIdentifiers);
     }
@@ -77,31 +77,31 @@ public class MCRUserIdentifierServiceTest {
         user1.getAttributes().add(new MCRUserAttribute("id_orcid", ORCID_2));
         MCRUserManager.createUser(user1);
 
-        final MCRIdentifier userid = new MCRIdentifier("userid", user1.getUserID());
+        final MCRIdentifier userid = new MCRIdentifier(MCRIdentifier.USER_ID_TYPE, user1.getUserID());
 
         Set<MCRIdentifier> allIdentifiers = service.findAllIdentifiers(userid);
         assertEquals(2, allIdentifiers.size());
 
-        service.addIdentifier(userid, new MCRIdentifier("orcid", ORCID_1)); // don't add id twice
+        service.addIdentifier(userid, new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_1)); // don't add id twice
         allIdentifiers = service.findAllIdentifiers(userid);
         assertEquals(2, allIdentifiers.size());
 
-        service.addIdentifier(userid, new MCRIdentifier("orcid", ORCID_3));
+        service.addIdentifier(userid, new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_3));
         allIdentifiers = service.findAllIdentifiers(userid);
         assertEquals(3, allIdentifiers.size());
-        Set<MCRIdentifier> expected = Set.of(new MCRIdentifier("orcid", ORCID_1),
-            new MCRIdentifier("orcid", ORCID_2),
-            new MCRIdentifier("orcid", ORCID_3));
+        Set<MCRIdentifier> expected = Set.of(new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_1),
+            new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_2),
+            new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_3));
         assertEquals(expected, allIdentifiers);
     }
 
     @Test
     public final void testNoUser() {
-        MCRIdentifier nonameUserid = new MCRIdentifier("userid", "noname");
+        MCRIdentifier nonameUserid = new MCRIdentifier(MCRIdentifier.USER_ID_TYPE, "noname");
         Set<MCRIdentifier> allIdentifiers = service.findAllIdentifiers(nonameUserid);
         assertEquals(0, allIdentifiers.size());
 
-        service.addIdentifier(nonameUserid, new MCRIdentifier("orcid", ORCID_1));
+        service.addIdentifier(nonameUserid, new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_1));
         allIdentifiers = service.findAllIdentifiers(nonameUserid);
         assertEquals(0, allIdentifiers.size());
     }
