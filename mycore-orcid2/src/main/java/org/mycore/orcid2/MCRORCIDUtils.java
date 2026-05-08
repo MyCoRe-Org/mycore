@@ -38,10 +38,10 @@ import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
 import org.mycore.common.digest.MCRMD5Digest;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.legalentity.MCRIdentifier;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.orcid2.exception.MCRORCIDException;
-import org.mycore.datamodel.legalentity.MCRIdentifier;
 
 /**
  * Provides utility methods.
