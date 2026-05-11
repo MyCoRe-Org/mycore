@@ -45,6 +45,8 @@ import org.mycore.common.config.instantiator.MCRInstanceName.Suffix;
  * <p>
  * Each configuration (top level or nested) keeps an unmodified  reference to the properties used to create
  * the top level configuration.
+ * 
+ * @param <S> The intended super class of the instantiated object.
  */
 public final class MCRInstanceConfiguration<S> {
 
@@ -199,12 +201,12 @@ public final class MCRInstanceConfiguration<S> {
      */
     public static <T> MCRInstanceConfiguration<T> ofName(Class<T> superClass, MCRInstanceName name,
         Map<String, String> properties, Set<Option> options) {
-        Class<? extends T> valueClass = getValueClass(superClass, name, name.actual(), properties, options);
+        Class<? extends T> valueClass = resolveValueClass(superClass, name, name.actual(), properties, options);
         Map<String, String> reducedProperties = reduceProperties(name, name.canonical(), properties);
         return new MCRInstanceConfiguration<>(superClass, valueClass, name, reducedProperties, properties);
     }
 
-    private static <S> Class<? extends S> getValueClass(Class<S> superClass, MCRInstanceName name,
+    private static <S> Class<? extends S> resolveValueClass(Class<S> superClass, MCRInstanceName name,
         String classProperty, Map<String, String> properties, Set<Option> options) {
         String className = properties.get(classProperty);
 
@@ -308,7 +310,7 @@ public final class MCRInstanceConfiguration<S> {
         MCRInstanceName nestedName = name.subName(prefix);
         String classProperty = nestedName.suffix().appendTo(prefix);
         Class<? extends N> valueClass =
-            getValueClass(superClass, nestedName, classProperty, properties, Options.IMPLICIT);
+            resolveValueClass(superClass, nestedName, classProperty, properties, Options.IMPLICIT);
         Map<String, String> reducedProperties = reduceProperties(nestedName, prefix, properties);
         return new MCRInstanceConfiguration<>(superClass, valueClass, nestedName, reducedProperties, fullProperties);
     }
@@ -459,13 +461,17 @@ public final class MCRInstanceConfiguration<S> {
         return nestedConfigurationMap;
     }
 
+    public MCRInstanceConfiguration<S> copy() {
+        return new MCRInstanceConfiguration<>(superClass, valueClass, name, new HashMap<>(properties), fullProperties);
+    }
+
     @Override
     public String toString() {
         return "MCRInstanceConfiguration {" +
             "superClass=" + superClass.getName() + ", " +
-            "valueClass=" + valueClass.getName() + ", " +
+            "valueClass=" + (valueClass == null ? "null" : valueClass.getName()) + ", " +
             "name=" + name + ", " +
-            "fullProperties=" + properties + ", " +
+            "properties=" + properties + ", " +
             "#fullProperties=" + fullProperties.size() + "}";
     }
 

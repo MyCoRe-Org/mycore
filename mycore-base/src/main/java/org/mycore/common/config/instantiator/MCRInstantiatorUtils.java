@@ -75,16 +75,11 @@ public final class MCRInstantiatorUtils {
             }
         }
 
-        Class<?> className = configuration.valueClass();
-        if (className == null) {
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("[CLEAN-UP] Ignoring {} {} and all sub-properties (no or empty class name)", description,
-                    property);
-            }
-            return null;
-        }
-
         if (!configuration.instantiatable()) {
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("[CLEAN-UP] Ignoring {} {} and all sub-properties (no or empty class name)",
+                    description, property);
+            }
             return null;
         }
 

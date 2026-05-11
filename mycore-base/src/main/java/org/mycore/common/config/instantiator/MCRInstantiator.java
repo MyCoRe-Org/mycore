@@ -32,12 +32,12 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
 import java.util.function.ToIntFunction;
 import java.util.stream.Stream;
 
+import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRFactory;
@@ -53,6 +53,11 @@ import org.mycore.common.config.instantiator.injectable.MCRMethodInjectable;
 import org.mycore.common.config.instantiator.source.MCRSource;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
+import com.google.common.base.Throwables;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.util.concurrent.UncheckedExecutionException;
+
 /**
  * A {@link MCRInstantiator} creates configured instances, by interpreting supported annotations on fields and methods,
  * using information from these annotations to select values, from the configuration properties, and injecting thees
@@ -63,7 +68,12 @@ import org.mycore.common.config.instantiator.target.MCRTarget;
     "PMD.MCR.Singleton.MethodReturnType", "PMD.SingletonClassReturningNewInstance" })
 final class MCRInstantiator {
 
-    private static final ConcurrentMap<Class<?>, MCRClassInfo<?>> INFOS = new ConcurrentHashMap<>();
+    public static final int INFOS_CACHE_SIZE = 128;
+
+    private static final Cache<Class<?>, MCRClassInfo<?>> INFOS = CacheBuilder.newBuilder()
+        .maximumSize(INFOS_CACHE_SIZE)
+        .softValues()
+        .build();
 
     private MCRInstantiator() {
     }
@@ -93,21 +103,26 @@ final class MCRInstantiator {
     @SuppressWarnings("unchecked")
     private static <S> S createInstanceDirectOrViaProxy(MCRInstanceConfiguration<S> configuration) {
 
-        Class<? extends S> valaueClass = configuration.valueClass();
-        MCRConfigurationProxy productAnnotation = valaueClass.getDeclaredAnnotation(MCRConfigurationProxy.class);
+        Class<? extends S> valueClass = configuration.valueClass();
+        MCRConfigurationProxy productAnnotation = valueClass.getDeclaredAnnotation(MCRConfigurationProxy.class);
 
         if (productAnnotation != null) {
             Class<Supplier<? extends S>> proxyClass = (Class<Supplier<? extends S>>) productAnnotation.proxyClass();
             return getInfo(proxyClass).createInstance(configuration).get();
         } else {
-            return getInfo(valaueClass).createInstance(configuration);
+            return getInfo(valueClass).createInstance(configuration);
         }
 
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "PMD.PreserveStackTrace" })
     private static <V> MCRClassInfo<V> getInfo(Class<V> valueClass) {
-        return (MCRClassInfo<V>) INFOS.computeIfAbsent(valueClass, MCRClassInfo::new);
+        try {
+            return (MCRClassInfo<V>) INFOS.get(valueClass, () -> new MCRClassInfo<>(valueClass));
+        } catch (ExecutionException | UncheckedExecutionException e) {
+            Throwables.throwIfUnchecked(e.getCause());
+            throw new MCRException("Failed to create class information for " + valueClass.getName(), e.getCause());
+        }
     }
 
     /**

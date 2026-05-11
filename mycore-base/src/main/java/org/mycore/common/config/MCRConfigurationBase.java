@@ -258,6 +258,10 @@ public final class MCRConfigurationBase {
         deprecatedProperties.putAll(deprecated);
         checkForDeprecatedProperties(props);
 
+        if (clear) {
+            MCRConfiguration2.clearCaches();
+        }
+
         // base properties
         if (clear) {
             getBaseProperties().clear();

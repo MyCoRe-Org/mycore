@@ -18,16 +18,14 @@
 
 package org.mycore.common.config;
 
-import static org.mycore.common.config.instantiator.MCRInstanceConfiguration.ofName;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -35,12 +33,17 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.mycore.common.MCRClassTools;
+import org.mycore.common.MCRException;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
-import org.mycore.common.config.instantiator.MCRInstanceConfiguration.Option;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration.Options;
 import org.mycore.common.config.instantiator.MCRInstanceName;
 import org.mycore.common.config.instantiator.MCRInstanceName.Suffix;
 import org.mycore.common.function.MCRTriConsumer;
+
+import com.google.common.base.Throwables;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.util.concurrent.UncheckedExecutionException;
 
 import jakarta.inject.Singleton;
 
@@ -96,6 +99,13 @@ public class MCRConfiguration2 {
 
     private static final Map<UUID, EventListener> LISTENERS = new ConcurrentHashMap<>();
 
+    private static final int CONFIGURATIONS_CACHE_SIZE = 32;
+
+    private static final Cache<ConfigurationKey, MCRInstanceConfiguration<?>> CONFIGURATIONS = CacheBuilder.newBuilder()
+        .maximumSize(CONFIGURATIONS_CACHE_SIZE)
+        .softValues()
+        .build();
+
     static Map<SingletonKey, Object> instanceHolder = new MCRConcurrentHashMap<>();
 
     public static Map<String, String> getPropertiesMap() {
@@ -124,8 +134,7 @@ public class MCRConfiguration2 {
      * @return a map of the properties as stated above
      */
     public static Map<String, String> getSubPropertiesMap(String propertyPrefix) {
-        return MCRConfigurationBase.getResolvedProperties()
-            .getAsMap()
+        return getPropertiesMap()
             .entrySet()
             .stream()
             .filter(e -> e.getKey().startsWith(propertyPrefix))
@@ -141,7 +150,7 @@ public class MCRConfiguration2 {
      * @throws MCRConfigurationException if the class can not be loaded or instantiated
      */
     public static <S> Optional<S> getInstanceOf(Class<S> superClass, String name) throws MCRConfigurationException {
-        return getInstanceOf(superClass, name, Options.NONE);
+        return createInstanceOf(superClass, name);
     }
 
     /**
@@ -154,8 +163,7 @@ public class MCRConfiguration2 {
      * or the configuration property is not set
      */
     public static <S> S getInstanceOfOrThrow(Class<S> superClass, String name) throws MCRConfigurationException {
-        return getInstanceOf(superClass, name, Options.IMPLICIT)
-            .orElseThrow(() -> createConfigurationException(name));
+        return createInstanceOf(superClass, name).orElseThrow(() -> createConfigurationException(name));
     }
 
     /**
@@ -168,7 +176,7 @@ public class MCRConfiguration2 {
      * @throws MCRConfigurationException if the class can not be loaded or instantiated
      */
     public static <S> Optional<S> getSingleInstanceOf(Class<S> superClass, String name) {
-        return getSingleInstanceOf(superClass, name, Options.NONE);
+        return createSingleInstanceOf(superClass, name);
     }
 
     /**
@@ -182,32 +190,44 @@ public class MCRConfiguration2 {
      * or the configuration property is not set
      */
     public static <S> S getSingleInstanceOfOrThrow(Class<S> superClass, String name) {
-        return getSingleInstanceOf(superClass, name, Options.IMPLICIT)
-            .orElseThrow(() -> createConfigurationException(name));
+        return createSingleInstanceOf(superClass, name).orElseThrow(() -> createConfigurationException(name));
     }
 
-    private static <S> Optional<S> getInstanceOf(Class<S> superClass, String name, Set<Option> options) {
-        if (isSingleton(superClass)) {
-            return getSingleInstanceOf(superClass, name, options);
+    private static <S> Optional<S> createInstanceOf(Class<S> superClass, String name) {
+        MCRInstanceConfiguration<S> configuration = getConfiguration(superClass, name);
+        if (!configuration.instantiatable()) {
+            return Optional.empty();
         }
-        return getInstantiableConfiguration(superClass, name, options).map(MCRInstanceConfiguration::instantiate);
+        if (isSingleton(configuration.valueClass())) {
+            return createSingleInstanceOf(configuration);
+        }
+        return Optional.of(configuration.instantiate());
+    }
 
+    private static <S> Optional<S> createSingleInstanceOf(Class<S> superClass, String name) {
+        MCRInstanceConfiguration<S> configuration = getConfiguration(superClass, name);
+        if (!configuration.instantiatable()) {
+            return Optional.empty();
+        }
+        return createSingleInstanceOf(configuration);
     }
 
     @SuppressWarnings("unchecked")
-    private static <S> Optional<S> getSingleInstanceOf(Class<S> superClass, String name, Set<Option> options) {
-        return getInstantiableConfiguration(superClass, name, options).map(
-            configuration -> {
-                SingletonKey key = new ConfigSingletonKey(name, configuration.valueClass().getName());
-                return (S) instanceHolder.computeIfAbsent(key, _ -> configuration.instantiate());
-            });
+    private static <S> Optional<S> createSingleInstanceOf(MCRInstanceConfiguration<S> configuration) {
+        SingletonKey key = new ConfigSingletonKey(configuration.name().actual(), configuration.valueClass().getName());
+        return Optional.ofNullable((S) instanceHolder.computeIfAbsent(key, _ -> configuration.instantiate()));
     }
 
-    private static <S> Optional<MCRInstanceConfiguration<S>> getInstantiableConfiguration(Class<S> superClass,
-        String name, Set<Option> options) {
-        MCRInstanceConfiguration<S> configuration = ofName(superClass, name, getPropertiesMap(), options);
-        return configuration.instantiatable() ? Optional.of(configuration) : Optional.empty();
-
+    @SuppressWarnings({ "unchecked", "PMD.PreserveStackTrace" })
+    private static <S> MCRInstanceConfiguration<S> getConfiguration(Class<S> superClass, String name) {
+        try {
+            return ((MCRInstanceConfiguration<S>) CONFIGURATIONS.get(
+                new ConfigurationKey(superClass.getName(), name),
+                () -> MCRInstanceConfiguration.ofName(superClass, name, getPropertiesMap(), Options.IMPLICIT))).copy();
+        } catch (ExecutionException | UncheckedExecutionException e) {
+            Throwables.throwIfUnchecked(e.getCause());
+            throw new MCRException("Failed to create instance configuration for " + name, e.getCause());
+        }
     }
 
     /**
@@ -416,6 +436,7 @@ public class MCRConfiguration2 {
     public static void set(final String name, String value) {
         Optional<String> oldValue = MCRConfigurationBase.getStringUnchecked(name);
         MCRConfigurationBase.set(name, value);
+        clearCaches();
         LISTENERS
             .values()
             .stream()
@@ -471,6 +492,10 @@ public class MCRConfiguration2 {
         }
     }
 
+    static void clearCaches() {
+        CONFIGURATIONS.invalidateAll();
+    }
+
     private static class EventListener {
 
         private final Predicate<String> keyPredicate;
@@ -495,7 +520,9 @@ public class MCRConfiguration2 {
     }
 
     record ConfigSingletonKey(String property, String classname) implements SingletonKey {
+    }
 
+    record ConfigurationKey(String superclassName, String name) {
     }
 
 }
