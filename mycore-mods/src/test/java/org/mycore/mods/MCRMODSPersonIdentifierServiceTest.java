@@ -126,7 +126,8 @@ public class MCRMODSPersonIdentifierServiceTest {
 
     @Test
     public final void testAddIdentifierNoModsperson() {
-        Set<MCRIdentifier> allIdentifiers = service.findAllIdentifiers(new MCRIdentifier(MCRIdentifier.USER_ID_TYPE, "noname"));
+        Set<MCRIdentifier> allIdentifiers = service.findAllIdentifiers(
+            new MCRIdentifier(MCRIdentifier.USER_ID_TYPE, "noname"));
         assertEquals(0, allIdentifiers.size());
 
         MCRUser user3 = new MCRUser("james");
