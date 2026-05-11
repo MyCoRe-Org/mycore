@@ -18,11 +18,11 @@
 
 package org.mycore.user2;
 
-import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.mycore.common.MCRException;
 import org.mycore.datamodel.legalentity.MCRIdentifier;
 import org.mycore.datamodel.legalentity.MCRLegalEntityService;
 
@@ -39,32 +39,43 @@ public class MCRUserIdentifierService implements MCRLegalEntityService {
      * Gets all {@link MCRIdentifier MCRIdentifiers} of a user by its {@link MCRUser#getUserID() user ID}.
      * @param userId the user id
      * @return all identifiers with the prefix {@link MCRUserIdentifierService#ATTR_ID_PREFIX}
-     * or an empty set. prefix is stripped
+     * or an empty set if user has none. Prefix is stripped
+     *
+     * @throws MCRException if the referenced user isn't found
      */
     @Override
     public Set<MCRIdentifier> findAllIdentifiers(MCRIdentifier userId) {
-        return findUserByUserID(userId)
-            .map(user -> user.getAttributes().stream()
-                .filter(a -> a.getName().startsWith(ATTR_ID_PREFIX))
-                .map(a -> new MCRIdentifier(stripPrefix(a.getName()), a.getValue()))
-                .collect(Collectors.toSet()))
-            .orElse(Collections.emptySet());
+        MCRUser user = findUserByUserID(userId)
+            .orElseThrow(() -> new MCRException("User not found for identifier: " + userId));
+
+        return user.getAttributes().stream()
+            .filter(a -> a.getName().startsWith(ATTR_ID_PREFIX))
+            .map(a -> new MCRIdentifier(stripPrefix(a.getName()), a.getValue()))
+            .collect(Collectors.toSet());
     }
 
     /**
      * Adds an attribute to a user by its {@link MCRUser#getUserID() user ID}.
      * @param userId the user id
      * @param attributeToAdd the attribute to add in the form of a {@link MCRIdentifier}
+     *
+     * @throws MCRException if an identifier cannot be added to the user
      */
     @Override
     public void addIdentifier(MCRIdentifier userId, MCRIdentifier attributeToAdd) {
-        findUserByUserID(userId).ifPresent(user -> {
-            MCRUserAttribute newAttribute = new MCRUserAttribute(
-                ATTR_ID_PREFIX + attributeToAdd.getType(), attributeToAdd.getValue());
-            if (user.getAttributes().add(newAttribute)) {
+        MCRUser user = findUserByUserID(userId)
+            .orElseThrow(() -> new MCRException("User not found for identifier: " + userId));
+
+        MCRUserAttribute newAttribute = new MCRUserAttribute(
+            ATTR_ID_PREFIX + attributeToAdd.getType(), attributeToAdd.getValue());
+
+        if (user.getAttributes().add(newAttribute)) {
+            try {
                 MCRUserManager.updateUser(user);
+            } catch (Exception e) {
+                throw new MCRException("Failed to update user for identifier: " + userId, e);
             }
-        });
+        }
     }
 
     /**

@@ -27,6 +27,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.legalentity.MCRIdentifier;
 import org.mycore.datamodel.legalentity.MCRLegalEntityService;
@@ -108,7 +109,7 @@ public class MCRORCIDUser {
      * Adds ORCID iD to user's user attributes.
      *
      * @param orcid the ORCID iD
-     * @throws MCRORCIDException if ORCID iD is invalid
+     * @throws MCRORCIDException if ORCID iD is invalid or there was an error while adding it
      */
     public void addORCID(String orcid) {
         if (!MCRORCIDValidationHelper.validateORCID(orcid)) {
@@ -117,7 +118,11 @@ public class MCRORCIDUser {
         final MCRIdentifier newOrcid = new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, orcid);
         final MCRIdentifier userid = new MCRIdentifier(MCRIdentifier.USER_ID_TYPE, user.getUserID());
 
-        legalEntityService.addIdentifier(userid, newOrcid);
+        try {
+            legalEntityService.addIdentifier(userid, newOrcid);
+        } catch (MCRException e) {
+            throw new MCRORCIDException("ORCID iD could not be added:" + e.getMessage());
+        }
     }
 
     /** Returns user's ORCID iDs.

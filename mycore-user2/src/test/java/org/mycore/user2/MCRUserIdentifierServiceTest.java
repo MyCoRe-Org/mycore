@@ -23,11 +23,14 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mycore.common.MCRException;
 import org.mycore.datamodel.legalentity.MCRIdentifier;
 import org.mycore.test.MCRJPAExtension;
 import org.mycore.test.MyCoReTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @MyCoReTest
 @ExtendWith({ MCRJPAExtension.class, MCRUserExtension.class })
@@ -98,11 +101,20 @@ public class MCRUserIdentifierServiceTest {
     @Test
     public final void testNoUser() {
         MCRIdentifier nonameUserid = new MCRIdentifier(MCRIdentifier.USER_ID_TYPE, "noname");
-        Set<MCRIdentifier> allIdentifiers = service.findAllIdentifiers(nonameUserid);
-        assertEquals(0, allIdentifiers.size());
 
-        service.addIdentifier(nonameUserid, new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_1));
-        allIdentifiers = service.findAllIdentifiers(nonameUserid);
+        MCRException exception = assertThrows(MCRException.class, () -> service.findAllIdentifiers(nonameUserid));
+        assertTrue(exception.getMessage().contains("User not found for identifier:"));
+        assertTrue(exception.getMessage().contains("userid:noname"));
+
+        exception = assertThrows(MCRException.class, () -> service.addIdentifier(
+            nonameUserid, new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_1)));
+        assertTrue(exception.getMessage().contains("User not found for identifier:"));
+        assertTrue(exception.getMessage().contains("userid:noname"));
+
+        user = new MCRUser("noname");
+        MCRUserManager.createUser(user);
+
+        Set<MCRIdentifier> allIdentifiers = service.findAllIdentifiers(nonameUserid);
         assertEquals(0, allIdentifiers.size());
     }
 }

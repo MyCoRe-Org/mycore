@@ -20,6 +20,7 @@ package org.mycore.datamodel.legalentity;
 
 import java.util.Set;
 
+import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 
 /**
@@ -34,15 +35,19 @@ public interface MCRLegalEntityService {
      * Finds all identifiers of a legal entity determined by a specific identifier.
      * @param identifier unique identifier of legal entity, not null
      * @return a set of identifiers a legal entity owns
+     *
+     * @throws MCRException if the reference to the entity isn't found
      */
-    Set<MCRIdentifier> findAllIdentifiers(MCRIdentifier identifier);
+    Set<MCRIdentifier> findAllIdentifiers(MCRIdentifier identifier) throws MCRException;
 
     /**
      * Adds an identifier to a legal entity. The entity is determined by a specific, given identifier
      * @param primaryIdentifier unique identifier of legal entity, not null
      * @param identifierToAdd the identifier to add, not null
+     *
+     * @throws MCRException if an identifier cannot be added to the entity
      */
-    void addIdentifier(MCRIdentifier primaryIdentifier, MCRIdentifier identifierToAdd);
+    void addIdentifier(MCRIdentifier primaryIdentifier, MCRIdentifier identifierToAdd) throws MCRException;
 
     /**
      * Get configured singleton service implementation.

@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.access.MCRAccessException;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.common.content.MCRURLContent;
@@ -43,6 +44,8 @@ import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @MyCoReTest
 @ExtendWith({ MCRJPAExtension.class, MCRMetadataExtension.class })
@@ -125,10 +128,11 @@ public class MCRMODSPersonIdentifierServiceTest {
     }
 
     @Test
-    public final void testAddIdentifierNoModsperson() {
-        Set<MCRIdentifier> allIdentifiers = service.findAllIdentifiers(
-            new MCRIdentifier(MCRIdentifier.USER_ID_TYPE, "noname"));
-        assertEquals(0, allIdentifiers.size());
+    public final void testAddIdentifierNoModsperson() throws MCRAccessException, IOException, JDOMException {
+        MCRException exception = assertThrows(MCRException.class, () -> service.findAllIdentifiers(
+            new MCRIdentifier(MCRIdentifier.USER_ID_TYPE, "noname")));
+        assertTrue(exception.getMessage().contains("Modsperson object not found"));
+        assertTrue(exception.getMessage().contains("userid:noname"));
 
         MCRUser user3 = new MCRUser("james");
         user3.setRealName("James Doe");
@@ -136,17 +140,49 @@ public class MCRMODSPersonIdentifierServiceTest {
         MCRUserManager.createUser(user3);
 
         final MCRIdentifier userid = new MCRIdentifier(MCRIdentifier.USER_ID_TYPE, user3.getUserID());
-        allIdentifiers = service.findAllIdentifiers(userid);
-        assertEquals(0, allIdentifiers.size());
+        exception = assertThrows(MCRException.class, () -> service.findAllIdentifiers(userid));
+        assertTrue(exception.getMessage().contains("Modsperson object not found"));
 
-        service.addIdentifier(userid, new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_2));
-        allIdentifiers = service.findAllIdentifiers(userid);
-        assertEquals(0, allIdentifiers.size());
+        exception = assertThrows(MCRException.class, () -> service.addIdentifier(userid,
+            new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_2)));
+        assertTrue(exception.getMessage().contains("Modsperson object not found"));
 
         user3.setUserAttribute("id_modsperson", "junit_modsperson_00000404");
         MCRUserManager.updateUser(user3);
-        allIdentifiers = service.findAllIdentifiers(userid);
-        assertEquals(0, allIdentifiers.size());
+        exception = assertThrows(MCRException.class, () -> service.findAllIdentifiers(userid));
+        assertTrue(exception.getMessage().contains("Modsperson object not found"));
+
+        URL url3 = MCRObjectMetadataTest.class.getResource(
+            "/MCRMODSPersonIdentifierServiceTest/junit_modsperson_00000003.xml");
+        Document doc3 = new MCRURLContent(url3).asXML();
+        MCRObject obj3 = new MCRObject(doc3);
+        MCRMetadataManager.create(obj3);
+
+        user3.setUserAttribute("id_modsperson", "junit_modsperson_00000003");
+        MCRUserManager.updateUser(user3);
+
+        Set<MCRIdentifier> allIdentifiers = service.findAllIdentifiers(userid);
+        assertEquals(1, allIdentifiers.size());
+        Set<MCRIdentifier> expected = Set.of(new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_1));
+        assertEquals(expected, allIdentifiers);
+    }
+
+    @Test
+    public final void testAddIdentifierMalformedModsperson() throws MCRAccessException, IOException, JDOMException {
+        URL url4 = MCRObjectMetadataTest.class.getResource(
+            "/MCRMODSPersonIdentifierServiceTest/junit_modsperson_00000004.xml");
+        Document doc4 = new MCRURLContent(url4).asXML();
+        MCRObject obj4 = new MCRObject(doc4);
+        MCRMetadataManager.create(obj4);
+
+        MCRUser user4 = new MCRUser("noname");
+        user4.setRealName("No Name");
+        user4.setUserAttribute("id_orcid", ORCID_1);
+        user4.setUserAttribute("id_modsperson", "junit_modsperson_00000004");
+        MCRUserManager.createUser(user4);
+        MCRException exception = assertThrows(MCRException.class, () ->
+            service.findAllIdentifiers(new MCRIdentifier(MCRIdentifier.USER_ID_TYPE, "noname")));
+        assertEquals("Malformed modsperson object: junit_modsperson_00000004", exception.getMessage());
     }
 
 }

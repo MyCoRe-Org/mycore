@@ -18,7 +18,6 @@
 
 package org.mycore.mods;
 
-import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -28,6 +27,7 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRConstants;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.legalentity.MCRIdentifier;
 import org.mycore.datamodel.legalentity.MCRLegalEntityService;
@@ -63,9 +63,11 @@ public class MCRMODSPersonIdentifierService implements MCRLegalEntityService {
      * and its modsperson id.
      * @param userId the user id connected to the modsperson
      * @return all known identifiers or an empty set
+     *
+     * @throws MCRException if the reference to the modsperson isn't found
      */
     @Override
-    public Set<MCRIdentifier> findAllIdentifiers(MCRIdentifier userId) {
+    public Set<MCRIdentifier> findAllIdentifiers(MCRIdentifier userId) throws MCRException {
         return getIdentifiers(userId, null);
     }
 
@@ -74,17 +76,20 @@ public class MCRMODSPersonIdentifierService implements MCRLegalEntityService {
      * and its modsperson id.
      * @param userId the user id connected to the modsperson
      * @param attributeToAdd the nameIdentifier to add to the modsperson
+     *
+     * @throws MCRException if an identifier cannot be added to the modsperson
      */
     @Override
-    public void addIdentifier(MCRIdentifier userId, MCRIdentifier attributeToAdd) {
+    public void addIdentifier(MCRIdentifier userId, MCRIdentifier attributeToAdd) throws MCRException {
         Optional<MCRObject> modspersonOptional = findModspersonByUsername(userId);
         if (modspersonOptional.isEmpty()) {
-            return;
+            throw new MCRException("Modsperson object not found for identifier: " + userId);
         }
+        MCRObjectID modspersonId = modspersonOptional.get().getId();
         MCRMODSWrapper wrapper = new MCRMODSWrapper(modspersonOptional.get());
         Element modsName = wrapper.getMODS().getChild(MODS_NAME, MCRConstants.MODS_NAMESPACE);
         if (modsName == null) {
-            return;
+            throw new MCRException("Malformed modsperson object: " + modspersonId);
         }
         Element nameIdentifier = new Element(MODS_NAMEIDENTIFIER, MCRConstants.MODS_NAMESPACE)
             .setAttribute(TYPE, attributeToAdd.getType())
@@ -93,10 +98,8 @@ public class MCRMODSPersonIdentifierService implements MCRLegalEntityService {
         try {
             MCRMetadataManager.update(modspersonOptional.get());
         } catch (MCRAccessException | MCRPersistenceException e) {
-            if (LOGGER.isWarnEnabled()) {
-                LOGGER.warn("Could not update modsperson object for user id {}",
-                    userId.getValue(), e);
-            }
+            throw new MCRException("Failed to update modsperson object "
+                + modspersonId + " for identifier: " + userId, e);
         }
     }
 
@@ -105,16 +108,20 @@ public class MCRMODSPersonIdentifierService implements MCRLegalEntityService {
      * @param userId the user id connected to the modsperson
      * @param identifierType optional type filter, leave null for no filter
      * @return a set of all identifiers found
+     *
+     * @throws MCRException if the reference to the modsperson isn't found
      */
     private Set<MCRIdentifier> getIdentifiers(MCRIdentifier userId, String identifierType) {
         Optional<MCRObject> modspersonOptional = findModspersonByUsername(userId);
         if (modspersonOptional.isEmpty()) {
-            return Collections.emptySet();
+            throw new MCRException("Modsperson object not found for identifier: " + userId);
         }
         MCRMODSWrapper wrapper = new MCRMODSWrapper(modspersonOptional.get());
         Element modsName = wrapper.getMODS().getChild(MODS_NAME, MCRConstants.MODS_NAMESPACE);
+        MCRObjectID modspersonId = modspersonOptional.get().getId();
+
         if (modsName == null) {
-            return Collections.emptySet();
+            throw new MCRException("Malformed modsperson object: " + modspersonId);
         }
         if (identifierType != null) {
             return modsName.getChildren(MODS_NAMEIDENTIFIER, MCRConstants.MODS_NAMESPACE)
