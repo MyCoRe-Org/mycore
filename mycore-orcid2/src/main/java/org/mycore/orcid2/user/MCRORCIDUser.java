@@ -121,7 +121,7 @@ public class MCRORCIDUser {
         try {
             legalEntityService.addIdentifier(userid, newOrcid);
         } catch (MCRException e) {
-            throw new MCRORCIDException("ORCID iD could not be added:" + e.getMessage());
+            throw new MCRORCIDException("ORCID iD could not be added:" + e.getMessage(), e);
         }
     }
 
