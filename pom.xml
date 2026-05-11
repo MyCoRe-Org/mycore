@@ -1463,7 +1463,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.bouncycastle</groupId>
         <artifactId>bcprov-jdk18on</artifactId>
-        <version>1.83</version>
+        <version>1.84</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.rdf4j</groupId>
