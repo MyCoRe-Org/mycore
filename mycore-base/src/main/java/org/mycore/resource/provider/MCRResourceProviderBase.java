@@ -90,10 +90,7 @@ public abstract class MCRResourceProviderBase implements MCRResourceProvider {
 
     @Override
     public MCRTreeMessage compileDescription(Level level) {
-        MCRTreeMessage description = new MCRTreeMessage();
-        description.add("Class", getClass().getName());
-        description.add("Coverage", coverage());
-        return description;
+        return MCRResourceProvider.super.compileDescription(level);
     }
 
 }

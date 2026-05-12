@@ -22,8 +22,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 
+import org.apache.logging.log4j.Level;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.datamodel.metadata.MCRDerivate;
 
 /**
@@ -70,6 +72,13 @@ public class MCRServiceFlagDerivateDisplayFilter implements MCRDerivateDisplayFi
 
         return null;
 
+    }
+
+    @Override
+    public MCRTreeMessage compileDescription(Level level) {
+        MCRTreeMessage description = MCRDerivateDisplayFilter.super.compileDescription(level);
+        description.add(FLAG_TYPE_PREFIX_KEY, flagTypePrefix);
+        return description;
     }
 
     public static class Factory implements Supplier<MCRServiceFlagDerivateDisplayFilter> {
