@@ -156,4 +156,5 @@ public class MCRRateLimitResolver implements URIResolver {
      */
     private record BucketConfig(String configId, RateLimitBehavior behavior, Bucket bucket) {
     }
+
 }

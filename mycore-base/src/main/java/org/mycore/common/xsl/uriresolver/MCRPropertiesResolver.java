@@ -96,4 +96,5 @@ public class MCRPropertiesResolver implements URIResolver {
 
         return new JDOMSource(entryElement);
     }
+
 }

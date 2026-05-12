@@ -22,26 +22,15 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -49,10 +38,8 @@ import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.URIResolver;
-import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
@@ -61,26 +48,15 @@ import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCache;
-import org.mycore.common.MCRClassTools;
-import org.mycore.common.MCRConstants;
-import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRExpandedObjectManager;
-import org.mycore.common.MCRHTTPClient;
-import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
-import org.mycore.common.MCRUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRFactory;
-import org.mycore.common.content.MCRBaseContent;
-import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
-import org.mycore.common.content.MCRPathContent;
 import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRParameterizedTransformer;
@@ -91,30 +67,9 @@ import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.common.xsl.MCRLazyStreamSource;
 import org.mycore.common.xsl.MCRParameterCollector;
-import org.mycore.datamodel.classifications2.MCRCategory;
-import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryID;
-import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
-import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
-import org.mycore.datamodel.common.MCRDataURL;
-import org.mycore.datamodel.common.MCRXMLMetadataManager;
-import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.datamodel.metadata.MCRExpandedObject;
-import org.mycore.datamodel.metadata.MCRFileMetadata;
-import org.mycore.datamodel.metadata.MCRMetadataManager;
-import org.mycore.datamodel.metadata.MCRObject;
-import org.mycore.datamodel.metadata.MCRObjectDerivate;
-import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRXMLConstants;
-import org.mycore.datamodel.niofs.MCRPath;
-import org.mycore.datamodel.niofs.MCRPathXML;
-import org.mycore.frontend.MCRLayoutUtilities;
-import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.resource.MCRResourceHelper;
 import org.mycore.resource.MCRResourcePath;
-import org.mycore.services.http.MCRURLQueryParameter;
-import org.mycore.services.i18n.MCRTranslation;
-import org.mycore.tools.MCRObjectFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -135,13 +90,11 @@ public final class MCRURIResolver implements URIResolver {
 
     private static final String CONFIG_PREFIX = "MCR.URIResolver.";
 
-    private static final String HTTP_CLIENT_PROPERTY = "MCR.HTTPClient";
-
     private static final Marker UNIQUE_MARKER = MarkerManager.getMarker("tryResolveXML");
 
-    private static final String PROPERTY_XSL_FOLDER = "MCR.Layout.Transformer.Factory.XSLFolder";
+    public static final String PROPERTY_XSL_FOLDER = "MCR.Layout.Transformer.Factory.XSLFolder";
 
-    private static final String RESOURCE_PREFIX = "resource:";
+    public static final String RESOURCE_PREFIX = "resource:";
 
     private static final String ELEMENT_NULL = "null";
 
@@ -164,7 +117,7 @@ public final class MCRURIResolver implements URIResolver {
 
     private static MCRResolverProvider getExternalResolverProvider() {
         return MCRConfiguration2
-            .getInstanceOf(MCRResolverProvider.class, CONFIG_PREFIX + "ExternalResolver")
+            .getInstanceOf(MCRResolverProvider.class, CONFIG_PREFIX + "ExternalResolver.Class")
             .orElse(HashMap::new);
     }
 
@@ -224,7 +177,7 @@ public final class MCRURIResolver implements URIResolver {
         return new JDOMSource(root);
     }
 
-    static URI resolveURI(String href, String base) {
+    public static URI resolveURI(String href, String base) {
         return Optional.ofNullable(base)
             .map(URI::create)
             .map(u -> u.resolve(href))
@@ -304,7 +257,7 @@ public final class MCRURIResolver implements URIResolver {
     /**
      * URI Resolver that resolves XSL document() or xsl:include calls.
      *
-     * @see URIResolver
+     * @see javax.xml.transform.URIResolver
      */
     @Override
     public Source resolve(String href, String base) throws TransformerException {
@@ -456,10 +409,6 @@ public final class MCRURIResolver implements URIResolver {
         Map<String, URIResolver> getURIResolverMapping();
     }
 
-    public interface MCRXslIncludeHrefs {
-        List<String> getHrefs();
-    }
-
     private static class MCRModuleResolverProvider implements MCRResolverProvider {
         private final Map<String, URIResolver> resolverMap = new HashMap<>();
 
@@ -481,119 +430,6 @@ public final class MCRURIResolver implements URIResolver {
             }
         }
 
-    }
-
-    private static final class MCRFileResolver implements URIResolver {
-
-        @Override
-        public Source resolve(String href, String base) throws TransformerException {
-            URI hrefURI = resolveURI(href, base);
-            if (!hrefURI.getScheme().equals("file")) {
-                throw new TransformerException("Unsupport file uri scheme: " + hrefURI.getScheme());
-            }
-            Path path = Paths.get(hrefURI);
-            StreamSource source;
-            try {
-                source = new StreamSource(Files.newInputStream(path), hrefURI.toASCIIString());
-                return source;
-            } catch (IOException e) {
-                throw new TransformerException(e);
-            }
-        }
-    }
-
-    private static class MCRRESTResolver implements URIResolver {
-        private final MCRHTTPClient client;
-
-        MCRRESTResolver() {
-            this.client = MCRConfiguration2.getInstanceOfOrThrow(MCRHTTPClient.class, HTTP_CLIENT_PROPERTY);
-        }
-
-        @Override
-        public Source resolve(String href, String base) throws TransformerException {
-            URI hrefURI = resolveURI(href, base);
-            try {
-                final Source source = client.get(hrefURI).getSource();
-                source.setSystemId(hrefURI.toASCIIString());
-                return source;
-            } catch (IOException e) {
-                throw new TransformerException(e);
-            }
-        }
-    }
-
-    private static final class MCRObjectResolver implements URIResolver {
-
-        /**
-         * Reads local MCRObject with a given ID from the store.
-         *
-         * @param href
-         *            for example, "mcrobject:DocPortal_document_07910401"
-         * @return XML representation from MCRXMLContainer
-         */
-        @Override
-        public Source resolve(String href, String base) throws TransformerException {
-            String id = href.substring(href.indexOf(':') + 1);
-            LOGGER.debug("Reading MCRObject with ID {}", id);
-            Map<String, String> params;
-            StringTokenizer tok = new StringTokenizer(id, "?");
-            id = tok.nextToken();
-
-            if (tok.hasMoreTokens()) {
-                params = getParameterMap(tok.nextToken());
-            } else {
-                params = Collections.emptyMap();
-            }
-
-            MCRObjectID mcrid = MCRObjectID.getInstance(id);
-            try {
-                MCRXMLMetadataManager xmlmm = MCRXMLMetadataManager.obtainInstance();
-
-                MCRContent content;
-                if (params.containsKey("r")) {
-                    content = xmlmm.retrieveContent(mcrid, params.get("r"));
-                } else {
-                    if (mcrid.getTypeId().equals(MCRDerivate.OBJECT_TYPE) ||
-                        (params.containsKey("expanded") && params.get("expanded").equals("false"))) {
-                        content = xmlmm.retrieveContent(mcrid);
-                    } else {
-                        MCRObject expanded = MCRMetadataManager.retrieveMCRObject(mcrid);
-                        MCRExpandedObject expandedObject =
-                            MCRExpandedObjectManager.getInstance().getExpandedObject(expanded);
-                        content = new MCRBaseContent(expandedObject);
-                    }
-                }
-                if (content == null) {
-                    return null;
-                }
-                LOGGER.debug("end resolving {}", href);
-                return content.getSource();
-            } catch (IOException e) {
-                throw new TransformerException(e);
-            }
-        }
-
-    }
-
-    /**
-     * Reads XML from a static file within the web application. the URI in the format webapp:path/to/servlet
-     */
-    private static final class MCRWebAppResolver implements URIResolver {
-
-        @Override
-        public Source resolve(String href, String base) throws TransformerException {
-            String path = href.substring(href.indexOf(':') + 1);
-            try {
-                URL resource = MCRResourceHelper.getWebResourceUrl(path);
-                if (resource != null) {
-                    return new StreamSource(resource.toURI().toASCIIString());
-                } else {
-                    throw new TransformerException("Could not find web resource: " + path);
-                }
-            } catch (Exception ex) {
-                throw new TransformerException("Could not load web resource: " + path, ex);
-            }
-        }
     }
 
     /**
@@ -625,342 +461,6 @@ public final class MCRURIResolver implements URIResolver {
             }
             return null;
         }
-
-    }
-
-    /**
-     * Delivers a jdom Element created by any local class that implements URIResolver
-     * interface. the class name of the file in the format localclass:org.mycore.ClassName?mode=getAll
-     */
-    private static final class MCRLocalClassResolver implements URIResolver {
-
-        @Override
-        public Source resolve(String href, String base) throws TransformerException {
-            String classname = href.substring(href.indexOf(':') + 1, href.indexOf('?'));
-            LogManager.getLogger(this.getClass()).debug("Loading Class: {}", classname);
-            URIResolver resolver;
-            try {
-                Class<? extends URIResolver> cl = MCRClassTools.forName(classname);
-                resolver = cl.getDeclaredConstructor().newInstance();
-            } catch (Exception e) {
-                throw new TransformerException(e);
-            }
-            return resolver.resolve(href, base);
-        }
-
-    }
-
-    private static final class MCRSessionResolver implements URIResolver {
-
-        /**
-         * Reads XML from URIs of type session:key. The method MCRSession.get( key ) is called and must return a JDOM
-         * element.
-         *
-         * @see org.mycore.common.MCRSession#get(Object)
-         * @param href
-         *            the URI in the format session:key
-         * @return the root element of the xml document
-         */
-        @Override
-        public Source resolve(String href, String base) {
-            String key = href.substring(href.indexOf(':') + 1);
-            LOGGER.debug("Reading xml from session using key {}", key);
-            Element value = (Element) MCRSessionMgr.getCurrentSession().get(key);
-            return new JDOMSource(value.clone());
-        }
-
-    }
-
-    private static final class MCRIFSResolver implements URIResolver {
-
-        /**
-         * Reads XML from a http or https URL.
-         *
-         * @param href
-         *            the URL of the xml document
-         * @return the root element of the xml document
-         */
-        @Override
-        public Source resolve(String href, String base) throws TransformerException {
-            LOGGER.debug("Reading xml from url {}", href);
-
-            String path = href.substring(href.indexOf(':') + 1);
-
-            int i = path.indexOf("?host");
-            if (i > 0) {
-                path = path.substring(0, i);
-            }
-            StringTokenizer st = new StringTokenizer(path, "/");
-
-            String ownerID = st.nextToken();
-            try {
-                String aPath = MCRXMLFunctions.decodeURIPath(path.substring(ownerID.length() + 1));
-                // TODO: make this more pretty
-                if (ownerID.endsWith(":")) {
-                    ownerID = ownerID.substring(0, ownerID.length() - 1);
-                }
-                LOGGER.debug("Get {} path: {}", ownerID, aPath);
-                return new JDOMSource(MCRPathXML.getDirectoryXML(MCRPath.getPath(ownerID, aPath)));
-            } catch (IOException | URISyntaxException e) {
-                throw new TransformerException(e);
-            }
-        }
-    }
-
-    private static final class MCRMCRFileResolver implements URIResolver {
-        @Override
-        public Source resolve(String href, String base) throws TransformerException {
-            LOGGER.debug("Reading xml from MCRFile {}", href);
-            MCRPath file = null;
-            String id = href.substring(href.indexOf(':') + 1);
-            if (id.contains("/")) {
-                // assume thats a derivate with path
-                try {
-                    MCRObjectID derivateID = MCRObjectID.getInstance(id.substring(0, id.indexOf('/')));
-                    String path = id.substring(id.indexOf('/'));
-                    file = MCRPath.getPath(derivateID.toString(), path);
-                } catch (MCRException exc) {
-                    // just check if the id is valid, don't care about the exception
-                }
-            }
-            if (file == null) {
-                throw new TransformerException("mcrfile: Resolver needs a path: " + href);
-            }
-            try {
-                return new MCRPathContent(file).getSource();
-            } catch (Exception e) {
-                throw new TransformerException(e);
-            }
-        }
-    }
-
-    private static final class MCRACLResolver implements URIResolver {
-
-        private static final String ACTION_PARAM = "action";
-
-        private static final String OBJECT_ID_PARAM = "object";
-
-        /**
-         * Returns access controll rules as XML
-         */
-        @Override
-        public Source resolve(String href, String base) {
-            String key = href.substring(href.indexOf(':') + 1);
-            LOGGER.debug("Reading xml from query result using key :{}", key);
-
-            String[] param;
-            StringTokenizer tok = new StringTokenizer(key, "&");
-            Map<String, String> params = new HashMap<>();
-
-            while (tok.hasMoreTokens()) {
-                param = tok.nextToken().split("=");
-                params.put(param[0], param[1]);
-            }
-
-            String action = params.get(ACTION_PARAM);
-            String objId = params.get(OBJECT_ID_PARAM);
-
-            if (action == null || objId == null) {
-                return null;
-            }
-
-            Element container = new Element("servacls").setAttribute("class", "MCRMetaAccessRule");
-            if (MCRAccessManager.implementsRulesInterface()) {
-                if (action.equals("all")) {
-                    for (String permission : MCRAccessManager.getPermissionsForID(objId)) {
-                        // one pool Element under access per defined AccessRule in pool for (Object-)ID
-                        addRule(container, permission,
-                            MCRAccessManager.requireRulesInterface().getRule(objId, permission));
-                    }
-                } else {
-                    addRule(container, action, MCRAccessManager.requireRulesInterface().getRule(objId, action));
-                }
-            }
-            return new JDOMSource(container);
-        }
-
-        private void addRule(Element root, String pool, Element rule) {
-            if (rule != null && pool != null) {
-                Element poolElement = new Element("servacl").setAttribute("permission", pool);
-                poolElement.addContent(rule);
-                root.addContent(poolElement);
-            }
-        }
-
-    }
-
-    private static class MCRClassificationResolver implements URIResolver {
-
-        private static final Pattern EDITORFORMAT_PATTERN = Pattern.compile("(\\[)([^\\]]*)(\\])");
-
-        private static final String FORMAT_CONFIG_PREFIX = CONFIG_PREFIX + "Classification.Format.";
-
-        private static final String SORT_CONFIG_PREFIX = CONFIG_PREFIX + "Classification.Sort.";
-
-        private static MCRCache<String, Element> categoryCache;
-
-        private static MCRCategoryDAO dao;
-
-        static {
-            try {
-                dao = MCRCategoryDAO.obtainInstance();
-                categoryCache = new MCRCache<>(
-                    MCRConfiguration2.getInt(CONFIG_PREFIX + "Classification.CacheSize").orElse(1000),
-                    "URIResolver categories");
-            } catch (Exception exc) {
-                LOGGER.error("Unable to initialize classification resolver", exc);
-            }
-        }
-
-        MCRClassificationResolver() {
-        }
-
-        private static String getLabelFormat(String editorString) {
-            Matcher m = EDITORFORMAT_PATTERN.matcher(editorString);
-            if (m.find() && m.groupCount() == 3) {
-                String formatDef = m.group(2);
-                return MCRConfiguration2.getStringOrThrow(FORMAT_CONFIG_PREFIX + formatDef);
-            }
-            return null;
-        }
-
-        private static boolean shouldSortCategories(String classId) {
-            return MCRConfiguration2.getBoolean(SORT_CONFIG_PREFIX + classId).orElse(true);
-        }
-
-        private static long getSystemLastModified() {
-            long xmlLastModified = MCRXMLMetadataManager.obtainInstance().getLastModified();
-            long classLastModified = dao.getLastModified();
-            return Math.max(xmlLastModified, classLastModified);
-        }
-
-        /**
-         * returns a classification in a specific format. Syntax:
-         * <code>classification:{editor[Complete]['['formatAlias']']|metadata}:{Levels}[:noEmptyLeaves]:{parents|
-         * children}:{ClassID}[:CategID] formatAlias: MCRConfiguration property
-         * MCR.UURResolver.Classification.Format.FormatAlias
-         *
-         * @param href
-         *            URI in the syntax above
-         * @return the root element of the XML document
-         * @see MCRCategoryTransformer
-         */
-        @Override
-        public Source resolve(String href, String base) {
-            LOGGER.debug("start resolving {}", href);
-            String cacheKey = getCacheKey(href);
-            Element returns = categoryCache.getIfUpToDate(cacheKey, getSystemLastModified());
-            if (returns == null) {
-                returns = getClassElement(href);
-                if (returns != null) {
-                    categoryCache.put(cacheKey, returns);
-                }
-            }
-            return new JDOMSource(returns);
-        }
-
-        protected String getCacheKey(String uri) {
-            return uri;
-        }
-
-        private Element getClassElement(String uri) {
-            StringTokenizer pst = new StringTokenizer(uri, ":", true);
-            if (pst.countTokens() < 9) {
-                // sanity check
-                throw new IllegalArgumentException("Invalid format of uri for retrieval of classification: " + uri);
-            }
-
-            pst.nextToken(); // "classification"
-            pst.nextToken(); // :
-            String format = pst.nextToken();
-            pst.nextToken(); // :
-
-            String levelS = pst.nextToken();
-            pst.nextToken(); // :
-            int levels = Objects.equals(levelS, "all") ? -1 : Integer.parseInt(levelS);
-
-            String axis;
-            String token = pst.nextToken();
-            pst.nextToken(); // :
-            boolean emptyLeaves = !Objects.equals(token, "noEmptyLeaves");
-            if (!emptyLeaves) {
-                axis = pst.nextToken();
-                pst.nextToken(); // :
-            } else {
-                axis = token;
-            }
-
-            String classID = pst.nextToken();
-            StringBuilder categID = new StringBuilder();
-            if (pst.hasMoreTokens()) {
-                pst.nextToken(); // :
-                while (pst.hasMoreTokens()) {
-                    categID.append(pst.nextToken());
-                }
-            }
-
-            String categ;
-            try {
-                categ = MCRXMLFunctions.decodeURIPath(categID.toString());
-            } catch (URISyntaxException e) {
-                categ = categID.toString();
-            }
-            MCRCategory cl = getMcrCategory(uri, axis, categ, classID, levels);
-            if (cl == null) {
-                return null;
-            }
-            return getElement(uri, format, classID, cl, emptyLeaves);
-        }
-
-        private static MCRCategory getMcrCategory(String uri, String axis, String categ, String classID, int levels) {
-            MCRCategory cl = null;
-            LOGGER.debug("categoryCache entry invalid or not found: start MCRClassificationQuery");
-            if (axis.equals("children")) {
-                if (!categ.isEmpty()) {
-                    cl = dao.getCategory(new MCRCategoryID(classID, categ), levels);
-                } else {
-                    cl = dao.getCategory(new MCRCategoryID(classID), levels);
-                }
-            } else if (axis.equals("parents")) {
-                if (categ.isEmpty()) {
-                    LOGGER.error("Cannot resolve parent axis without a CategID. URI: {}", uri);
-                    throw new IllegalArgumentException(
-                        "Invalid format (categID is required in mode 'parents') "
-                            + "of uri for retrieval of classification: "
-                            + uri);
-                }
-                cl = dao.getRootCategory(new MCRCategoryID(classID, categ), levels);
-            }
-            if (cl == null) {
-                return null;
-            }
-            return cl;
-        }
-
-        private static Element getElement(String uri, String format, String classID, MCRCategory cl,
-            boolean emptyLeaves) {
-            Element returns;
-            LOGGER.debug("start transformation of ClassificationQuery");
-            if (format.startsWith("editor")) {
-                boolean completeId = format.startsWith("editorComplete");
-                boolean sort = shouldSortCategories(classID);
-                String labelFormat = getLabelFormat(format);
-                if (labelFormat == null) {
-                    returns = MCRCategoryTransformer.getEditorItems(cl, sort, emptyLeaves, completeId);
-                } else {
-                    returns = MCRCategoryTransformer.getEditorItems(cl, labelFormat, sort, emptyLeaves, completeId);
-                }
-            } else if (format.equals("metadata")) {
-                returns = MCRCategoryTransformer.getMetaDataDocument(cl, false).getRootElement().detach();
-            } else {
-                LOGGER.error("Unknown target format given. URI: {}", uri);
-                throw new IllegalArgumentException(
-                    "Invalid target format (" + format + ") in uri for retrieval of classification: " + uri);
-            }
-            LOGGER.debug("end resolving {}", uri);
-            return returns;
-        }
-
     }
 
     private static final class MCRExceptionAsXMLResolver implements URIResolver {
@@ -1245,59 +745,6 @@ public final class MCRURIResolver implements URIResolver {
     }
 
     /**
-     * <p>
-     * Includes xsl files which are set in the mycore.properties file.
-     * </p>
-     * Example: MCR.URIResolver.xslIncludes.components=iview.xsl,wcms.xsl
-     * <p>
-     * Or retrieve the hrefs to be included from a class implementing
-     * {@link MCRXslIncludeHrefs}. The <code>class.</code> part has to be set,
-     * everything after <code>class.</code> can be chosen freely.
-     * </p>
-     * Example: MCR.URIResolver.xslIncludes.class.template=org.foo.XSLHrefs
-     * <p>
-     * Returns a xsl file with the includes as href.
-     */
-    private static final class MCRXslIncludeResolver implements URIResolver {
-
-        private static final Logger LOGGER = LogManager.getLogger();
-
-        @Override
-        public Source resolve(String href, String base) {
-            String includePart = href.substring(href.indexOf(':') + 1);
-            Namespace xslNamespace = Namespace.getNamespace("xsl", "http://www.w3.org/1999/XSL/Transform");
-
-            Element root = new Element("stylesheet", xslNamespace);
-            root.setAttribute(MCRXMLConstants.VERSION, "1.0");
-
-            // get the parameters from mycore.properties
-            String propertyName = "MCR.URIResolver.xslIncludes." + includePart;
-            List<String> propValue;
-            if (includePart.startsWith("class.")) {
-                MCRXslIncludeHrefs incHrefClass = MCRConfiguration2.instantiateClass(
-                    MCRXslIncludeHrefs.class, MCRConfiguration2.getStringOrThrow(propertyName));
-                propValue = incHrefClass.getHrefs();
-            } else {
-                propValue = MCRConfiguration2.getString(propertyName)
-                    .map(MCRConfiguration2::splitValue)
-                    .map(s -> s.collect(Collectors.toList()))
-                    .orElseGet(Collections::emptyList);
-            }
-
-            final String xslFolder = MCRConfiguration2.getStringOrThrow(PROPERTY_XSL_FOLDER);
-            for (String include : propValue) {
-                // create a new include element
-                Element includeElement = new Element("include", xslNamespace);
-                includeElement.setAttribute("href",
-                    include.contains(":") ? include : RESOURCE_PREFIX + xslFolder + "/" + include);
-                root.addContent(includeElement);
-                LOGGER.debug("Resolved XSL include: {}", include);
-            }
-            return new JDOMSource(root);
-        }
-    }
-
-    /**
      * Imports xsl files which are set in the mycore.properties file. Example:
      * MCR.URIResolver.xslImports.components=first.xsl,second.xsl Every file must import this URIResolver to form a
      * import chain:
@@ -1340,344 +787,6 @@ public final class MCRURIResolver implements URIResolver {
     }
 
     /**
-     * Builds XML trees from a string representation. Multiple XPath expressions can be separated by &amp; Example:
-     * buildxml:_rootName_=mycoreobject&metadata/parents/parent/@href= 'FooBar_Document_4711' This will return:
-     * &lt;mycoreobject&gt; &lt;metadata&gt; &lt;parents&gt; &lt;parent href="FooBar_Document_4711" /&gt;
-     * &lt;/parents&gt; &lt;/metadata&gt; &lt;/mycoreobject&gt;
-     */
-    private static final class MCRBuildXMLResolver implements URIResolver {
-
-        private static void constructElement(Element current, String xpath, String value) {
-            StringTokenizer st = new StringTokenizer(xpath, "/");
-            Element currentToken = current;
-            String name = null;
-            while (st.hasMoreTokens()) {
-                name = st.nextToken();
-                if (name.startsWith("@")) {
-                    break;
-                }
-                String localName = getLocalName(name);
-                Namespace namespace = getNamespace(name);
-
-                Element child = currentToken.getChild(localName, namespace);
-                if (child == null) {
-                    child = new Element(localName, namespace);
-                    currentToken.addContent(child);
-                }
-                currentToken = child;
-            }
-            if (name.startsWith("@")) {
-                name = name.substring(1);
-                String localName = getLocalName(name);
-                Namespace namespace = getNamespace(name);
-                currentToken.setAttribute(localName, value, namespace);
-            } else {
-                currentToken.setText(value);
-            }
-        }
-
-        private static Namespace getNamespace(String name) {
-            if (!name.contains(":")) {
-                return Namespace.NO_NAMESPACE;
-            }
-            String prefix = name.split(":")[0];
-            Namespace ns = MCRConstants.getStandardNamespace(prefix);
-            return ns == null ? Namespace.NO_NAMESPACE : ns;
-        }
-
-        private static String getLocalName(String name) {
-            if (!name.contains(":")) {
-                return name;
-            } else {
-                return name.split(":")[1];
-            }
-        }
-
-        /**
-         * Builds a simple xml node tree on basis of name value pair
-         */
-        @Override
-        public Source resolve(String href, String base) {
-            String key = href.substring(href.indexOf(':') + 1);
-            LOGGER.debug("Building xml from {}", key);
-
-            Map<String, String> params = getParameterMap(key);
-
-            Element defaultRoot = new Element("root");
-            Element root = defaultRoot;
-            String rootName = params.get("_rootName_");
-            if (rootName != null) {
-                root = new Element(getLocalName(rootName), getNamespace(rootName));
-                params.remove("_rootName_");
-            }
-
-            for (Map.Entry<String, String> entry : params.entrySet()) {
-                constructElement(root, entry.getKey(), entry.getValue());
-            }
-            if (root.equals(defaultRoot) && root.getChildren().size() > 1) {
-                LOGGER.warn("More than 1 root node defined, returning first");
-                return new JDOMSource(root.getChildren().getFirst().detach());
-            }
-            return new JDOMSource(root);
-        }
-
-    }
-
-    /**
-     * Resolves the current user information. Example: currentUserInfo:attribute=eMail&attribute=realName&role=administrator <br>
-     * Returns: <br>
-     * <code>
-     *     &lt;user id="admin"&gt; <br>
-     *     &lt;attribute name="eMail"&gt;example@mycore.de&lt;/attribute&gt;<br>
-     *     &lt;attribute name="realName"&gt;Administrator&lt;/attribute&gt;<br>
-     *     &lt;role name="administrator"&gt;true&lt;/role&gt;<br>
-     *     &lt;/user&gt;<br>
-     * </code>
-     */
-    private static final class MCRCurrentUserInfoResolver implements URIResolver {
-        @Override
-        public Source resolve(String href, String base) throws TransformerException {
-            MCRUserInformation userInformation = MCRSessionMgr.getCurrentSession().getUserInformation();
-            String userID = userInformation.getUserID();
-
-            String[] split = href.split(":");
-
-            Set<String> suppliedAttributes = new HashSet<>();
-            Set<String> suppliedRoles = new HashSet<>();
-            Element root = new Element("user");
-            root.setAttribute("id", userID);
-
-            if (split.length == 2) {
-                String req = split[1];
-                MCRURLQueryParameter.parse(req).forEach(nv -> {
-                    if (nv.name().equals("attribute")) {
-                        if (suppliedAttributes.contains(nv.value())) {
-                            LOGGER.warn("Duplicate attribute {} in user info request", nv::value);
-                            return;
-                        }
-                        suppliedAttributes.add(nv.value());
-                        Element attribute = new Element("attribute");
-                        attribute.setAttribute("name", nv.value());
-                        attribute.setText(userInformation.getUserAttribute(nv.value()));
-                        root.addContent(attribute);
-                    } else if (nv.name().equals("role")) {
-                        if (suppliedRoles.contains(nv.value())) {
-                            LOGGER.warn("Duplicate role {} in user info request", nv::value);
-                            return;
-                        }
-                        suppliedRoles.add(nv.value());
-                        Element role = new Element("role");
-                        role.setAttribute("name", nv.value());
-                        role.setText(String.valueOf(userInformation.isUserInRole(nv.value())));
-                        root.addContent(role);
-                    }
-                });
-            }
-
-            return new JDOMSource(root);
-        }
-    }
-
-    /**
-     * Resolves the software Version of the MyCoRe Instance. The following types are supported: gitDescribe, abbrev,
-     * branch, version, revision, completeVersion. The default is completeVersion.
-     * The resulting XML looks like this:
-     * <code>
-     *     &lt;version&gt;MyCoRe 2022.06.3-SNAPSHOT 2022.06.x:v2022.06.2-1-g881e24d&lt;/version&gt;
-     * </code>
-     */
-    private static final class MCRVersionResolver implements URIResolver {
-
-        @SuppressWarnings("PMD.AvoidDuplicateLiterals")
-        @Override
-        public Source resolve(String href, String base) throws TransformerException {
-            String versionType = href.substring(href.indexOf(':') + 1);
-            final Element versionElement = new Element("version");
-            versionElement.setText(
-                switch (versionType) {
-                    case "gitDescribe" -> MCRCoreVersion.getGitDescribe();
-                    case "abbrev" -> MCRCoreVersion.getAbbrev();
-                    case "branch" -> MCRCoreVersion.getBranch();
-                    case "version" -> MCRCoreVersion.getVersion();
-                    case "completeVersion" -> MCRCoreVersion.getCompleteVersion();
-                    case "revision" -> MCRCoreVersion.getRevision();
-                    default -> throw new IllegalArgumentException(
-                        "Invalid parameter for MCRVersionResolver: " + versionType);
-
-                });
-            return new JDOMSource(versionElement);
-        }
-    }
-
-    /**
-     * Resolver for MCRLayoutUtils. The following types are supported: readAccess:$webpageID,
-     * readAccess:$webpageID:split:$blockerWebpageID
-     * returns
-     * <code>
-     *     &lt;true /&gt;
-     * </code>
-     * or
-     * <code>
-     *     &lt;false /&gt;
-     * </code>
-     */
-    private static final class MCRLayoutUtilsResolver implements URIResolver {
-
-        @Override
-        public Source resolve(String href, String base) throws TransformerException {
-            String[] args = href.split(":", 3);
-
-            if (args.length < 2) {
-                throw new TransformerException("No arguments given");
-            }
-            String function = args[1];
-
-            if (function.equals("readAccess")) {
-                String[] params = args[2].split(":split:");
-                if (params.length == 1) {
-                    return new JDOMSource(new Element(String.valueOf(MCRLayoutUtilities.readAccess(params[0]))));
-                } else if (params.length == 2) {
-                    return new JDOMSource(
-                        new Element(String.valueOf(MCRLayoutUtilities.readAccess(params[0], params[1]))));
-                }
-            } else if (function.equals("personalNavigation")) {
-                try {
-                    return new DOMSource(MCRLayoutUtilities.getPersonalNavigation());
-                } catch (JDOMException | XPathExpressionException e) {
-                    throw new MCRException("Error while loading personal navigation!", e);
-                }
-            }
-            throw new TransformerException("Unknown argument: " + args[2]);
-        }
-    }
-
-    /**
-     * Resolver for MCRWebsiteWriteProtection. Returns an XML with the following format:
-     * <code>
-     *   &lt;message  active="true|false"&gt;Message to display when write protection is active&lt;/message&gt;
-     * </code>
-     */
-    private static final class MCRWebsiteWriteProtectionResolver implements URIResolver {
-
-        @Override
-        public Source resolve(String href, String base) throws TransformerException {
-            boolean active = MCRWebsiteWriteProtection.isActive();
-            org.w3c.dom.Document message;
-            try {
-                message = MCRWebsiteWriteProtection.getMessage();
-            } catch (JDOMException e) {
-                throw new TransformerException(e);
-            }
-            if (message.getDocumentElement() == null) {
-                //fallback to default message if no message is set
-                message.appendChild(message.createElement("message"));
-            }
-            message.getDocumentElement().setAttribute("active", String.valueOf(active));
-            return new DOMSource(message);
-        }
-    }
-
-    private static final class MCRVersionInfoResolver implements URIResolver {
-
-        @Override
-        public Source resolve(String href, String base) throws TransformerException {
-            String id = href.substring(href.indexOf(':') + 1);
-            LOGGER.debug("Reading version info of MCRObject with ID {}", id);
-            MCRObjectID mcrId = MCRObjectID.getInstance(id);
-            MCRXMLMetadataManager metadataManager = MCRXMLMetadataManager.obtainInstance();
-            try {
-                List<? extends MCRAbstractMetadataVersion<?>> versions = metadataManager.listRevisions(mcrId);
-                if (versions != null && !versions.isEmpty()) {
-                    return getSource(versions);
-                } else {
-                    return getSource(Instant.ofEpochMilli(metadataManager.getLastModified(mcrId))
-                        .truncatedTo(ChronoUnit.MILLIS));
-                }
-            } catch (Exception e) {
-                throw new TransformerException(e);
-            }
-        }
-
-        @SuppressWarnings("PMD.AvoidDuplicateLiterals")
-        private Source getSource(Instant lastModified) {
-            Element e = new Element("versions");
-            Element v = new Element("version");
-            e.addContent(v);
-            v.setAttribute("date", lastModified.toString());
-            return new JDOMSource(e);
-        }
-
-        @SuppressWarnings("PMD.AvoidDuplicateLiterals")
-        private Source getSource(List<? extends MCRAbstractMetadataVersion<?>> versions) {
-            Element e = new Element("versions");
-            for (MCRAbstractMetadataVersion<?> version : versions) {
-                Element v = new Element("version");
-                v.setAttribute("user", version.getUser());
-                v.setAttribute("date", MCRXMLFunctions.getISODate(version.getDate(), null));
-                v.setAttribute("r", version.getRevision());
-                v.setAttribute("action", Character.toString(version.getType()));
-                e.addContent(v);
-            }
-            return new JDOMSource(e);
-        }
-    }
-
-    private static final class MCRDeletedObjectResolver implements URIResolver {
-
-        /**
-         * Returns a deleted mcr object xml for the given id. If there is no such object a dummy object with an empty
-         * metadata element is returned.
-         *
-         * @param href
-         *            an uri starting with <code>deletedMcrObject:</code>
-         * @param base
-         *            may be null
-         */
-        @Override
-        public Source resolve(String href, String base) throws TransformerException {
-            String[] parts = href.split(":");
-            MCRObjectID mcrId = MCRObjectID.getInstance(parts[parts.length - 1]);
-            LOGGER.info("Resolving deleted object {}", mcrId);
-            try {
-                MCRContent lastPresentVersion = MCRXMLMetadataManager.obtainInstance().retrieveContent(mcrId);
-                if (lastPresentVersion == null) {
-                    LOGGER.warn("Could not resolve deleted object {}", mcrId);
-                    return new JDOMSource(MCRObjectFactory.getSampleObject(mcrId));
-                }
-                return lastPresentVersion.getSource();
-            } catch (IOException e) {
-                throw new TransformerException(e);
-            }
-        }
-    }
-
-    private static final class MCRFileMetadataResolver implements URIResolver {
-
-        @Override
-        public Source resolve(String href, String base) {
-            String[] parts = href.split(":");
-            String completePath = parts[1];
-            String[] pathParts = completePath.split("/", 2);
-            MCRObjectID derivateID = MCRObjectID.getInstance(pathParts[0]);
-            MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derivateID);
-            MCRObjectDerivate objectDerivate = derivate.getDerivate();
-            if (pathParts.length == 1) {
-                //only derivate is given;
-                Element fileset = new Element(MCRObjectDerivate.ELEMENT_FILESET);
-                if (objectDerivate.getURN() != null) {
-                    fileset.setAttribute(MCRObjectDerivate.ATTRIBUTE_FILESET_URN, objectDerivate.getURN());
-                    for (MCRFileMetadata fileMeta : objectDerivate.getFileMetadata()) {
-                        fileset.addContent(fileMeta.createXML());
-                    }
-                }
-                return new JDOMSource(fileset);
-            }
-            MCRFileMetadata fileMetadata = objectDerivate.getOrCreateFileMetadata("/" + pathParts[1]);
-            return new JDOMSource(fileMetadata.createXML());
-        }
-    }
-
-    /**
      * Redirect to different URIResolver that is defined via property. This resolver is meant to serve static content as
      * no variable substitution takes place Example: MCR.URIResolver.redirect.alias=webapp:path/to/alias.xml
      */
@@ -1697,107 +806,8 @@ public final class MCRURIResolver implements URIResolver {
         }
     }
 
-    /**
-     * Resolves an data url and returns the content.
-     *
-     * @see MCRDataURL
-     */
-    private static final class MCRDataURLResolver implements URIResolver {
-
-        @Override
-        public Source resolve(String href, String base) throws TransformerException {
-            try {
-                final MCRDataURL dataURL = MCRDataURL.parse(href);
-
-                final MCRByteContent content = new MCRByteContent(dataURL.getData());
-                content.setSystemId(href);
-                content.setMimeType(dataURL.getMimeType());
-                content.setEncoding(dataURL.getCharset().name());
-
-                return content.getSource();
-            } catch (IOException e) {
-                throw new TransformerException(e);
-            }
-        }
-
-    }
-
-    private static final class MCRI18NResolver implements URIResolver {
-
-        /**
-         * Resolves the I18N String value for the given property.<br><br>
-         * <br>
-         * Syntax: <code>i18n:{i18n-code},{i18n-prefix}*,{i18n-prefix}*...</code> or <br>
-         *         <code>i18n:{i18n-code}[:param1:param2:…paramN]</code>
-         * <br>
-         * Result: <code> <br>
-         *     &lt;i18n&gt; <br>
-         *   &lt;translation key=&quot;key1&quot;&gt;translation1&lt;/translation&gt; <br>
-         *   &lt;translation key=&quot;key2&quot;&gt;translation2&lt;/translation&gt; <br>
-         *   &lt;translation key=&quot;key3&quot;&gt;translation3&lt;/translation&gt; <br>
-         * &lt;/i18n&gt; <br>
-         * </code>
-         * <br/>
-         * If just one i18n-code is passed, then the translation element is skipped.
-         * <code>
-         *     &lt;i18n&gt; <br>translation&lt;/i18n&gt;<br>
-         * </code>
-         * Additionally, if the singular i18n-code is followed by a ":"-separated list of values,
-         * the translation result is interpreted to be in Java MessageFormat and will be formatted with those values.
-         * E.g.
-         * <code>i18n:module.dptbase.common.results.nResults:15</code> (<code>{0} objects found</code>)
-         *  -> "<code>15 objects found</code>"
-         * @param href
-         *            URI in the syntax above
-         * @param base
-         *            not used
-         * @return the element with result format above
-         * @see URIResolver
-         */
-        @Override
-        public Source resolve(String href, String base) {
-            String target = href.substring(href.indexOf(':') + 1);
-
-            final Element i18nElement = new Element("i18n");
-            if (!target.contains("*") && !target.contains(",")) {
-                String translation;
-                if (target.contains(":")) {
-                    final int i = target.indexOf(':');
-                    translation = MCRTranslation.translate(target.substring(0, i),
-                        (Object[]) target.substring(i + 1).split(":"));
-                } else {
-                    translation = MCRTranslation.translate(target);
-                }
-                i18nElement.addContent(translation);
-                return new JDOMSource(i18nElement);
-            }
-
-            final String[] translationKeys = target.split(",");
-
-            // Combine translations to prevent duplicates
-            Map<String, String> translations = new HashMap<>();
-            for (String translationKey : translationKeys) {
-                if (translationKey.endsWith("*")) {
-                    final String prefix = translationKey.substring(0, translationKey.length() - 1);
-                    translations.putAll(MCRTranslation.translatePrefix(prefix));
-                } else {
-                    translations.put(translationKey,
-                        MCRTranslation.translate(translationKey));
-                }
-            }
-
-            translations.forEach((key, value) -> {
-                final Element translation = new Element("translation");
-                translation.setAttribute("key", key);
-                translation.setText(value);
-                i18nElement.addContent(translation);
-            });
-
-            return new JDOMSource(i18nElement);
-        }
-    }
-
     private static final class MCRCheckPermissionChainResolver implements URIResolver {
+
         /**
          * Checks the permission and if granted resolve the uri
          * <p>
@@ -1835,58 +845,6 @@ public final class MCRURIResolver implements URIResolver {
             }
 
             return obtainInstance().resolve(uri, base);
-        }
-    }
-
-    private static final class MCRCheckPermissionResolver implements URIResolver {
-        /**
-         * returns the boolean value for the given ACL permission.
-         * <p>
-         * Syntax: <code>checkPermission:{id}:{permission}</code> or <code>checkPermission:{permission}</code>
-         *
-         * @param href
-         *            URI in the syntax above
-         * @param base
-         *            not used
-         * @return the root element "boolean" of the XML document with content string true of false
-         * @see URIResolver
-         */
-        @Override
-        public Source resolve(String href, String base) {
-            final String[] split = href.split(":");
-            boolean permission = switch (split.length) {
-                case 2 -> MCRAccessManager.checkPermission(split[1]);
-                case 3 -> MCRAccessManager.checkPermission(split[1], split[2]);
-                default -> throw new IllegalArgumentException(
-                    "Invalid format of uri for retrieval of checkPermission: " + href);
-            };
-            return createBooleanResponse(permission);
-        }
-    }
-
-    private static final class MCRCheckDerivateDisplayEnabledResolver implements URIResolver {
-        /**
-         * returns the boolean value for the given derivate and intent.
-         * <p>
-         * Syntax: <code>checkDerivateDisplayEnabled:{id}:{intent}</code>
-         *
-         * @param href
-         *            URI in the syntax above
-         * @param base
-         *            not used
-         * @return the root element "boolean" of the XML document with content string true of false
-         * @see URIResolver
-         */
-        @Override
-        public Source resolve(String href, String base) {
-            final String[] split = href.split(":");
-            boolean result = switch (split.length) {
-                case 2 -> true;
-                case 3 -> MCRXMLFunctions.isDerivateDisplayEnabled(split[1], split[2]);
-                default -> throw new IllegalArgumentException(
-                    "Invalid format of uri for retrieval of checkDerivateDisplayEnabled: " + href);
-            };
-            return createBooleanResponse(result);
         }
     }
 

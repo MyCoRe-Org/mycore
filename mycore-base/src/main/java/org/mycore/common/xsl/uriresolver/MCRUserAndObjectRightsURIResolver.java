@@ -98,4 +98,5 @@ public class MCRUserAndObjectRightsURIResolver implements URIResolver {
             throw new TransformerException("Error creating DOM document for " + href, e);
         }
     }
+
 }
