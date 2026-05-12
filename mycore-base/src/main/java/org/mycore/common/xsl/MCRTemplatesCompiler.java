@@ -33,7 +33,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.xml.utils.WrappedRuntimeException;
 import org.mycore.common.MCRExceptionCauseFinder;
 import org.mycore.common.config.MCRConfigurationException;
-import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 
 /**
  * Compiles XSL sources, reports compile errors and returns transformer

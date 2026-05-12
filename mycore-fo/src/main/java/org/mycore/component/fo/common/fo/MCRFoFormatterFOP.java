@@ -59,8 +59,8 @@ import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRSourceContent;
-import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xsl.MCRErrorListener;
+import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 import org.mycore.resource.MCRResourceHelper;
 
 /**

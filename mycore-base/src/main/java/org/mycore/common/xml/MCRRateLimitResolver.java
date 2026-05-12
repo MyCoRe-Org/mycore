@@ -31,6 +31,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRRateLimitBuckets;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.ConsumptionProbe;

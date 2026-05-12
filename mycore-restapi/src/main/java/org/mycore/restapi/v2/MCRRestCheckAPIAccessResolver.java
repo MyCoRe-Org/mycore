@@ -23,7 +23,7 @@ import javax.xml.transform.URIResolver;
 
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 import org.mycore.restapi.v2.access.MCRRestAccessManager;
 
 public class MCRRestCheckAPIAccessResolver implements URIResolver {

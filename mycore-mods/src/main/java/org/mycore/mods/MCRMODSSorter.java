@@ -26,7 +26,7 @@ import javax.xml.transform.URIResolver;
 
 import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
-import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 
 /**
  * Provides functionality to sort MODS elements to a predefined order.

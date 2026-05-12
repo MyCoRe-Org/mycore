@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 import org.jdom2.Element;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 import org.mycore.oai.pmh.DateUtils;
 import org.mycore.oai.pmh.Description;
 import org.mycore.oai.pmh.FriendsDescription;

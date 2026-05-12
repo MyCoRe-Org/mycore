@@ -27,7 +27,7 @@ import javax.xml.transform.URIResolver;
 
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
-import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 
 /**
  * Provides URIResolver to hash string.

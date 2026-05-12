@@ -76,6 +76,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.common.xml.derivate.MCRDerivateDisplayFilter;
+import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategory;

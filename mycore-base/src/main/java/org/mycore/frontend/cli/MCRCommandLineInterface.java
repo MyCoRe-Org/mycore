@@ -50,7 +50,7 @@ import org.mycore.common.MCRTransactionManager;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.events.MCRStartupHandler;
-import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 import org.mycore.resource.MCRResourceHelper;
 
 /**
@@ -294,7 +294,7 @@ public class MCRCommandLineInterface {
             .forEach(l -> System.out.printf(Locale.ROOT, "%04d: %s", ln.incrementAndGet(), l));
         System.out.println();
     }
-    
+
     /**
      * Reads XML content from URIResolver and sends output to a local file.
      */

@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.common.xml;
+package org.mycore.common.xsl.uriresolver;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -85,6 +85,10 @@ import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRParameterizedTransformer;
 import org.mycore.common.content.transformer.MCRXSLTransformer;
+import org.mycore.common.xml.MCREntityResolver;
+import org.mycore.common.xml.MCRLayoutTransformerFactory;
+import org.mycore.common.xml.MCRXMLFunctions;
+import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.common.xsl.MCRLazyStreamSource;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -300,7 +304,7 @@ public final class MCRURIResolver implements URIResolver {
     /**
      * URI Resolver that resolves XSL document() or xsl:include calls.
      *
-     * @see javax.xml.transform.URIResolver
+     * @see URIResolver
      */
     @Override
     public Source resolve(String href, String base) throws TransformerException {
@@ -1247,7 +1251,7 @@ public final class MCRURIResolver implements URIResolver {
      * Example: MCR.URIResolver.xslIncludes.components=iview.xsl,wcms.xsl
      * <p>
      * Or retrieve the hrefs to be included from a class implementing
-     * {@link org.mycore.common.xml.MCRURIResolver.MCRXslIncludeHrefs}. The <code>class.</code> part has to be set,
+     * {@link MCRXslIncludeHrefs}. The <code>class.</code> part has to be set,
      * everything after <code>class.</code> can be chosen freely.
      * </p>
      * Example: MCR.URIResolver.xslIncludes.class.template=org.foo.XSLHrefs
@@ -1748,7 +1752,7 @@ public final class MCRURIResolver implements URIResolver {
          * @param base
          *            not used
          * @return the element with result format above
-         * @see javax.xml.transform.URIResolver
+         * @see URIResolver
          */
         @Override
         public Source resolve(String href, String base) {
@@ -1804,7 +1808,7 @@ public final class MCRURIResolver implements URIResolver {
          * @param base
          *            not used
          * @return if you have the permission then the resolved uri otherwise an Exception
-         * @see javax.xml.transform.URIResolver
+         * @see URIResolver
          */
         @Override
         public Source resolve(String href, String base) throws TransformerException {
@@ -1845,7 +1849,7 @@ public final class MCRURIResolver implements URIResolver {
          * @param base
          *            not used
          * @return the root element "boolean" of the XML document with content string true of false
-         * @see javax.xml.transform.URIResolver
+         * @see URIResolver
          */
         @Override
         public Source resolve(String href, String base) {
@@ -1871,7 +1875,7 @@ public final class MCRURIResolver implements URIResolver {
          * @param base
          *            not used
          * @return the root element "boolean" of the XML document with content string true of false
-         * @see javax.xml.transform.URIResolver
+         * @see URIResolver
          */
         @Override
         public Source resolve(String href, String base) {

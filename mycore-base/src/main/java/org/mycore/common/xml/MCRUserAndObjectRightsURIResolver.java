@@ -27,34 +27,35 @@ import javax.xml.transform.dom.DOMSource;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
+import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
  * URI-Resolver, that checks if a MyCoRe object is
  * worldReadable or worldReadableComplete and certain user and role information
- * 
+ *
  * It is used as replacement for Xalan-Java functions in XSLT3 stylesheets.
- * 
- * 
+ *
+ *
  * It is registered as property:
  * MCR.URIResolver.ModuleResolver.userobjectrights=org.mycore.common.xml.MCRUserAndObjectRightsURIResolver
- *  
+ *
  * returns for boolean results
  * an XML element &lt;boolean&gt; with text 'true' or 'false'
- * 
+ *
  * or for user attributes 
  * an XML element &lt;userattribute name='{key}'&gt;{value}&lt;/userattribute&gt;
- * 
+ *
  * sample usage (usually in SOLR indexing templates):
- * 
+ *
  * &lt;field name="worldReadable"&gt;
  *     &lt;xsl:value-of select="document(concat('userobjectrights:isWorldReadable:',@ID))/boolean" /&gt;
  * &lt;/field&gt;
  * &lt;field name="worldReadableComplete"&gt;
  *     &lt;xsl:value-of select="document(concat('userobjectrights:isWorldReadableComplete:',@ID))/boolean" /&gt;
  * &lt;/field&gt;
- * 
+ *
  */
 public class MCRUserAndObjectRightsURIResolver implements URIResolver {
 
@@ -68,10 +69,10 @@ public class MCRUserAndObjectRightsURIResolver implements URIResolver {
         try {
             return switch (key) {
                 case "isWorldReadable" -> MCRURIResolver.createBooleanResponse(MCRXMLFunctions.isWorldReadable(value));
-                case "isWorldReadableComplete"
-                    -> MCRURIResolver.createBooleanResponse(MCRXMLFunctions.isWorldReadableComplete(value));
-                case "isDisplayedEnabledDerivate"
-                    -> MCRURIResolver.createBooleanResponse(MCRAccessManager.checkDerivateDisplayPermission(value));
+                case "isWorldReadableComplete" ->
+                    MCRURIResolver.createBooleanResponse(MCRXMLFunctions.isWorldReadableComplete(value));
+                case "isDisplayedEnabledDerivate" ->
+                    MCRURIResolver.createBooleanResponse(MCRAccessManager.checkDerivateDisplayPermission(value));
                 case "isCurrentUserInRole" -> MCRURIResolver
                     .createBooleanResponse(MCRSessionMgr.getCurrentSession().getUserInformation().isUserInRole(value));
                 case "isCurrentUserSuperUser" -> MCRURIResolver.createBooleanResponse(MCRSessionMgr.getCurrentSession()
@@ -88,8 +89,8 @@ public class MCRUserAndObjectRightsURIResolver implements URIResolver {
                             MCRSessionMgr.getCurrentSession().getUserInformation().getUserAttribute(value)));
                     yield new DOMSource(doc);
                 }
-                default
-                    -> throw new TransformerException("Unknown query for MCRUserAndObjectRightsURIResolver: " + query);
+                default ->
+                    throw new TransformerException("Unknown query for MCRUserAndObjectRightsURIResolver: " + query);
             };
 
         } catch (ParserConfigurationException e) {

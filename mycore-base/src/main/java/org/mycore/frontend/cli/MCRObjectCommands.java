@@ -71,11 +71,11 @@ import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
 import org.mycore.common.xml.MCREntityResolver;
 import org.mycore.common.xml.MCRLayoutTransformerFactory;
-import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.common.xml.MCRXSLTransformerUtils;
 import org.mycore.common.xsl.MCRErrorListener;
+import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRFileBaseCacheObjectIDGenerator;
@@ -524,7 +524,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
         return mcrObject;
     }
-    
 
     /**
      * Shows the next free MCRObjectIDs.
@@ -1082,7 +1081,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         LOGGER.info("Setting link in \"{}\" to parent \"{}\"", sourceId, newParentObjectID);
         MCRMetaParentID parentLinkId = new MCRMetaParentID(newParentObjectID);
         sourceMCRObject.getStructure().setParent(parentLinkId);
-
 
         LOGGER.info("Update \"{}\" in datastore (saving new link)", sourceId);
         MCRMetadataManager.update(sourceMCRObject);

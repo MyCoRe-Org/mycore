@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.common.xml;
+package org.mycore.common.xsl.uriresolver;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -51,7 +51,7 @@ public class MCRURIResolverFilter implements Filter {
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final ThreadLocal<List<String>> URI_LIST = ThreadLocal.withInitial(ArrayList::new);
-    
+
     static void addUri(String uri) {
         URI_LIST.get().add(uri);
     }

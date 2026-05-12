@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.jdom2.Element;
 import org.junit.jupiter.api.Test;
+import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest

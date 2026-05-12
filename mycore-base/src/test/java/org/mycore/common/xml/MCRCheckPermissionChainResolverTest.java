@@ -36,6 +36,7 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.access.MCRAccessMock;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
+import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest

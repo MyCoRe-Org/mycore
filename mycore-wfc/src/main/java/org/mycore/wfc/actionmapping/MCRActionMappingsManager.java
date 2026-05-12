@@ -21,7 +21,7 @@ package org.mycore.wfc.actionmapping;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 
-import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 import org.mycore.wfc.MCRConstants;
 
 import jakarta.xml.bind.JAXBElement;
