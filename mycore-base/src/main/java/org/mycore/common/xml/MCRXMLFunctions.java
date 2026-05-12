@@ -74,6 +74,7 @@ import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRSourceContent;
+import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.common.xml.derivate.MCRDerivateDisplayFilter;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
@@ -108,7 +109,9 @@ import jakarta.ws.rs.core.UriBuilder;
  */
 public class MCRXMLFunctions {
 
-    public static final String DERIVATE_DISPLAY_FILTER_PROPERTY = "MCR.Derivate.DisplayFilter.Class";
+    private static final Logger LOGGER = LogManager.getLogger();
+
+    public static final String SELECTED_DERIVATE_DISPLAY_FILTER_PROPERTY = "MCR.Derivate.SelectedDisplayFilter";
 
     private static final String TAG_START = "\\<\\w+((\\s+\\w+(\\s*\\=\\s*(?:\".*?\"|'.*?'|[^'\"\\>\\s]+))?)+"
         + "\\s*|\\s*)\\>";
@@ -126,10 +129,22 @@ public class MCRXMLFunctions {
         .compile("(" + TAG_START + "((.*?[^\\<]))" + TAG_END + ")|(" + TAG_SELF_CLOSING + ")|(" + HTML_ENTITY + ")",
             Pattern.DOTALL);
 
-    private static final MCRDerivateDisplayFilter DERIVATE_DISPLAY_FILTER = MCRConfiguration2
-        .getInstanceOfOrThrow(MCRDerivateDisplayFilter.class, DERIVATE_DISPLAY_FILTER_PROPERTY);
+    private static final MCRDerivateDisplayFilter DERIVATE_DISPLAY_FILTER;
 
-    private static final Logger LOGGER = LogManager.getLogger();
+    static {
+
+        String selectedFilter = MCRConfiguration2.getStringOrThrow(SELECTED_DERIVATE_DISPLAY_FILTER_PROPERTY);
+
+        DERIVATE_DISPLAY_FILTER = MCRConfiguration2.getInstanceOfOrThrow(MCRDerivateDisplayFilter.class,
+            "MCR.Derivate.DisplayFilters." + selectedFilter + ".Class");
+
+        if (LOGGER.isInfoEnabled()) {
+            String introduction = "Configuration of selected derivate display filter (" + selectedFilter + "):";
+            MCRTreeMessage description = DERIVATE_DISPLAY_FILTER.compileDescription(LOGGER.getLevel());
+            LOGGER.info(description.logMessage(introduction));
+        }
+
+    }
 
     private static volatile MimetypesFileTypeMap mimetypeMap;
 
@@ -388,7 +403,7 @@ public class MCRXMLFunctions {
      * Returns, weather the derivate identified by the given derivate ID
      * should be included when displaying derivates for the given intent
      * (which is controlled by the configured {@link MCRDerivateDisplayFilter},
-     * set by configuration property {@link MCRXMLFunctions#DERIVATE_DISPLAY_FILTER_PROPERTY}).
+     * selected by configuration property {@link MCRXMLFunctions#SELECTED_DERIVATE_DISPLAY_FILTER_PROPERTY}).
      * <p>
      * This check is independent of weather the derivate is allowed to be accessed,
      * which can be ascertained, depending on context, by, for example,
@@ -405,7 +420,7 @@ public class MCRXMLFunctions {
      * Returns, weather the derivate identified by the given derivate ID
      * should be included when displaying derivates for the given intent
      * (which is controlled by the configured {@link MCRDerivateDisplayFilter},
-     * set by configuration property {@link MCRXMLFunctions#DERIVATE_DISPLAY_FILTER_PROPERTY}).
+     * selected by configuration property {@link MCRXMLFunctions#SELECTED_DERIVATE_DISPLAY_FILTER_PROPERTY}).
      * <p>
      * This check is independent of weather the derivate is allowed to be accessed,
      * which can be ascertained, depending on context, by, for example,

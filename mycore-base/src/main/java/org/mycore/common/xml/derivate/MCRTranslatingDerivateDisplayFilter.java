@@ -23,9 +23,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
 
+import org.apache.logging.log4j.Level;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstance;
 import org.mycore.common.config.annotation.MCRPropertyMap;
+import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.datamodel.metadata.MCRDerivate;
 
 /**
@@ -68,6 +70,20 @@ public class MCRTranslatingDerivateDisplayFilter implements MCRDerivateDisplayFi
     @Override
     public Boolean isDisplayEnabled(MCRDerivate derivate, String intent) {
         return filter.isDisplayEnabled(derivate, translations.getOrDefault(intent, intent));
+    }
+
+    @Override
+    public MCRTreeMessage compileDescription(Level level) {
+        MCRTreeMessage description = MCRDerivateDisplayFilter.super.compileDescription(level);
+        description.add("Translations", compileTranslationsDescription());
+        description.add("Filter", filter.compileDescription(level));
+        return description;
+    }
+
+    private MCRTreeMessage compileTranslationsDescription() {
+        MCRTreeMessage translationsDescription = new MCRTreeMessage();
+        translations.forEach(translationsDescription::add);
+        return translationsDescription;
     }
 
     public static class Factory implements Supplier<MCRTranslatingDerivateDisplayFilter> {

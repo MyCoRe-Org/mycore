@@ -26,9 +26,11 @@ import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.Level;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstanceMap;
 import org.mycore.common.config.annotation.MCRPropertyMap;
+import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
 
@@ -93,6 +95,19 @@ public class MCRDerivateTypeDerivateDisplayFilter implements MCRDerivateDisplayF
 
     }
 
+    @Override
+    public MCRTreeMessage compileDescription(Level level) {
+        MCRTreeMessage description = MCRDerivateDisplayFilter.super.compileDescription(level);
+        description.add("Mappings", compileMappingsDescription());
+        return description;
+    }
+
+    private MCRTreeMessage compileMappingsDescription() {
+        MCRTreeMessage mappingsDescription = new MCRTreeMessage();
+        mappings.forEach((intent, mapping) -> mappingsDescription.add(intent, mapping.compileDescription()));
+        return mappingsDescription;
+    }
+
     @MCRConfigurationProxy(proxyClass = Mapping.Factory.class)
     public static final class Mapping {
 
@@ -109,6 +124,12 @@ public class MCRDerivateTypeDerivateDisplayFilter implements MCRDerivateDisplayF
         @Override
         public String toString() {
             return mappings.toString();
+        }
+
+        public MCRTreeMessage compileDescription() {
+            MCRTreeMessage mappingsDescription = new MCRTreeMessage();
+            mappings.forEach((derivateType, value) -> mappingsDescription.add(derivateType, value.toString()));
+            return mappingsDescription;
         }
 
         public static final class Factory implements Supplier<Mapping> {

@@ -24,9 +24,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 
+import org.apache.logging.log4j.Level;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstanceList;
 import org.mycore.common.config.annotation.MCRSentinel;
+import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.datamodel.metadata.MCRDerivate;
 
 /**
@@ -79,6 +81,13 @@ public class MCRCombinedDerivateDisplayFilter implements MCRDerivateDisplayFilte
             }
         }
         return null;
+    }
+
+    @Override
+    public MCRTreeMessage compileDescription(Level level) {
+        MCRTreeMessage description = MCRDerivateDisplayFilter.super.compileDescription(level);
+        filters.forEach(filter -> description.add("Filter", filter.compileDescription(level)));
+        return description;
     }
 
     public static class Factory implements Supplier<MCRCombinedDerivateDisplayFilter> {
