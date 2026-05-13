@@ -23,7 +23,7 @@ import javax.xml.transform.URIResolver;
 
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.common.xsl.uriresolver.MCRURIResolver;
+import org.mycore.common.xsl.uriresolver.MCRURIResolverResponse;
 import org.mycore.restapi.v2.access.MCRRestAccessManager;
 
 public class MCRRestCheckAPIAccessResolver implements URIResolver {
@@ -48,7 +48,7 @@ public class MCRRestCheckAPIAccessResolver implements URIResolver {
             final String permission = hrefParts[2];
             final MCRAccessInterface acl = MCRAccessManager.getAccessImpl();
             final boolean isPermitted = MCRRestAccessManager.checkRestAPIAccess(acl, permission, hrefParts[1]);
-            return MCRURIResolver.createBooleanResponse(isPermitted);
+            return MCRURIResolverResponse.ofBoolean(isPermitted);
         }
         throw new IllegalArgumentException("Invalid format of uri for retrieval of checkRestAPIAccess: " + href);
     }

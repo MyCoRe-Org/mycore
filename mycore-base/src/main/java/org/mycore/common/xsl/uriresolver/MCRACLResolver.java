@@ -18,9 +18,7 @@
 
 package org.mycore.common.xsl.uriresolver;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.URIResolver;
@@ -47,14 +45,7 @@ public class MCRACLResolver implements URIResolver {
         String key = href.substring(href.indexOf(':') + 1);
         LOGGER.debug("Reading xml from query result using key :{}", key);
 
-        String[] param;
-        StringTokenizer tok = new StringTokenizer(key, "&");
-        Map<String, String> params = new HashMap<>();
-
-        while (tok.hasMoreTokens()) {
-            param = tok.nextToken().split("=");
-            params.put(param[0], param[1]);
-        }
+        Map<String, String> params = MCRURIResolverHelper.parseQueryParameters(key);
 
         String action = params.get(ACTION_PARAM);
         String objId = params.get(OBJECT_ID_PARAM);

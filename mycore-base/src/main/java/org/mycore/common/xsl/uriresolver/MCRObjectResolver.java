@@ -59,7 +59,7 @@ public class MCRObjectResolver implements URIResolver {
         id = tok.nextToken();
 
         if (tok.hasMoreTokens()) {
-            params = MCRURIResolver.getParameterMap(tok.nextToken());
+            params = MCRURIResolverHelper.parseQueryParameters(tok.nextToken());
         } else {
             params = Collections.emptyMap();
         }

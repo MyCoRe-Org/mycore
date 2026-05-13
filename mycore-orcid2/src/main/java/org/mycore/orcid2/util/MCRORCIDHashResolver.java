@@ -27,7 +27,7 @@ import javax.xml.transform.URIResolver;
 
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
-import org.mycore.common.xsl.uriresolver.MCRURIResolver;
+import org.mycore.common.xsl.uriresolver.MCRURIResolverResponse;
 
 /**
  * Provides URIResolver to hash string.
@@ -78,6 +78,6 @@ public class MCRORCIDHashResolver implements URIResolver {
         } catch (NumberFormatException e) {
             throw new MCRException("Invalid format of uri for retrieval of hash: " + href, e);
         }
-        return MCRURIResolver.createStringResponse(result);
+        return MCRURIResolverResponse.ofString(result);
     }
 }

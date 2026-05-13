@@ -46,7 +46,7 @@ public class MCRCheckPermissionResolver implements URIResolver {
             default -> throw new IllegalArgumentException(
                 "Invalid format of uri for retrieval of checkPermission: " + href);
         };
-        return MCRURIResolver.createBooleanResponse(permission);
+        return MCRURIResolverResponse.ofBoolean(permission);
     }
 
 }

@@ -26,7 +26,7 @@ import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 
-import org.mycore.common.xsl.uriresolver.MCRURIResolver;
+import org.mycore.common.xsl.uriresolver.MCRURIResolverResponse;
 import org.mycore.services.http.MCRURLQueryParameter;
 
 /**
@@ -70,7 +70,7 @@ public class MCRActionMappingURIResolver implements URIResolver {
         return switch (method) {
             case GET_URL_FOR_ID_METHOD -> {
                 requireArguments(argumentMap, GET_URL_FOR_ID_METHOD, ACTION_ARG, ID_ARG, ABSOLUTE_ARG);
-                yield MCRURIResolver.createStringResponse(Objects.toString(MCRURLRetriever.getURLforID(
+                yield MCRURIResolverResponse.ofString(Objects.toString(MCRURLRetriever.getURLforID(
                     argumentMap.get(ACTION_ARG),
                     argumentMap.get(ID_ARG),
                     Boolean.parseBoolean(argumentMap.get(ABSOLUTE_ARG))), ""));
@@ -78,7 +78,7 @@ public class MCRActionMappingURIResolver implements URIResolver {
             case GET_URL_FOR_COLLECTION_METHOD -> {
                 requireArguments(argumentMap, GET_URL_FOR_COLLECTION_METHOD, ACTION_ARG, COLLECTION_ARG,
                     ABSOLUTE_ARG);
-                yield MCRURIResolver.createStringResponse(Objects.toString(MCRURLRetriever.getURLforCollection(
+                yield MCRURIResolverResponse.ofString(Objects.toString(MCRURLRetriever.getURLforCollection(
                     argumentMap.get(ACTION_ARG),
                     argumentMap.get(COLLECTION_ARG),
                     Boolean.parseBoolean(argumentMap.get(ABSOLUTE_ARG))), ""));

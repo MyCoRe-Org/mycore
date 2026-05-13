@@ -27,7 +27,7 @@ import javax.xml.transform.dom.DOMSource;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.common.xsl.uriresolver.MCRURIResolver;
+import org.mycore.common.xsl.uriresolver.MCRURIResolverResponse;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -70,16 +70,16 @@ public class MCRUserAndObjectRightsURIResolver implements URIResolver {
 
         try {
             return switch (key) {
-                case "isWorldReadable" -> MCRURIResolver.createBooleanResponse(MCRXMLFunctions.isWorldReadable(value));
+                case "isWorldReadable" -> MCRURIResolverResponse.ofBoolean(MCRXMLFunctions.isWorldReadable(value));
                 case "isWorldReadableComplete" ->
-                    MCRURIResolver.createBooleanResponse(MCRXMLFunctions.isWorldReadableComplete(value));
+                    MCRURIResolverResponse.ofBoolean(MCRXMLFunctions.isWorldReadableComplete(value));
                 case "isDisplayedEnabledDerivate" ->
-                    MCRURIResolver.createBooleanResponse(MCRAccessManager.checkDerivateDisplayPermission(value));
-                case "isCurrentUserInRole" -> MCRURIResolver
-                    .createBooleanResponse(MCRSessionMgr.getCurrentSession().getUserInformation().isUserInRole(value));
-                case "isCurrentUserSuperUser" -> MCRURIResolver.createBooleanResponse(MCRSessionMgr.getCurrentSession()
+                    MCRURIResolverResponse.ofBoolean(MCRAccessManager.checkDerivateDisplayPermission(value));
+                case "isCurrentUserInRole" -> MCRURIResolverResponse
+                    .ofBoolean(MCRSessionMgr.getCurrentSession().getUserInformation().isUserInRole(value));
+                case "isCurrentUserSuperUser" -> MCRURIResolverResponse.ofBoolean(MCRSessionMgr.getCurrentSession()
                     .getUserInformation().getUserID().equals(MCRSystemUserInformation.SUPER_USER.getUserID()));
-                case "isCurrentUserGuestUser" -> MCRURIResolver.createBooleanResponse(MCRSessionMgr.getCurrentSession()
+                case "isCurrentUserGuestUser" -> MCRURIResolverResponse.ofBoolean(MCRSessionMgr.getCurrentSession()
                     .getUserInformation().getUserID().equals(MCRSystemUserInformation.GUEST.getUserID()));
                 case "getCurrentUserAttribute" -> {
                     Document doc = MCRDOMUtils.getDocumentBuilder().newDocument();

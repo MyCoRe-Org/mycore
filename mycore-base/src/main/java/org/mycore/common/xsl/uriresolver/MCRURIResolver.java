@@ -20,8 +20,6 @@ package org.mycore.common.xsl.uriresolver;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,15 +36,13 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.jdom2.Element;
-import org.jdom2.transform.JDOMSource;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRFactory;
 import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.xml.MCREntityResolver;
 import org.mycore.common.xsl.MCRLazyStreamSource;
-import org.mycore.resource.MCRResourceHelper;
-import org.mycore.resource.MCRResourcePath;
+import org.mycore.common.xsl.MCRXSLResourceHelper;
 import org.xml.sax.InputSource;
 
 /**
@@ -66,12 +62,6 @@ public class MCRURIResolver implements URIResolver {
     private static final String CONFIG_PREFIX = "MCR.URIResolver.";
 
     private static final Marker UNIQUE_MARKER = MarkerManager.getMarker("tryResolveXML");
-
-    public static final String PROPERTY_XSL_FOLDER = "MCR.Layout.Transformer.Factory.XSLFolder";
-
-    public static final String RESOURCE_PREFIX = "resource:";
-
-    public static final String ELEMENT_NULL = "null";
 
     private Map<String, URIResolver> supportedSchemes;
 
@@ -96,16 +86,6 @@ public class MCRURIResolver implements URIResolver {
             .orElse(HashMap::new);
     }
 
-    public static void findAndThrowTransformerException(Exception e) throws TransformerException {
-        Throwable cause = e.getCause();
-        while (cause != null) {
-            if (cause instanceof TransformerException te) {
-                throw te;
-            }
-            cause = cause.getCause();
-        }
-    }
-
     @MCRFactory
     public static MCRURIResolver obtainInstance() {
         return LazyInstanceHolder.SHARED_INSTANCE;
@@ -113,43 +93,6 @@ public class MCRURIResolver implements URIResolver {
 
     public static MCRURIResolver createInstance() {
         return new MCRURIResolver();
-    }
-
-    public static Map<String, String> getParameterMap(String key) {
-        String[] param;
-        StringTokenizer tok = new StringTokenizer(key, "&");
-        Map<String, String> params = new HashMap<>();
-
-        while (tok.hasMoreTokens()) {
-            param = tok.nextToken().split("=");
-            params.put(URLDecoder.decode(param[0], StandardCharsets.UTF_8),
-                param.length >= 2 ? URLDecoder.decode(param[1], StandardCharsets.UTF_8) : "");
-        }
-        return params;
-    }
-
-    /**
-     * creates the default boolean response of a MyCoRe URIResolver.
-     * This is an element with text body: &lt;boolean&gt;true|false&lt;boolean&gt;
-     * @param value the boolean value that should be returned
-     * @return a JDOMSource
-     */
-    public static Source createBooleanResponse(boolean value) {
-        Element root = new Element("boolean");
-        root.setText(Boolean.toString(value));
-        return new JDOMSource(root);
-    }
-
-    /**
-     * creates the default String response of a MyCoRe URIResolver.
-     * This is an element with text body: &lt;string&gt;texte&lt;string&gt;
-     * @param text the String text that should be returned
-     * @return a JDOMSource
-     */
-    public static Source createStringResponse(String text) {
-        Element root = new Element("string");
-        root.setText(text);
-        return new JDOMSource(root);
     }
 
     public static URI resolveURI(String href, String base) {
@@ -166,29 +109,6 @@ public class MCRURIResolver implements URIResolver {
         Map<String, URIResolver> supportedSchemes = new HashMap<>(10 + extResolverMapping.size(), 1);
         supportedSchemes.putAll(extResolverMapping);
         return supportedSchemes;
-    }
-
-    /**
-     * Tries to calculate the resource uri to the directory of the stylesheet that includes the given file.
-     *
-     * @param base the base uri of the stylesheet that includes the given file
-     * @return the resource uri to the directory of the stylesheet that includes the given file.
-     */
-    static String getParentDirectoryResourceURI(String base) {
-        if (base == null) {
-            // the file was not included from another file, so we need to use the default resource directory
-            final String xslFolder = MCRConfiguration2.getStringOrThrow(PROPERTY_XSL_FOLDER);
-            return RESOURCE_PREFIX + xslFolder + "/";
-        } else {
-            String resolvingBase = null;
-            MCRResourcePath resourcePath = MCRResourceHelper.getResourcePath(base);
-            if (resourcePath != null) {
-                String path = resourcePath.asRelativePath();
-                resolvingBase = RESOURCE_PREFIX + path.substring(0, path.lastIndexOf('/') + 1);
-            }
-
-            return resolvingBase;
-        }
     }
 
     /**
@@ -249,7 +169,7 @@ public class MCRURIResolver implements URIResolver {
     }
 
     private Source tryResolveXSL(String href, String base) throws TransformerException {
-        String baseUri = getParentDirectoryResourceURI(base);
+        String baseUri = MCRXSLResourceHelper.getXSLDirectory(base);
 
         final String initialUri = baseUri + href;
         String saneHref = href;
@@ -269,10 +189,8 @@ public class MCRURIResolver implements URIResolver {
             return newResolveMethodResult;
         }
 
-        // new relative include did not work, now fall back to old behaviour and print a warning if it works
-        final String xslFolder = MCRConfiguration2.getStringOrThrow(PROPERTY_XSL_FOLDER);
-        Source oldResolveMethodResult = supportedSchemes.get("resource")
-            .resolve(RESOURCE_PREFIX + xslFolder + "/" + href, base);
+        Source oldResolveMethodResult =
+            supportedSchemes.get("resource").resolve(MCRXSLResourceHelper.getXSLResourceURI(href), base);
         if (oldResolveMethodResult != null) {
             LOGGER.warn(UNIQUE_MARKER,
                 () -> "The Stylesheet " + base + " has include " + href + " which only works with an old " +

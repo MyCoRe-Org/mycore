@@ -46,7 +46,7 @@ public class MCRCheckDerivateDisplayEnabledResolver implements URIResolver {
             default -> throw new IllegalArgumentException(
                 "Invalid format of uri for retrieval of checkDerivateDisplayEnabled: " + href);
         };
-        return MCRURIResolver.createBooleanResponse(result);
+        return MCRURIResolverResponse.ofBoolean(result);
     }
 
 }

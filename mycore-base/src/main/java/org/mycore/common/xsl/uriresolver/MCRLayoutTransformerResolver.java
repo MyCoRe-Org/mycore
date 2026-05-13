@@ -28,8 +28,6 @@ import javax.xml.transform.URIResolver;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jdom2.Element;
-import org.jdom2.transform.JDOMSource;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRSourceContent;
@@ -60,7 +58,7 @@ public class MCRLayoutTransformerResolver implements URIResolver {
 
         String subUri = target.substring(target.indexOf(':') + 1);
         if (subUri.isEmpty()) {
-            return new JDOMSource(new Element(MCRURIResolver.ELEMENT_NULL));
+            return MCRURIResolverResponse.ofNull();
         }
 
         Map<String, String> params;
@@ -68,7 +66,7 @@ public class MCRLayoutTransformerResolver implements URIResolver {
         transformerId = tok.nextToken();
 
         if (tok.hasMoreTokens()) {
-            params = MCRURIResolver.getParameterMap(tok.nextToken());
+            params = MCRURIResolverHelper.parseQueryParameters(tok.nextToken());
         } else {
             params = Collections.emptyMap();
         }
@@ -91,11 +89,10 @@ public class MCRLayoutTransformerResolver implements URIResolver {
                 return result.getSource();
             } else {
                 LOGGER.debug("MCRLayoutStyleResolver returning empty xml");
-                return new JDOMSource(new Element(MCRURIResolver.ELEMENT_NULL));
+                return MCRURIResolverResponse.ofNull();
             }
         } catch (Exception e) {
-            MCRURIResolver.findAndThrowTransformerException(e);
-            throw new TransformerException(e);
+            throw MCRURIResolverHelper.asTransformerException(e);
         }
     }
 

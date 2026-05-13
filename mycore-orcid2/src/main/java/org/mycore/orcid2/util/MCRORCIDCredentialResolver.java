@@ -24,7 +24,7 @@ import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 
-import org.mycore.common.xsl.uriresolver.MCRURIResolver;
+import org.mycore.common.xsl.uriresolver.MCRURIResolverResponse;
 import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.orcid2.user.MCRORCIDSessionUtils;
 import org.mycore.orcid2.user.MCRORCIDUser;
@@ -70,10 +70,10 @@ public class MCRORCIDCredentialResolver implements URIResolver {
         final MCRORCIDCredential credential = orcidUser.getCredentialByORCID(orcid);
 
         if (Objects.equals("exists", method)) {
-            return MCRURIResolver.createBooleanResponse(credential != null);
+            return MCRURIResolverResponse.ofBoolean(credential != null);
         } else if (Objects.equals("scope", method)) {
             if (credential != null) {
-                return MCRURIResolver.createStringResponse(credential.getScope());
+                return MCRURIResolverResponse.ofString(credential.getScope());
             } else {
                 throw new IllegalArgumentException("Credential for " + orcid + " does not exist");
             }

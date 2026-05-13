@@ -31,6 +31,7 @@ import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.xsl.MCRXSLResourceHelper;
 import org.mycore.datamodel.metadata.MCRXMLConstants;
 
 /**
@@ -73,12 +74,11 @@ public class MCRXslIncludeResolver implements URIResolver {
                 .orElseGet(Collections::emptyList);
         }
 
-        final String xslFolder = MCRConfiguration2.getStringOrThrow(MCRURIResolver.PROPERTY_XSL_FOLDER);
         for (String include : propValue) {
             // create a new include element
             Element includeElement = new Element("include", xslNamespace);
             includeElement.setAttribute("href",
-                include.contains(":") ? include : MCRURIResolver.RESOURCE_PREFIX + xslFolder + "/" + include);
+                include.contains(":") ? include : MCRXSLResourceHelper.getXSLResourceURI(include));
             root.addContent(includeElement);
             LOGGER.debug("Resolved XSL include: {}", include);
         }

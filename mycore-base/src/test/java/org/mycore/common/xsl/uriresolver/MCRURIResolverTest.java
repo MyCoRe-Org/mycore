@@ -35,6 +35,7 @@ import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.MCRConfigurationDir;
+import org.mycore.common.xsl.MCRXSLResourceHelper;
 import org.mycore.resource.MCRResourceHelper;
 import org.mycore.test.MyCoReTest;
 
@@ -78,7 +79,7 @@ public class MCRURIResolverTest {
     }
 
     private void checkParentDirectoryResourceUri(String uri, String expectedParentDirectoryResourceUri) {
-        String actualParentDirectoryResourceURI = MCRURIResolver.getParentDirectoryResourceURI(uri);
+        String actualParentDirectoryResourceURI = MCRXSLResourceHelper.getXSLDirectory(uri);
         assertEquals(expectedParentDirectoryResourceUri, actualParentDirectoryResourceURI);
     }
 

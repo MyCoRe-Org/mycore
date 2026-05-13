@@ -67,7 +67,7 @@ public class MCRFunctionResolver implements URIResolver {
             Method method = MCRClassTools.forName(className).getMethod(methodName, types);
             Object result = method.invoke(null, params);
 
-            return MCRURIResolver.createStringResponse(
+            return MCRURIResolverResponse.ofString(
                 result == null ? "" : String.valueOf(result));
         } catch (Exception e) {
             throw new TransformerException(e);

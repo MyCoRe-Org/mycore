@@ -30,7 +30,7 @@ import javax.xml.transform.URIResolver;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRClassTools;
-import org.mycore.common.xsl.uriresolver.MCRURIResolver;
+import org.mycore.common.xsl.uriresolver.MCRURIResolverResponse;
 
 /**
  * Resolves arbitrary static methods of arbitrary classes. Parameters are considerd to be of type
@@ -69,8 +69,7 @@ public class MCRFunctionResolver implements URIResolver {
             Method method = MCRClassTools.forName(className).getMethod(methodName, types);
             Object result = method.invoke(null, params);
 
-            return MCRURIResolver.createStringResponse(
-                result == null ? "" : String.valueOf(result));
+            return MCRURIResolverResponse.ofString(result == null ? "" : String.valueOf(result));
         } catch (Exception e) {
             throw new TransformerException(e);
         }

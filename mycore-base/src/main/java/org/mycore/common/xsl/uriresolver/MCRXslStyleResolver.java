@@ -36,6 +36,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.content.transformer.MCRXSLTransformer;
 import org.mycore.common.xsl.MCRParameterCollector;
+import org.mycore.common.xsl.MCRXSLResourceHelper;
 
 /**
  * Transforms the result of another resolver using one or more XSL stylesheets.
@@ -61,10 +62,8 @@ public class MCRXslStyleResolver implements URIResolver {
         Class<? extends TransformerFactory> defaultFactoryClass = MCRConfiguration2
             .<TransformerFactory>getClass("MCR.LayoutService.TransformerFactoryClass")
             .orElseGet(TransformerFactory.newInstance()::getClass);
-        String defaultXslFolder = MCRConfiguration2
-            .getStringOrThrow(MCRURIResolver.PROPERTY_XSL_FOLDER);
 
-        defaultFlavor = new Flavor(defaultFactoryClass, defaultXslFolder);
+        defaultFlavor = new Flavor(defaultFactoryClass, MCRXSLResourceHelper.getXSLFolder());
         LOGGER.info("Working with default flavor {}", defaultFlavor);
 
         flavors = new HashMap<>();
@@ -156,7 +155,7 @@ public class MCRXslStyleResolver implements URIResolver {
             configurationEnd = paramsStart;
         }
 
-        Map<String, String> parameterMap = MCRURIResolver.getParameterMap(parameters);
+        Map<String, String> parameterMap = MCRURIResolverHelper.parseQueryParameters(parameters);
         String flavorParameter = parameterMap.remove(FLAVOR_PARAMETER);
 
         //  copy stylesheets from href
@@ -193,8 +192,7 @@ public class MCRXslStyleResolver implements URIResolver {
             MCRSourceContent content = new MCRSourceContent(resolved);
             return transformer.transform(content, parameterCollector).getSource();
         } catch (IOException e) {
-            MCRURIResolver.findAndThrowTransformerException(e);
-            throw new TransformerException(e);
+            throw MCRURIResolverHelper.asTransformerException(e);
         }
     }
 

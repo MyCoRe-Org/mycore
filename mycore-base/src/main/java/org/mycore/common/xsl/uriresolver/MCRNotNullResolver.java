@@ -24,7 +24,6 @@ import javax.xml.transform.URIResolver;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
-import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRSourceContent;
@@ -48,7 +47,7 @@ public class MCRNotNullResolver implements URIResolver {
         // fixes exceptions if suburi is empty like "mcrobject:"
         String subUri = target.substring(target.indexOf(':') + 1);
         if (subUri.isEmpty()) {
-            return new JDOMSource(new Element(MCRURIResolver.ELEMENT_NULL));
+            return MCRURIResolverResponse.ofNull();
         }
         // end fix
         LOGGER.debug("Ensuring xml is not null: {}", target);
@@ -63,13 +62,13 @@ public class MCRNotNullResolver implements URIResolver {
                 return new JDOMSource(document.getRootElement().detach());
             } else {
                 LOGGER.debug("MCRNotNullResolver returning empty xml");
-                return new JDOMSource(new Element(MCRURIResolver.ELEMENT_NULL));
+                return MCRURIResolverResponse.ofNull();
             }
         } catch (Exception ex) {
             LOGGER.info("MCRNotNullResolver caught exception: {}", ex::getLocalizedMessage);
             LOGGER.debug(ex::getLocalizedMessage, ex);
             LOGGER.debug("MCRNotNullResolver returning empty xml");
-            return new JDOMSource(new Element(MCRURIResolver.ELEMENT_NULL));
+            return MCRURIResolverResponse.ofNull();
         }
     }
 

@@ -28,8 +28,8 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.jdom2.transform.JDOMSource;
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.xml.MCRXMLFunctions;
+import org.mycore.common.xsl.MCRXSLResourceHelper;
 import org.mycore.datamodel.metadata.MCRXMLConstants;
 
 /**
@@ -51,7 +51,7 @@ public class MCRXslImportResolver implements URIResolver {
 
     @Override
     public Source resolve(String href, String base) throws TransformerException {
-        final String baseURI = MCRURIResolver.getParentDirectoryResourceURI(base);
+        final String baseURI = MCRXSLResourceHelper.getXSLDirectory(base);
         // set xslt folder
         final String xslFolder;
         if (Strings.CS.startsWith(baseURI, "resource:xsl/")) {
@@ -59,7 +59,7 @@ public class MCRXslImportResolver implements URIResolver {
         } else if (Strings.CS.startsWith(baseURI, "resource:xslt/")) {
             xslFolder = "xslt";
         } else {
-            xslFolder = MCRConfiguration2.getStringOrThrow(MCRURIResolver.PROPERTY_XSL_FOLDER);
+            xslFolder = MCRXSLResourceHelper.getXSLFolder();
         }
 
         String importXSL = MCRXMLFunctions.nextImportStep(href.substring(href.indexOf(':') + 1));
@@ -72,7 +72,7 @@ public class MCRXslImportResolver implements URIResolver {
         }
         LOGGER.debug("xslImport importing {}", importXSL);
 
-        return fallback.resolve(MCRURIResolver.RESOURCE_PREFIX + xslFolder + "/" + importXSL, base);
+        return fallback.resolve(MCRXSLResourceHelper.RESOURCE_PREFIX + xslFolder + "/" + importXSL, base);
     }
 
 }
