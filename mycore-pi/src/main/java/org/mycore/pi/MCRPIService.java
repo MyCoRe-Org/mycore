@@ -52,6 +52,7 @@ import org.mycore.common.config.annotation.MCRRawProperties;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
+import org.mycore.datamodel.metadata.MCRMetadataManager.MCRObjectLock;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
@@ -340,24 +341,26 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         // There are many querys that require the current database state.
         // So we start a new transaction within the synchronized block
         final MCRFixedUserCallable<T> createPICallable = new MCRFixedUserCallable<>(() -> {
-            this.validateRegistration(obj, additional, updateObject);
-            final T identifier = getNewIdentifier(obj, additional);
-            MCRPIServiceDates dates = this.registerIdentifier(obj, additional, identifier);
-            this.getMetadataService().insertIdentifier(identifier, obj, additional);
+            try (MCRObjectLock ignored = MCRMetadataManager.lock(obj.getId())) {
+                this.validateRegistration(obj, additional, updateObject);
+                final T identifier = getNewIdentifier(obj, additional);
+                MCRPIServiceDates dates = this.registerIdentifier(obj, additional, identifier);
+                this.getMetadataService().insertIdentifier(identifier, obj, additional);
 
-            MCRPI databaseEntry = insertIdentifierToDatabase(obj, additional, identifier, dates);
+                MCRPI databaseEntry = insertIdentifierToDatabase(obj, additional, identifier, dates);
 
-            addFlagToObject(obj, databaseEntry);
+                addFlagToObject(obj, databaseEntry);
 
-            if (updateObject) {
-                if (obj instanceof MCRObject object) {
-                    MCRMetadataManager.update(object);
-                } else if (obj instanceof MCRDerivate derivate) {
-                    MCRMetadataManager.update(derivate);
+                if (updateObject) {
+                    if (obj instanceof MCRObject object) {
+                        MCRMetadataManager.update(object);
+                    } else if (obj instanceof MCRDerivate derivate) {
+                        MCRMetadataManager.update(derivate);
+                    }
                 }
-            }
 
-            return identifier;
+                return identifier;
+            }
         }, MCRSessionMgr.getCurrentSession().getUserInformation());
 
         try {
@@ -513,25 +516,27 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
     }
 
     public void updateFlag(MCRObjectID id, String additional, MCRPI mcrpi) {
-        MCRBase obj = MCRMetadataManager.retrieve(id);
-        MCRObjectService service = obj.getService();
-        List<String> flags = service.getFlags(PI_FLAG);
-        Gson gson = getGson();
-        String stringFlag = flags.stream().filter(s -> {
-            MCRPI flag = gson.fromJson(s, MCRPI.class);
-            return Objects.equals(flag.getAdditional(), additional) && Objects
-                .equals(flag.getIdentifier(), mcrpi.getIdentifier());
-        }).findAny().orElseThrow(() -> new MCRException(new MCRPersistentIdentifierException(
-            "Could find flag to update (" + id + "," + additional + "," + mcrpi.getIdentifier() + ")")));
+        try (MCRObjectLock ignored = MCRMetadataManager.lock(id)) {
+            MCRBase obj = MCRMetadataManager.retrieve(id);
+            MCRObjectService service = obj.getService();
+            List<String> flags = service.getFlags(PI_FLAG);
+            Gson gson = getGson();
+            String stringFlag = flags.stream().filter(s -> {
+                MCRPI flag = gson.fromJson(s, MCRPI.class);
+                return Objects.equals(flag.getAdditional(), additional) && Objects
+                    .equals(flag.getIdentifier(), mcrpi.getIdentifier());
+            }).findAny().orElseThrow(() -> new MCRException(new MCRPersistentIdentifierException(
+                "Could find flag to update (" + id + "," + additional + "," + mcrpi.getIdentifier() + ")")));
 
-        int flagIndex = service.getFlagIndex(stringFlag);
-        service.removeFlag(flagIndex);
+            int flagIndex = service.getFlagIndex(stringFlag);
+            service.removeFlag(flagIndex);
 
-        addFlagToObject(obj, mcrpi);
-        try {
-            MCRMetadataManager.update(obj);
-        } catch (Exception e) {
-            throw new MCRException("Could not update flags of object " + id, e);
+            addFlagToObject(obj, mcrpi);
+            try {
+                MCRMetadataManager.update(obj);
+            } catch (Exception e) {
+                throw new MCRException("Could not update flags of object " + id, e);
+            }
         }
     }
 

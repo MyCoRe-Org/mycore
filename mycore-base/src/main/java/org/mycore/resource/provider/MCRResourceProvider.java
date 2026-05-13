@@ -73,7 +73,12 @@ public interface MCRResourceProvider {
     /**
      * Returns a description of this {@link MCRResourceProvider}.
      */
-    MCRTreeMessage compileDescription(Level level);
+    default MCRTreeMessage compileDescription(Level level) {
+        MCRTreeMessage description = new MCRTreeMessage();
+        description.add("Class", getClass().getName());
+        description.add("Coverage", coverage());
+        return description;
+    }
 
     String coverage();
 

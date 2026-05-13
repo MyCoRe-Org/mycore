@@ -18,6 +18,8 @@
 
 package org.mycore.common.xml.derivate;
 
+import org.apache.logging.log4j.Level;
+import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.datamodel.metadata.MCRDerivate;
 
 /**
@@ -28,11 +30,19 @@ public interface MCRDerivateDisplayFilter {
 
     String DEFAULT_KEY_PREFIX = "MCR.Default.Derivate.DisplayFilter.";
 
-
     /**
      * Returns, weather the given derivate should be included when displaying derivates for the given intent, or
      * <code>null</code> to indicate, that no opinion is expressed.
      */
     Boolean isDisplayEnabled(MCRDerivate derivate, String intent);
+
+    /**
+     * Returns a description of this {@link MCRDerivateDisplayFilter}.
+     */
+    default MCRTreeMessage compileDescription(Level level) {
+        MCRTreeMessage description = new MCRTreeMessage();
+        description.add("Class", getClass().getName());
+        return description;
+    }
 
 }
