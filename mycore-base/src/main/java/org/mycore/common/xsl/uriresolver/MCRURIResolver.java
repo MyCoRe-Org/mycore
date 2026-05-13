@@ -159,50 +159,12 @@ public class MCRURIResolver implements URIResolver {
             .orElse(URI.create(href));
     }
 
-    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private Map<String, URIResolver> getResolverMapping() {
         final Map<String, URIResolver> extResolverMapping = extResolver.getURIResolverMapping();
         extResolverMapping.putAll(new MCRModuleResolverProvider().getURIResolverMapping());
         // set Map to final size with loadfactor: full
         Map<String, URIResolver> supportedSchemes = new HashMap<>(10 + extResolverMapping.size(), 1);
-        // don't let interal mapping be overwritten
         supportedSchemes.putAll(extResolverMapping);
-        supportedSchemes.put("webapp", new MCRWebAppResolver());
-        supportedSchemes.put("ifs", new MCRIFSResolver());
-        supportedSchemes.put("mcrfile", new MCRMCRFileResolver());
-        supportedSchemes.put("mcrobject", new MCRObjectResolver());
-        supportedSchemes.put("session", new MCRSessionResolver());
-        supportedSchemes.put("access", new MCRACLResolver());
-        supportedSchemes.put("resource", new MCRResourceResolver());
-        supportedSchemes.put("localclass", new MCRLocalClassResolver());
-        supportedSchemes.put("classification", new MCRClassificationResolver());
-        supportedSchemes.put("buildxml", new MCRBuildXMLResolver());
-        supportedSchemes.put("catchEx", new MCRExceptionAsXMLResolver());
-        supportedSchemes.put("notnull", new MCRNotNullResolver());
-        supportedSchemes.put("xslStyle", new MCRXslStyleResolver());
-        supportedSchemes.put("xslTransform", new MCRLayoutTransformerResolver());
-        supportedSchemes.put("xslInclude", new MCRXslIncludeResolver());
-        supportedSchemes.put("xslImport", new MCRXslImportResolver());
-        supportedSchemes.put("currentUserInfo", new MCRCurrentUserInfoResolver());
-        supportedSchemes.put("version", new MCRVersionResolver());
-        supportedSchemes.put("layoutUtils", new MCRLayoutUtilsResolver());
-        supportedSchemes.put("versioninfo", new MCRVersionInfoResolver());
-        supportedSchemes.put("deletedMcrObject", new MCRDeletedObjectResolver());
-        supportedSchemes.put("fileMeta", new MCRFileMetadataResolver());
-        supportedSchemes.put("basket", new org.mycore.frontend.basket.MCRBasketResolver());
-        supportedSchemes.put("language", new org.mycore.datamodel.language.MCRLanguageResolver());
-        supportedSchemes.put("redirect", new MCRRedirectResolver());
-        supportedSchemes.put("data", new MCRDataURLResolver());
-        supportedSchemes.put("i18n", new MCRI18NResolver());
-        supportedSchemes.put("checkPermissionChain", new MCRCheckPermissionChainResolver());
-        supportedSchemes.put("checkPermission", new MCRCheckPermissionResolver());
-        supportedSchemes.put("checkDerivateDisplayEnabled", new MCRCheckDerivateDisplayEnabledResolver());
-        MCRRESTResolver restResolver = new MCRRESTResolver();
-        supportedSchemes.put("http", restResolver);
-        supportedSchemes.put("https", restResolver);
-        supportedSchemes.put("file", new MCRFileResolver());
-        supportedSchemes.put("cache", new MCRCachingResolver());
-        supportedSchemes.put("websiteWriteProtection", new MCRWebsiteWriteProtectionResolver());
         return supportedSchemes;
     }
 
