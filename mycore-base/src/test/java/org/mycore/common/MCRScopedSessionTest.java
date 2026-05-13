@@ -24,11 +24,18 @@ import org.junit.Test;
 
 public class MCRScopedSessionTest extends MCRTestCase {
 
+    /**
+     * Verifies that MCR-3704 does not reappear when scoped values are rendered as text.
+     */
     @Test
     public void doAsDoesNotCreateRecursiveScopedValuesStringRepresentation() {
         MCRScopedSession session = new MCRScopedSession();
         MCRScopedSession.ScopedValues values = new MCRScopedSession.ScopedValues(MCRSystemUserInformation.JANITOR);
-        session.doAs(values, () -> assertEquals(Boolean.TRUE, session.get(MCRScopedSession.SCOPED_HINT)));
+        session.doAs(values, () -> {
+            assertEquals(Boolean.TRUE, session.get(MCRScopedSession.SCOPED_HINT));
+            values.toString();
+            session.getMapEntries().toString();
+        });
     }
 
 }
