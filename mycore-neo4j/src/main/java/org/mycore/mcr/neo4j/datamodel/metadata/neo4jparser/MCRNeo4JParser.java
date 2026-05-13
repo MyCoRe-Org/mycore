@@ -57,7 +57,7 @@ public class MCRNeo4JParser implements MCRNeo4JMetaParser {
 
     private final Map<String, MCRNeo4JAbstractDataModelParser> parserMap;
 
-    private static final String CLASS_KEY = "BaseParser.Class";
+    private static final String CLASS_KEY = "BaseParser";
 
     public MCRNeo4JParser() {
         Map<String, String> propertiesMap = MCRConfiguration2.getSubPropertiesMap(NEO4J_CONFIG_PREFIX + "Parser.");

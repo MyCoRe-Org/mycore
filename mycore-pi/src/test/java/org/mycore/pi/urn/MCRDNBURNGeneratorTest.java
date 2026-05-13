@@ -59,7 +59,7 @@ public class MCRDNBURNGeneratorTest {
         MCRObject mcrObject1 = new MCRObject();
         mcrObject1.setId(getID);
         MCRFLURNGenerator flGenerator = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRFLURNGenerator.class, "MCR.PI.Generator." + GENERATOR_ID + ".Class");
+            MCRFLURNGenerator.class, "MCR.PI.Generator." + GENERATOR_ID);
         MCRDNBURN generated = flGenerator.generate(mcrObject1, "");
 
         String urn = generated.asString();

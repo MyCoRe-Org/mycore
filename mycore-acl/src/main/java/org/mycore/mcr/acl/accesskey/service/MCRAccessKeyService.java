@@ -40,7 +40,7 @@ public interface MCRAccessKeyService {
      */
     static MCRAccessKeyService obtainInstance() {
         return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRAccessKeyService.class,
-            "MCR.ACL.AccessKey.Service.Class");
+            "MCR.ACL.AccessKey.Service");
     }
 
     /**

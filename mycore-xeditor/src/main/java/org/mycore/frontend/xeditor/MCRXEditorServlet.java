@@ -88,6 +88,6 @@ public class MCRXEditorServlet extends MCRServlet {
 
     private MCREditorTarget getTarget(String targetID) {
         return MCRConfiguration2.getInstanceOfOrThrow(MCREditorTarget.class,
-            "MCR.XEditor.Target." + targetID + ".Class");
+            "MCR.XEditor.Target." + targetID);
     }
 }

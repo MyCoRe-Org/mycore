@@ -39,8 +39,6 @@ public final class MCRSolrAuthenticationManager {
 
     private static final String SOLR_AUTH_PROPERTY_PREFIX = MCRSolrConstants.SOLR_CONFIG_PREFIX + "Server.Auth.";
 
-    private static final String CLASS_SUFFIX = ".Class";
-
     private final ConcurrentMap<MCRSolrAuthenticationLevel, MCRSolrAuthenticator> authenticators =
         new ConcurrentHashMap<>();
 
@@ -55,7 +53,7 @@ public final class MCRSolrAuthenticationManager {
 
     private void initAuthenticator(MCRSolrAuthenticationLevel level) {
         authenticators.put(level, MCRConfiguration2.getInstanceOfOrThrow(MCRSolrAuthenticator.class,
-            SOLR_AUTH_PROPERTY_PREFIX + level.getPropertyName() + CLASS_SUFFIX));
+            SOLR_AUTH_PROPERTY_PREFIX + level.getPropertyName()));
     }
 
     private void updateAuthenticator(String key) {

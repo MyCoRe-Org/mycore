@@ -104,7 +104,7 @@ public class MCRWebappLibraryResourceFilterTest {
 
         MCRHints hints = toHints(fooWebappDir);
         MCRResourceFilter filter = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRWebappLibraryResourceFilter.class, "Test.Class");
+            MCRWebappLibraryResourceFilter.class, "Test");
 
         List<URL> resourceUrls = filter.filter(allResourceUrls.stream(), hints).toList();
 

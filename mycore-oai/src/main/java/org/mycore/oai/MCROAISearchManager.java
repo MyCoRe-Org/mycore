@@ -248,10 +248,10 @@ public class MCROAISearchManager {
 
     public static MCROAISearcher getSearcher(MCROAIIdentify identify, MetadataFormat format, int partitionSize,
         MCROAISetManager setManager, MCROAIObjectManager objectManager) {
-        String className = identify.getConfigPrefix() + "Searcher.Class";
+        String className = identify.getConfigPrefix() + "Searcher";
         MCROAISearcher searcher = MCRConfiguration2.getInstanceOf(MCROAISearcher.class, className)
             .orElseGet(() -> MCRConfiguration2.getInstanceOfOrThrow(
-                MCROAISearcher.class, MCROAIAdapter.PREFIX + "DefaultSearcher.Class"));
+                MCROAISearcher.class, MCROAIAdapter.PREFIX + "DefaultSearcher"));
         searcher.init(identify, format, MAX_AGE, partitionSize, setManager, objectManager);
         return searcher;
     }

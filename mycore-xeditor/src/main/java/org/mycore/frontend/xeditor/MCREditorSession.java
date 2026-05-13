@@ -81,7 +81,7 @@ public class MCREditorSession {
 
     private static MCRPostProcessorXSL getDefaultPostProcessorImplementation() {
         return MCRConfiguration2.getInstanceOfOrThrow(MCRPostProcessorXSL.class,
-            "MCR.XEditor.PostProcessor.Default.Class");
+            "MCR.XEditor.PostProcessor.Default");
     }
 
     public MCREditorSession(Map<String, String[]> requestParameters, MCRParameterCollector collector) {

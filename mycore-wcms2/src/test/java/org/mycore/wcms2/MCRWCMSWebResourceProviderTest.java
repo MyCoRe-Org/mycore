@@ -171,7 +171,7 @@ public class MCRWCMSWebResourceProviderTest {
 
         MCRConfiguration2.set("MCR.WCMS2.DataDir", fooWcmsDataDir.toAbsolutePath().toString());
         MCRResourceProvider provider = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRWCMSWebResourceProvider.class, "Test.Class");
+            MCRWCMSWebResourceProvider.class, "Test");
 
         Optional<URL> fooResourceUrl = provider.provide(WEB_FOO_PATH, MCRHints.EMPTY);
         Optional<URL> barResourceUrl = provider.provide(WEB_BAR_PATH, MCRHints.EMPTY);

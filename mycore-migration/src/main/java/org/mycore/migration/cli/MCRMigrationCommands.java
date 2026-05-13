@@ -87,14 +87,16 @@ public class MCRMigrationCommands {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public static final String CHILDREN_ORDER_STRATEGY_PROPERTY = "MCR.Migration.ChildrenOrder.Strategy.Class";
+    public static final String CHILDREN_ORDER_STRATEGY_PROPERTY = "MCR.Migration.ChildrenOrder.Strategy";
+
+    public static final String CHILDREN_ORDER_STRATEGY_CLASS_PROPERTY = CHILDREN_ORDER_STRATEGY_PROPERTY + ".Class";
 
     public static final String MIGRATE_NORMALIZED_OBJECT = "migrate to normalized object {0}";
     public static final String MIGRATE_NORMALIZED_OBJECT_VERSION = "migrate svn store to normalized versioned objects";
 
     @MCRCommand(syntax = MIGRATE_NORMALIZED_OBJECT,
         help = "Migrates an object to a normalized one (MCR-3375). "
-            + "Uses strategy defined in " + CHILDREN_ORDER_STRATEGY_PROPERTY
+            + "Uses strategy defined in " + CHILDREN_ORDER_STRATEGY_CLASS_PROPERTY
             + " (default: NeverAddChildrenOrderStrategy) to decide if <children> should become <childrenOrder>.",
         order = 30)
     public static void migrateNormalizedObject(String mcrObjectIDStr) throws IOException, JDOMException {
@@ -133,7 +135,7 @@ public class MCRMigrationCommands {
 
     @MCRCommand(syntax = MIGRATE_NORMALIZED_OBJECT_VERSION,
         help = "Migrates all MCRObject metadata (MCR-3375). "
-            + "Uses strategy defined in " + CHILDREN_ORDER_STRATEGY_PROPERTY
+            + "Uses strategy defined in " + CHILDREN_ORDER_STRATEGY_CLASS_PROPERTY
             + " (default: NeverAddChildrenOrderStrategy) to decide if <children> should become <childrenOrder>.",
         order = 30)
     public static void migrateNormalizedObjects() throws SVNException, IOException, JDOMException {

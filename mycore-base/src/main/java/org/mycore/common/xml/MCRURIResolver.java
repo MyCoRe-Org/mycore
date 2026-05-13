@@ -131,7 +131,7 @@ public final class MCRURIResolver implements URIResolver {
 
     private static final String CONFIG_PREFIX = "MCR.URIResolver.";
 
-    private static final String HTTP_CLIENT_CLASS = "MCR.HTTPClient.Class";
+    private static final String HTTP_CLIENT_PROPERTY = "MCR.HTTPClient";
 
     private static final Marker UNIQUE_MARKER = MarkerManager.getMarker("tryResolveXML");
 
@@ -160,7 +160,7 @@ public final class MCRURIResolver implements URIResolver {
 
     private static MCRResolverProvider getExternalResolverProvider() {
         return MCRConfiguration2
-            .getInstanceOf(MCRResolverProvider.class, CONFIG_PREFIX + "ExternalResolver.Class")
+            .getInstanceOf(MCRResolverProvider.class, CONFIG_PREFIX + "ExternalResolver")
             .orElse(HashMap::new);
     }
 
@@ -502,7 +502,7 @@ public final class MCRURIResolver implements URIResolver {
         private final MCRHTTPClient client;
 
         MCRRESTResolver() {
-            this.client = MCRConfiguration2.getInstanceOfOrThrow(MCRHTTPClient.class, HTTP_CLIENT_CLASS);
+            this.client = MCRConfiguration2.getInstanceOfOrThrow(MCRHTTPClient.class, HTTP_CLIENT_PROPERTY);
         }
 
         @Override
@@ -1189,7 +1189,7 @@ public final class MCRURIResolver implements URIResolver {
      */
     static class MCRLayoutTransformerResolver implements URIResolver {
 
-        private static final String TRANSFORMER_FACTORY_PROPERTY = "MCR.Layout.Transformer.Factory.Class";
+        private static final String TRANSFORMER_FACTORY_PROPERTY = "MCR.Layout.Transformer.Factory";
 
         @Override
         public Source resolve(String href, String base) throws TransformerException {
@@ -1247,8 +1247,8 @@ public final class MCRURIResolver implements URIResolver {
      * Example: MCR.URIResolver.xslIncludes.components=iview.xsl,wcms.xsl
      * <p>
      * Or retrieve the include hrefs from a class implementing
-     * {@link org.mycore.common.xml.MCRURIResolver.MCRXslIncludeHrefs}. The class. part have to be set, everything after
-     * class. Can be freely chosen.
+     * {@link org.mycore.common.xml.MCRURIResolver.MCRXslIncludeHrefs}. The </code>class.</code> part has to be set,
+     * everything after <code>class.</code> can be chosen freely.
      * </p>
      * Example: MCR.URIResolver.xslIncludes.class.template=org.foo.XSLHrefs
      * <p>
@@ -1270,8 +1270,8 @@ public final class MCRURIResolver implements URIResolver {
             String propertyName = "MCR.URIResolver.xslIncludes." + includePart;
             List<String> propValue;
             if (includePart.startsWith("class.")) {
-                MCRXslIncludeHrefs incHrefClass = MCRConfiguration2.getInstanceOfOrThrow(
-                    MCRXslIncludeHrefs.class, propertyName);
+                MCRXslIncludeHrefs incHrefClass = MCRConfiguration2.instantiateClass(
+                    MCRXslIncludeHrefs.class, MCRConfiguration2.getStringOrThrow(propertyName));
                 propValue = incHrefClass.getHrefs();
             } else {
                 propValue = MCRConfiguration2.getString(propertyName)

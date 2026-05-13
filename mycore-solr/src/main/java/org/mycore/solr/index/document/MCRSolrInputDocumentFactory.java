@@ -41,7 +41,7 @@ public abstract class MCRSolrInputDocumentFactory {
 
     public static MCRSolrInputDocumentFactory obtainInstance() {
         return MCRConfiguration2.getInstanceOfOrThrow(MCRSolrInputDocumentFactory.class,
-            SOLR_CONFIG_PREFIX + "SolrInputDocument.Factory.Class");
+            SOLR_CONFIG_PREFIX + "SolrInputDocument.Factory");
     }
 
     public abstract SolrInputDocument getDocument(MCRObjectID id, MCRContent content) throws SAXException, IOException;

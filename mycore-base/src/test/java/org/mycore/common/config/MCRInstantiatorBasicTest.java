@@ -42,8 +42,7 @@ public class MCRInstantiatorBasicTest {
         })
     public void singletonFactory() {
 
-        TestClassWithSingletonFactory instance = ofName(TestClassWithSingletonFactory.class,
-            "Foo.Class").instantiate();
+        TestClassWithSingletonFactory instance = ofName(TestClassWithSingletonFactory.class, "Foo").instantiate();
 
         assertNotNull(instance);
 
@@ -56,8 +55,7 @@ public class MCRInstantiatorBasicTest {
         })
     public void annotatedFactory() {
 
-        TestClassWitAnnotatedFactory instance = ofName(TestClassWitAnnotatedFactory.class,
-            "Foo.Class").instantiate();
+        TestClassWitAnnotatedFactory instance = ofName(TestClassWitAnnotatedFactory.class, "Foo").instantiate();
 
         assertNotNull(instance);
 
@@ -71,7 +69,7 @@ public class MCRInstantiatorBasicTest {
     public void annotatedFactories() {
 
         assertThrows(MCRConfigurationException.class,
-            () -> ofName(TestClassWitAnnotatedFactories.class, "Foo.Class").instantiate());
+            () -> ofName(TestClassWitAnnotatedFactories.class, "Foo").instantiate());
 
     }
 
@@ -82,8 +80,7 @@ public class MCRInstantiatorBasicTest {
         })
     public void constructorFactory() {
 
-        TestClassWithConstructor instance = ofName(TestClassWithConstructor.class,
-            "Foo.Class").instantiate();
+        TestClassWithConstructor instance = ofName(TestClassWithConstructor.class, "Foo").instantiate();
 
         assertNotNull(instance);
 
@@ -97,7 +94,7 @@ public class MCRInstantiatorBasicTest {
     public void noConstructorOrFactory() {
 
         assertThrows(MCRConfigurationException.class,
-            () -> ofName(TestClassWithoutConstructorOrFactory.class, "Foo.Class").instantiate());
+            () -> ofName(TestClassWithoutConstructorOrFactory.class, "Foo").instantiate());
 
     }
 
@@ -109,7 +106,7 @@ public class MCRInstantiatorBasicTest {
     public void multipleFactories() {
 
         assertThrows(MCRConfigurationException.class,
-            () -> ofName(TestClassWithMultipleFactories.class, "Foo.Class").instantiate());
+            () -> ofName(TestClassWithMultipleFactories.class, "Foo").instantiate());
 
     }
 
@@ -120,8 +117,8 @@ public class MCRInstantiatorBasicTest {
         })
     public void configurationImplicit() {
 
-        ImplicitTestClass instance = ofName(ImplicitTestClass.class,
-            "Foo.Class", MCRInstanceConfiguration.Options.IMPLICIT).instantiate();
+        ImplicitTestClass instance = ofName(ImplicitTestClass.class, "Foo",
+            MCRInstanceConfiguration.Options.IMPLICIT).instantiate();
 
         assertNotNull(instance);
 
@@ -135,8 +132,7 @@ public class MCRInstantiatorBasicTest {
         })
     public void configurationProxy() {
 
-        TestClassWithConfigurationProxy instance = ofName(TestClassWithConfigurationProxy.class,
-            "Foo.Class").instantiate();
+        TestClassWithConfigurationProxy instance = ofName(TestClassWithConfigurationProxy.class, "Foo").instantiate();
 
         assertNotNull(instance);
 

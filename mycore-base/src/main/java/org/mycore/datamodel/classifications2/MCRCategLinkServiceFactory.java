@@ -36,8 +36,7 @@ public class MCRCategLinkServiceFactory {
      */
     @Deprecated(forRemoval = true)
     public static MCRCategLinkService obtainInstance() {
-        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRCategLinkService.class,
-            "MCR.Category.LinkService.Class");
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRCategLinkService.class, "MCR.Category.LinkService");
     }
 
 }

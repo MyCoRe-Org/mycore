@@ -95,8 +95,6 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
     @SuppressWarnings("unused")
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public static final String CLASS_SUFFIX = ".Class";
-
     static {
         ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("MCRPIRegister-#%d")
             .build();
@@ -236,7 +234,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
                 getServiceID() + " has no " + METADATA_SERVICE_PROPERTY_KEY + "!");
         }
 
-        String msProperty = METADATA_SERVICE_CONFIG_PREFIX + metadataService + CLASS_SUFFIX;
+        String msProperty = METADATA_SERVICE_CONFIG_PREFIX + metadataService;
         return MCRConfiguration2.getInstanceOfOrThrow(MCRPIMetadataService.class, msProperty);
     }
 
@@ -248,7 +246,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         String generatorName = Optional.ofNullable(getProperties().get(GENERATOR_PROPERTY_KEY))
             .orElseThrow(generatorPropertiesNotSetError);
 
-        String generatorPropertyKey = GENERATOR_CONFIG_PREFIX + generatorName + CLASS_SUFFIX;
+        String generatorPropertyKey = GENERATOR_CONFIG_PREFIX + generatorName;
         return MCRConfiguration2.getInstanceOfOrThrow(MCRPIGenerator.class, generatorPropertyKey);
     }
 
@@ -559,7 +557,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
 
     protected Predicate<MCRBase> getCreationPredicate() {
         final String predicateProperty = MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX +
-            getServiceID() + "." + MCRPIJobService.CREATION_PREDICATE + CLASS_SUFFIX;
+            getServiceID() + "." + MCRPIJobService.CREATION_PREDICATE;
         if (MCRConfiguration2.getString(predicateProperty).isEmpty()) {
             return (o) -> false;
         }
@@ -568,7 +566,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
 
     protected Predicate<MCRBase> getRegistrationPredicate() {
         final String predicateProperty = MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX +
-            getServiceID() + "." + MCRPIJobService.REGISTRATION_PREDICATE  + CLASS_SUFFIX;
+            getServiceID() + "." + MCRPIJobService.REGISTRATION_PREDICATE;
         if (MCRConfiguration2.getString(predicateProperty).isEmpty()) {
             return (o) -> true;
         }

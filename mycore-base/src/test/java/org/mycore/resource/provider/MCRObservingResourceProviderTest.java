@@ -170,7 +170,7 @@ public class MCRObservingResourceProviderTest {
 
         MCRHints hints = toHints(factory);
         MCRResourceProvider provider = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRObservingResourceProvider.class, "Test.Class");
+            MCRObservingResourceProvider.class, "Test");
 
         Optional<URL> fooResourceUrl = provider.provide(FOO_PATH, hints);
         Optional<URL> barResourceUrl = provider.provide(BAR_PATH, hints);

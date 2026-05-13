@@ -219,7 +219,7 @@ public class MCRClasspathDirsResourceProviderTest {
 
         MCRHints hints = toHints(fooBaseDir, barBaseDir);
         MCRResourceProvider provider = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRClasspathDirsResourceProvider.class, "Test.Class");
+            MCRClasspathDirsResourceProvider.class, "Test");
 
         Optional<URL> fooResourceUrl = provider.provide(FOO_PATH, hints);
         Optional<URL> barResourceUrl = provider.provide(BAR_PATH, hints);

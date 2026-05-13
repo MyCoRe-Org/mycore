@@ -30,7 +30,7 @@ import org.mycore.test.MyCoReTest;
 @MyCoReTest
 @MCRTestConfiguration(properties = {
     @MCRTestProperty(key = "MCR.Processable.Registry.Class", classNameOf = MCRCentralProcessableRegistry.class),
-    @MCRTestProperty(key = MCRCronjobManager.JOBS_CONFIG_PREFIX + "Test2", classNameOf = MCRTestCronJob.class),
+    @MCRTestProperty(key = MCRCronjobManager.JOBS_CONFIG_PREFIX + "Test2.Class", classNameOf = MCRTestCronJob.class),
     @MCRTestProperty(key = MCRCronjobManager.JOBS_CONFIG_PREFIX + "Test2.Contexts", string = "CLI"),
     @MCRTestProperty(key = MCRCronjobManager.JOBS_CONFIG_PREFIX + "Test2.CronType", string = "QUARTZ"),
     @MCRTestProperty(key = MCRCronjobManager.JOBS_CONFIG_PREFIX + "Test2.Cron", string = "* * * * * ? *"),

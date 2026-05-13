@@ -60,7 +60,7 @@ public class MCRLayoutService {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final String TRANSFORMER_FACTORY_PROPERTY = "MCR.Layout.Transformer.Factory.Class";
+    private static final String TRANSFORMER_FACTORY_PROPERTY = "MCR.Layout.Transformer.Factory";
 
     @MCRFactory
     public static MCRLayoutService obtainInstance() {

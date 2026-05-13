@@ -150,7 +150,7 @@ public class MCRClassLoaderResourceLocatorTest {
 
         MCRHints hints = toHints(fooBaseDir);
         MCRResourceLocator locator = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRClassLoaderResourceLocator.class, "Test.Class");
+            MCRClassLoaderResourceLocator.class, "Test");
 
         List<URL> fooResourceUrl = locator.locate(FOO_PATH, hints).toList();
         List<URL> barResourceUrl = locator.locate(BAR_PATH, hints).toList();

@@ -13,7 +13,7 @@ public final class MCRChildrenOrderStrategyManager {
 
     private static final class ChildrenOrderStrategyHolder {
         private static final MCRChildrenOrderStrategy INSTANCE = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRChildrenOrderStrategy.class, "MCR.ChildrenOrderStrategy.Class");
+            MCRChildrenOrderStrategy.class, "MCR.ChildrenOrderStrategy");
     }
 
 }

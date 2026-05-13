@@ -39,7 +39,7 @@ import org.mycore.mcr.neo4j.utils.MCRNeo4JQueryRunner;
 @SuppressWarnings({"unused"})
 public class MCRNeo4JCommands extends MCRAbstractCommands {
 
-    private static final String NEO4J_MANAGER_CLASS_PROPERTY = "MCR.Neo4J.Manager.Class";
+    private static final String NEO4J_MANAGER_PROPERTY = "MCR.Neo4J.Manager";
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -88,8 +88,7 @@ public class MCRNeo4JCommands extends MCRAbstractCommands {
         order = 50)
     public static void synchronizeForMCRID(final String id) {
         LOGGER.info("Synchronize Neo4J with metadata for MCRID");
-        MCRNeo4JManager clazz = MCRConfiguration2.getInstanceOfOrThrow(MCRNeo4JManager.class,
-            NEO4J_MANAGER_CLASS_PROPERTY);
+        MCRNeo4JManager clazz = MCRConfiguration2.getInstanceOfOrThrow(MCRNeo4JManager.class, NEO4J_MANAGER_PROPERTY);
         MCRObject mcrObject = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(id));
         clazz.updateNodeByMCRObject(mcrObject);
     }
@@ -99,8 +98,7 @@ public class MCRNeo4JCommands extends MCRAbstractCommands {
         order = 60)
     public static void synchronizeForBase(final String baseId) {
         LOGGER.info("Synchronize Neo4J with metadata for MCRBase {}", baseId);
-        MCRNeo4JManager clazz = MCRConfiguration2.getInstanceOfOrThrow(MCRNeo4JManager.class,
-            NEO4J_MANAGER_CLASS_PROPERTY);
+        MCRNeo4JManager clazz = MCRConfiguration2.getInstanceOfOrThrow(MCRNeo4JManager.class, NEO4J_MANAGER_PROPERTY);
         List<String> selectedObjectIds = MCRXMLMetadataManager
             .obtainInstance().listIDsForBase(baseId);
         for (String objectId : selectedObjectIds) {
@@ -114,8 +112,7 @@ public class MCRNeo4JCommands extends MCRAbstractCommands {
         order = 70)
     public static void synchronizeForType(final String type) {
         LOGGER.info("Synchronize Neo4J with metadata for MCRType {}", type);
-        MCRNeo4JManager clazz = MCRConfiguration2.getInstanceOfOrThrow(MCRNeo4JManager.class,
-            NEO4J_MANAGER_CLASS_PROPERTY);
+        MCRNeo4JManager clazz = MCRConfiguration2.getInstanceOfOrThrow(MCRNeo4JManager.class, NEO4J_MANAGER_PROPERTY);
         List<String> selectedObjectIds = MCRXMLMetadataManager
             .obtainInstance().listIDsOfType(type);
         for (String objectId : selectedObjectIds) {
@@ -127,8 +124,7 @@ public class MCRNeo4JCommands extends MCRAbstractCommands {
     @MCRCommand(syntax = "synchronize neo4j metadata", help = "synchronize all metadata the Neo4J database", order = 80)
     public static void synchronizeAll() {
         LOGGER.info("Synchronisation of all metadata with the Neo4J database");
-        MCRNeo4JManager clazz = MCRConfiguration2.getInstanceOfOrThrow(MCRNeo4JManager.class,
-            NEO4J_MANAGER_CLASS_PROPERTY);
+        MCRNeo4JManager clazz = MCRConfiguration2.getInstanceOfOrThrow(MCRNeo4JManager.class, NEO4J_MANAGER_PROPERTY);
         List<String> selectedObjectIds = MCRXMLMetadataManager
             .obtainInstance()
             .listIDs();

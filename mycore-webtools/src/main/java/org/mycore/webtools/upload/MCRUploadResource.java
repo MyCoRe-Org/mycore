@@ -162,7 +162,7 @@ public class MCRUploadResource {
 
     public static MCRUploadHandler getUploadHandler(String uploadHandlerID) {
         Optional<MCRUploadHandler> uploadHandler = MCRConfiguration2.getSingleInstanceOf(MCRUploadHandler.class,
-            "MCR.Upload.Handler." + Optional.ofNullable(uploadHandlerID).orElse("Default") + ".Class");
+            "MCR.Upload.Handler." + Optional.ofNullable(uploadHandlerID).orElse("Default"));
         if (uploadHandler.isEmpty()) {
             throw new BadRequestException("The UploadHandler " + uploadHandlerID + " is invalid!");
         }

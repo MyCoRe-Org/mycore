@@ -76,7 +76,7 @@ public abstract class MCRAccessStore {
     public abstract Collection<String> getDistinctStringIDs();
 
     public static MCRAccessStore obtainInstance() {
-        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRAccessStore.class, "MCR.Persistence.Access.Store.Class");
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRAccessStore.class, "MCR.Persistence.Access.Store");
     }
 
     public static Collection<String> getPools() {

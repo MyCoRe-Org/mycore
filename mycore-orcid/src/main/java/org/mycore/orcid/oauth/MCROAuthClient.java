@@ -58,8 +58,6 @@ public final class MCROAuthClient {
 
     private static final String CLIENT_PROPERTY = "MCR.ORCID.OAuth";
 
-    private static final String CLASS_PROPERTY = CLIENT_PROPERTY + ".Class";
-
     private final Settings settings;
 
     private final Client client;
@@ -70,11 +68,11 @@ public final class MCROAuthClient {
     }
 
     public static MCROAuthClient obtainInstance() {
-        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCROAuthClient.class, CLASS_PROPERTY);
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCROAuthClient.class, CLIENT_PROPERTY);
     }
 
     public static MCROAuthClient createInstance() {
-        return MCRConfiguration2.getInstanceOfOrThrow(MCROAuthClient.class, CLASS_PROPERTY);
+        return MCRConfiguration2.getInstanceOfOrThrow(MCROAuthClient.class, CLIENT_PROPERTY);
     }
 
     public String getClientID() {

@@ -39,8 +39,8 @@ public class MCRMergerFactory {
      * Returns an MCRMerger instance usable for merging MODS elements with the given name
      */
     private static MCRMerger getEntryInstance(String name) {
-        return MCRConfiguration2.getInstanceOf(MCRMerger.class, CONFIG_PREFIX + name + ".Class")
-            .orElseGet(() -> MCRConfiguration2.getInstanceOfOrThrow(MCRMerger.class, CONFIG_PREFIX + "default.Class"));
+        return MCRConfiguration2.getInstanceOf(MCRMerger.class, CONFIG_PREFIX + name)
+            .orElseGet(() -> MCRConfiguration2.getInstanceOfOrThrow(MCRMerger.class, CONFIG_PREFIX + "default"));
     }
 
     /**

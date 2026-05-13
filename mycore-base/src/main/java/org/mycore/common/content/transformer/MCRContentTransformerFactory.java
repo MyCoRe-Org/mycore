@@ -57,7 +57,7 @@ public class MCRContentTransformerFactory {
         }
         MCRContentTransformer transformer = MCRConfiguration2.getInstanceOf(MCRContentTransformer.class, property)
             .orElseGet(() -> MCRConfiguration2.getInstanceOfOrThrow(MCRContentTransformer.class,
-                "MCR.ContentTransformer.Default.Class"));
+                "MCR.ContentTransformer.Default"));
         transformer.init(id);
         transformers.put(id, transformer);
         return transformer;

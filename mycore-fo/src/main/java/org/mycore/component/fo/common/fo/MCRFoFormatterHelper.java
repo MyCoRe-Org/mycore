@@ -34,7 +34,7 @@ import org.mycore.common.config.MCRConfiguration2;
 public class MCRFoFormatterHelper {
 
     /** The configuration PROPERTY */
-    private static final String PROPERTY = "MCR.LayoutService.FoFormatter.Class";
+    private static final String FORMATTER_PROPERTY = "MCR.LayoutService.FoFormatter";
 
     /** The singleton */
     private static MCRFoFormatterInterface formatter;
@@ -42,7 +42,7 @@ public class MCRFoFormatterHelper {
     /** @return the XSL-FO formatter instance configured */
     public static synchronized MCRFoFormatterInterface getFoFormatter() {
         if (formatter == null) {
-            formatter = MCRConfiguration2.getInstanceOfOrThrow(MCRFoFormatterInterface.class, PROPERTY);
+            formatter = MCRConfiguration2.getInstanceOfOrThrow(MCRFoFormatterInterface.class, FORMATTER_PROPERTY);
         }
         return formatter;
     }

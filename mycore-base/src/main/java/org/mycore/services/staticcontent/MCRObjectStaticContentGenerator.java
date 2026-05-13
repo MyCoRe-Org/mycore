@@ -58,8 +58,6 @@ public class MCRObjectStaticContentGenerator {
 
     private static final String DEFAULT_TRANSFORMER_PATH_PROPERTY = "MCR.Object.Static.Content.Default.Path";
 
-    private static final String CLASS_SUFFIX = ".Class";
-
     protected final String configID;
 
     private final MCRContentTransformer transformer;
@@ -95,7 +93,7 @@ public class MCRObjectStaticContentGenerator {
 
     static MCRObjectStaticContentGenerator obtainInstance(String id) {
         return MCRConfiguration2.getInstanceOfOrThrow(MCRObjectStaticContentGenerator.class,
-            CONFIG_ID_PREFIX + id + CLASS_SUFFIX);
+            CONFIG_ID_PREFIX + id);
     }
 
     public static List<String> getContentGenerators() {

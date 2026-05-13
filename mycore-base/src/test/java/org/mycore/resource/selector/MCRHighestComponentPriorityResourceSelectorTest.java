@@ -246,7 +246,7 @@ public class MCRHighestComponentPriorityResourceSelectorTest {
 
         MCRHints hints = toHints(COMPONENT_25_1, COMPONENT_50_1, COMPONENT_75_1);
         MCRResourceSelector selector = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRHighestComponentPriorityResourceSelector.class, "Test.Class");
+            MCRHighestComponentPriorityResourceSelector.class, "Test");
 
         List<URL> resourceUrls = selector.select(List.of(component501ResourceUrl), hints);
 

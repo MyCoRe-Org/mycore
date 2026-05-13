@@ -50,7 +50,7 @@ public final class MCRMETSGeneratorFactory {
     static {
 
         generatorSelector = MCRConfiguration2.getInstanceOfOrThrow(MCRMETSGeneratorSelector.class,
-            "MCR.Component.MetsMods.Generator.Selector.Class");
+            "MCR.Component.MetsMods.Generator.Selector");
 
         // ignore mets.xml of the derivate by default
         ignoreMetsXml = true;
@@ -164,7 +164,7 @@ public final class MCRMETSGeneratorFactory {
         @Override
         public MCRMETSGenerator get(MCRPath derivatePath) {
             return MCRConfiguration2.getInstanceOfOrThrow(MCRMETSGenerator.class,
-                "MCR.Component.MetsMods.Generator.Class");
+                "MCR.Component.MetsMods.Generator");
         }
 
     }

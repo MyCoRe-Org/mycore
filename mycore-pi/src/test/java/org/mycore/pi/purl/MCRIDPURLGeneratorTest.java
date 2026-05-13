@@ -59,12 +59,12 @@ public class MCRIDPURLGeneratorTest {
         mcrObject.setId(testID);
 
         MCRIDPURLGenerator generator1 = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRIDPURLGenerator.class, GENERATOR_CONFIG_PREFIX + GENERATOR_1 + ".Class");
+            MCRIDPURLGenerator.class, GENERATOR_CONFIG_PREFIX + GENERATOR_1);
         assertEquals("http://purl.myurl.de/my_test_00000001",
                 generator1.generate(mcrObject, "").asString(), "");
 
         MCRIDPURLGenerator generator2 = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRIDPURLGenerator.class, GENERATOR_CONFIG_PREFIX + GENERATOR_2 + ".Class");
+            MCRIDPURLGenerator.class, GENERATOR_CONFIG_PREFIX + GENERATOR_2);
         assertEquals("http://purl.myurl.de/my_test_00000001/my_test_00000001/my_test_00000001",
                 generator2.generate(mcrObject, "").asString(), "");
 

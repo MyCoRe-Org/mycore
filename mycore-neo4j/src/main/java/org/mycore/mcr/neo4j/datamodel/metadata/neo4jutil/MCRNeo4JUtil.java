@@ -116,7 +116,7 @@ public final class MCRNeo4JUtil {
             // avoid loop instantiation
             if (!Objects.equals(k, filterClassKey)) {
                 String type = k;
-                if (k.endsWith(".Class") || k.endsWith(".class")) {
+                if (k.endsWith(".Class")) {
                     type = k.substring(0, k.length() - ".Class".length());
                 }
                 parserMap.put(type, MCRConfiguration2.getInstanceOfOrThrow(MCRNeo4JAbstractDataModelParser.class,

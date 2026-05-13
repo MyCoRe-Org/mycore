@@ -610,7 +610,7 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
             @SuppressWarnings("unchecked")
             MCROCFLDigestCalculator<Path, MCRDigest> digestCalculator =
                 (MCROCFLDigestCalculator<Path, MCRDigest>) MCRConfiguration2
-                    .getSingleInstanceOfOrThrow(MCROCFLDigestCalculator.class, "MCR.Content.DigestCalculator.Class");
+                    .getSingleInstanceOfOrThrow(MCROCFLDigestCalculator.class, "MCR.Content.DigestCalculator");
             return new MCROCFLDefaultRemoteTemporaryStorage(root, evictionStrategy, digestCalculator);
         }
 

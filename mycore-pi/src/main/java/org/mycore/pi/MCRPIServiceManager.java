@@ -29,8 +29,6 @@ public final class MCRPIServiceManager {
 
     public static final String REGISTRATION_SERVICE_CONFIG_PREFIX = "MCR.PI.Service.";
 
-    public static final String CLASS_SUFFIX = ".Class";
-
     private MCRPIServiceManager(){
     }
 
@@ -42,8 +40,8 @@ public final class MCRPIServiceManager {
         return MCRConfiguration2.getInstantiatablePropertyKeys(REGISTRATION_SERVICE_CONFIG_PREFIX)
             .map(s -> s.substring(REGISTRATION_SERVICE_CONFIG_PREFIX.length()))
             .map(s -> {
-                if (s.endsWith(CLASS_SUFFIX) || s.endsWith(".class")) {
-                    return s.substring(0, s.length() - CLASS_SUFFIX.length());
+                if (s.endsWith(".Class")) {
+                    return s.substring(0, s.length() - ".Class".length());
                 }
                 return s;
             })
@@ -62,14 +60,15 @@ public final class MCRPIServiceManager {
             .stream()
             .filter(service -> MCRConfiguration2
                 .getString(REGISTRATION_SERVICE_CONFIG_PREFIX + service.getServiceID() + "." +
-                    CREATION_PREDICATE + CLASS_SUFFIX)
+                    CREATION_PREDICATE)
                 .isPresent())
             .collect(Collectors.toList());
     }
 
+    @SuppressWarnings("unchecked")
     public <T extends MCRPersistentIdentifier> MCRPIService<T> getRegistrationService(String id) {
         return MCRConfiguration2.getSingleInstanceOfOrThrow(
-            MCRPIService.class, REGISTRATION_SERVICE_CONFIG_PREFIX + id + CLASS_SUFFIX);
+            MCRPIService.class, REGISTRATION_SERVICE_CONFIG_PREFIX + id);
     }
 
     private static final class LazyInstanceHolder {

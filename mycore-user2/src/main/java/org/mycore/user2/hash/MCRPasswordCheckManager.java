@@ -105,8 +105,6 @@ public final class MCRPasswordCheckManager {
 
     public static final String CONFIGURATION_CHECKS_KEY = "ConfigurationChecks";
 
-    private static final String CLASS_PROPERTY = MANAGER_PROPERTY + ".Class";
-
     private final SecureRandom random;
 
     private final Map<String, MCRPasswordCheckStrategy> strategies;
@@ -143,11 +141,11 @@ public final class MCRPasswordCheckManager {
     }
 
     public static MCRPasswordCheckManager obtainInstance() {
-        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRPasswordCheckManager.class, CLASS_PROPERTY);
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRPasswordCheckManager.class, MANAGER_PROPERTY);
     }
 
     public static MCRPasswordCheckManager createInstance() {
-        return MCRConfiguration2.getInstanceOfOrThrow(MCRPasswordCheckManager.class, CLASS_PROPERTY);
+        return MCRConfiguration2.getInstanceOfOrThrow(MCRPasswordCheckManager.class, MANAGER_PROPERTY);
     }
 
     public MCRPasswordCheckData create(String password) {

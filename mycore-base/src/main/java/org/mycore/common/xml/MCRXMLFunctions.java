@@ -136,7 +136,7 @@ public class MCRXMLFunctions {
         String selectedFilter = MCRConfiguration2.getStringOrThrow(SELECTED_DERIVATE_DISPLAY_FILTER_PROPERTY);
 
         DERIVATE_DISPLAY_FILTER = MCRConfiguration2.getInstanceOfOrThrow(MCRDerivateDisplayFilter.class,
-            "MCR.Derivate.DisplayFilters." + selectedFilter + ".Class");
+            "MCR.Derivate.DisplayFilters." + selectedFilter);
 
         if (LOGGER.isInfoEnabled()) {
             String introduction = "Configuration of selected derivate display filter (" + selectedFilter + "):";

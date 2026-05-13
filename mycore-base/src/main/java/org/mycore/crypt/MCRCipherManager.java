@@ -34,7 +34,10 @@ import org.mycore.common.config.MCRConfiguration2;
  *
  */
 public class MCRCipherManager {
+
     private static final Logger LOGGER = LogManager.getLogger();
+
+    public static final String CIPHER_PREFIX = "MCR.Crypt.Cipher.";
 
     /**
      * Create a single instance of a MCRCipher and initialize it. If the cipher can't initialized an exception
@@ -47,8 +50,7 @@ public class MCRCipherManager {
 
     public static MCRCipher getCipher(String id) throws MCRCryptKeyFileNotFoundException {
         LOGGER.debug("getCipher for id {} .", id);
-        String property = "MCR.Crypt.Cipher." + id + ".Class";
-        MCRCipher cipher = MCRConfiguration2.getSingleInstanceOfOrThrow(MCRCipher.class, property);
+        MCRCipher cipher = MCRConfiguration2.getSingleInstanceOfOrThrow(MCRCipher.class, CIPHER_PREFIX + id);
         if (!cipher.isInitialised()) {
             LOGGER.debug("init Cipher for id {} .", id);
             try {
@@ -71,9 +73,9 @@ public class MCRCipherManager {
 
     public static MCRCipher getUnIntitialisedCipher(String id) {
         LOGGER.debug("getCipher for id {} .", id);
-        String property = "MCR.Crypt.Cipher." + id + ".Class";
-        MCRCipher cipher = MCRConfiguration2.getSingleInstanceOfOrThrow(MCRCipher.class, property);
+        MCRCipher cipher = MCRConfiguration2.getSingleInstanceOfOrThrow(MCRCipher.class, CIPHER_PREFIX + id);
         cipher.reset();
         return cipher;
     }
+
 }

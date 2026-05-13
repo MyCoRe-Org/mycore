@@ -22,9 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.mycore.common.config.instantiator.MCRInstanceName;
-import org.mycore.test.MyCoReTest;
 
-@MyCoReTest
 public class MCRInstanceNameTest {
 
     @Test
@@ -32,130 +30,38 @@ public class MCRInstanceNameTest {
 
         MCRInstanceName name = MCRInstanceName.of("Foo.Bar");
 
-        assertEquals("Foo.Bar", name.actual());
         assertEquals("Foo.Bar", name.canonical());
-        assertEquals(MCRInstanceName.Suffix.NONE, name.suffix());
+        assertEquals("Foo.Bar.Class", name.actual());
 
     }
 
     @Test
-    public void subNameWithoutSuffix() {
+    public void nestedWithoutSuffix() {
 
-        MCRInstanceName name = MCRInstanceName.of("Foo.Bar").subName("Baz");
+        MCRInstanceName name = MCRInstanceName.of("Foo.Bar").nested("Baz");
 
-        assertEquals("Foo.Bar.Baz", name.actual());
         assertEquals("Foo.Bar.Baz", name.canonical());
-        assertEquals(MCRInstanceName.Suffix.NONE, name.suffix());
+        assertEquals("Foo.Bar.Baz.Class", name.actual());
 
     }
 
     @Test
-    public void nameWithUpperCaseSuffix() {
+    public void nameWithSuffix() {
 
         MCRInstanceName name = MCRInstanceName.of("Foo.Bar.Class");
 
+        assertEquals("Foo.Bar", name.canonical());
         assertEquals("Foo.Bar.Class", name.actual());
-        assertEquals("Foo.Bar", name.canonical());
-        assertEquals(MCRInstanceName.Suffix.UPPER_CASE, name.suffix());
 
     }
 
     @Test
-    public void subNameWithUpperCaseSuffix() {
+    public void nestedWithSuffix() {
 
-        MCRInstanceName name = MCRInstanceName.of("Foo.Bar.Class").subName("Baz");
+        MCRInstanceName name = MCRInstanceName.of("Foo.Bar.Class").nested("Baz");
 
+        assertEquals("Foo.Bar.Baz", name.canonical());
         assertEquals("Foo.Bar.Baz.Class", name.actual());
-        assertEquals("Foo.Bar.Baz", name.canonical());
-        assertEquals(MCRInstanceName.Suffix.UPPER_CASE, name.suffix());
-
-    }
-
-    @Test
-    public void nameWithLowerCaseSuffix() {
-
-        MCRInstanceName name = MCRInstanceName.of("Foo.Bar.class");
-
-        assertEquals("Foo.Bar.class", name.actual());
-        assertEquals("Foo.Bar", name.canonical());
-        assertEquals(MCRInstanceName.Suffix.LOWER_CASE, name.suffix());
-
-    }
-
-    @Test
-    public void subNameWithLowerCaseSuffix() {
-
-        MCRInstanceName name = MCRInstanceName.of("Foo.Bar.class").subName("Baz");
-
-        assertEquals("Foo.Bar.Baz.class", name.actual());
-        assertEquals("Foo.Bar.Baz", name.canonical());
-        assertEquals(MCRInstanceName.Suffix.LOWER_CASE, name.suffix());
-
-    }
-
-    @Test
-    public void emptyNameWithoutSuffix() {
-
-        MCRInstanceName name = MCRInstanceName.of("");
-
-        assertEquals("", name.actual());
-        assertEquals("", name.canonical());
-        assertEquals(MCRInstanceName.Suffix.NONE, name.suffix());
-
-    }
-
-    @Test
-    public void subEmptyNameWithoutSuffix() {
-
-        MCRInstanceName name = MCRInstanceName.of("").subName("Baz");
-
-        assertEquals("Baz", name.actual());
-        assertEquals("Baz", name.canonical());
-        assertEquals(MCRInstanceName.Suffix.NONE, name.suffix());
-
-    }
-
-    @Test
-    public void emptyNameWithUpperCaseSuffix() {
-
-        MCRInstanceName name = MCRInstanceName.of("Class");
-
-        assertEquals("Class", name.actual());
-        assertEquals("", name.canonical());
-        assertEquals(MCRInstanceName.Suffix.UPPER_CASE, name.suffix());
-
-    }
-
-    @Test
-    public void subEmptyNameWithUpperCaseSuffix() {
-
-        MCRInstanceName name = MCRInstanceName.of("Class").subName("Baz");
-
-        assertEquals("Baz.Class", name.actual());
-        assertEquals("Baz", name.canonical());
-        assertEquals(MCRInstanceName.Suffix.UPPER_CASE, name.suffix());
-
-    }
-
-    @Test
-    public void emptyNameWithLowerCaseSuffix() {
-
-        MCRInstanceName name = MCRInstanceName.of("class");
-
-        assertEquals("class", name.actual());
-        assertEquals("", name.canonical());
-        assertEquals(MCRInstanceName.Suffix.LOWER_CASE, name.suffix());
-
-    }
-
-    @Test
-    public void subEmptyNameWithLowerCaseSuffix() {
-
-        MCRInstanceName name = MCRInstanceName.of("class").subName("Baz");
-
-        assertEquals("Baz.class", name.actual());
-        assertEquals("Baz", name.canonical());
-        assertEquals(MCRInstanceName.Suffix.LOWER_CASE, name.suffix());
 
     }
 

@@ -45,8 +45,7 @@ public class MCRFactsAccessSystemHelper {
     }
 
     static MCRCondition build(String type) {
-        MCRCondition condition = MCRConfiguration2.getInstanceOfOrThrow(MCRCondition.class,
-            CONDITION_PREFIX + type + ".Class");
+        MCRCondition condition = MCRConfiguration2.getInstanceOfOrThrow(MCRCondition.class, CONDITION_PREFIX + type);
         if (LOGGER.isDebugEnabled() && condition instanceof MCRCombinedCondition combCond) {
             combCond.setDebug(true);
         }

@@ -103,7 +103,7 @@ public class MCRSyntheticResourceLocatorTest {
 
         MCRHints hints = toHints(factory);
         MCRResourceLocator locator = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRSyntheticResourceLocator.class, "Test.Class");
+            MCRSyntheticResourceLocator.class, "Test");
 
         List<URL> fooResourceUrl = locator.locate(FOO_PATH, hints).toList();
         List<URL> barResourceUrl = locator.locate(BAR_PATH, hints).toList();

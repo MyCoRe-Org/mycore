@@ -44,7 +44,7 @@ public class MCRInstantiatorProxyTest {
     public void annotated() {
 
         TestClassWithConfigurationProxy instance = ofName(TestClassWithConfigurationProxy.class,
-            "Foo.Class").instantiate();
+            "Foo").instantiate();
 
         assertNotNull(instance);
         assertEquals("Value1-Value2", instance.value());

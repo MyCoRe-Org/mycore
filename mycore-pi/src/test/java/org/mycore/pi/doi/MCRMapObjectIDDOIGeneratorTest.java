@@ -49,7 +49,7 @@ public class MCRMapObjectIDDOIGeneratorTest {
     @BeforeEach
     public void setUp() {
         doiGenerator = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRMapObjectIDDOIGenerator.class, "MCR.PI.Generator.MapObjectIDDOI.Class");
+            MCRMapObjectIDDOIGenerator.class, "MCR.PI.Generator.MapObjectIDDOI");
     }
 
     @Test

@@ -52,7 +52,7 @@ public abstract class MCRRuleStore {
     public abstract int getNextFreeRuleID(String prefix);
 
     public static MCRRuleStore obtainInstance() {
-        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRRuleStore.class, "MCR.Persistence.Rule.Store.Class");
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRRuleStore.class, "MCR.Persistence.Rule.Store");
     }
 
 }

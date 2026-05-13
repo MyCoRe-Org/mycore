@@ -85,7 +85,7 @@ public final class MCRAccessKeyServiceFactory {
 
     private static MCRAccessKeySecretProcessor getSecretProcessor() {
         return MCRConfiguration2.getSingleInstanceOfOrThrow(
-            MCRAccessKeySecretProcessor.class, MCRAccessKeyConfig.getSecretProcessorClassProperty());
+            MCRAccessKeySecretProcessor.class, MCRAccessKeyConfig.getSecretProcessorProperty());
     }
 
     private static final class ServiceHolder {

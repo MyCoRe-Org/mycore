@@ -65,7 +65,7 @@ public class MCRNormalizeMCRObjectIDsFilter implements ContainerRequestFilter {
     HttpServletResponse response;
 
     private MCRIDMapper mcrIdMapper = MCRConfiguration2
-        .getInstanceOf(MCRIDMapper.class, MCRIDMapper.MCR_PROPERTY_CLASS).get();
+        .getInstanceOf(MCRIDMapper.class, MCRIDMapper.MAPPER_PROPERTY).get();
 
     @Override
     @SuppressWarnings("PMD.NPathComplexity")

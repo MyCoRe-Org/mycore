@@ -103,8 +103,7 @@ public final class MCRJobQueueCleaner {
     }
 
     public static MCRJobQueueCleaner createInstance() {
-        String classProperty = CLEANER_PROPERTY + ".Class";
-        return MCRConfiguration2.getInstanceOfOrThrow(MCRJobQueueCleaner.class, classProperty);
+        return MCRConfiguration2.getInstanceOfOrThrow(MCRJobQueueCleaner.class, CLEANER_PROPERTY);
     }
 
     /**

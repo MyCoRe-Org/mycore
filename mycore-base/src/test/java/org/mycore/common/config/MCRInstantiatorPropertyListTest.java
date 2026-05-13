@@ -250,7 +250,7 @@ public class MCRInstantiatorPropertyListTest {
         Configurable instance = null;
         MCRConfigurationException exception = null;
         try {
-            instance = MCRInstanceConfiguration.ofName(Configurable.class, CONFIGURED_CLASS_PROPERTY).instantiate();
+            instance = MCRInstanceConfiguration.ofName(Configurable.class, "Foo").instantiate();
         } catch (MCRConfigurationException e) {
             exception = e;
         }

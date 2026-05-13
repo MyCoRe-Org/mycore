@@ -53,7 +53,7 @@ public class MCRInstantiatorDefaultTest {
     public void nested() {
 
         TestClassWithNestedClass instance = ofName(TestClassWithNestedClass.class,
-            "Foo.Class").instantiate();
+            "Foo").instantiate();
 
         assertNotNull(instance);
         assertNotNull(instance.nested);
@@ -70,7 +70,7 @@ public class MCRInstantiatorDefaultTest {
     public void nestedImplicit() {
 
         TestClassWithImplicitNestedClass instance = ofName(TestClassWithImplicitNestedClass.class,
-            "Foo.Class").instantiate();
+            "Foo").instantiate();
 
         assertNotNull(instance);
         assertNotNull(instance.nested);
@@ -89,7 +89,7 @@ public class MCRInstantiatorDefaultTest {
     public void nestedNested() {
 
         TestClassWithNestedNestedClass instance = ofName(TestClassWithNestedNestedClass.class,
-            "Foo.Class").instantiate();
+            "Foo").instantiate();
 
         assertNotNull(instance);
         assertNotNull(instance.nested);
@@ -109,7 +109,7 @@ public class MCRInstantiatorDefaultTest {
     public void nestedMap() {
 
         TestClassWithNestedMap instance = ofName(TestClassWithNestedMap.class,
-            "Foo.Class").instantiate();
+            "Foo").instantiate();
 
         assertNotNull(instance);
         assertNotNull(instance.map);
@@ -137,7 +137,7 @@ public class MCRInstantiatorDefaultTest {
     public void nestedMapImplicit() {
 
         TestClassWithNestedMapOfImplicitEntries instance = ofName(TestClassWithNestedMapOfImplicitEntries.class,
-            "Foo.Class").instantiate();
+            "Foo").instantiate();
 
         assertNotNull(instance);
         assertNotNull(instance.map);
@@ -167,7 +167,7 @@ public class MCRInstantiatorDefaultTest {
     public void nestedList() {
 
         TestClassWithNestedList instance = ofName(TestClassWithNestedList.class,
-            "Foo.Class").instantiate();
+            "Foo").instantiate();
 
         assertNotNull(instance);
         assertNotNull(instance.list);
@@ -195,7 +195,7 @@ public class MCRInstantiatorDefaultTest {
     public void nestedListImplicit() {
 
         TestClassWithNestedListOfImplicitEntries instance = ofName(TestClassWithNestedListOfImplicitEntries.class,
-            "Foo.Class").instantiate();
+            "Foo").instantiate();
 
         assertNotNull(instance);
         assertNotNull(instance.list);

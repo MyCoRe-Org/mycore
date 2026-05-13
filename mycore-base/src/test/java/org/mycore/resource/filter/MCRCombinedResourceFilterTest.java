@@ -121,7 +121,7 @@ public class MCRCombinedResourceFilterTest {
     public void configuration() {
 
         MCRResourceFilter filter = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRCombinedResourceFilter.class, "Test.Class");
+            MCRCombinedResourceFilter.class, "Test");
 
         List<URL> resourceUrls = filter.filter(allResourceUrls.stream(), MCRHints.EMPTY).toList();
 

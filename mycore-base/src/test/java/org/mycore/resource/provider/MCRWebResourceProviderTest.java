@@ -233,7 +233,7 @@ public class MCRWebResourceProviderTest {
 
         MCRHints hints = toHints(factory);
         MCRResourceProvider provider = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRWebResourceProvider.class, "Test.Class");
+            MCRWebResourceProvider.class, "Test");
 
         Optional<URL> fooResourceUrl = provider.provide(FOO_PATH, hints);
         Optional<URL> webFooResourceUrl = provider.provide(WEB_FOO_PATH, hints);

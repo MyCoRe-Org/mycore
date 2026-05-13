@@ -37,7 +37,6 @@ import org.mycore.common.MCRException;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration.Options;
 import org.mycore.common.config.instantiator.MCRInstanceName;
-import org.mycore.common.config.instantiator.MCRInstanceName.Suffix;
 import org.mycore.common.function.MCRTriConsumer;
 
 import com.google.common.base.Throwables;
@@ -331,8 +330,8 @@ public class MCRConfiguration2 {
                 if (!s.contains(".")) {
                     result = true;
                 } else {
-                    result = (s.endsWith(".class") || s.endsWith(".Class")) &&
-                        !s.substring(0, s.length() - ".class".length()).contains(".");
+                    result = (s.endsWith(".Class")) &&
+                        !s.substring(0, s.length() - ".Class".length()).contains(".");
                 }
                 return result;
             })
@@ -474,7 +473,7 @@ public class MCRConfiguration2 {
 
     public static <S> S instantiateClass(Class<S> superClass, String className) {
         return MCRInstanceConfiguration.ofClassName(superClass, className, "MCR.AnonymousInstance." + className,
-            Suffix.UPPER_CASE, new HashMap<>(), getPropertiesMap()).instantiate();
+           new HashMap<>(), getPropertiesMap()).instantiate();
     }
 
     public static <S> Stream<S> instantiateClasses(Class<S> superClass, String propertyName) {

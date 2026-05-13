@@ -20,7 +20,6 @@ package org.mycore.common.config.instantiator;
 
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -30,7 +29,6 @@ import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
-import org.mycore.common.config.instantiator.MCRInstanceName.Suffix;
 
 /**
  * Represents an extract of properties (typically {@link MCRConfiguration2#getPropertiesMap()}) used to
@@ -69,13 +67,7 @@ public final class MCRInstanceConfiguration<S> {
         this.name = name;
         this.properties = properties;
         this.fullProperties = fullProperties;
-        if (name.suffix() != Suffix.UPPER_CASE) {
-            if (LOGGER.isWarnEnabled()) {
-                LOGGER.warn("Using instance configuration for actual instance name {}, " +
-                    "which doesn't have suffix '.Class'. Support for such names is deprecated" +
-                    "and support will be removed in a future release of MyCoRe", name::actual);
-            }
-        }
+        properties.remove("Class");
     }
 
     public boolean instantiatable() {
@@ -87,25 +79,23 @@ public final class MCRInstanceConfiguration<S> {
     }
 
     /**
-     * Shorthand for {@link MCRInstanceConfiguration#ofClass(Class, Class, String, Suffix, Map, Map)} that
-     * creates uses {@link MCRClassTools#forName(String)} to resolve the value class.
+     * Shorthand for {@link MCRInstanceConfiguration#ofClass(Class, Class, String, Map, Map)} that
+     * uses {@link MCRClassTools#forName(String)} to resolve the value class.
      */
     public static <S> MCRInstanceConfiguration<S> ofClassName(Class<S> superClass, String className,
-        String prefix, Suffix suffix, Map<String, String> properties, Map<String, String> fullProperties) {
+        String prefix, Map<String, String> properties, Map<String, String> fullProperties) {
         try {
             Class<? extends S> valueClass = MCRClassTools.forName(className);
-            return ofClass(superClass, valueClass, prefix, suffix, properties, fullProperties);
+            return ofClass(superClass, valueClass, prefix, properties, fullProperties);
         } catch (ClassNotFoundException e) {
             throw new MCRException("Failed to load class " + className, e);
-
         }
     }
 
     /**
      * Creates a new configuration for the given super class and value class based on the given properties.
      * <p>
-     * Example: Given value class <code>Some.Instance.Name</code>, prefix <code>Some.Instance.Name</code>,
-     * suffix {@link Suffix#NONE} and properties
+     * Example: Given value class <code>Some.Instance.Name</code>, prefix <code>Some.Instance.Name</code> and properties
      * <ul>
      *     <li><code>Some.Instance.Name.Key1=Value1</code></li>
      *     <li><code>Some.Instance.Name.Key2=Value1</code></li>
@@ -119,21 +109,10 @@ public final class MCRInstanceConfiguration<S> {
      *     <li><code>Key2=Value2</code></li>
      * </ul>
      * and {@link MCRInstanceConfiguration#fullProperties()} that are equal to the given properties.
-     * <p>
-     * Alternatively, the {@link Suffix#LOWER_CASE} or {@link Suffix#NONE} could be used, in which case
-     * the keys <code>Class</code>, <code>class</code> and the empty key, if present,
-     * are not added to the {@link MCRInstanceConfiguration#properties()}.
-     * <p>
-     * Example: If prefix <code>Some.Instance.Name</code> and suffix {@link Suffix#UPPER_CASE}
-     * would have been used, properties <code>Some.Instance.Name.class=Foo</code> and
-     * <code>Some.Instance.Name=Bar</code> would be ignored. The resulting
-     * {@link MCRInstanceConfiguration#properties()} would not contains entries with keys <code>class</code>
-     * or the empty key, respectively.
      */
     public static <S> MCRInstanceConfiguration<S> ofClass(Class<S> superClass, Class<? extends S> valueClass,
-        String prefix, Suffix suffix, Map<String, String> properties, Map<String, String> fullProperties) {
-        MCRInstanceName name = MCRInstanceName.of(suffix.appendTo(prefix));
-        name.ignoredKeys().forEach(properties::remove);
+        String prefix, Map<String, String> properties, Map<String, String> fullProperties) {
+        MCRInstanceName name = MCRInstanceName.of(prefix);
         return new MCRInstanceConfiguration<>(superClass, valueClass, name, properties, fullProperties);
     }
 
@@ -208,15 +187,15 @@ public final class MCRInstanceConfiguration<S> {
      */
     public static <T> MCRInstanceConfiguration<T> ofName(Class<T> superClass, MCRInstanceName name,
         Map<String, String> properties, Set<Option> options) {
-        Class<? extends T> valueClass = resolveValueClass(superClass, name, name.actual(), properties, options);
-        Map<String, String> reducedProperties = reduceProperties(name, name.canonical(), properties);
+        Map<String, String> reducedProperties = reduceProperties(name.canonical(), properties);
+        Class<? extends T> valueClass = resolveValueClass(superClass, name, reducedProperties, options);
         return new MCRInstanceConfiguration<>(superClass, valueClass, name, reducedProperties, properties);
     }
 
     private static <S> Class<? extends S> resolveValueClass(Class<S> superClass, MCRInstanceName name,
-        String classProperty, Map<String, String> properties, Set<Option> options) {
-        String className = properties.get(classProperty);
+        Map<String, String> properties, Set<Option> options) {
 
+        String className = properties.get("Class");
         if (className != null) {
             if (className.isBlank()) {
                 return null;
@@ -239,12 +218,10 @@ public final class MCRInstanceConfiguration<S> {
 
     }
 
-    private static Map<String, String> reduceProperties(MCRInstanceName name, String prefix,
-        Map<String, String> properties) {
+    private static Map<String, String> reduceProperties(String prefix, Map<String, String> properties) {
 
         final String prefixWithDelimiter = prefix + '.';
         final int prefixWithDelimiterLength = prefixWithDelimiter.length();
-        final List<String> ignoredKeys = name.ignoredKeys();
 
         Map<String, String> reducedProperties = new HashMap<>();
         for (Map.Entry<String, String> entry : properties.entrySet()) {
@@ -259,7 +236,6 @@ public final class MCRInstanceConfiguration<S> {
         if (directProperty != null) {
             reducedProperties.put("", directProperty);
         }
-        name.ignoredKeys().forEach(reducedProperties::remove);
         return reducedProperties;
     }
 
@@ -316,11 +292,9 @@ public final class MCRInstanceConfiguration<S> {
      * @return the nested configuration
      */
     public <N> MCRInstanceConfiguration<N> nested(Class<N> superClass, String prefix) {
-        MCRInstanceName nestedName = name.subName(prefix);
-        String classProperty = nestedName.suffix().appendTo(prefix);
-        Class<? extends N> valueClass =
-            resolveValueClass(superClass, nestedName, classProperty, properties, Options.IMPLICIT);
-        Map<String, String> reducedProperties = reduceProperties(nestedName, prefix, properties);
+        MCRInstanceName nestedName = name.nested(prefix);
+        Map<String, String> reducedProperties = reduceProperties(prefix, properties);
+        Class<? extends N> valueClass = resolveValueClass(superClass, nestedName, reducedProperties, Options.IMPLICIT);
         return new MCRInstanceConfiguration<>(superClass, valueClass, nestedName, reducedProperties, fullProperties);
     }
 

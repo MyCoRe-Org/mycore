@@ -99,19 +99,19 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
     @SuppressWarnings("unchecked")
     public void init() throws IOException {
         // digest calculator
-        String digestCalculatorProperty = "MCR.Content.DigestCalculator.Class";
+        String digestCalculatorProperty = "MCR.Content.DigestCalculator";
         this.digestCalculator = MCRConfiguration2
             .getSingleInstanceOfOrThrow(MCROCFLDigestCalculator.class, digestCalculatorProperty);
 
         // transactional storage
-        String transactionalStorageProperty = "MCR.Content.TransactionalStorage.Class";
+        String transactionalStorageProperty = "MCR.Content.TransactionalStorage";
         this.transactionalStorage = MCRConfiguration2
             .getSingleInstanceOfOrThrow(MCROCFLTransactionalStorage.class, transactionalStorageProperty);
         Files.createDirectories(this.transactionalStorage.getRoot());
         this.transactionalStorage.clearTransactional();
 
         // remote storage
-        String remoteStorageProperty = "MCR.Content.RemoteStorage.Class";
+        String remoteStorageProperty = "MCR.Content.RemoteStorage";
         this.remoteStorage = MCRConfiguration2
             .getSingleInstanceOf(MCROCFLRemoteTemporaryStorage.class, remoteStorageProperty).orElse(null);
 
