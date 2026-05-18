@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.common.xml;
+package org.mycore.common.xsl.uriresolver;
 
 import java.lang.reflect.Method;
 import java.net.URLDecoder;
@@ -30,7 +30,6 @@ import javax.xml.transform.URIResolver;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRClassTools;
-import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 
 /**
  * Resolves arbitrary static methods of arbitrary classes. Parameters are considerd to be of type

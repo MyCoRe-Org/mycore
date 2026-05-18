@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.common.xml;
+package org.mycore.common.xsl.uriresolver;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -36,7 +36,6 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.access.MCRAccessMock;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
-import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest

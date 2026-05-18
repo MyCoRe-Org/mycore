@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.common.xml;
+package org.mycore.common.xsl.uriresolver;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
@@ -27,7 +27,8 @@ import javax.xml.transform.dom.DOMSource;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.common.xsl.uriresolver.MCRURIResolver;
+import org.mycore.common.xml.MCRDOMUtils;
+import org.mycore.common.xml.MCRXMLFunctions;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -39,7 +40,7 @@ import org.w3c.dom.Element;
  *
  *
  * It is registered as property:
- * MCR.URIResolver.ModuleResolver.userobjectrights=org.mycore.common.xml.MCRUserAndObjectRightsURIResolver
+ * MCR.URIResolver.ModuleResolver.userobjectrights=org.mycore.common.xsl.uriresolver.MCRUserAndObjectRightsURIResolver
  *
  * returns for boolean results
  * an XML element &lt;boolean&gt; with text 'true' or 'false'

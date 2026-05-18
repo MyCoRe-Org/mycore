@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.common.xml;
+package org.mycore.common.xsl.uriresolver;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -37,7 +37,6 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRRateLimitBuckets;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
-import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 import org.mycore.test.MyCoReTest;
 
 import io.github.bucket4j.Bucket;
@@ -51,7 +50,6 @@ public class MCRRateLimitResolverTest {
 
     @BeforeEach
     public void setUp() throws Exception {
-        MCRConfiguration2.set("MCR.URIResolver.ModuleResolver.ratelimit", "org.mycore.common.xml.MCRRateLimitResolver");
         MCRMockResolver.setResultSource(resultSource);
         MCRRateLimitBuckets.clearAllBuckets();
     }
