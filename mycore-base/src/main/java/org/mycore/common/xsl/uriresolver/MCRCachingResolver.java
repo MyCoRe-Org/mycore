@@ -35,15 +35,14 @@ public class MCRCachingResolver implements URIResolver {
 
     private final static Logger LOGGER = LogManager.getLogger();
 
-    private final static String CONFIG_PREFIX = "MCR.URIResolver.CachingResolver";
+    private final MCRCache<String, Element> cache;
 
     private final long maxAge;
 
-    private final MCRCache<String, Element> cache;
-
     public MCRCachingResolver() {
-        int capacity = MCRConfiguration2.getOrThrow(CONFIG_PREFIX + ".Capacity", Integer::parseInt);
-        maxAge = MCRConfiguration2.getOrThrow(CONFIG_PREFIX + ".MaxAge", Long::parseLong);
+        String configPrefix = "MCR.URIResolver.CachingResolver";
+        int capacity = MCRConfiguration2.getOrThrow(configPrefix + ".Capacity", Integer::parseInt);
+        maxAge = MCRConfiguration2.getOrThrow(configPrefix + ".MaxAge", Long::parseLong);
         cache = new MCRCache<>(capacity, MCRCachingResolver.class.getName());
     }
 

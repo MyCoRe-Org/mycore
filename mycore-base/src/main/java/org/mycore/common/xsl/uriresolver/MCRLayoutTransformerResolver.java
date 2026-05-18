@@ -48,7 +48,12 @@ public class MCRLayoutTransformerResolver implements URIResolver {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final String TRANSFORMER_FACTORY_PROPERTY = "MCR.Layout.Transformer.Factory";
+    private final MCRLayoutTransformerFactory layoutTransformerFactory;
+
+    public MCRLayoutTransformerResolver() {
+        layoutTransformerFactory = MCRConfiguration2.getInstanceOfOrThrow(MCRLayoutTransformerFactory.class,
+            "MCR.Layout.Transformer.Factory");
+    }
 
     @Override
     public Source resolve(String href, String base) throws TransformerException {
@@ -75,9 +80,7 @@ public class MCRLayoutTransformerResolver implements URIResolver {
         try {
             if (resolved != null) {
                 MCRSourceContent content = new MCRSourceContent(resolved);
-                MCRLayoutTransformerFactory factory = MCRConfiguration2.getInstanceOfOrThrow(
-                    MCRLayoutTransformerFactory.class, TRANSFORMER_FACTORY_PROPERTY);
-                MCRContentTransformer transformer = factory.getTransformer(transformerId);
+                MCRContentTransformer transformer = layoutTransformerFactory.getTransformer(transformerId);
                 MCRContent result;
                 if (transformer instanceof MCRParameterizedTransformer parameterizedTransformer) {
                     MCRParameterCollector paramcollector = MCRParameterCollector.ofCurrentSession();

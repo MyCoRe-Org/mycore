@@ -65,23 +65,16 @@ public class MCRClassificationResolver implements URIResolver {
 
     private static final Pattern EDITORFORMAT_PATTERN = Pattern.compile("(\\[)([^\\]]*)(\\])");
 
-    private static final String FORMAT_CONFIG_PREFIX = MCRURIResolver.CONFIG_PREFIX + "Classification.Format.";
+    private static final String CONFIG_PREFIX = "MCR.URIResolver.Classification.";
 
-    private static final String SORT_CONFIG_PREFIX = MCRURIResolver.CONFIG_PREFIX + "Classification.Sort.";
+    private final MCRCache<String, Element> categoryCache;
 
-    private static MCRCache<String, Element> categoryCache;
+    private final MCRCategoryDAO dao;
 
-    private static MCRCategoryDAO dao;
-
-    static {
-        try {
-            dao = MCRCategoryDAO.obtainInstance();
-            categoryCache = new MCRCache<>(
-                MCRConfiguration2.getInt(MCRURIResolver.CONFIG_PREFIX + "Classification.CacheSize").orElse(1000),
-                "URIResolver categories");
-        } catch (Exception exc) {
-            LOGGER.error("Unable to initialize classification resolver", exc);
-        }
+    public MCRClassificationResolver() {
+        int cacheCapacity = MCRConfiguration2.getOrThrow(CONFIG_PREFIX + "CacheSize", Integer::parseInt);
+        categoryCache = new MCRCache<>(cacheCapacity, "URIResolver categories");
+        dao = MCRCategoryDAO.obtainInstance();
     }
 
     @Override
@@ -106,16 +99,16 @@ public class MCRClassificationResolver implements URIResolver {
         Matcher m = EDITORFORMAT_PATTERN.matcher(editorString);
         if (m.find() && m.groupCount() == 3) {
             String formatDef = m.group(2);
-            return MCRConfiguration2.getStringOrThrow(FORMAT_CONFIG_PREFIX + formatDef);
+            return MCRConfiguration2.getStringOrThrow(CONFIG_PREFIX + "Format." + formatDef);
         }
         return null;
     }
 
     private static boolean shouldSortCategories(String classId) {
-        return MCRConfiguration2.getBoolean(SORT_CONFIG_PREFIX + classId).orElse(true);
+        return MCRConfiguration2.getBoolean(CONFIG_PREFIX + "Sort." + classId).orElse(true);
     }
 
-    private static long getSystemLastModified() {
+    private long getSystemLastModified() {
         long xmlLastModified = MCRXMLMetadataManager.obtainInstance().getLastModified();
         long classLastModified = dao.getLastModified();
         return Math.max(xmlLastModified, classLastModified);
@@ -170,7 +163,7 @@ public class MCRClassificationResolver implements URIResolver {
         return getElement(uri, format, classID, cl, emptyLeaves);
     }
 
-    private static MCRCategory getMcrCategory(String uri, String axis, String categ, String classID, int levels) {
+    private MCRCategory getMcrCategory(String uri, String axis, String categ, String classID, int levels) {
         MCRCategory cl = null;
         LOGGER.debug("categoryCache entry invalid or not found: start MCRClassificationQuery");
         if (axis.equals("children")) {

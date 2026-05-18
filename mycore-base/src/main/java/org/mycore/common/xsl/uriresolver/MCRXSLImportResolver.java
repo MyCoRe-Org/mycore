@@ -47,20 +47,15 @@ public class MCRXSLImportResolver implements URIResolver {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    URIResolver fallback = new MCRResourceResolver();
+    private final URIResolver fallback;
+
+    public MCRXSLImportResolver() {
+        fallback = new MCRResourceResolver();
+    }
 
     @Override
     public Source resolve(String href, String base) throws TransformerException {
-        final String baseURI = MCRXSLResourceHelper.getXSLDirectory(base);
-        // set xslt folder
-        final String xslFolder;
-        if (Strings.CS.startsWith(baseURI, "resource:xsl/")) {
-            xslFolder = "xsl";
-        } else if (Strings.CS.startsWith(baseURI, "resource:xslt/")) {
-            xslFolder = "xslt";
-        } else {
-            xslFolder = MCRXSLResourceHelper.getXSLFolder();
-        }
+        String xslFolder = getXSLFolder(base);
 
         String importXSL = MCRXMLFunctions.nextImportStep(href.substring(href.indexOf(':') + 1));
         if (importXSL.isEmpty()) {
@@ -73,6 +68,17 @@ public class MCRXSLImportResolver implements URIResolver {
         LOGGER.debug("xslImport importing {}", importXSL);
 
         return fallback.resolve(MCRXSLResourceHelper.RESOURCE_PREFIX + xslFolder + "/" + importXSL, base);
+    }
+
+    private String getXSLFolder(String base) {
+        String baseURI = MCRXSLResourceHelper.getXSLDirectory(base);
+        if (Strings.CS.startsWith(baseURI, "resource:xsl/")) {
+            return "xsl";
+        } else if (Strings.CS.startsWith(baseURI, "resource:xslt/")) {
+            return "xslt";
+        } else {
+            return MCRXSLResourceHelper.getXSLFolder();
+        }
     }
 
 }
