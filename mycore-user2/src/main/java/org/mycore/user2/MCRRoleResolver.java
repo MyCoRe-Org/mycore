@@ -36,8 +36,7 @@ import org.mycore.access.MCRMissingPrivilegeException;
 import org.mycore.datamodel.classifications2.MCRLabel;
 
 /**
- * @author Thomas Scheffler (yagee)
- *
+ * {@link URIResolver} that provides role-related information for the current user as XML.
  */
 public class MCRRoleResolver implements URIResolver {
 
@@ -78,8 +77,33 @@ public class MCRRoleResolver implements URIResolver {
         return root;
     }
 
-    /* (non-Javadoc)
-     * @see javax.xml.transform.URIResolver#resolve(java.lang.String, java.lang.String)
+    /**
+     * Resolves the given role query and returns the result as an XML source.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{method}
+     * </pre>
+     * <p>Supported methods:
+     * <ul>
+     *   <li>{@code getAssignableGroupsForUser} – returns all roles assignable by the current user,
+     *       depending on their privileges</li>
+     * </ul>
+     * <p>Example request:
+     * <pre>
+     *   group:getAssignableGroupsForUser
+     * </pre>
+     * <p>Example response:
+     * <pre>{@code
+     *   <items>
+     *     <item value="admins" label="Administrators"/>
+     *     <item value="editors" label="Editors"/>
+     *   </items>
+     * }</pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link JDOMSource} wrapping the result element
+     * @throws TransformerException if the method is unknown or the current user lacks the required privileges
      */
     @Override
     public Source resolve(final String href, final String base) throws TransformerException {

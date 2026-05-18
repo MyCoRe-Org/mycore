@@ -35,17 +35,44 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.util.JAXBSource;
 
 /**
- * Implements URIResolver for use in editor form user-editor.xml
- *  
- * user:{userID}
- *   returns detailed user data including owned users and groups
- * user:current
- *   returns detailed user data of the user currently logged in
- * 
- * @author Thomas Scheffler (yagee)
+ * {@link URIResolver} that returns user data for a given user ID or the currently logged-in user.
  */
 public class MCRUserResolver implements URIResolver {
 
+    /**
+     * Resolves user data for the given user ID and returns it as an XML source.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{userId}
+     *   &lt;scheme&gt;:current
+     *   &lt;scheme&gt;:getOwnedUsers:{userId}
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   user:myuser
+     *   user:current
+     *   user:getOwnedUsers:myuser
+     * </pre>
+     * <p>Example response for a user:
+     * <pre>{@code
+     *   <user name="myuser">
+     *     ...
+     *   </user>
+     * }</pre>
+     * <p>Example response for {@code getOwnedUsers}:
+     * <pre>{@code
+     *   <owns>
+     *     <user name="owneduser1"/>
+     *     <user name="owneduser2"/>
+     *   </owns>
+     * }</pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link JAXBSource} wrapping the user or owned users data,
+     *         or {@code null} if the user is not found
+     * @throws TransformerException if the JAXB serialization fails
+     */
     @Override
     public Source resolve(String href, String base) throws TransformerException {
         String[] hrefParts = href.split(":");

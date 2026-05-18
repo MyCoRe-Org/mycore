@@ -30,13 +30,7 @@ import org.mycore.common.xsl.uriresolver.MCRURIResolverResponse;
 import org.mycore.services.http.MCRURLQueryParameter;
 
 /**
- * URI resolver used by XSLT 3 function wrappers for workflow action mapping URLs.
- *
- * Supported operations:
- * <ul>
- * <li>{@code actionmapping:getURLforID/?action=...&id=...&absolute=true|false}</li>
- * <li>{@code actionmapping:getURLforCollection/?action=...&collection=...&absolute=true|false}</li>
- * </ul>
+ * {@link URIResolver} that resolves workflow action mapping URLs for use in XSLT 3 function wrappers.
  */
 public class MCRActionMappingURIResolver implements URIResolver {
 
@@ -52,6 +46,30 @@ public class MCRActionMappingURIResolver implements URIResolver {
 
     private static final String ABSOLUTE_ARG = "absolute";
 
+    /**
+     * Resolves the given action mapping query and returns the resulting URL as an XML source.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:getURLforID?action={action}&amp;id={id}&amp;absolute={true|false}
+     *   &lt;scheme&gt;:getURLforCollection?action={action}&amp;collection={collection}&amp;absolute={true|false}
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   someScheme:getURLforID?action=edit&amp;id=mcr_document_00000001&amp;absolute=true
+     *   someScheme:getURLforCollection?action=search&amp;collection=mcr&amp;absolute=false
+     * </pre>
+     * <p>Example response:
+     * <pre>{@code
+     *   <string>https://example.org/edit/mcr_document_00000001</string>
+     * }</pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link Source} wrapping a {@code <string>} element containing the resolved URL,
+     *         or an empty string if no URL is found
+     * @throws TransformerException if the URI is malformed, a required argument is missing,
+     *                              or the method is unknown
+     */
     @Override
     public Source resolve(String href, String base) throws TransformerException {
         String[] parts = href.split(":", 2);

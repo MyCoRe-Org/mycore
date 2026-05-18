@@ -29,22 +29,42 @@ import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
 
 /**
- * Implements URIResolver for realms
- *  
- * realm:{realmID}
- *   returns information about this realm
- * realm:local
- *   returns information about the local realm
- * realm:all
- *   returns all realms  
- * 
- * @author Thomas Scheffler (yagee)
- *
+ * {@link URIResolver} that returns information about one or all configured realms as XML.
  */
 public class MCRRealmResolver implements URIResolver {
 
-    /* (non-Javadoc)
-     * @see javax.xml.transform.URIResolver#resolve(java.lang.String, java.lang.String)
+    /**
+     * Resolves the given realm ID and returns the corresponding realm data as an XML source.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{realmId}
+     *   &lt;scheme&gt;:local
+     *   &lt;scheme&gt;:all
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   realm:myRealm
+     *   realm:local
+     *   realm:all
+     * </pre>
+     * <p>Example response for a single realm:
+     * <pre>{@code
+     *   <realm id="myRealm">
+     *     ...
+     *   </realm>
+     * }</pre>
+     * <p>Example response for {@code all}:
+     * <pre>{@code
+     *   <realms>
+     *     <realm id="local">...</realm>
+     *     <realm id="myRealm">...</realm>
+     *   </realms>
+     * }</pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link Source} wrapping either a single {@code <realm>} element or
+     *         the full {@code <realms>} document
      */
     @Override
     public Source resolve(final String href, final String base) {

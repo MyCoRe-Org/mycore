@@ -40,15 +40,40 @@ import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.mets.model.MCRMETSGeneratorFactory;
 
 /**
- * returns a structured METS document for any valid MyCoRe ID (object or
- * derivate). May return empty &lt;mets:mets/&gt; if no derivate is present. No
- * metadata is attached.
- * 
- * @author Thomas Scheffler (yagee)
+ * {@link URIResolver} that returns the METS document for a given MCR object or derivate as XML.
  */
 public class MCRMetsResolver implements URIResolver {
+
     private static final Logger LOGGER = LogManager.getLogger();
 
+    /**
+     * Resolves the METS document for the given MCR object or derivate ID and returns it as an XML source.
+     * <p>If a MCR object ID is given, the first displayable derivate is used. If no displayable
+     * derivate is found, an empty {@code <mets:mets>} element is returned. If a {@code mets.xml}
+     * file exists in the derivate, it is returned directly; otherwise a METS document is generated
+     * on the fly.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{mcrId|derivateId}
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   mets:mcr_document_00000001
+     *   mets:mcr_derivate_00000001
+     * </pre>
+     * <p>Example response:
+     * <pre>{@code
+     *   <mets:mets xmlns:mets="http://www.loc.gov/METS/">
+     *     ...
+     *   </mets:mets>
+     * }</pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link Source} wrapping the METS document, or an empty {@code <mets:mets>}
+     *         element if no displayable derivate is found
+     * @throws TransformerException if the METS document cannot be read or generated
+     */
     @Override
     public Source resolve(String href, String base) throws TransformerException {
         String id = href.substring(href.indexOf(':') + 1);

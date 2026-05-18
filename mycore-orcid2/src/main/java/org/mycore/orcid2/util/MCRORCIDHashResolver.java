@@ -30,25 +30,35 @@ import org.mycore.common.MCRUtils;
 import org.mycore.common.xsl.uriresolver.MCRURIResolverResponse;
 
 /**
- * Provides URIResolver to hash string.
+ * {@link URIResolver} that hashes a given input string and returns the result as an XML source.
  */
 public class MCRORCIDHashResolver implements URIResolver {
 
     /**
-     * Hashes given input with given algoritm.
-     * <p>
-     * Syntax: <code>hash:{input}:{algorithm}:{?salt}:{?iterations}</code>
-     * <p>
-     * input and salt will be url decoded
+     * Hashes the given input with the specified algorithm and returns the result as an XML source.
+     * <p>Both {@code input} and {@code salt} are URL-decoded before processing.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{input}:{algorithm}
+     *   &lt;scheme&gt;:{input}:{algorithm}:{salt}
+     *   &lt;scheme&gt;:{input}:{algorithm}:{salt}:{iterations}
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   hash:mySecret:SHA-256
+     *   hash:mySecret:SHA-256:mySalt
+     *   hash:mySecret:SHA-256:mySalt:1000
+     * </pre>
+     * <p>Example response:
+     * <pre>{@code
+     *   <string>a3f1c2...</string>
+     * }</pre>
      *
-     * @param href
-     *            URI in the syntax above
-     * @param base
-     *            not used
-     *
-     * @return hashed input as hex string
-     * @throws MCRException query is invalid or hash algorithm is not supported
-     * @see javax.xml.transform.URIResolver
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link Source} wrapping a {@code <string>} element containing the hex-encoded hash
+     * @throws IllegalArgumentException if the URI does not contain at least scheme, input, and algorithm
+     * @throws MCRException if the iteration count is not a valid integer or the algorithm is not supported
      */
     @Override
     public Source resolve(String href, String base) throws TransformerException {
@@ -80,4 +90,5 @@ public class MCRORCIDHashResolver implements URIResolver {
         }
         return MCRURIResolverResponse.ofString(result);
     }
+
 }

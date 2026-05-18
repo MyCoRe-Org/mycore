@@ -39,16 +39,7 @@ import org.mycore.solr.MCRSolrUtils;
 import org.mycore.solr.search.MCRSolrSearchUtils;
 
 /**
- * <pre>
- *  Usage:   solr:{optional core}:query
- *  Example: solr:q=%2BobjectType%3Ajpjournal
- *
- *  Usage:   solr:{optional core}:{optional requestHandler:&lt;requestHandler&gt;}:query
- *  Example: solr:requestHandler:browse-inventory:q=%2BobjectType%3Ajpjournal
- *           solr:mysolrcore:requestHandler:browse-inventory:q=%2BobjectType%3Ajpjournal
- * </pre>
- *
- * @author Sebastian Hofmann
+ * {@link URIResolver} that executes a Solr query and returns the raw XML response as a source.
  */
 public class MCRSolrQueryResolver implements URIResolver {
 
@@ -70,13 +61,47 @@ public class MCRSolrQueryResolver implements URIResolver {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    /**
+     * Resolves the given Solr query and returns the raw XML response as a source.
+     * <p>If no core is specified, the main Solr index is used. If no request handler is specified,
+     * {@code /select} is used.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{query}
+     *   &lt;scheme&gt;:{core}:{query}
+     *   &lt;scheme&gt;:requestHandler:{handler}:{query}
+     *   &lt;scheme&gt;:{core}:requestHandler:{handler}:{query}
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   solr:q=%2BobjectType%3Adocument
+     *   solr:mycore:q=%2BobjectType%3Adocument
+     *   solr:requestHandler:browse-inventory:q=%2BobjectType%3Adocument
+     *   solr:mycore:requestHandler:browse-inventory:q=%2BobjectType%3Adocument
+     * </pre>
+     * <p>Example response:
+     * <pre>{@code
+     *   <response>
+     *     <result name="response" numFound="1">
+     *       <doc>
+     *         <str name="id">mcr_document_00000001</str>
+     *       </doc>
+     *     </result>
+     *   </response>
+     * }</pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link Source} wrapping the raw Solr XML response
+     * @throws MCRException if the URI does not match the expected pattern or the query is empty
+     */
     @Override
     public Source resolve(String href, String base) {
         Matcher matcher = URI_PATTERN.matcher(href);
 
         if (!matcher.matches()) {
             printMismatchWarning(href);
-            throw new IllegalArgumentException("Did not understand uri: " + href);
+            throw new MCRException("Did not understand uri: " + href);
         }
         Optional<String> core = Optional.ofNullable(matcher.group(CORE_GROUP_NAME));
         Optional<String> requestHandler = Optional.ofNullable(matcher.group(REQUEST_HANDLER_GROUP_NAME));
@@ -98,7 +123,7 @@ public class MCRSolrQueryResolver implements URIResolver {
             result.setSystemId(href);
             return result.getSource();
         } catch (Exception exc) {
-            throw new MCRException("Error while executing solr request for query " + href, exc);
+            throw new IllegalArgumentException("Error while executing solr request for query " + href, exc);
         }
     }
 

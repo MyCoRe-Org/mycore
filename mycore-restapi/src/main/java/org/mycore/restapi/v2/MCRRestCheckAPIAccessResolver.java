@@ -26,20 +26,30 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.xsl.uriresolver.MCRURIResolverResponse;
 import org.mycore.restapi.v2.access.MCRRestAccessManager;
 
+/**
+ * {@link URIResolver} that checks whether the current user has permission to access a REST API path.
+ */
 public class MCRRestCheckAPIAccessResolver implements URIResolver {
 
     /**
-     * Checks permission for a given rest api path.
-     * <p>
-     * Syntax: <code>checkRestAPIAccess:{path}:{permission}</code>
+     * Checks the REST API access permission for the given path and returns the result as an XML boolean.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{path}:{permission}
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   checkrestapiaccess:/api/v2/objects:read
+     * </pre>
+     * <p>Example response:
+     * <pre>{@code
+     *   <boolean>true</boolean>
+     * }</pre>
      *
-     * @param href
-     *            URI in the syntax above
-     * @param base
-     *            not used
-     *
-     * @return the root element "boolean" of the XML document with content string "true" or "false"
-     * @see javax.xml.transform.URIResolver
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link Source} wrapping an XML element {@code <boolean>} with value {@code true} or {@code false}
+     * @throws IllegalArgumentException if the URI does not match the expected syntax
      */
     @Override
     public Source resolve(String href, String base) throws IllegalArgumentException {

@@ -41,6 +41,9 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
+/**
+ * {@link URIResolver} that provides persistent identifier (PI) related queries as XML.
+ */
 public class MCRPIURIResolver implements URIResolver {
 
     private static final Logger LOGGER = LogManager.getLogger();
@@ -85,6 +88,44 @@ public class MCRPIURIResolver implements URIResolver {
             .equals(id));
     }
 
+    /**
+     * Resolves the given PI query and returns the result as an XML source.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{method}/?{param}={value}[&amp;{param}={value}...]
+     * </pre>
+     * <p>Supported methods and their required parameters:
+     * <ul>
+     *   <li>{@code hasIdentifierCreated}: {@code service}, {@code id}, {@code additional}</li>
+     *   <li>{@code hasIdentifierRegistrationStarted}: {@code service}, {@code id}, {@code additional}</li>
+     *   <li>{@code hasIdentifierRegistered}: {@code service}, {@code id}, {@code additional}</li>
+     *   <li>{@code hasManagedPI}: {@code objectID}</li>
+     *   <li>{@code isManagedPI}: {@code pi}, {@code id}</li>
+     *   <li>{@code getPIServiceInformation}: {@code objectID}</li>
+     * </ul>
+     * <p>Example request:
+     * <pre>
+     *   pi:hasIdentifierRegistered/?service=myService&amp;id=mcr_document_00000001&amp;additional=
+     *   pi:hasManagedPI/?objectID=mcr_document_00000001
+     *   pi:getPIServiceInformation/?objectID=mcr_document_00000001
+     * </pre>
+     * <p>Example response for boolean methods:
+     * <pre>{@code
+     *   <boolean>true</boolean>
+     * }</pre>
+     * <p>Example response for {@code getPIServiceInformation}:
+     * <pre>{@code
+     *   <list>
+     *     <service id="myService" type="doi" inscribed="true" permission="true"/>
+     *   </list>
+     * }</pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link Source} wrapping the result element
+     * @throws TransformerException if the URI is malformed, a required argument is missing,
+     *                                  or the method is unknown
+     */
     @Override
     public Source resolve(String href, String base) throws TransformerException {
         String[] parts = href.split(":", 2);

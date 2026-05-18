@@ -26,25 +26,40 @@ import org.jdom2.transform.JDOMSource;
 import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 
 /**
- * Retrieves a publication as MODS XML from a given URI and
- * enriches publication data using external data sources.
- * <p>
- * There may be different configurations for the enrichment process.
- * Syntax:
- * enrich:[ConfigID]:[URIReturningExistingMODS]
- * <p>
- * To start with just an identifier, use the "buildxml" resolver, e.g.
- * enrich:import:buildxml:_rootName_=mods:mods&amp;mods:identifier=10.123/456&amp;mods:identifier/@type=doi
- * This first builds an empty MODS document with just a DOI identifier,
- * then enriches it using the "import" configuration of MCREnricher.
- * <p>
- * For further details,
- * @see MCREnricher
- *
- * @author Frank Lützenkirchen
+ * {@link URIResolver} that resolves a URI returning a MODS element and enriches it using
+ * external data sources via a configured {@link MCREnricher}.
  */
 public class MCREnrichmentResolver implements URIResolver {
 
+    /**
+     * Resolves the target URI, enriches the returned MODS element using the specified
+     * enrichment configuration, and returns the result as an XML source.
+     * <p>To start with just an identifier, combine with the {@code buildxml} resolver to
+     * construct a minimal MODS document before enrichment.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{configId}:{anyMCRUri}
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   enrich:import:mcrobject:mcr_document_00000001
+     *   enrich:import:buildxml:_rootName_=mods:mods&amp;mods:identifier=10.123/456&amp;mods:identifier/@type=doi
+     * </pre>
+     * <p>Example response:
+     * <pre>{@code
+     *   <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+     *     <mods:identifier type="doi">10.123/456</mods:identifier>
+     *     <mods:titleInfo>
+     *       <mods:title>Enriched Title</mods:title>
+     *     </mods:titleInfo>
+     *     ...
+     *   </mods:mods>
+     * }</pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link JDOMSource} wrapping the enriched MODS element
+     */
     @Override
     public Source resolve(String href, String base) {
 
@@ -62,4 +77,5 @@ public class MCREnrichmentResolver implements URIResolver {
         MCREnricher enricher = new MCREnricher(configID);
         enricher.enrich(mods);
     }
+
 }

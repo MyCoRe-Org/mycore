@@ -25,7 +25,38 @@ import javax.xml.transform.URIResolver;
 import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
 
+/**
+ * {@link URIResolver} that provides IView2 tile and file support checks as XML.
+ */
 public class MCRIview2URIResolver implements URIResolver {
+
+    /**
+     * Resolves the given IView2 query and returns the result as an XML source.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{function}:{argument}
+     * </pre>
+     * <p>Supported functions:
+     * <ul>
+     *   <li>{@code isCompletelyTiled} – whether the given derivate is completely tiled</li>
+     *   <li>{@code isFileSupported} – whether the given file type is supported by IView2</li>
+     * </ul>
+     * <p>Example request:
+     * <pre>
+     *   iview:isCompletelyTiled:mcr_derivate_00000001
+     *   iview:isFileSupported:image.tif
+     * </pre>
+     * <p>Example response:
+     * <pre>{@code
+     *   <true/>
+     * }</pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link JDOMSource} wrapping an element named {@code true} or {@code false}
+     * @throws TransformerException if the URI does not contain exactly three segments or
+     *                              the function name is unknown
+     */
     @Override
     public Source resolve(String href, String base) throws TransformerException {
         String[] params = href.split(":");

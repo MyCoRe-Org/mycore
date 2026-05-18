@@ -29,13 +29,8 @@ import org.jdom2.transform.JDOMSource;
 import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 
 /**
- * Provides functionality to sort MODS elements to a predefined order.
- * The MODSSorter can be either used as URIResolver via
- * "sort:[...URI returning MODS...]"
- * or by invoking
- * MCRMODSSorter.sort( [JDOM Element with mods:mods] );
- *
- * @author Frank Lützenkirchen
+ * {@link URIResolver} that resolves a URI returning a MODS element and sorts its children
+ * into the canonical MODS element order.
  */
 public class MCRMODSSorter implements URIResolver {
 
@@ -48,6 +43,33 @@ public class MCRMODSSorter implements URIResolver {
 
     private static final List<String> ORDER_LIST = Arrays.asList(ORDER);
 
+    /**
+     * Resolves the target URI, sorts the returned MODS element's children into canonical order,
+     * and returns the result as an XML source.
+     * <p>Elements not present in the predefined order are sorted alphabetically after all
+     * known elements.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{anyMCRUri}
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   sort:mcrobject:mcr_document_00000001
+     * </pre>
+     * <p>Example response:
+     * <pre>{@code
+     *   <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+     *     <mods:genre>article</mods:genre>
+     *     <mods:titleInfo>...</mods:titleInfo>
+     *     <mods:name>...</mods:name>
+     *     ...
+     *   </mods:mods>
+     * }</pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link JDOMSource} wrapping the sorted MODS element
+     */
     @Override
     public Source resolve(String href, String base) {
         String subHref = href.substring(href.indexOf(':') + 1);

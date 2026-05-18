@@ -36,12 +36,7 @@ import org.mycore.media.video.MCRMediaSourceProvider;
 import org.mycore.services.http.MCRURLQueryParameter;
 
 /**
- * URI resolver used by XSLT 3 function wrappers for media source lookup.
- *
- * Supported operations:
- * <ul>
- * <li>{@code mediasources:getSources?derivateId=...&path=...&userAgent=...}</li>
- * </ul>
+ * {@link URIResolver} that returns available media sources for a given derivate file as XML.
  */
 public class MCRMediaSourcesURIResolver implements URIResolver {
 
@@ -66,6 +61,31 @@ public class MCRMediaSourcesURIResolver implements URIResolver {
         this.mediaSourceProviderFactory = mediaSourceProviderFactory;
     }
 
+    /**
+     * Resolves the available media sources for the given derivate file and returns them as an XML source.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:getSources?derivateId={derivateId}&amp;path={filePath}[&amp;userAgent={userAgent}]
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   mediasources:getSources?derivateId=mcr_derivate_00000001&amp;path=/video.mp4
+     *   mediasources:getSources?derivateId=mcr_derivate_00000001&amp;path=/video.mp4&amp;userAgent=Mozilla/5.0
+     * </pre>
+     * <p>Example response:
+     * <pre>{@code
+     *   <sources>
+     *     <source src="https://example.org/video.mp4" type="video/mp4"/>
+     *     <source src="https://example.org/video.webm" type="video/webm"/>
+     *   </sources>
+     * }</pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link JDOMSource} wrapping the {@code <sources>} element
+     * @throws TransformerException if the URI is malformed, a required argument is missing,
+     *                              or the media sources cannot be resolved
+     */
     @Override
     public Source resolve(String href, String base) throws TransformerException {
         String[] parts = href.split(":", 2);

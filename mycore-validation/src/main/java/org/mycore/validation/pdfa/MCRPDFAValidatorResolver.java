@@ -30,24 +30,33 @@ import org.mycore.datamodel.niofs.MCRPath;
 import org.w3c.dom.Document;
 
 /**
- * MCRPdfAValidatorResolver is a custom URIResolver implementation used for resolving XML document URIs during
- * transformations. It resolves a specific URI, gathers validation results using MCRPdfAFunctions, and returns the
- * resulting XML document as a Source object.
- *<p><br>
- * When an XML transformation is performed, and an external resource URI is encountered in the document, the
- * 'resolve' method of this class is called to handle the resolution of the URI. In this case, the URI format is assumed
- * to be 'mcrpdfa:{derivateId}', where 'derivateId' is the ID of the object for which validation results are required.
- *<p><br>
- * The 'resolve' method takes the 'href' and 'base' parameters, but only the 'href' is used. The 'href' is split to
- * extract the 'derivateId', and then the MCRPdfAFunctions class is used to generate the XML document containing the
- * validation results. The resulting XML document is returned as a DOMSource object, which can be used in the XML
- * transformation process.
- *<p><br>
- * Note: This implementation assumes that the 'href' parameter follows the 'mcrpdfa:{derivateId}' format, and the 'base'
- * parameter is not used in the resolution process.
+ * {@link URIResolver} that validates PDF/A files in a given derivate and returns the results as XML.
  */
 public class MCRPDFAValidatorResolver implements URIResolver {
 
+    /**
+     * Validates all PDF/A files in the given derivate and returns the validation results as an XML source.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{derivateId}
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   pdfAValidator:mcr_derivate_00000001
+     * </pre>
+     * <p>Example response:
+     * <pre>{@code
+     *   <pdfa>
+     *     <result file="/document.pdf" valid="true"/>
+     *     <result file="/other.pdf" valid="false"/>
+     *   </pdfa>
+     * }</pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link DOMSource} wrapping the validation results document
+     * @throws TransformerException if the validation results cannot be generated
+     */
     @Override
     public Source resolve(String href, String base) throws TransformerException {
         String[] hrefParts = href.split(":");
@@ -60,4 +69,5 @@ public class MCRPDFAValidatorResolver implements URIResolver {
             throw new MCRException(e);
         }
     }
+
 }

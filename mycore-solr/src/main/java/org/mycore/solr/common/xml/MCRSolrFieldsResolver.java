@@ -41,39 +41,7 @@ import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 
 /**
- *
- * Retrieves the solr field information for a given solr core, using {@link LukeRequest}
- * <pre>
- * Usage:
- * solrfields:{core}
- *
- * Example:
- * solrfields:main
- *
- * result:
- * </pre>
- * <code>
- * &lt;solrFields core="main"&gt;
- *   &lt;fields&gt;
- *     &lt;field name="id" type="string" schema="required:true" docs="1"&gt;
- *       &lt;flags&gt;
- *         &lt;flag&gt;INDEXED&lt;/flag&gt;
- *         &lt;flag&gt;STORED&lt;/flag&gt;
- *       &lt;/flags&gt;
- *     &lt;/field&gt;
- *     ...
- *   &lt;/fields&gt;
- *   &lt;dynamicFields&gt;
- *     &lt;field name="*_i" type="plint" schema="multiValued:false"&gt;
- *       &lt;flags&gt;
- *         &lt;flag&gt;INDEXED&lt;/flag&gt;
- *         &lt;flag&gt;STORED&lt;/flag&gt;
- *       &lt;/flags&gt;
- *     &lt;/field&gt;
- *     ...
- *   &lt;/dynamicFields&gt;
- * &lt;/solrFields&gt;
- * </code>
+ * {@link URIResolver} that retrieves field information for a given Solr core and returns it as XML.
  */
 public class MCRSolrFieldsResolver implements URIResolver {
 
@@ -83,6 +51,43 @@ public class MCRSolrFieldsResolver implements URIResolver {
         return href.substring(SOLRFIELDS_PREFIX.length());
     }
 
+    /**
+     * Resolves the field information for the given Solr core and returns it as an XML source.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{core}
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   solrfields:main
+     * </pre>
+     * <p>Example response:
+     * <pre>{@code
+     *   <solrFields core="main">
+     *     <fields>
+     *       <field name="id" type="string" schema="required:true" docs="1">
+     *         <flags>
+     *           <flag>INDEXED</flag>
+     *           <flag>STORED</flag>
+     *         </flags>
+     *       </field>
+     *     </fields>
+     *     <dynamicFields>
+     *       <field name="*_i" type="plint" schema="multiValued:false" docs="0">
+     *         <flags>
+     *           <flag>INDEXED</flag>
+     *         </flags>
+     *       </field>
+     *     </dynamicFields>
+     *   </solrFields>
+     * }</pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link JDOMSource} wrapping the {@code <solrFields>} document
+     * @throws IllegalArgumentException if the URI prefix is invalid, the Solr core is not found,
+     *                                  or the Solr request fails
+     */
     @Override
     public Source resolve(String href, String base) throws TransformerException {
         if (!href.startsWith(SOLRFIELDS_PREFIX)) {
@@ -160,4 +165,5 @@ public class MCRSolrFieldsResolver implements URIResolver {
         }
         return field;
     }
+
 }

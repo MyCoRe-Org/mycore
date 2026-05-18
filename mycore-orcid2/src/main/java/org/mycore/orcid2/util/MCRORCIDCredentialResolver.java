@@ -21,7 +21,6 @@ package org.mycore.orcid2.util;
 import java.util.Objects;
 
 import javax.xml.transform.Source;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 
 import org.mycore.common.xsl.uriresolver.MCRURIResolverResponse;
@@ -30,35 +29,43 @@ import org.mycore.orcid2.user.MCRORCIDSessionUtils;
 import org.mycore.orcid2.user.MCRORCIDUser;
 
 /**
- * {@link URIResolver} to resolve ORCID credential.
+ * {@link URIResolver} that returns ORCID credential information for the current user as XML.
  */
 public class MCRORCIDCredentialResolver implements URIResolver {
 
     /**
-     * Resolves a custom URI for ORCID credential and returns either a check
-     * for the existence of the credential or the credential's scope of current user.
-     * The URI must follow the format "orcidCredential:{method}:{orcid}", where:
+     * Resolves ORCID credential information for the given ORCID and returns the result as an XML source.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{method}:{orcid}
+     * </pre>
+     * <p>Supported methods:
      * <ul>
-     *   <li><b>method</b> is either "exists" or "scope"</li>
-     *   <li><b>orcid</b> is the ORCiD of the current user to check</li>
+     *   <li>{@code exists}: whether a credential for the current user and given ORCID exists</li>
+     *   <li>{@code scope}: the scope of the existing credential for the current user and given ORCID</li>
      * </ul>
+     * <p>Example request:
+     * <pre>
+     *   orcidCredential:exists:0000-0000-0000-0001
+     *   orcidCredential:scope:0000-0000-0000-0001
+     * </pre>
+     * <p>Example response for {@code exists}:
+     * <pre>{@code
+     *   <boolean>true</boolean>
+     * }</pre>
+     * <p>Example response for {@code scope}:
+     * <pre>{@code
+     *   <string>/authenticate /read-limited</string>
+     * }</pre>
      *
-     * <p>If the method is "exists", the function checks if an credential
-     * for current user and the provided ORCiD exists.
-     * If it exists, the response is an XML element with "true"; otherwise, "false".</p>
-     *
-     * <p>If the method is "scope", the function returns the credential's scope if it exists.
-     *
-     * @param href the URI in the syntax above
-     * @param base not used
-     * @return the XML result element
-     * @throws IllegalArgumentException if the URI format is invalid or the input is invalid
-     * @throws TransformerException if an error occurs during the transformation process
-     *
-     * @see javax.xml.transform.URIResolver
+     * @param href the URI to resolve; split by {@code :} into scheme, method, and ORCID
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link Source} wrapping the result element
+     * @throws IllegalArgumentException if the URI format is invalid, the method is unknown,
+     *                                  or {@code scope} is requested but no credential exists
      */
     @Override
-    public Source resolve(String href, String base) throws TransformerException {
+    public Source resolve(String href, String base) {
         final String[] split = href.split(":");
         if (split.length != 3) {
             throw new IllegalArgumentException("Invalid format of uri: " + href);
@@ -81,4 +88,5 @@ public class MCRORCIDCredentialResolver implements URIResolver {
             throw new IllegalArgumentException("Invalid method: " + method);
         }
     }
+
 }

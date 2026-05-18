@@ -23,13 +23,25 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 
 /**
- * Implements URIResolver to assist transforming xed to html.
- * This resolver is be called via xsl document() function from within xeditor.xsl.
- * 
- * @author Frank Lützenkirchen
+ * {@link URIResolver} that assists in transforming XEditor forms to HTML.
  */
 public class MCRTransformerHelperResolver implements URIResolver {
 
+    /**
+     * Resolves the given transformer helper call and returns the result as an XML source.
+     * <p>The URI is parsed into a {@link MCRTransformerHelperCall}, which is dispatched to the
+     * appropriate method handler via {@link MCRTransformationState}.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{method}[:{params}]
+     * </pre>
+     *
+     * @param href the URI to resolve; parsed as a {@link MCRTransformerHelperCall}
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return the {@link Source} returned by the invoked method handler
+     * @throws TransformerException if the method handler throws a {@link TransformerException}
+     *                              or any other exception during processing
+     */
     @Override
     public Source resolve(String href, String base) throws TransformerException {
         MCRTransformerHelperCall call = new MCRTransformerHelperCall(href);
@@ -49,4 +61,5 @@ public class MCRTransformerHelperResolver implements URIResolver {
         MCRTransformationState tfhelper = call.getTransformerHelper();
         tfhelper.getMethodHelperMap().get(call.getMethod()).handle(call);
     }
+
 }
