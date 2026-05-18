@@ -56,7 +56,7 @@ import org.w3c.dom.Element;
  *     &lt;xsl:value-of select="document(concat('userobjectrights:isWorldReadableComplete:',@ID))/boolean" /&gt;
  * &lt;/field&gt;
  *
- * @deprecated Use {@link org.mycore.common.xsl.uriresolver.MCRUserAndObjectRightsURIResolver} instead.
+ * @deprecated Use {@link org.mycore.common.xsl.uriresolver.MCRUserObjectRightsResolver} instead.
  */
 @Deprecated(forRemoval = true)
 public class MCRUserAndObjectRightsURIResolver implements URIResolver {

@@ -58,7 +58,7 @@ import org.w3c.dom.Element;
  * &lt;/field&gt;
  *
  */
-public class MCRUserAndObjectRightsURIResolver implements URIResolver {
+public class MCRUserObjectRightsResolver implements URIResolver {
 
     @Override
     public Source resolve(String href, String base) throws TransformerException {
@@ -90,8 +90,7 @@ public class MCRUserAndObjectRightsURIResolver implements URIResolver {
                             MCRSessionMgr.getCurrentSession().getUserInformation().getUserAttribute(value)));
                     yield new DOMSource(doc);
                 }
-                default ->
-                    throw new TransformerException("Unknown query for MCRUserAndObjectRightsURIResolver: " + query);
+                default -> throw new TransformerException("Unknown query for MCRUserObjectRightsResolver: " + query);
             };
 
         } catch (ParserConfigurationException e) {
