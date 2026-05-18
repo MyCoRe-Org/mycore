@@ -29,7 +29,7 @@ import org.mycore.common.content.MCRPathContent;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 
-public class MCRMCRFileResolver implements URIResolver {
+public class MCRDerivateFileResolver implements URIResolver {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
