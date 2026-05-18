@@ -32,9 +32,7 @@ import org.jdom2.transform.JDOMSource;
 import org.mycore.tools.MCRLanguageOrientationHelper;
 
 /**
- * Resolves languages by code. Syntax: language:{ISOCode}
- *
- * @author Frank Lützenkirchen
+ * {@link URIResolver} that returns language metadata for a given ISO language code as XML.
  */
 public class MCRLanguageResolver implements URIResolver {
 
@@ -47,6 +45,33 @@ public class MCRLanguageResolver implements URIResolver {
         XML_ATTRIBUTE_CODE_NAMES.put(MCRLanguageCodeType.TERM_CODE, "termCode");
     }
 
+    /**
+     * Resolves the given ISO language code and returns its metadata as an XML source.
+     * <p>The result includes all known code representations, translated labels in available
+     * languages, and a right-to-left indicator.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{ISOCode}
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   language:de
+     *   language:eng
+     * </pre>
+     * <p>Example response:
+     * <pre>{@code
+     *   <language xmlCode="de" biblCode="ger" termCode="deu" rtl="false">
+     *     <label xml:lang="de">Deutsch</label>
+     *     <label xml:lang="en">German</label>
+     *   </language>
+     * }</pre>
+     *
+     * @param href the URI to resolve; the part after the first {@code :} is the ISO language code
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link JDOMSource} wrapping the {@code <language>} element
+     * @throws TransformerException if the language code is unknown or an undefined code type is encountered
+     * @throws IllegalArgumentException if no language code is provided
+     */
     @Override
     public Source resolve(String href, String base) throws TransformerException, IllegalArgumentException {
         String[] hrefContent = href.split(":");

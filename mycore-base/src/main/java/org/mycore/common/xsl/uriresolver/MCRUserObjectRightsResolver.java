@@ -33,33 +33,46 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * URI-Resolver, that checks if a MyCoRe object is
- * worldReadable or worldReadableComplete and certain user and role information
- *
- * It is used as replacement for Xalan-Java functions in XSLT3 stylesheets.
- *
- *
- * It is registered as property:
- * MCR.URIResolver.ModuleResolver.userobjectrights=org.mycore.common.xsl.uriresolver.MCRUserAndObjectRightsURIResolver
- *
- * returns for boolean results
- * an XML element &lt;boolean&gt; with text 'true' or 'false'
- *
- * or for user attributes 
- * an XML element &lt;userattribute name='{key}'&gt;{value}&lt;/userattribute&gt;
- *
- * sample usage (usually in SOLR indexing templates):
- *
- * &lt;field name="worldReadable"&gt;
- *     &lt;xsl:value-of select="document(concat('userobjectrights:isWorldReadable:',@ID))/boolean" /&gt;
- * &lt;/field&gt;
- * &lt;field name="worldReadableComplete"&gt;
- *     &lt;xsl:value-of select="document(concat('userobjectrights:isWorldReadableComplete:',@ID))/boolean" /&gt;
- * &lt;/field&gt;
- *
+ * {@link URIResolver} that checks object access rights and returns user or role information as XML.
  */
 public class MCRUserObjectRightsResolver implements URIResolver {
 
+    /**
+     * Resolves the given query and returns the result as an XML source.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{function}:{argument}
+     * </pre>
+     * <p>Supported functions:
+     * <ul>
+     *   <li>{@code isWorldReadable} – whether the object is world-readable</li>
+     *   <li>{@code isWorldReadableComplete} – whether the object is completely world-readable</li>
+     *   <li>{@code isDisplayedEnabledDerivate} – whether the derivate has display permission</li>
+     *   <li>{@code isCurrentUserInRole} – whether the current user is in the given role</li>
+     *   <li>{@code isCurrentUserSuperUser} – whether the current user is the superuser (argument unused)</li>
+     *   <li>{@code isCurrentUserGuestUser} – whether the current user is the guest user (argument unused)</li>
+     *   <li>{@code getCurrentUserAttribute} – returns the given attribute of the current user</li>
+     * </ul>
+     * <p>Example request:
+     * <pre>
+     *   userobjectrights:isWorldReadable:mcr_document_00000001
+     *   userobjectrights:isCurrentUserInRole:admin
+     *   userobjectrights:getCurrentUserAttribute:eMail
+     * </pre>
+     * <p>Example response for boolean functions:
+     * <pre>{@code
+     *   <boolean>true</boolean>
+     * }</pre>
+     * <p>Example response for {@code getCurrentUserAttribute}:
+     * <pre>{@code
+     *   <userattribute name="getCurrentUserAttribute">example@mycore.de</userattribute>
+     * }</pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link Source} wrapping the result element
+     * @throws TransformerException if the function name is unknown or the DOM document cannot be created
+     */
     @Override
     public Source resolve(String href, String base) throws TransformerException {
         String query = href.substring(href.indexOf(':') + 1);

@@ -27,19 +27,42 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
 
 /**
- * Redirect to different URIResolver that is defined via property. This resolver is meant to serve static content as
- * no variable substitution takes place Example: MCR.URIResolver.redirect.alias=webapp:path/to/alias.xml
+ * {@link URIResolver} that redirects to another URI defined via a configuration property.
+ * <p>The target URI is looked up from {@code MCR.URIResolver.redirect.{alias}} and passed
+ * to {@link MCRURIResolver} for resolution. No variable substitution takes place, making
+ * this resolver suitable for static content only.
  */
 public class MCRRedirectResolver implements URIResolver {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    /**
+     * Resolves the configured target URI for the given alias and returns its content.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{alias}
+     * </pre>
+     * <p>The alias is appended to {@code MCR.URIResolver.redirect.} to look up the target URI.
+     * <p>Example configuration:
+     * <pre>
+     *   MCR.URIResolver.redirect.myAlias=webapp:path/to/file.xml
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   redirect:myAlias
+     * </pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet, passed through to the delegated resolver
+     * @return the {@link Source} returned by resolving the configured target URI
+     * @throws TransformerException if the target URI cannot be resolved
+     */
     @Override
     public Source resolve(String href, String base) throws TransformerException {
-        String configsuffix = href.substring(href.indexOf(':') + 1);
+        String configSuffix = href.substring(href.indexOf(':') + 1);
 
         // get the parameters from mycore.properties
-        String propertyName = "MCR.URIResolver.redirect." + configsuffix;
+        String propertyName = "MCR.URIResolver.redirect." + configSuffix;
         String propValue = MCRConfiguration2.getStringOrThrow(propertyName);
         LOGGER.info("Redirect {} to {}", href, propValue);
         return MCRURIResolver.obtainInstance().resolve(propValue, base);

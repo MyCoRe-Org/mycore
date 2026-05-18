@@ -31,19 +31,37 @@ import org.mycore.common.MCRException;
 import org.mycore.frontend.MCRLayoutUtilities;
 
 /**
- * Resolver for MCRLayoutUtils. The following types are supported: readAccess:$webpageID,
- * readAccess:$webpageID:split:$blockerWebpageID
- * returns
- * <code>
- *     &lt;true /&gt;
- * </code>
- * or
- * <code>
- *     &lt;false /&gt;
- * </code>
+ * {@link URIResolver} that provides layout utility functions such as read access checks
+ * and personal navigation.
  */
 public class MCRLayoutUtilsResolver implements URIResolver {
 
+    /**
+     * Resolves the given URI by invoking the specified layout utility function.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:readAccess:{webpageID}
+     *   &lt;scheme&gt;:readAccess:{webpageID}:split:{blockerWebpageID}
+     *   &lt;scheme&gt;:personalNavigation
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   layoutUtils:readAccess:content/below/index.xml
+     *   layoutUtils:readAccess:content/page.xml:split:content/blocker.xml
+     *   layoutUtils:personalNavigation
+     * </pre>
+     * <p>Example response for {@code readAccess}:
+     * <pre>{@code
+     *   <true/>
+     * }</pre>
+     * <p>Example response for {@code personalNavigation}: the personal navigation DOM subtree.
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link Source} wrapping the function result
+     * @throws TransformerException if no arguments are given, the function is unknown,
+     *                              or the personal navigation cannot be loaded
+     */
     @Override
     public Source resolve(String href, String base) throws TransformerException {
         String[] args = href.split(":", 3);

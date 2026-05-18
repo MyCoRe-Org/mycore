@@ -28,10 +28,26 @@ import javax.xml.transform.stream.StreamSource;
 import org.mycore.resource.MCRResourceHelper;
 
 /**
- * Reads XML from a static file within the web application. the URI in the format webapp:path/to/servlet
+ * {@link URIResolver} that reads static XML files from the web application context.
  */
 public class MCRWebAppResolver implements URIResolver {
 
+    /**
+     * Resolves the given web application path and returns its content as a source.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{path/to/resource}
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   webapp:path/to/file.xml
+     * </pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link StreamSource} pointing to the resolved web resource
+     * @throws TransformerException if the resource cannot be found or loaded
+     */
     @Override
     public Source resolve(String href, String base) throws TransformerException {
         String path = href.substring(href.indexOf(':') + 1);

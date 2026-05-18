@@ -29,8 +29,39 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
+/**
+ * {@link URIResolver} that returns file metadata of a derivate or a specific file within it as XML.
+ */
 public class MCRFileMetadataResolver implements URIResolver {
 
+    /**
+     * Resolves file metadata for a derivate or a specific file path within a derivate.
+     * <p>If only a derivate ID is given, the full fileset metadata including URN is returned.
+     * If a file path is also given, only the metadata for that specific file is returned.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{derivateId}[/{filePath}]
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   fileMeta:mcr_derivate_00000001
+     *   fileMeta:mcr_derivate_00000001/path/to/file.pdf
+     * </pre>
+     * <p>Example response for a derivate:
+     * <pre>{@code
+     *   <fileset urn="urn:nbn:de:...">
+     *     <file name="/file.pdf">...</file>
+     *   </fileset>
+     * }</pre>
+     * <p>Example response for a file:
+     * <pre>{@code
+     *   <file name="/path/to/file.pdf">...</file>
+     * }</pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link JDOMSource} wrapping either the {@code <fileset>} or {@code <file>} element
+     */
     @Override
     public Source resolve(String href, String base) {
         String[] parts = href.split(":");

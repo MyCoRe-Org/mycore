@@ -26,11 +26,27 @@ import org.apache.logging.log4j.LogManager;
 import org.mycore.common.MCRClassTools;
 
 /**
- * Delivers a jdom Element created by any local class that implements URIResolver
- * interface. the class name of the file in the format localclass:org.mycore.ClassName?mode=getAll
+ * {@link URIResolver} that delegates resolution to a dynamically loaded local class
+ * implementing {@link URIResolver}.
  */
 public class MCRLocalClassResolver implements URIResolver {
 
+    /**
+     * Instantiates the specified class and delegates resolution to it.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{className}?{params}
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   localclass:org.mycore.MyResolver?mode=getAll
+     * </pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet, passed through to the delegated resolver
+     * @return the {@link Source} returned by the delegated resolver
+     * @throws TransformerException if the class cannot be loaded or instantiated, or resolution fails
+     */
     @Override
     public Source resolve(String href, String base) throws TransformerException {
         String classname = href.substring(href.indexOf(':') + 1, href.indexOf('?'));

@@ -29,6 +29,9 @@ import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.access.MCRAccessManager;
 
+/**
+ * {@link URIResolver} that returns access control rules for MCR objects as XML.
+ */
 public class MCRACLResolver implements URIResolver {
 
     private static final Logger LOGGER = LogManager.getLogger();
@@ -38,7 +41,35 @@ public class MCRACLResolver implements URIResolver {
     private static final String OBJECT_ID_PARAM = "object";
 
     /**
-     * Returns access controll rules as XML
+     * Resolves the given URI and returns the ACL rules matching the request as an XML source.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:object=&lt;objectId&gt;&amp;action=&lt;permission|all&gt;
+     * </pre>
+     * <p>Parameters:
+     * <ul>
+     *   <li>{@code object}: the ID of the MCR object to query rules for</li>
+     *   <li>{@code action}: a specific permission name (e.g. {@code read}, {@code write}),
+     *       or {@code all} to retrieve all defined permissions for the object</li>
+     * </ul>
+     * <p>Example request:
+     * <pre>
+     *   acl:object=mcr_document_00000001&amp;action=all
+     * </pre>
+     * <p>Example response:
+     * <pre>{@code
+     *   <servacls class="MCRMetaAccessRule">
+     *     <pool permission="read">
+     *       <condition format="xml">...</condition>
+     *     </pool>
+     *   </servacls>
+     * }</pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link JDOMSource} wrapping the {@code <servacls>} element,
+     *         or {@code null} if the {@code object} or {@code action} parameter
+     *         is missing
      */
     @Override
     public Source resolve(String href, String base) {

@@ -32,10 +32,39 @@ import org.jdom2.Namespace;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.common.MCRException;
 
+/**
+ * {@link URIResolver} that delegates to another URI resolver and returns any exception as XML
+ * instead of propagating it.
+ */
 public class MCRExceptionHandlingResolver implements URIResolver {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    /**
+     * Resolves the given URI and, if an exception occurs, returns it as an XML source instead
+     * of propagating it.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{uri}
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   catchEx:mcrobject:mcr_document_00000001
+     * </pre>
+     * <p>Example response on success: the resolved content of the target URI.
+     * <p>Example response on error:
+     * <pre>{@code
+     *   <exception>
+     *     <message>Some error message</message>
+     *     <stacktrace xml:space="preserve">...</stacktrace>
+     *   </exception>
+     * }</pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet, passed through to the delegated resolver
+     * @return a {@link Source} wrapping the resolved content, or an {@code <exception>} element
+     *         if resolution fails
+     */
     @Override
     public Source resolve(String href, String base) {
         String target = href.substring(href.indexOf(':') + 1);

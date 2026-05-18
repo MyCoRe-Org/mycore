@@ -28,37 +28,44 @@ import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.services.i18n.MCRTranslation;
 
+/**
+ * {@link URIResolver} that resolves i18n translation keys and returns the results as XML.
+ */
 public class MCRI18NResolver implements URIResolver {
 
     /**
-     * Resolves the I18N String value for the given property.<br><br>
-     * <br>
-     * Syntax: <code>i18n:{i18n-code},{i18n-prefix}*,{i18n-prefix}*...</code> or <br>
-     *         <code>i18n:{i18n-code}[:param1:param2:…paramN]</code>
-     * <br>
-     * Result: <code> <br>
-     *     &lt;i18n&gt; <br>
-     *   &lt;translation key=&quot;key1&quot;&gt;translation1&lt;/translation&gt; <br>
-     *   &lt;translation key=&quot;key2&quot;&gt;translation2&lt;/translation&gt; <br>
-     *   &lt;translation key=&quot;key3&quot;&gt;translation3&lt;/translation&gt; <br>
-     * &lt;/i18n&gt; <br>
-     * </code>
-     * <br/>
-     * If just one i18n-code is passed, then the translation element is skipped.
-     * <code>
-     *     &lt;i18n&gt; <br>translation&lt;/i18n&gt;<br>
-     * </code>
-     * Additionally, if the singular i18n-code is followed by a ":"-separated list of values,
-     * the translation result is interpreted to be in Java MessageFormat and will be formatted with those values.
-     * E.g.
-     * <code>i18n:module.dptbase.common.results.nResults:15</code> (<code>{0} objects found</code>)
-     *  -> "<code>15 objects found</code>"
-     * @param href
-     *            URI in the syntax above
-     * @param base
-     *            not used
-     * @return the element with result format above
-     * @see javax.xml.transform.URIResolver
+     * Resolves one or more i18n translation keys and returns the translations as an XML source.
+     * <p>For a single key, the translation is returned as the text content of the {@code <i18n>}
+     * element directly. For multiple keys or prefix wildcards, each translation is wrapped in a
+     * {@code <translation>} child element. A single key may be followed by {@code :}-separated
+     * {@link java.text.MessageFormat} arguments.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{i18n-key}[:{arg}...]
+     *   &lt;scheme&gt;:{i18n-key},{i18n-key},...
+     *   &lt;scheme&gt;:{i18n-prefix}*[,{i18n-prefix}*,...]
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   i18n:module.results.nResults:15
+     *   i18n:module.title,module.description
+     *   i18n:module.*
+     * </pre>
+     * <p>Example response for a single key:
+     * <pre>{@code
+     *   <i18n>15 objects found</i18n>
+     * }</pre>
+     * <p>Example response for multiple keys:
+     * <pre>{@code
+     *   <i18n>
+     *     <translation key="module.title">My Title</translation>
+     *     <translation key="module.description">My Description</translation>
+     *   </i18n>
+     * }</pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link JDOMSource} wrapping the {@code <i18n>} element
      */
     @Override
     public Source resolve(String href, String base) {

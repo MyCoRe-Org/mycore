@@ -30,17 +30,38 @@ import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
 
 /**
- * Ensures that resolving the given URI never returns {@code null}.
- * <p>
- * Usage:
- * <pre>
- * notnull:&lt;anyMyCoReURI&gt;
- * </pre>
+ * {@link URIResolver} that delegates to another URI resolver and guarantees a non-{@code null}
+ * result by returning an empty XML element on failure or empty resolution.
  */
 public class MCRNotNullResolver implements URIResolver {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    /**
+     * Resolves the target URI and returns its content, falling back to an empty XML result
+     * instead of returning {@code null} or propagating exceptions.
+     * <p>The resolved content is fully parsed into a JDOM document before being returned,
+     * using a silent XML parser to suppress log noise. If the sub-URI is empty, the target
+     * resolves to {@code null}, or any exception occurs, an empty result is returned.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{anyMCRUri}
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   notnull:mcrobject:mcr_document_00000001
+     * </pre>
+     * <p>Example response on success: the resolved content of the target URI.
+     * <p>Example response on failure:
+     * <pre>{@code
+     *   <null/>
+     * }</pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet, passed through to the delegated resolver
+     * @return a {@link JDOMSource} wrapping the resolved content, or an empty result if
+     *         resolution fails or returns {@code null}
+     */
     @Override
     public Source resolve(String href, String base) {
         String target = href.substring(href.indexOf(':') + 1);

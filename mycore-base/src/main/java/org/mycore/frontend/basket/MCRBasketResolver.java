@@ -27,12 +27,42 @@ import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
 
 /**
- * Resolves entries from a basket, for example to edit the data
- * in an editor form. Syntax: basket:{typeID}:{entryID}
- *
- * @author Frank Lützenkirchen
+ * {@link URIResolver} that returns the contents of a basket or a single basket entry as XML.
  */
 public class MCRBasketResolver implements URIResolver {
+
+    /**
+     * Resolves the basket of the given type, or a single entry within it, and returns it as an XML source.
+     * <p>If no entry ID is provided, the entire basket is returned. If the entry ID is given but
+     * not found in the basket, an empty {@code <entry>} element with the given ID is returned.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{type}
+     *   &lt;scheme&gt;:{type}:{id}
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   basket:objects
+     *   basket:objects:mcr_document_00000001
+     * </pre>
+     * <p>Example response for a single entry:
+     * <pre>{@code
+     *   <entry id="mcr_document_00000001">
+     *     ...
+     *   </entry>
+     * }</pre>
+     * <p>Example response for the entire basket:
+     * <pre>{@code
+     *   <basket type="objects">
+     *     <entry id="mcr_document_00000001">...</entry>
+     *   </basket>
+     * }</pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link JDOMSource} wrapping either a single {@code <entry>} or a {@code <basket>} element
+     * @throws TransformerException if the basket content cannot be resolved
+     */
     @Override
     public Source resolve(String href, String base) throws TransformerException {
         try {
@@ -63,4 +93,5 @@ public class MCRBasketResolver implements URIResolver {
             throw new TransformerException(ex);
         }
     }
+
 }

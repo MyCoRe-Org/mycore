@@ -30,20 +30,8 @@ import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
 
 /**
- * This class provides an URIResolver for encryption and decryption.
- * <p>
- * URI Pattern:
- * crypt:{encrypt/decrypt}:{cipherid}:{value}
- * <p>
- * where
- * <ul>
- *   <li>encrypt/decrypt - the action to act an value</li>
- *   <li>cipherid - ID of the cipher</li>
- *   <li>value - string to be encryptet or decypted</li>
- * </ul>
- * @author Paul Borchert
+ * {@link URIResolver} that encrypts or decrypts a value using a configured cipher.
  */
-
 public class MCRCryptResolver implements URIResolver {
 
     public static final String XML_PREFIX = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
@@ -56,6 +44,31 @@ public class MCRCryptResolver implements URIResolver {
 
     private static final Set<String> ACTIONS = Set.of(ENCRYPT_ACTION, DECRYPT_ACTION);
 
+    /**
+     * Encrypts or decrypts the given value using the specified cipher and returns the result as an XML source.
+     * <p>If the cipher key is not found or the current user lacks permission to read it,
+     * the result depends on the action: for decryption the original value is returned unchanged,
+     * for encryption an empty string is returned.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{encrypt|decrypt}:{cipherId}:{value}
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   crypt:encrypt:myCipher:plaintext
+     *   crypt:decrypt:myCipher:encryptedtext
+     * </pre>
+     * <p>Example response:
+     * <pre>{@code
+     *   <value>encryptedOrDecryptedText</value>
+     * }</pre>
+     *
+     * @param s the URI in the syntax above to resolve
+     * @param s1 the base URI of the calling stylesheet (unused)
+     * @return a {@link JDOMSource} wrapping the {@code <value>} element containing the result
+     * @throws TransformerException if the URI is malformed or the action is not {@code encrypt}
+     *                              or {@code decrypt}
+     */
     @Override
     public Source resolve(String s, String s1) throws TransformerException {
         String[] parts = s.split(":", 4);

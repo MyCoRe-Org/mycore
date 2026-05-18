@@ -36,12 +36,34 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
 /**
- * Reads XML from the CLASSPATH of the application. the location of the file in the format resource:path/to/file
+ * {@link URIResolver} that reads XML resources from the application classpath.
  */
 public class MCRResourceResolver implements URIResolver {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    /**
+     * Resolves the given classpath resource and returns its content as a source.
+     * <p>XSL stylesheets are parsed via SAX with entity resolution enabled.
+     * All other resource types are delegated to {@link MCRURIResolver} using the resolved resource URL.
+     * If the resource cannot be found on the classpath, {@code null} is returned.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{path/to/resource}
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   resource:xsl/my-stylesheet.xsl
+     *   resource:config/defaults.xml
+     * </pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet, passed through to the delegated resolver
+     *             for non-XSL resources
+     * @return a {@link SAXSource} for XSL resources, the delegated {@link Source} for all others,
+     *         or {@code null} if the resource is not found on the classpath
+     * @throws TransformerException if the SAX parser cannot be created or the resource cannot be read
+     */
     @Override
     public Source resolve(String href, String base) throws TransformerException {
         String path = href.substring(href.indexOf(':') + 1);

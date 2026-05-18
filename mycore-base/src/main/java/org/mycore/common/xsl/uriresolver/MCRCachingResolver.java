@@ -29,7 +29,12 @@ import org.mycore.common.MCRCache;
 import org.mycore.common.config.MCRConfiguration2;
 
 /**
- * @author Frank Lützenkirchen
+ * {@link URIResolver} that resolves XML content from a URI and caches the result for re-use.
+ * <p>Cache capacity and maximum age are configured via:
+ * <ul>
+ *   <li>{@code MCR.URIResolver.CachingResolver.Capacity}: maximum number of cached entries</li>
+ *   <li>{@code MCR.URIResolver.CachingResolver.MaxAge}: maximum age of a cache entry in milliseconds</li>
+ * </ul>
  */
 public class MCRCachingResolver implements URIResolver {
 
@@ -47,14 +52,25 @@ public class MCRCachingResolver implements URIResolver {
     }
 
     /**
-     * Resolves XML content from a given URI and caches it for re-use.
-     * <p>
-     * If the URI was already resolved within the last
-     * MCR.URIResolver.CachingResolver.MaxAge milliseconds, the cached version is returned.
-     * The default max age is one hour.
-     * <p>
-     * The cache capacity is configured via MCR.URIResolver.CachingResolver.Capacity
-     * The default capacity is 100.
+     * Resolves XML content from the given URI, returning a cached result if still valid.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:&lt;uri&gt;
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   cache:mcrobject:mcr_document_00000001
+     * </pre>
+     * <p>Example response:
+     * <pre>{@code
+     *   <root>
+     *     ...
+     *   </root>
+     * }</pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link JDOMSource} wrapping the resolved or cached XML element
      */
     @Override
     public Source resolve(String href, String base) {

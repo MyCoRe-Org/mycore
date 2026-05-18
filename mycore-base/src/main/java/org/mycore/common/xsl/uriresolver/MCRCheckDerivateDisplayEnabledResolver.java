@@ -23,19 +23,31 @@ import javax.xml.transform.URIResolver;
 
 import org.mycore.common.xml.MCRXMLFunctions;
 
+/**
+ * {@link URIResolver} that checks whether a derivate is enabled for display for a given intent.
+ */
 public class MCRCheckDerivateDisplayEnabledResolver implements URIResolver {
 
     /**
-     * returns the boolean value for the given derivate and intent.
-     * <p>
-     * Syntax: <code>checkDerivateDisplayEnabled:{id}:{intent}</code>
+     * Resolves whether a derivate is enabled for display and returns the result as an XML boolean.
+     * <p>If no intent is provided, {@code true} is returned unconditionally.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:&lt;id&gt;[:&lt;intent&gt;]
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   checkDerivateDisplayEnabled:mcr_derivate_00000001:thumbnail
+     * </pre>
+     * <p>Example response:
+     * <pre>{@code
+     *   <boolean>true</boolean>
+     * }</pre>
      *
-     * @param href
-     *            URI in the syntax above
-     * @param base
-     *            not used
-     * @return the root element "boolean" of the XML document with content string true of false
-     * @see javax.xml.transform.URIResolver
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link Source} wrapping an XML element {@code <boolean>} with value {@code true} or {@code false}
+     * @throws IllegalArgumentException if the URI does not contain exactly one or two segments after the scheme
      */
     @Override
     public Source resolve(String href, String base) {

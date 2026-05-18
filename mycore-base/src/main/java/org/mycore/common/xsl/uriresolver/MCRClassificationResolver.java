@@ -41,23 +41,9 @@ import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 
 /**
- * Returns a classification in a configurable output format.
- * <p>
- * Syntax:
- * <pre>
- * classification:{editor[Complete]['['formatAlias']']|metadata}:{levels}
- *               [:noEmptyLeaves]:{parents|children}:{classID}[:categID]
- * </pre>
- *
- * Example:
- * <pre>
- * classification:editorComplete[mods]:2:children:myClass:root
- * </pre>
- *
- * The optional {@code formatAlias} references a configuration property:
- * <pre>
- * MCR.URIResolver.Classification.Format.&lt;formatAlias&gt;
- * </pre>
+ * {@link URIResolver} that returns a classification in a configurable output format.
+ * <p>Results are cached and invalidated based on the last modification time of the
+ * classification and XML metadata store.
  */
 public class MCRClassificationResolver implements URIResolver {
 
@@ -77,6 +63,35 @@ public class MCRClassificationResolver implements URIResolver {
         dao = MCRCategoryDAO.obtainInstance();
     }
 
+    /**
+     * Resolves the given URI and returns the requested classification as an XML source.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{editor[Complete]['['formatAlias']']|metadata}:{levels|all}
+     *            [:noEmptyLeaves]:{parents|children}:{classID}[:categID]
+     * </pre>
+     * <p>The optional {@code formatAlias} references the configuration property
+     * {@code MCR.URIResolver.Classification.Format.<formatAlias>}.
+     * If {@code noEmptyLeaves} is specified, leaf categories without entries are excluded.
+     * <p>Example request:
+     * <pre>
+     *   classification:editorComplete[mods]:2:children:myClass:root
+     *   classification:metadata:all:noEmptyLeaves:parents:myClass:someCateg
+     * </pre>
+     * <p>Example response:
+     * <pre>{@code
+     *   <items>
+     *     <item value="root">
+     *       <label xml:lang="en">Root Category</label>
+     *     </item>
+     *   </items>
+     * }</pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link JDOMSource} wrapping the classification element, or an empty source if not found
+     * @throws IllegalArgumentException if the URI does not match the expected syntax or contains an unknown format
+     */
     @Override
     public Source resolve(String href, String base) {
         LOGGER.debug("start resolving {}", href);

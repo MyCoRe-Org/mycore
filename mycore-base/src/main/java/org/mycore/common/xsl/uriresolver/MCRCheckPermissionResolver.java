@@ -23,19 +23,34 @@ import javax.xml.transform.URIResolver;
 
 import org.mycore.access.MCRAccessManager;
 
+/**
+ * {@link URIResolver} that checks an ACL permission and returns the result as an XML boolean.
+ */
 public class MCRCheckPermissionResolver implements URIResolver {
 
     /**
-     * returns the boolean value for the given ACL permission.
-     * <p>
-     * Syntax: <code>checkPermission:{id}:{permission}</code> or <code>checkPermission:{permission}</code>
+     * Resolves whether the current user holds the given permission and returns the result as an XML boolean.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:&lt;permission&gt;
+     *   &lt;scheme&gt;:&lt;id&gt;:&lt;permission&gt;
+     * </pre>
+     * <p>If only a permission is provided, it is checked globally. If an object ID is also
+     * provided, the permission is checked for that specific object.
+     * <p>Example request:
+     * <pre>
+     *   checkPermission:administrate
+     *   checkPermission:mcr_document_00000001:read
+     * </pre>
+     * <p>Example response:
+     * <pre>{@code
+     *   <boolean>true</boolean>
+     * }</pre>
      *
-     * @param href
-     *            URI in the syntax above
-     * @param base
-     *            not used
-     * @return the root element "boolean" of the XML document with content string true of false
-     * @see javax.xml.transform.URIResolver
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link Source} wrapping an XML element {@code <boolean>} with value {@code true} or {@code false}
+     * @throws IllegalArgumentException if the URI does not match either expected syntax
      */
     @Override
     public Source resolve(String href, String base) {

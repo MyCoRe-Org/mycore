@@ -32,21 +32,36 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRClassTools;
 
 /**
- * Resolves arbitrary static methods of arbitrary classes. Parameters are considerd to be of type
- * {@link java.lang.String}. Encoding parameter values is recommended.
- * <br/><br/>
- * <strong>Invocation</strong>
- * <pre><code>function:&lt;class name&gt;:&lt;method name&gt;:&lt;param1&gt;:&lt;param2&gt;</code></pre>
- * <br/>
- * <strong>Example</strong>
- * <pre><code>function:de.uni_jena.thunibib.user.ThUniBibUtils:getLeadId:id_connection:foobar;</code></pre>
- *
- * @author shermann (Silvio Hermann)
- * */
+ * {@link URIResolver} that invokes a static Java method and returns its result as an XML source.
+ */
 public class MCRFunctionResolver implements URIResolver {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    /**
+     * Resolves the given URI by invoking a static Java method with the provided arguments
+     * and returning the result as an XML source.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{className}:{methodName}[:{arg}...]
+     * </pre>
+     * <p>All arguments are URL-decoded before being passed to the method. The method must be
+     * public and static, accept only {@link String} parameters, and belong to a class accessible
+     * via {@link MCRClassTools}. A {@code null} return value is treated as an empty string.
+     * <p>Example request:
+     * <pre>
+     *   callJava:org.mycore.MyClass:myMethod:arg1:arg2
+     * </pre>
+     * <p>Example response:
+     * <pre>{@code
+     *   <string>result value</string>
+     * }</pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link Source} wrapping the string result of the invoked method
+     * @throws TransformerException if the class or method cannot be found, or invocation fails
+     */
     @Override
     public Source resolve(String href, String base) throws TransformerException {
         LOGGER.debug("Resolving {}", href);

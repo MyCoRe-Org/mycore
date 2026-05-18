@@ -39,16 +39,41 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
+/**
+ * {@link URIResolver} that reads a object from the metadata store and returns it as an XML source.
+ */
 public class MCRObjectResolver implements URIResolver {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     /**
-     * Reads local MCRObject with a given ID from the store.
+     * Resolves the given object ID and returns its XML representation.
+     * <p>By default, non-derivate objects are returned in their expanded form via
+     * {@link MCRExpandedObjectManager}. This can be suppressed with {@code expanded=false}.
+     * A specific revision can be requested with the {@code r} parameter.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{mcrId}[?r={revision}]
+     *   &lt;scheme&gt;:{mcrId}[?expanded=false]
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   mcrobject:mcr_document_00000001
+     *   mcrobject:mcr_document_00000001?r=3
+     *   mcrobject:mcr_document_00000001?expanded=false
+     * </pre>
+     * <p>Example response:
+     * <pre>{@code
+     *   <mycoreobject ID="mcr_document_00000001" ...>
+     *     <metadata>...</metadata>
+     *   </mycoreobject>
+     * }</pre>
      *
-     * @param href
-     *            for example, "mcrobject:DocPortal_document_07910401"
-     * @return XML representation from MCRXMLContainer
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link Source} wrapping the XML representation of the object,
+     *         or {@code null} if no content is found
+     * @throws TransformerException if the content cannot be read
      */
     @Override
     public Source resolve(String href, String base) throws TransformerException {

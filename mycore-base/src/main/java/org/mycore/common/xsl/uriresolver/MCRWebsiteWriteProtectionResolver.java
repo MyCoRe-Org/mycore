@@ -27,13 +27,31 @@ import org.jdom2.JDOMException;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
 
 /**
- * Resolver for MCRWebsiteWriteProtection. Returns an XML with the following format:
- * <code>
- *   &lt;message  active="true|false"&gt;Message to display when write protection is active&lt;/message&gt;
- * </code>
+ * {@link URIResolver} that returns the current write protection status and message as XML.
  */
 public class MCRWebsiteWriteProtectionResolver implements URIResolver {
 
+    /**
+     * Resolves the current write protection state and returns it as an XML source.
+     * <p>If no message is configured, a default empty {@code <message>} element is returned.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   websiteWriteProtection:
+     * </pre>
+     * <p>Example response:
+     * <pre>{@code
+     *   <message active="true">Maintenance mode active</message>
+     * }</pre>
+     *
+     * @param href the URI to resolve (unused)
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link DOMSource} wrapping the {@code <message>} element with an {@code active} attribute
+     * @throws TransformerException if the configured message cannot be parsed
+     */
     @Override
     public Source resolve(String href, String base) throws TransformerException {
         boolean active = MCRWebsiteWriteProtection.isActive();

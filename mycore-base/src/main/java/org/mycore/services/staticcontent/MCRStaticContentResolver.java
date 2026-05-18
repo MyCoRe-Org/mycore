@@ -25,8 +25,28 @@ import org.mycore.common.MCRException;
 import org.mycore.common.xsl.MCRLazyStreamSource;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
+/**
+ * {@link URIResolver} that returns statically generated content for an object as a stream source.
+ */
 public class MCRStaticContentResolver implements URIResolver {
 
+    /**
+     * Resolves the static content for the given object using the specified content generator
+     * and returns it as a lazy stream source.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{contentGeneratorId}:{mcrId}
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   staticcontent:myGenerator:mcr_document_00000001
+     * </pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link MCRLazyStreamSource} that lazily generates the content for the given object
+     * @throws MCRException if the URI does not contain exactly three {@code :}-separated segments
+     */
     @Override
     public Source resolve(String href, String base) {
         final String[] parts = href.split(":", 3);
@@ -41,4 +61,5 @@ public class MCRStaticContentResolver implements URIResolver {
 
         return new MCRLazyStreamSource(() -> generator.get(objectID), href);
     }
+
 }

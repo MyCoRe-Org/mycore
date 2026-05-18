@@ -33,15 +33,15 @@ import org.mycore.common.xsl.MCRXSLResourceHelper;
 import org.mycore.datamodel.metadata.MCRXMLConstants;
 
 /**
- * Imports xsl files which are set in the mycore.properties file. Example:
- * MCR.URIResolver.xslImports.components=first.xsl,second.xsl Every file must import this URIResolver to form a
- * import chain:
- *
+ * {@link URIResolver} that resolves XSL import chains configured via properties.
+ * <p>Each stylesheet in the chain must import this resolver to continue the chain:
  * <pre>
- *  &lt;xsl:import href="xslImport:components:first.xsl"&gt;
+ *   &lt;xsl:import href="xslImport:{configId}:{filename.xsl}"/&gt;
  * </pre>
- * <p>
- * Returns a xsl file with the import as href.
+ * The import order is defined by:
+ * <pre>
+ *   MCR.URIResolver.xslImports.{configId}=first.xsl,second.xsl
+ * </pre>
  */
 public class MCRXSLImportResolver implements URIResolver {
 
@@ -53,6 +53,30 @@ public class MCRXSLImportResolver implements URIResolver {
         fallback = new MCRResourceResolver();
     }
 
+    /**
+     * Resolves the next XSL stylesheet in the import chain for the given config ID and file.
+     * <p>If no further import step exists, an empty {@code <xsl:stylesheet>} element is returned
+     * to terminate the chain cleanly.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{configId}:{filename.xsl}
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   xslImport:components:second.xsl
+     * </pre>
+     * <p>Example response when the chain continues: the next XSL stylesheet as a source.
+     * <p>Example response at end of chain:
+     * <pre>{@code
+     *   <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"/>
+     * }</pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet, used to determine the XSL folder
+     * @return a {@link Source} wrapping the next stylesheet in the chain, or an empty
+     *         {@code <xsl:stylesheet>} element if the end of the chain is reached
+     * @throws TransformerException if the next stylesheet cannot be resolved
+     */
     @Override
     public Source resolve(String href, String base) throws TransformerException {
         String xslFolder = getXSLFolder(base);

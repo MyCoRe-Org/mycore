@@ -35,23 +35,46 @@ import org.mycore.common.xsl.MCRXSLResourceHelper;
 import org.mycore.datamodel.metadata.MCRXMLConstants;
 
 /**
- * <p>
- * Includes xsl files which are set in the mycore.properties file.
- * </p>
- * Example: MCR.URIResolver.xslIncludes.components=iview.xsl,wcms.xsl
- * <p>
- * Or retrieve the include hrefs from a class implementing
- * {@link org.mycore.common.xsl.uriresolver.MCRXslIncludeResolver.MCRXslIncludeHrefs}.
- * The class. part have to be set, everything after * class. Can be freely chosen.
- * </p>
- * Example: MCR.URIResolver.xslIncludes.class.template=org.foo.XSLHrefs
- * <p>
- * Returns a xsl file with the includes as href.
+ * {@link URIResolver} that returns an XSL stylesheet containing include configured directives.
+ * <p>Includes can be configured either as a comma-separated list of XSL filenames:
+ * <pre>
+ *   MCR.URIResolver.xslIncludes.{configId}=first.xsl,second.xsl
+ * </pre>
+ * or via a class implementing {@link MCRXslIncludeHrefs}:
+ * <pre>
+ *   MCR.URIResolver.xslIncludes.class.{configId}=org.foo.XSLHrefs
+ * </pre>
  */
 public class MCRXSLIncludeResolver implements URIResolver {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    /**
+     * Resolves the configured XSL includes for the given config ID and returns them as
+     * an XSL stylesheet source.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{configId}
+     *   &lt;scheme&gt;:class.{configId}
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   xslInclude:components
+     *   xslInclude:class.template
+     * </pre>
+     * <p>Example response:
+     * <pre>{@code
+     *   <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+     *     <xsl:include href="resource:xsl/first.xsl"/>
+     *     <xsl:include href="resource:xsl/second.xsl"/>
+     *   </xsl:stylesheet>
+     * }</pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link JDOMSource} wrapping an {@code <xsl:stylesheet>} element containing
+     *         the configured {@code <xsl:include>} directives
+     */
     @Override
     public Source resolve(String href, String base) {
         String includePart = href.substring(href.indexOf(':') + 1);

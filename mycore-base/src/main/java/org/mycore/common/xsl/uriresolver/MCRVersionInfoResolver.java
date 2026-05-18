@@ -35,10 +35,44 @@ import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
+/**
+ * {@link URIResolver} that returns the version history of a object as an XML source.
+ */
 public class MCRVersionInfoResolver implements URIResolver {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    /**
+     * Resolves the version history of the given object ID and returns it as an XML source.
+     * <p>If the metadata store supports revisions, all revisions are returned. Otherwise,
+     * a single {@code <version>} element with the last modification timestamp is returned.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{mcrId}
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   versioninfo:mcr_document_00000001
+     * </pre>
+     * <p>Example response with revisions:
+     * <pre>{@code
+     *   <versions>
+     *     <version user="admin" date="2024-01-01T00:00:00Z" r="1" action="A"/>
+     *     <version user="editor" date="2024-06-01T12:00:00Z" r="2" action="M"/>
+     *   </versions>
+     * }</pre>
+     * <p>Example response without revision support:
+     * <pre>{@code
+     *   <versions>
+     *     <version date="2024-06-01T12:00:00Z"/>
+     *   </versions>
+     * }</pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link JDOMSource} wrapping the {@code <versions>} element
+     * @throws TransformerException if the version history cannot be read
+     */
     @Override
     public Source resolve(String href, String base) throws TransformerException {
         String id = href.substring(href.indexOf(':') + 1);

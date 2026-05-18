@@ -27,16 +27,25 @@ import org.mycore.access.MCRAccessManager;
 public class MCRCheckPermissionChainResolver implements URIResolver {
 
     /**
-     * Checks the permission and if granted resolve the uri
-     * <p>
-     * Syntax: <code>checkPermissionChain:{?id}:{permission}:{$uri}</code>
+     * Checks whether the current user holds the given permission and, if so, resolves the URI.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:&lt;id&gt;:&lt;permission&gt;:&lt;uri&gt;
+     * </pre>
+     * <p>If {@code id} is blank, the permission is checked globally via
+     * {@link MCRAccessManager#checkPermission(String)}; otherwise it is checked
+     * for the given object ID via {@link MCRAccessManager#checkPermission(String, String)}.
+     * <p>Example request:
+     * <pre>
+     *   checkPermissionChain:mcr_document_00000001:read:mcrobject:mcr_document_00000001
+     *   checkPermissionChain::administrate:mcrobject:mcr_document_00000001
+     * </pre>
      *
-     * @param href
-     *            URI in the syntax above
-     * @param base
-     *            not used
-     * @return if you have the permission then the resolved uri otherwise an Exception
-     * @see javax.xml.transform.URIResolver
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet, passed through to the delegated resolver
+     * @return the resolved {@link Source} of the target URI if access is granted
+     * @throws TransformerException if the current user does not have the required permission
+     * @throws IllegalArgumentException if the URI does not match the expected syntax
      */
     @Override
     public Source resolve(String href, String base) throws TransformerException {

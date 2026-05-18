@@ -28,6 +28,10 @@ import javax.xml.transform.URIResolver;
 import org.mycore.common.MCRHTTPClient;
 import org.mycore.common.config.MCRConfiguration2;
 
+/**
+ * {@link URIResolver} that fetches XML content from a remote HTTP or HTTPS endpoint.
+ * <p>The HTTP client used for requests is configured via {@code MCR.HTTPClient.Class}.
+ */
 public class MCRHTTPResolver implements URIResolver {
 
     private static final String HTTP_CLIENT_CLASS = "MCR.HTTPClient.Class";
@@ -38,6 +42,23 @@ public class MCRHTTPResolver implements URIResolver {
         this.client = MCRConfiguration2.getInstanceOfOrThrow(MCRHTTPClient.class, HTTP_CLIENT_CLASS);
     }
 
+    /**
+     * Resolves the given URI by performing an HTTP GET request and returning the response as a source.
+     * <p>URI Syntax:
+     * <pre>
+     *   http://{host}/{path}
+     *   https://{host}/{path}
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   https://example.org/api/document/1
+     * </pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI used to resolve relative URIs
+     * @return a {@link Source} wrapping the HTTP response body
+     * @throws TransformerException if the request fails or the response cannot be read
+     */
     @Override
     public Source resolve(String href, String base) throws TransformerException {
         URI hrefURI = MCRURIResolver.resolveURI(href, base);

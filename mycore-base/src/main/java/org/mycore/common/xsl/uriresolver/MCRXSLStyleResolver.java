@@ -39,12 +39,7 @@ import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.common.xsl.MCRXSLResourceHelper;
 
 /**
- * Transforms the result of another resolver using one or more XSL stylesheets.
- * <p>
- * Usage:
- * <pre>
- * xslStyle:&lt;stylesheet&gt;&lt;,&lt;stylesheet&gt;&gt;&lt;?param1=value1&amp;param2=value2&gt;&lt;#flavor&gt;:&lt;anyMyCoReURI&gt;
- * </pre>
+ * {@link URIResolver} that resolves a URI and transforms its result using one or more XSL stylesheets.
  */
 public class MCRXSLStyleResolver implements URIResolver {
 
@@ -91,6 +86,29 @@ public class MCRXSLStyleResolver implements URIResolver {
             .collect(Collectors.toSet());
     }
 
+    /**
+     * Resolves the target URI and transforms its content using the specified XSL stylesheets.
+     * <p>Multiple stylesheets are applied in order. Optional query parameters are passed to the
+     * transformer. An optional flavor selects the transformer factory and XSL folder to use;
+     * if omitted, the default flavor is used. The flavor can also be passed as the
+     * {@code xslStyleFlavor} query parameter.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{stylesheet}[,{stylesheet}...][?param=value...][#{flavor}]:{anyMCRUri}
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   xslStyle:my-stylesheet?lang=de:mcrobject:mcr_document_00000001
+     *   xslStyle:sheet1,sheet2?lang=de#xslt3:mcrobject:mcr_document_00000001
+     * </pre>
+     * <p>Example response: the transformed XML content produced by the stylesheets.
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet, passed through to the delegated resolver
+     * @return a {@link Source} wrapping the transformed content
+     * @throws TransformerException if the target URI cannot be resolved or the transformation fails
+     * @throws MCRUsageException if the target URI is missing or an unknown flavor is specified
+     */
     @Override
     public Source resolve(String href, String base) throws TransformerException {
         String help = href.substring(href.indexOf(':') + 1);

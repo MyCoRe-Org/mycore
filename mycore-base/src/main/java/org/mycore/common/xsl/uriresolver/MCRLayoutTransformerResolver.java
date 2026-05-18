@@ -37,12 +37,7 @@ import org.mycore.common.xml.MCRLayoutTransformerFactory;
 import org.mycore.common.xsl.MCRParameterCollector;
 
 /**
- * Transforms the result of another resolver using an XSL stylesheet.
- * <p>
- * Usage:
- * <pre>
- * xslTransform:&lt;transformer&gt;&lt;?param1=value1&amp;param2=value2&gt;:&lt;anyMyCoReURI&gt;
- * </pre>
+ * {@link URIResolver} that resolves a URI and transforms its result using an XSL stylesheet.
  */
 public class MCRLayoutTransformerResolver implements URIResolver {
 
@@ -55,6 +50,27 @@ public class MCRLayoutTransformerResolver implements URIResolver {
             "MCR.Layout.Transformer.Factory");
     }
 
+    /**
+     * Resolves the target URI and transforms its content using the specified XSL transformer.
+     * <p>Optional query parameters are passed to the transformer if it implements
+     * {@link MCRParameterizedTransformer}; otherwise they are ignored.
+     * If the target URI resolves to {@code null} or the sub-URI is empty, an empty result is returned.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{transformerId}[?param1=value1&amp;param2=value2]:{anyMCRUri}
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   xslTransform:myStylesheet?lang=de:mcrobject:mcr_document_00000001
+     * </pre>
+     * <p>Example response: the transformed XML content produced by the stylesheet.
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet, passed through to the delegated resolver
+     * @return a {@link Source} wrapping the transformed content, or an empty result if the
+     *         target URI resolves to {@code null} or the sub-URI is empty
+     * @throws TransformerException if the target URI cannot be resolved or the transformation fails
+     */
     @Override
     public Source resolve(String href, String base) throws TransformerException {
         String help = href.substring(href.indexOf(':') + 1);

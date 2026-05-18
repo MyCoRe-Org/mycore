@@ -27,15 +27,39 @@ import org.jdom2.transform.JDOMSource;
 import org.mycore.common.MCRCoreVersion;
 
 /**
- * Resolves the software Version of the MyCoRe Instance. The following types are supported: gitDescribe, abbrev,
- * branch, version, revision, completeVersion. The default is completeVersion.
- * The resulting XML looks like this:
- * <code>
- *     &lt;version&gt;MyCoRe 2022.06.3-SNAPSHOT 2022.06.x:v2022.06.2-1-g881e24d&lt;/version&gt;
- * </code>
+ * {@link URIResolver} that returns version information about the running MyCoRe instance as XML.
  */
 public class MCRVersionResolver implements URIResolver {
 
+    /**
+     * Resolves the requested version information and returns it as an XML source.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{versionType}
+     * </pre>
+     * <p>Supported version types:
+     * <ul>
+     *   <li>{@code gitDescribe} – full Git describe string</li>
+     *   <li>{@code abbrev} – abbreviated commit hash</li>
+     *   <li>{@code branch} – current branch name</li>
+     *   <li>{@code version} – Maven version string</li>
+     *   <li>{@code revision} – full commit hash</li>
+     *   <li>{@code completeVersion} – combined version string (default)</li>
+     * </ul>
+     * <p>Example request:
+     * <pre>
+     *   version:completeVersion
+     * </pre>
+     * <p>Example response:
+     * <pre>{@code
+     *   <version>MyCoRe 2022.06.3-SNAPSHOT 2022.06.x:v2022.06.2-1-g881e24d</version>
+     * }</pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link JDOMSource} wrapping the {@code <version>} element
+     * @throws IllegalArgumentException if the version type is not one of the supported values
+     */
     @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     @Override
     public Source resolve(String href, String base) throws TransformerException {

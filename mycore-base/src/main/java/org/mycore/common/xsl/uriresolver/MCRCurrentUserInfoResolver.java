@@ -34,26 +34,38 @@ import org.mycore.common.MCRUserInformation;
 import org.mycore.services.http.MCRURLQueryParameter;
 
 /**
- * Resolves information about the currently authenticated user.
- * <p>
- * Example request:
- * <pre>
- * currentUserInfo:attribute=eMail&amp;attribute=realName&amp;role=administrator
- * </pre>
- *
- * Example response:
- * <pre>{@code
- * <user id="admin">
- *   <attribute name="eMail">example@mycore.de</attribute>
- *   <attribute name="realName">Administrator</attribute>
- *   <role name="administrator">true</role>
- * </user>
- * }</pre>
+ * {@link URIResolver} that returns information about the currently authenticated user as XML.
  */
 public class MCRCurrentUserInfoResolver implements URIResolver {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    /**
+     * Resolves information about the currently authenticated user and returns it as an XML source.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:attribute={name}[&amp;attribute={name}...][&amp;role={name}...]
+     * </pre>
+     * <p>Each {@code attribute} parameter adds the corresponding user attribute to the response.
+     * Each {@code role} parameter adds a boolean indicating whether the user is in that role.
+     * Duplicate parameter values are ignored with a warning.
+     * <p>Example request:
+     * <pre>
+     *   currentUserInfo:attribute=eMail&amp;attribute=realName&amp;role=administrator
+     * </pre>
+     * <p>Example response:
+     * <pre>{@code
+     *   <user id="admin">
+     *     <attribute name="eMail">example@mycore.de</attribute>
+     *     <attribute name="realName">Administrator</attribute>
+     *     <role name="administrator">true</role>
+     *   </user>
+     * }</pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link JDOMSource} wrapping the {@code <user>} element
+     */
     @Override
     public Source resolve(String href, String base) throws TransformerException {
         MCRUserInformation userInformation = MCRSessionMgr.getCurrentSession().getUserInformation();
@@ -95,4 +107,5 @@ public class MCRCurrentUserInfoResolver implements URIResolver {
 
         return new JDOMSource(root);
     }
+
 }

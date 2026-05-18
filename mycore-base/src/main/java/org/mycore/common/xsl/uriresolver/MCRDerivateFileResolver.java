@@ -29,17 +29,36 @@ import org.mycore.common.content.MCRPathContent;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 
+/**
+ * {@link URIResolver} that resolves a file within a derivate and returns its content as a source.
+ */
 public class MCRDerivateFileResolver implements URIResolver {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    /**
+     * Resolves the given derivate path and returns the file content as a source.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{derivateId}/{filePath}
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   mcrfile:mcr_derivate_00000001/path/to/file.xml
+     * </pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link Source} with the content of the resolved file
+     * @throws TransformerException if no valid derivate path is provided or the file cannot be read
+     */
     @Override
     public Source resolve(String href, String base) throws TransformerException {
         LOGGER.debug("Reading xml from MCRFile {}", href);
         MCRPath file = null;
         String id = href.substring(href.indexOf(':') + 1);
         if (id.contains("/")) {
-            // assume thats a derivate with path
+            // assume that is a derivate with path
             try {
                 MCRObjectID derivateID = MCRObjectID.getInstance(id.substring(0, id.indexOf('/')));
                 String path = id.substring(id.indexOf('/'));

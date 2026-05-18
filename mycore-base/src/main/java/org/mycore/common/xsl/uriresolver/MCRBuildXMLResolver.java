@@ -32,32 +32,41 @@ import org.jdom2.transform.JDOMSource;
 import org.mycore.common.MCRConstants;
 
 /**
- * Builds XML trees from a compact string representation.
- * <p>
- * Multiple XPath-like expressions can be separated using {@code &}.
- * <p>
- * Example request:
- * <pre>
- * buildxml:_rootName_=mycoreobject&amp;metadata/parents/parent/@href='FooBar_Document_4711'
- * </pre>
- * <p>
- * Example response:
- * <pre>{@code
- * <mycoreobject>
- *   <metadata>
- *     <parents>
- *       <parent href="FooBar_Document_4711" />
- *     </parents>
- *   </metadata>
- * </mycoreobject>
- * }</pre>
+ * {@link URIResolver} that dynamically builds an XML element tree from URI query parameters.
  */
 public class MCRBuildXMLResolver implements URIResolver {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     /**
-     * Builds a simple xml node tree on basis of name value pair
+     * Resolves the given URI and constructs an XML element tree from its query parameters.
+     * <p>Each query parameter is interpreted as an XPath-like path/value pair and mapped
+     * onto the resulting XML tree. Intermediate elements are created as needed. Attribute
+     * nodes are created when a path segment starts with {@code @}. Namespace prefixes are
+     * resolved via {@link MCRConstants}; unknown prefixes default to no namespace.
+     * <p>An optional {@code _rootName_} parameter sets the name (and namespace) of the
+     * root element. If omitted, {@code <root>} is used. If no {@code _rootName_} is given
+     * and more than one top-level child would result, only the first top-level child
+     * element is returned and a warning is logged.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:[_rootName_=&lt;element&gt;&amp;]&lt;xpath&gt;=&lt;value&gt;[&amp;...]
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   buildxml:_rootName_=mods:mods&amp;mods:title=My+Document&amp;mods:date/@type=issued
+     * </pre>
+     * <p>Example response:
+     * <pre>{@code
+     *   <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+     *     <mods:title>My Document</mods:title>
+     *     <mods:date type="issued"/>
+     *   </mods:mods>
+     * }</pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link JDOMSource} wrapping the constructed root element
      */
     @Override
     public Source resolve(String href, String base) {

@@ -33,16 +33,36 @@ import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.MCRPathXML;
 
+/**
+ * {@link URIResolver} that returns the directory listing of a path as XML.
+ */
 public class MCRIFSResolver implements URIResolver {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     /**
-     * Reads XML from a http or https URL.
+     * Resolves the given path and returns its directory listing as an XML source.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{ownerId}/{path}[?host]
+     * </pre>
+     * <p>The optional {@code ?host} suffix is stripped before resolving. The owner ID
+     * is the first path segment and identifies the derivate or storage owner.
+     * <p>Example request:
+     * <pre>
+     *   ifs:mcr_derivate_00000001/path/to/dir
+     * </pre>
+     * <p>Example response:
+     * <pre>{@code
+     *   <directory name="dir">
+     *     <file name="file.xml">...</file>
+     *   </directory>
+     * }</pre>
      *
-     * @param href
-     *            the URL of the xml document
-     * @return the root element of the xml document
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link JDOMSource} wrapping the directory XML of the resolved path
+     * @throws TransformerException if the path cannot be read or the URI is malformed
      */
     @Override
     public Source resolve(String href, String base) throws TransformerException {

@@ -29,13 +29,32 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 import javax.xml.transform.stream.StreamSource;
 
+/**
+ * {@link URIResolver} that resolves a {@code file://} URI and returns its content as a stream source.
+ */
 public class MCRFileResolver implements URIResolver {
 
+    /**
+     * Resolves the given file URI and returns its content as a {@link StreamSource}.
+     * <p>URI Syntax:
+     * <pre>
+     *   file://{path}
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   file:///var/data/mycore/foo.xml
+     * </pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet, passed through to the delegated resolver
+     * @return a {@link StreamSource} reading from the resolved file path
+     * @throws TransformerException if the URI scheme is not {@code file}, or the file cannot be read
+     */
     @Override
     public Source resolve(String href, String base) throws TransformerException {
         URI hrefURI = MCRURIResolver.resolveURI(href, base);
         if (!hrefURI.getScheme().equals("file")) {
-            throw new TransformerException("Unsupport file uri scheme: " + hrefURI.getScheme());
+            throw new TransformerException("Unsupported file uri scheme: " + hrefURI.getScheme());
         }
         Path path = Paths.get(hrefURI);
         StreamSource source;

@@ -28,12 +28,30 @@ import org.mycore.common.content.MCRByteContent;
 import org.mycore.datamodel.common.MCRDataURL;
 
 /**
- * Resolves an data url and returns the content.
- *
- * @see MCRDataURL
+ * {@link URIResolver} that resolves a data URL and returns its content as an XML source.
  */
 public class MCRDataURLResolver implements URIResolver {
 
+    /**
+     * Resolves the given data URL and returns its decoded content as a source.
+     * <p>URI Syntax:
+     * <pre>
+     *   data:[&lt;mediatype&gt;][;base64],&lt;data&gt;
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   data:application/xml;base64,PGZvby8+
+     * </pre>
+     * <p>Example response:
+     * <pre>{@code
+     *   <foo/>
+     * }</pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link Source} wrapping the decoded content of the data URL
+     * @throws TransformerException if the data URL cannot be parsed or the content cannot be read
+     */
     @Override
     public Source resolve(String href, String base) throws TransformerException {
         try {

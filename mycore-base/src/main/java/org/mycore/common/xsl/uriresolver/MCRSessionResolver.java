@@ -27,18 +27,33 @@ import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.common.MCRSessionMgr;
 
+/**
+ * {@link URIResolver} that reads a JDOM element stored in the current session.
+ */
 public class MCRSessionResolver implements URIResolver {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     /**
-     * Reads XML from URIs of type session:key. The method MCRSession.get( key ) is called and must return a JDOM
-     * element.
+     * Resolves the given session key and returns the stored JDOM element as an XML source.
+     * <p>The value stored under the key must be a JDOM {@link Element}; it is cloned before
+     * being returned to prevent unintended modification of the session state.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{key}
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   session:mySessionKey
+     * </pre>
+     * <p>Example response:
+     * <pre>{@code
+     *   <myElement>...</myElement>
+     * }</pre>
      *
-     * @see org.mycore.common.MCRSession#get(Object)
-     * @param href
-     *            the URI in the format session:key
-     * @return the root element of the xml document
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link JDOMSource} wrapping a clone of the element stored under the given key
      */
     @Override
     public Source resolve(String href, String base) {

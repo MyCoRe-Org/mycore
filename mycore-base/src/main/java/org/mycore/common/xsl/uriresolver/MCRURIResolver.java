@@ -46,14 +46,13 @@ import org.mycore.common.xsl.MCRXSLResourceHelper;
 import org.xml.sax.InputSource;
 
 /**
- * Reads XML documents from various URI types. This resolver is used to read DTDs, XML Schema files, XSL document()
- * usages, xsl:include usages and MyCoRe Editor include declarations. DTDs and Schema files are read from the CLASSPATH
- * of the application when XML is parsed. XML document() calls and xsl:include calls within XSL stylesheets can be read
- * from URIs of type resource, webapp, file, session, query or mcrobject. MyCoRe editor include declarations can read
- * XML files from resource, webapp, file, session, http or https, query, or mcrobject URIs.
+ * Resolves URIs of various schemes by delegating to registered {@link URIResolver} implementations.
+ * <p>
+ * Additional URI schemes can be registered via {@link MCRURIResolverProvider} by setting the
+ * {@code MCR.URIResolver.ExternalResolver.Class} property, or via module resolvers configured
+ * under {@code MCR.URIResolver.ModuleResolver.<scheme>.Class}.
  *
- * @author Frank Lützenkirchen
- * @author Thomas Scheffler (yagee)
+ * @see MCRURIResolverProvider
  */
 public class MCRURIResolver implements URIResolver {
 
@@ -71,6 +70,11 @@ public class MCRURIResolver implements URIResolver {
         reinitialize();
     }
 
+    /**
+     * Reinitializes this resolver by reloading the external resolver provider and rebuilding
+     * the scheme-to-{@link URIResolver} mapping. Can be called to pick up configuration changes
+     * at runtime without creating a new instance.
+     */
     public void reinitialize() {
         try {
             extResolver = getExternalResolverProvider();
@@ -86,15 +90,32 @@ public class MCRURIResolver implements URIResolver {
             .orElse(HashMap::new);
     }
 
+    /**
+     * Returns the shared singleton instance of {@link MCRURIResolver}.
+     *
+     * @return the shared {@link MCRURIResolver} instance
+     */
     @MCRFactory
     public static MCRURIResolver obtainInstance() {
         return LazyInstanceHolder.SHARED_INSTANCE;
     }
 
+    /**
+     * Creates and returns a new, independent {@link MCRURIResolver} instance.
+     *
+     * @return a new {@link MCRURIResolver}
+     */
     public static MCRURIResolver createInstance() {
         return new MCRURIResolver();
     }
 
+    /**
+     * Resolves a relative or absolute {@code href} against an optional {@code base} URI.
+     *
+     * @param href the URI to resolve
+     * @param base the base URI to resolve against, or {@code null} to use {@code href} as-is
+     * @return the resolved {@link URI}
+     */
     public static URI resolveURI(String href, String base) {
         return Optional.ofNullable(base)
             .map(URI::create)
@@ -112,9 +133,27 @@ public class MCRURIResolver implements URIResolver {
     }
 
     /**
-     * URI Resolver that resolves XSL document() or xsl:include calls.
+     * Resolves a URI by delegating to the registered {@link URIResolver} for its scheme.
+     * <p>URI syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{target}
+     * </pre>
+     * <p>Example requests:
+     * <pre>
+     *   resource:xsl/myStylesheet.xsl
+     *   mcrobject:mcr_document_00000001
+     * </pre>
+     * <p>If no scheme is present and the href ends with {@code .xsl}, resolution is attempted
+     * via the {@code resource} scheme relative to the base URI.
+     * <p>If the scheme has no registered resolver, resolution falls back to
+     * {@link MCREntityResolver} and finally to a plain {@link StreamSource}.
      *
-     * @see javax.xml.transform.URIResolver
+     * @param href the URI to resolve, optionally prefixed with a scheme
+     * @param base the base URI of the calling stylesheet, used for relative URI resolution
+     *             and scheme fallback
+     * @return a {@link Source} for the resolved content, or {@code null} if the URI cannot
+     *         be resolved
+     * @throws TransformerException if a relative XSL href points outside the base URI
      */
     @Override
     public Source resolve(String href, String base) throws TransformerException {
@@ -204,11 +243,16 @@ public class MCRURIResolver implements URIResolver {
     }
 
     /**
-     * Reads XML from URIs of various type.
+     * Reads an XML document from the given URI and returns its root element.
+     * <p>Example:
+     * <pre>
+     *   Element root = resolver.resolve("resource:xml/myConfig.xml");
+     * </pre>
      *
-     * @param uri
-     *            the URI where to read the XML from
-     * @return the root element of the XML document
+     * @param uri the URI to read the XML from
+     * @return the detached root element of the resolved XML document, or {@code null} if
+     *         the URI resolves to no content
+     * @throws MCRException if the URI cannot be resolved or the content is not valid XML
      */
     public Element resolve(String uri) {
         if (LOGGER.isDebugEnabled()) {
@@ -224,13 +268,19 @@ public class MCRURIResolver implements URIResolver {
     }
 
     /**
-     * Returns the protocol or scheme for the given URI.
+     * Extracts the scheme (protocol) from a URI.
+     * <p>If the given {@code uri} contains no {@code :}, the scheme is taken from {@code base}
+     * instead.
+     * <p>Example:
+     * <pre>
+     *   getScheme("mcrobject:mcr_document_00000001", null) // returns "mcrobject"
+     *   getScheme("myFile.xsl", "resource:/xsl/")          // returns "resource"
+     * </pre>
      *
-     * @param uri
-     *            the URI to parse
-     * @param base
-     *            if uri is relative, resolve scheme from base parameter
-     * @return the protocol/scheme part before the ":"
+     * @param uri  the URI whose scheme to extract
+     * @param base fallback URI used when {@code uri} contains no scheme
+     * @return the scheme portion before the first {@code :}, or {@code null} if neither
+     *         {@code uri} nor {@code base} contains one
      */
     public String getScheme(String uri, String base) {
         StringTokenizer uriTokenizer = new StringTokenizer(uri, ":");
