@@ -43,7 +43,7 @@ import org.mycore.datamodel.metadata.MCRXMLConstants;
  * <p>
  * Returns a xsl file with the import as href.
  */
-public class MCRXslImportResolver implements URIResolver {
+public class MCRXSLImportResolver implements URIResolver {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
