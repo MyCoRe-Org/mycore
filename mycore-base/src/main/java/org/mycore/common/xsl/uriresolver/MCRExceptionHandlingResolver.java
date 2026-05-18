@@ -32,7 +32,7 @@ import org.jdom2.Namespace;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.common.MCRException;
 
-public class MCRExceptionAsXMLResolver implements URIResolver {
+public class MCRExceptionHandlingResolver implements URIResolver {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
