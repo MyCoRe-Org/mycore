@@ -48,7 +48,7 @@ import org.mycore.datamodel.metadata.MCRXMLConstants;
  * <p>
  * Returns a xsl file with the includes as href.
  */
-public class MCRXslIncludeResolver implements URIResolver {
+public class MCRXSLIncludeResolver implements URIResolver {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
