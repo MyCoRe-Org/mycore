@@ -28,13 +28,13 @@ import javax.xml.transform.URIResolver;
 import org.mycore.common.MCRHTTPClient;
 import org.mycore.common.config.MCRConfiguration2;
 
-public class MCRRESTResolver implements URIResolver {
+public class MCRHTTPResolver implements URIResolver {
 
     private static final String HTTP_CLIENT_CLASS = "MCR.HTTPClient.Class";
 
     private final MCRHTTPClient client;
 
-    public MCRRESTResolver() {
+    public MCRHTTPResolver() {
         this.client = MCRConfiguration2.getInstanceOfOrThrow(MCRHTTPClient.class, HTTP_CLIENT_CLASS);
     }
 
