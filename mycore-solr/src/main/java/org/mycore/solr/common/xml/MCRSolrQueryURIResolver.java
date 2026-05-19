@@ -41,7 +41,7 @@ import org.mycore.solr.search.MCRSolrSearchUtils;
 /**
  * {@link URIResolver} that executes a Solr query and returns the raw XML response as a source.
  */
-public class MCRSolrQueryResolver implements URIResolver {
+public class MCRSolrQueryURIResolver implements URIResolver {
 
     public static final String QUERY_GROUP_NAME = "query";
 

@@ -32,7 +32,7 @@ import org.w3c.dom.Document;
 /**
  * {@link URIResolver} that validates PDF/A files in a given derivate and returns the results as XML.
  */
-public class MCRPDFAValidatorResolver implements URIResolver {
+public class MCRPDFAValidatorURIResolver implements URIResolver {
 
     /**
      * Validates all PDF/A files in the given derivate and returns the validation results as an XML source.

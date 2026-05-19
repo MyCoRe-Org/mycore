@@ -32,7 +32,7 @@ import org.mycore.common.xsl.uriresolver.MCRURIResolver;
  * {@link URIResolver} that resolves a URI returning a MODS element and sorts its children
  * into the canonical MODS element order.
  */
-public class MCRMODSSorter implements URIResolver {
+public class MCRMODSSorterURIResolver implements URIResolver {
 
     private static final String[] ORDER = { "genre", "typeofResource", "titleInfo", "nonSort", "subTitle", "title",
         "partNumber", "partName", "name", "namePart", "displayForm", "role", "affiliation", "originInfo", "place",
@@ -79,7 +79,7 @@ public class MCRMODSSorter implements URIResolver {
     }
 
     public static void sort(Element mods) {
-        mods.sortChildren(MCRMODSSorter::compare);
+        mods.sortChildren(MCRMODSSorterURIResolver::compare);
     }
 
     private static int compare(Element e1, Element e2) {

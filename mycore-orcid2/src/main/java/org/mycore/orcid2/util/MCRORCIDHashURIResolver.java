@@ -32,7 +32,7 @@ import org.mycore.common.xsl.uriresolver.MCRURIResolverResponse;
 /**
  * {@link URIResolver} that hashes a given input string and returns the result as an XML source.
  */
-public class MCRORCIDHashResolver implements URIResolver {
+public class MCRORCIDHashURIResolver implements URIResolver {
 
     /**
      * Hashes the given input with the specified algorithm and returns the result as an XML source.

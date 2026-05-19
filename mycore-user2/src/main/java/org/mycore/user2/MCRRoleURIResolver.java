@@ -38,7 +38,7 @@ import org.mycore.datamodel.classifications2.MCRLabel;
 /**
  * {@link URIResolver} that provides role-related information for the current user as XML.
  */
-public class MCRRoleResolver implements URIResolver {
+public class MCRRoleURIResolver implements URIResolver {
 
     private static final Logger LOGGER = LogManager.getLogger();
 

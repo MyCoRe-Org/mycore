@@ -42,7 +42,7 @@ import org.mycore.mets.model.MCRMETSGeneratorFactory;
 /**
  * {@link URIResolver} that returns the METS document for a given MCR object or derivate as XML.
  */
-public class MCRMetsResolver implements URIResolver {
+public class MCRMetsURIResolver implements URIResolver {
 
     private static final Logger LOGGER = LogManager.getLogger();
 

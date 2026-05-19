@@ -29,7 +29,7 @@ import org.mycore.restapi.v2.access.MCRRestAccessManager;
 /**
  * {@link URIResolver} that checks whether the current user has permission to access a REST API path.
  */
-public class MCRRestCheckAPIAccessResolver implements URIResolver {
+public class MCRRestCheckAPIAccessURIResolver implements URIResolver {
 
     /**
      * Checks the REST API access permission for the given path and returns the result as an XML boolean.

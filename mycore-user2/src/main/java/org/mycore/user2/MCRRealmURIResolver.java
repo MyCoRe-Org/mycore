@@ -31,7 +31,7 @@ import org.jdom2.transform.JDOMSource;
 /**
  * {@link URIResolver} that returns information about one or all configured realms as XML.
  */
-public class MCRRealmResolver implements URIResolver {
+public class MCRRealmURIResolver implements URIResolver {
 
     /**
      * Resolves the given realm ID and returns the corresponding realm data as an XML source.

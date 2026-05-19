@@ -29,7 +29,7 @@ import org.mycore.common.xsl.uriresolver.MCRURIResolver;
  * {@link URIResolver} that resolves a URI returning a MODS element and enriches it using
  * external data sources via a configured {@link MCREnricher}.
  */
-public class MCREnrichmentResolver implements URIResolver {
+public class MCREnrichmentURIResolver implements URIResolver {
 
     /**
      * Resolves the target URI, enriches the returned MODS element using the specified

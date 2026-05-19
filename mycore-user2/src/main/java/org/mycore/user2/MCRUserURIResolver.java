@@ -37,7 +37,7 @@ import jakarta.xml.bind.util.JAXBSource;
 /**
  * {@link URIResolver} that returns user data for a given user ID or the currently logged-in user.
  */
-public class MCRUserResolver implements URIResolver {
+public class MCRUserURIResolver implements URIResolver {
 
     /**
      * Resolves user data for the given user ID and returns it as an XML source.

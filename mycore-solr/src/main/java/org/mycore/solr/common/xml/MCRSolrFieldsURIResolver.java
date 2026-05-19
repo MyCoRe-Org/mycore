@@ -43,7 +43,7 @@ import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 /**
  * {@link URIResolver} that retrieves field information for a given Solr core and returns it as XML.
  */
-public class MCRSolrFieldsResolver implements URIResolver {
+public class MCRSolrFieldsURIResolver implements URIResolver {
 
     public static final String SOLRFIELDS_PREFIX = "solrfields:";
 

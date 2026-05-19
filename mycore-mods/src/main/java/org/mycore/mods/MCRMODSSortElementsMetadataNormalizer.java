@@ -1,6 +1,5 @@
 package org.mycore.mods;
 
-
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.normalization.MCRObjectNormalizer;
 
@@ -12,7 +11,7 @@ public class MCRMODSSortElementsMetadataNormalizer extends MCRObjectNormalizer {
     @Override
     public void normalize(MCRObject mcrObject) {
         MCRMODSWrapper modsWrapper = new MCRMODSWrapper(mcrObject);
-        MCRMODSSorter.sort(modsWrapper.getMODS());
+        MCRMODSSorterURIResolver.sort(modsWrapper.getMODS());
     }
 
 }

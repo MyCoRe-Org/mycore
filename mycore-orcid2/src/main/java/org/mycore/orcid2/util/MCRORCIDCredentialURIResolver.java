@@ -31,7 +31,7 @@ import org.mycore.orcid2.user.MCRORCIDUser;
 /**
  * {@link URIResolver} that returns ORCID credential information for the current user as XML.
  */
-public class MCRORCIDCredentialResolver implements URIResolver {
+public class MCRORCIDCredentialURIResolver implements URIResolver {
 
     /**
      * Resolves ORCID credential information for the given ORCID and returns the result as an XML source.

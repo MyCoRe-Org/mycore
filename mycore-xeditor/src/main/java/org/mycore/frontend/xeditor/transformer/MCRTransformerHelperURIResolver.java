@@ -25,7 +25,7 @@ import javax.xml.transform.URIResolver;
 /**
  * {@link URIResolver} that assists in transforming XEditor forms to HTML.
  */
-public class MCRTransformerHelperResolver implements URIResolver {
+public class MCRTransformerHelperURIResolver implements URIResolver {
 
     /**
      * Resolves the given transformer helper call and returns the result as an XML source.
