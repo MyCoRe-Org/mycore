@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.common.xml;
+package org.mycore.common.xsl.uriresolver;
 
 import java.lang.reflect.Method;
 import java.net.URLDecoder;
@@ -30,26 +30,38 @@ import javax.xml.transform.URIResolver;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRClassTools;
-import org.mycore.common.xsl.uriresolver.MCRFunctionURIResolver;
-import org.mycore.common.xsl.uriresolver.MCRURIResolverResponse;
 
 /**
- * Resolves arbitrary static methods of arbitrary classes. Parameters are considerd to be of type
- * {@link String}. Encoding parameter values is recommended.
- * <br/><br/>
- * <strong>Invocation</strong>
- * <pre><code>function:&lt;class name&gt;:&lt;method name&gt;:&lt;param1&gt;:&lt;param2&gt;</code></pre>
- * <br/>
- * <strong>Example</strong>
- * <pre><code>function:de.uni_jena.thunibib.user.ThUniBibUtils:getLeadId:id_connection:foobar;</code></pre>
- *
- * @author shermann (Silvio Hermann)
- * @deprecated Use {@link MCRFunctionURIResolver} instead.
- * */
-@Deprecated(forRemoval = true)
-public class MCRFunctionResolver implements URIResolver {
+ * {@link URIResolver} that invokes a static Java method and returns its result as an XML source.
+ */
+public class MCRFunctionURIResolver implements URIResolver {
+
     private static final Logger LOGGER = LogManager.getLogger();
 
+    /**
+     * Resolves the given URI by invoking a static Java method with the provided arguments
+     * and returning the result as an XML source.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{className}:{methodName}[:{arg}...]
+     * </pre>
+     * <p>All arguments are URL-decoded before being passed to the method. The method must be
+     * public and static, accept only {@link String} parameters, and belong to a class accessible
+     * via {@link MCRClassTools}. A {@code null} return value is treated as an empty string.
+     * <p>Example request:
+     * <pre>
+     *   callJava:org.mycore.MyClass:myMethod:arg1:arg2
+     * </pre>
+     * <p>Example response:
+     * <pre>{@code
+     *   <string>result value</string>
+     * }</pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link Source} wrapping the string result of the invoked method
+     * @throws TransformerException if the class or method cannot be found, or invocation fails
+     */
     @Override
     public Source resolve(String href, String base) throws TransformerException {
         LOGGER.debug("Resolving {}", href);
@@ -70,9 +82,11 @@ public class MCRFunctionResolver implements URIResolver {
             Method method = MCRClassTools.forName(className).getMethod(methodName, types);
             Object result = method.invoke(null, params);
 
-            return MCRURIResolverResponse.ofString(result == null ? "" : String.valueOf(result));
+            return MCRURIResolverResponse.ofString(
+                result == null ? "" : String.valueOf(result));
         } catch (Exception e) {
             throw new TransformerException(e);
         }
     }
+
 }

@@ -1,4 +1,4 @@
 MCRUserAttributeMapper$Mappings
-MCRUserResolver$MCROwns
+MCRUserURIResolver$MCROwns
 MCRUser
 MCRRole

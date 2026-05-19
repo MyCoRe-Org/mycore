@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.common.xml;
+package org.mycore.common.xsl.uriresolver;
 
 import java.util.concurrent.TimeUnit;
 
@@ -31,36 +31,51 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRRateLimitBuckets;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
-import org.mycore.common.xsl.uriresolver.MCRRateLimitURIResolver;
-import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.ConsumptionProbe;
 
 /**
- * URI-Resolver that can limit the processing of downstream URI-Resolver operations.
- * Format ist "ratelimit:&lt;configID&gt;:&lt;anyMyCoReURI&gt;". Specific rate limits can be configured in
- * {@link Bucket Buckets}, see also {@link MCRRateLimitBuckets}.
- *
- * @deprecated Use {@link MCRRateLimitURIResolver} instead.
+ * {@link URIResolver} that limits the rate of downstream URI resolver operations via token buckets.
+ * <p>Rate limit buckets and their behavior are configured via:
+ * <ul>
+ *   <li>{@code MCR.RateLimitResolver.{configId}.Behavior}: one of {@code block}, {@code error}, or {@code empty}</li>
+ * </ul>
+ * See {@link MCRRateLimitBuckets} for bucket configuration.
  */
-@Deprecated(forRemoval = true)
-public class MCRRateLimitResolver implements URIResolver {
+public class MCRRateLimitURIResolver implements URIResolver {
 
     private static final String CONFIG_PREFIX = "MCR.RateLimitResolver.";
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     /**
-     * Expects a configuration of the rate limit of a specific configID. Checks if
-     * limit is reached and handles the configured behavior upon reaching it.
-     * Resolves remaining URI if limit is not yet reached.
-     * @param href An href attribute, which may be relative or absolute.
-     * @param base The base URI against which the first argument will be made
-     * absolute if the absolute URI is required.
+     * Checks the rate limit for the given config ID and resolves the target URI if the limit
+     * has not been reached.
+     * <p>Behavior when the limit is reached depends on the configured {@link RateLimitBehavior}:
+     * {@code block} waits until a token is available, {@code error} throws an exception,
+     * and {@code empty} returns an empty source.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{configId}:{anyMCRUri}
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   ratelimit:myLimit:mcrobject:mcr_document_00000001
+     * </pre>
+     * <p>Example response on success: the resolved content of the target URI.
+     * <p>Example response with {@code empty} behavior:
+     * <pre>{@code
+     *   (empty source)
+     * }</pre>
      *
-     * @return the {@link Source}-object of downstream processing
-     * @throws TransformerException in case resolving of downstream processing leads to an error
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet, passed through to the delegated resolver
+     * @return a {@link Source} wrapping the resolved content, or an empty source if the limit
+     *         is reached and {@code empty} behavior is configured
+     * @throws TransformerException if the target URI cannot be resolved
+     * @throws MCRException if the limit is reached and {@code error} behavior is configured
+     * @throws MCRConfigurationException if the behavior for the given config ID is not configured correctly
      */
     @Override
     public Source resolve(String href, String base) throws TransformerException {
@@ -161,4 +176,5 @@ public class MCRRateLimitResolver implements URIResolver {
      */
     private record BucketConfig(String configId, RateLimitBehavior behavior, Bucket bucket) {
     }
+
 }
