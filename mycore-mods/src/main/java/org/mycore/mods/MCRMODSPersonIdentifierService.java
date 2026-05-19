@@ -18,12 +18,9 @@
 
 package org.mycore.mods;
 
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRConstants;
@@ -47,15 +44,13 @@ import org.mycore.user2.MCRUserManager;
  */
 public class MCRMODSPersonIdentifierService implements MCRLegalEntityService {
 
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final String MODSPERSON_ATTR_NAME = "id_modsperson";
 
-    public static final String MODSPERSON_ATTR_NAME = "id_modsperson";
+    private static final String MODS_NAME = "name";
 
-    public static final String MODS_NAME = "name";
+    private static final String MODS_NAMEIDENTIFIER = "nameIdentifier";
 
-    public static final String MODS_NAMEIDENTIFIER = "nameIdentifier";
-
-    public static final String TYPE = "type";
+    private static final String TYPE = "type";
 
 
     /**
@@ -81,12 +76,9 @@ public class MCRMODSPersonIdentifierService implements MCRLegalEntityService {
      */
     @Override
     public void addIdentifier(MCRIdentifier userId, MCRIdentifier attributeToAdd) throws MCRException {
-        Optional<MCRObject> modspersonOptional = findModspersonByUsername(userId);
-        if (modspersonOptional.isEmpty()) {
-            throw new MCRException("Modsperson object not found for identifier: " + userId);
-        }
-        MCRObjectID modspersonId = modspersonOptional.get().getId();
-        MCRMODSWrapper wrapper = new MCRMODSWrapper(modspersonOptional.get());
+        MCRObject modsperson = findModspersonByUsername(userId);
+        MCRObjectID modspersonId = modsperson.getId();
+        MCRMODSWrapper wrapper = new MCRMODSWrapper(modsperson);
         Element modsName = wrapper.getMODS().getChild(MODS_NAME, MCRConstants.MODS_NAMESPACE);
         if (modsName == null) {
             throw new MCRException("Malformed modsperson object: " + modspersonId);
@@ -96,7 +88,7 @@ public class MCRMODSPersonIdentifierService implements MCRLegalEntityService {
             .setText(attributeToAdd.getValue());
         modsName.addContent(nameIdentifier);
         try {
-            MCRMetadataManager.update(modspersonOptional.get());
+            MCRMetadataManager.update(modsperson);
         } catch (MCRAccessException | MCRPersistenceException e) {
             throw new MCRException("Failed to update modsperson object "
                 + modspersonId + " for identifier: " + userId, e);
@@ -112,13 +104,11 @@ public class MCRMODSPersonIdentifierService implements MCRLegalEntityService {
      * @throws MCRException if the reference to the modsperson isn't found
      */
     private Set<MCRIdentifier> getIdentifiers(MCRIdentifier userId, String identifierType) {
-        Optional<MCRObject> modspersonOptional = findModspersonByUsername(userId);
-        if (modspersonOptional.isEmpty()) {
-            throw new MCRException("Modsperson object not found for identifier: " + userId);
-        }
-        MCRMODSWrapper wrapper = new MCRMODSWrapper(modspersonOptional.get());
+        MCRObject modsperson = findModspersonByUsername(userId);
+
+        MCRMODSWrapper wrapper = new MCRMODSWrapper(modsperson);
         Element modsName = wrapper.getMODS().getChild(MODS_NAME, MCRConstants.MODS_NAMESPACE);
-        MCRObjectID modspersonId = modspersonOptional.get().getId();
+        MCRObjectID modspersonId = modsperson.getId();
 
         if (modsName == null) {
             throw new MCRException("Malformed modsperson object: " + modspersonId);
@@ -137,29 +127,26 @@ public class MCRMODSPersonIdentifierService implements MCRLegalEntityService {
     /**
      * Takes a username and returns an Optional with the referenced modsperson.
      * @param userId the user id
-     * @return a nullable Optional that might contain a modsperson
+     * @return a modsperson object
+     *
+     * @throws MCRException if the modsperson cannot be found via the user id or another error occurs
      */
-    private Optional<MCRObject> findModspersonByUsername(MCRIdentifier userId) {
+    private MCRObject findModspersonByUsername(MCRIdentifier userId) {
         if (userId == null || !MCRIdentifier.USER_ID_TYPE.equals(userId.getType())) {
-            return Optional.empty();
+            throw new MCRException("Invalid user id: " + userId);
         }
         MCRUser user = MCRUserManager.getUser(userId.getValue());
         if (user == null) {
-            return Optional.empty();
+            throw new MCRException("No user found with user id: " + userId);
         }
         String modspersonId = user.getUserAttribute(MODSPERSON_ATTR_NAME);
         if (modspersonId == null) {
-            return Optional.empty();
+            throw new MCRException("No modsperson found for user: " + userId);
         }
         try {
-            MCRObject modsperson = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(modspersonId));
-            return Optional.of(modsperson);
+            return MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(modspersonId));
         } catch (MCRPersistenceException e) {
-            if (LOGGER.isWarnEnabled()) {
-                LOGGER.warn("Could not retrieve modsperson object for user id {} (modspersonId={})",
-                    userId.getValue(), modspersonId, e);
-            }
-            return Optional.empty();
+            throw new MCRException("Error accessing the modsperson object for id " + userId + ":", e);
         }
     }
 }

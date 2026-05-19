@@ -74,8 +74,6 @@ public class MCRORCIDUser {
 
     private final MCRUser user;
 
-    private MCRLegalEntityService legalEntityService = MCRLegalEntityService.obtainInstance();
-
     /**
      * Wraps MCRUser to MCRORCIDUser.
      *
@@ -83,17 +81,6 @@ public class MCRORCIDUser {
      */
     public MCRORCIDUser(MCRUser user) {
         this.user = user;
-    }
-
-    /**
-     * Wraps MCRUser to MCRORCIDUser.
-     *
-     * @param user the MCRUser
-     * @param legalEntityService the {@link MCRLegalEntityService} to use
-     */
-    protected MCRORCIDUser(MCRUser user, MCRLegalEntityService legalEntityService) {
-        this.user = user;
-        this.legalEntityService = legalEntityService;
     }
 
     /**
@@ -119,7 +106,7 @@ public class MCRORCIDUser {
         final MCRIdentifier userid = new MCRIdentifier(MCRIdentifier.USER_ID_TYPE, user.getUserID());
 
         try {
-            legalEntityService.addIdentifier(userid, newOrcid);
+            MCRLegalEntityService.obtainInstance().addIdentifier(userid, newOrcid);
         } catch (MCRException e) {
             throw new MCRORCIDException("ORCID iD could not be added:" + e.getMessage(), e);
         }
@@ -131,7 +118,7 @@ public class MCRORCIDUser {
      */
     public Set<String> getORCIDs() {
         final MCRIdentifier userid = new MCRIdentifier(MCRIdentifier.USER_ID_TYPE, user.getUserID());
-        Set<MCRIdentifier> orcidIdentifiers =  legalEntityService.findAllIdentifiers(userid);
+        Set<MCRIdentifier> orcidIdentifiers = MCRLegalEntityService.obtainInstance().findAllIdentifiers(userid);
         return orcidIdentifiers.stream()
             .filter(identifiers -> identifiers.getType().equals(MCRIdentifier.ORCID_ID_TYPE))
             .map(MCRIdentifier::getValue).collect(Collectors.toSet());
@@ -253,7 +240,7 @@ public class MCRORCIDUser {
      */
     public Set<MCRIdentifier> getIdentifiers() {
         final MCRIdentifier userId = new MCRIdentifier(MCRIdentifier.USER_ID_TYPE, user.getUserID());
-        return legalEntityService.findAllIdentifiers(userId);
+        return MCRLegalEntityService.obtainInstance().findAllIdentifiers(userId);
     }
 
     /**

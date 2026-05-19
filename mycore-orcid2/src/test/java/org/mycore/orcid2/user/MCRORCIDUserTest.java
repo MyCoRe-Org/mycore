@@ -19,12 +19,12 @@
 package org.mycore.orcid2.user;
 
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.datamodel.legalentity.MCRIdentifier;
 import org.mycore.datamodel.legalentity.MCRLegalEntityService;
 import org.mycore.orcid2.client.MCRORCIDCredential;
@@ -33,17 +33,16 @@ import org.mycore.test.MCRJPAExtension;
 import org.mycore.test.MyCoReTest;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserAttribute;
-import org.mycore.user2.MCRUserIdentifierService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.when;
 
 @MyCoReTest
 @ExtendWith(MCRJPAExtension.class)
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.LegalEntityService.Class", string = "org.mycore.orcid2.user.MCRLegalEntityServiceMock")
+})
 public class MCRORCIDUserTest {
 
     private static final String ORCID = "0000-0001-2345-6789";
@@ -59,20 +58,11 @@ public class MCRORCIDUserTest {
     @BeforeEach
     public void prepare() {
         userMock = new MCRUser("junit");
-        MCRLegalEntityService legalEntityServiceMock = Mockito.mock(MCRUserIdentifierService.class);
-        orcidUser = new MCRORCIDUser(userMock, legalEntityServiceMock);
+        orcidUser = new MCRORCIDUser(userMock);
 
-        when(legalEntityServiceMock.findAllIdentifiers(any(MCRIdentifier.class))).thenAnswer(
-            invocation -> userMock.getAttributes()
-        .stream().map(attr -> new MCRIdentifier(stripPrefix(attr.getName()), attr.getValue()))
-        .collect(Collectors.toSet()));
-
-        doAnswer(invocation -> {
-            MCRIdentifier identifierToAdd = invocation.getArgument(1);
-            userMock.getAttributes().add(new MCRUserAttribute(
-                "id_" + identifierToAdd.getType(), identifierToAdd.getValue()));
-            return null;
-        }).when(legalEntityServiceMock).addIdentifier(any(MCRIdentifier.class), any(MCRIdentifier.class));
+        MCRLegalEntityServiceMock legalEntityServiceMock =
+            (MCRLegalEntityServiceMock) MCRLegalEntityService.obtainInstance();
+        legalEntityServiceMock.setUserMock(userMock);
     }
 
     @Test

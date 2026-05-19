@@ -18,7 +18,6 @@
 
 package org.mycore.user2;
 
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -33,7 +32,7 @@ import org.mycore.datamodel.legalentity.MCRLegalEntityService;
  */
 public class MCRUserIdentifierService implements MCRLegalEntityService {
 
-    public static final String ATTR_ID_PREFIX = "id_";
+    private static final String ATTR_ID_PREFIX = "id_";
 
     /**
      * Gets all {@link MCRIdentifier MCRIdentifiers} of a user by its {@link MCRUser#getUserID() user ID}.
@@ -45,8 +44,7 @@ public class MCRUserIdentifierService implements MCRLegalEntityService {
      */
     @Override
     public Set<MCRIdentifier> findAllIdentifiers(MCRIdentifier userId) {
-        MCRUser user = findUserByUserID(userId)
-            .orElseThrow(() -> new MCRException("User not found for identifier: " + userId));
+        MCRUser user = findUserByUserID(userId);
 
         return user.getAttributes().stream()
             .filter(a -> a.getName().startsWith(ATTR_ID_PREFIX))
@@ -63,8 +61,7 @@ public class MCRUserIdentifierService implements MCRLegalEntityService {
      */
     @Override
     public void addIdentifier(MCRIdentifier userId, MCRIdentifier attributeToAdd) {
-        MCRUser user = findUserByUserID(userId)
-            .orElseThrow(() -> new MCRException("User not found for identifier: " + userId));
+        MCRUser user = findUserByUserID(userId);
 
         MCRUserAttribute newAttribute = new MCRUserAttribute(
             ATTR_ID_PREFIX + attributeToAdd.getType(), attributeToAdd.getValue());
@@ -81,17 +78,19 @@ public class MCRUserIdentifierService implements MCRLegalEntityService {
     /**
      * Takes a user id and returns an Optional with the corresponding user.
      * @param userId the user id
-     * @return a nullable Optional that might contain a user
+     * @return a {@link MCRUser user}
+     *
+     * @throws MCRException if the user cannot be found via the user id or another error occurs
      */
-    private Optional<MCRUser> findUserByUserID(MCRIdentifier userId) {
-        if (userId == null) {
-            return Optional.empty();
-        }
-        if (!MCRIdentifier.USER_ID_TYPE.equals(userId.getType())) {
-            return Optional.empty();
+    private MCRUser findUserByUserID(MCRIdentifier userId) {
+        if (userId == null || !MCRIdentifier.USER_ID_TYPE.equals(userId.getType())) {
+            throw new MCRException("Invalid user id: " + userId);
         }
         MCRUser user = MCRUserManager.getUser(userId.getValue());
-        return Optional.ofNullable(user);
+        if (user == null) {
+            throw new MCRException("User not found for identifier: " + userId);
+        }
+        return user;
     }
 
     private String stripPrefix(String name) {

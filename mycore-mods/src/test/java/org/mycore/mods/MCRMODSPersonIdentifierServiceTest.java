@@ -131,7 +131,7 @@ public class MCRMODSPersonIdentifierServiceTest {
     public final void testAddIdentifierNoModsperson() throws MCRAccessException, IOException, JDOMException {
         MCRException exception = assertThrows(MCRException.class, () -> service.findAllIdentifiers(
             new MCRIdentifier(MCRIdentifier.USER_ID_TYPE, "noname")));
-        assertTrue(exception.getMessage().contains("Modsperson object not found"));
+        assertTrue(exception.getMessage().contains("No user found with user id"));
         assertTrue(exception.getMessage().contains("userid:noname"));
 
         MCRUser user3 = new MCRUser("james");
@@ -141,16 +141,16 @@ public class MCRMODSPersonIdentifierServiceTest {
 
         final MCRIdentifier userid = new MCRIdentifier(MCRIdentifier.USER_ID_TYPE, user3.getUserID());
         exception = assertThrows(MCRException.class, () -> service.findAllIdentifiers(userid));
-        assertTrue(exception.getMessage().contains("Modsperson object not found"));
+        assertTrue(exception.getMessage().contains("No modsperson found for user"));
 
         exception = assertThrows(MCRException.class, () -> service.addIdentifier(userid,
             new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_2)));
-        assertTrue(exception.getMessage().contains("Modsperson object not found"));
+        assertTrue(exception.getMessage().contains("No modsperson found for user"));
 
         user3.setUserAttribute("id_modsperson", "junit_modsperson_00000404");
         MCRUserManager.updateUser(user3);
         exception = assertThrows(MCRException.class, () -> service.findAllIdentifiers(userid));
-        assertTrue(exception.getMessage().contains("Modsperson object not found"));
+        assertTrue(exception.getMessage().contains("Error accessing the modsperson object for id"));
 
         URL url3 = MCRObjectMetadataTest.class.getResource(
             "/MCRMODSPersonIdentifierServiceTest/junit_modsperson_00000003.xml");
