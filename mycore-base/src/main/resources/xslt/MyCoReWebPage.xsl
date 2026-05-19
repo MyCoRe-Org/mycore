@@ -4,6 +4,7 @@
 ]>
 <xsl:stylesheet version="3.0"
   xmlns:mcri18n="http://www.mycore.de/xslt/i18n"
+  xmlns:mcrlayoututils="http://www.mycore.de/xslt/layoututils"
   xmlns:mcrwebpage="http://www.mycore.de/MyCoReWebPage"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   exclude-result-prefixes="#all">
@@ -141,6 +142,20 @@
     <xsl:value-of select="mcri18n:translate(@key)" />
   </xsl:template>
 
+  <!-- =============================================================================== -->
+
+  <xsl:template match="desktop">
+    <xsl:if test="not(mcrlayoututils:isMobileDevice($UserAgent))">
+      <xsl:apply-templates/>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template match="mobile">
+    <xsl:if test="mcrlayoututils:isMobileDevice($UserAgent)">
+      <xsl:apply-templates/>
+    </xsl:if>
+  </xsl:template>
+  
   <!-- =============================================================================== -->
 
   <!-- Dynamic includes -->
