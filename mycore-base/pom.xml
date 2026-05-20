@@ -39,7 +39,7 @@
             <configuration>
               <usedDependencies>
                 <!-- used by commons-vfs -->
-                <useDependency>com.jcraft:jsch</useDependency>
+                <useDependency>com.github.mwiede:jsch</useDependency>
                 <!-- used by svnkit -->
                 <useDependency>net.java.dev.jna:jna</useDependency>
                 <!-- used in hibernate tests -->
@@ -175,6 +175,11 @@
       <artifactId>woodstox-core</artifactId>
     </dependency>
     <dependency>
+      <!-- required for commons-vfs -->
+      <groupId>com.github.mwiede</groupId>
+      <artifactId>jsch</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.github.spotbugs</groupId>
       <artifactId>spotbugs-annotations</artifactId>
     </dependency>
@@ -201,11 +206,6 @@
     <dependency>
       <groupId>com.ibm.icu</groupId>
       <artifactId>icu4j</artifactId>
-    </dependency>
-    <dependency>
-      <!-- required for commons-vfs -->
-      <groupId>com.jcraft</groupId>
-      <artifactId>jsch</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-beanutils</groupId>
