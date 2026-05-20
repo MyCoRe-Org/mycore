@@ -22,6 +22,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -46,7 +47,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * given base id. The cache file is located in the data directory of MyCoRe and is named "id_cache" and contains one
  * file for each base id. The file contains the last generated id as a string.
  */
-public class MCRFileBaseCacheObjectIDGenerator implements MCRObjectIDGenerator {
+public class MCRFileBaseCacheObjectIDGenerator implements MCRTrackingObjectIDGenerator {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -139,7 +140,56 @@ public class MCRFileBaseCacheObjectIDGenerator implements MCRObjectIDGenerator {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * If the cache file for the base ID of {@code id} is missing, empty or contains an ID lower
+     * than {@code id}, the cache file is updated to {@code id}. Otherwise the call is a no-op.
+     */
+    @Override
     @SuppressWarnings("PMD.AvoidDuplicateLiterals")
+    public void recordID(MCRObjectID id) {
+        String baseId = id.getBase();
+        Path cacheFile = getCacheFilePath(baseId);
+
+        ReentrantReadWriteLock lock = LOCKS.computeIfAbsent(baseId, k -> new ReentrantReadWriteLock());
+        ReentrantReadWriteLock.WriteLock writeLock = lock.writeLock();
+
+        try {
+            writeLock.lock();
+            try (
+                FileChannel channel = FileChannel.open(cacheFile, StandardOpenOption.READ, StandardOpenOption.WRITE,
+                    StandardOpenOption.SYNC);
+                @SuppressWarnings("PMD.UnusedLocalVariable")
+                FileLock fileLock = channel.lock()) {
+
+                int idLengthInBytes = MCRObjectID.formatID(baseId, 1).getBytes(StandardCharsets.UTF_8).length;
+                ByteBuffer buffer = ByteBuffer.allocate(idLengthInBytes);
+                buffer.clear();
+                channel.position(0);
+                int bytesRead = channel.read(buffer);
+                if (bytesRead > 0 && bytesRead != idLengthInBytes) {
+                    throw new MCRException("Content has different id length " + cacheFile.toAbsolutePath());
+                }
+                if (bytesRead == idLengthInBytes) {
+                    buffer.flip();
+                    MCRObjectID cached = readObjectIDFromBuffer(idLengthInBytes, buffer);
+                    if (cached.getNumberAsInteger() >= id.getNumberAsInteger()) {
+                        return;
+                    }
+                }
+                writeNewID(id, buffer, channel, cacheFile);
+            } catch (FileNotFoundException e) {
+                throw new MCRException("Could not create " + cacheFile.toAbsolutePath(), e);
+            } catch (IOException e) {
+                throw new MCRException("Could not open " + cacheFile.toAbsolutePath(), e);
+            }
+        } finally {
+            writeLock.unlock();
+        }
+    }
+
+
     @Override
     public MCRObjectID getNextFreeId(String baseId, int maxInWorkflow) {
         Path cacheFile = getCacheFilePath(baseId);
