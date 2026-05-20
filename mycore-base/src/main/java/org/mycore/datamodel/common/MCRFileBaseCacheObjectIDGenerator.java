@@ -189,7 +189,6 @@ public class MCRFileBaseCacheObjectIDGenerator implements MCRTrackingObjectIDGen
         }
     }
 
-
     @Override
     public MCRObjectID getNextFreeId(String baseId, int maxInWorkflow) {
         Path cacheFile = getCacheFilePath(baseId);
@@ -203,7 +202,9 @@ public class MCRFileBaseCacheObjectIDGenerator implements MCRTrackingObjectIDGen
             writeLock.lock();
             try (
                 FileChannel channel = FileChannel.open(cacheFile, StandardOpenOption.READ, StandardOpenOption.WRITE,
-                    StandardOpenOption.SYNC)) {
+                    StandardOpenOption.SYNC);
+                @SuppressWarnings("PMD.UnusedLocalVariable")
+                FileLock fileLock = channel.lock()) {
 
                 int idLengthInBytes = MCRObjectID.formatID(baseId, 1).getBytes(StandardCharsets.UTF_8).length;
                 ByteBuffer buffer = ByteBuffer.allocate(idLengthInBytes);
