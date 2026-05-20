@@ -19,10 +19,9 @@
 package org.mycore.common.xsl.uriresolver;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Objects;
+import java.util.function.Supplier;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
@@ -33,6 +32,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRInstance;
+import org.mycore.common.config.annotation.MCRInstanceMap;
+import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.content.transformer.MCRXSLTransformer;
 import org.mycore.common.xsl.MCRParameterCollector;
@@ -41,49 +44,32 @@ import org.mycore.common.xsl.MCRXSLResourceHelper;
 /**
  * {@link URIResolver} that resolves a URI and transforms its result using one or more XSL stylesheets.
  */
+@MCRConfigurationProxy(proxyClass = MCRXSLStyleURIResolver.Factory.class)
 public class MCRXSLStyleURIResolver implements URIResolver {
 
     private static final Logger LOGGER = LogManager.getLogger();
-
-    private static final String CONFIG_PREFIX = "MCR.URIResolver.XSLStyle.Flavor.";
 
     private static final String FLAVOR_PARAMETER = "xslStyleFlavor";
 
     private final Flavor defaultFlavor;
 
-    private final Map<String, Flavor> flavors;
+    private final Map<String, Flavor> flavorMap;
 
-    public MCRXSLStyleURIResolver() {
-        Class<? extends TransformerFactory> defaultFactoryClass = MCRConfiguration2
-            .<TransformerFactory>getClass("MCR.LayoutService.TransformerFactoryClass")
-            .orElseGet(TransformerFactory.newInstance()::getClass);
-
-        defaultFlavor = new Flavor(defaultFactoryClass, MCRXSLResourceHelper.getXSLFolder());
+    /**
+     * Creates a new {@code MCRXSLStyleURIResolver} with the given default flavor and named flavor map.
+     *
+     * @param defaultFlavor the flavor used when no flavor name is present in the URI or as a query
+     *                      parameter; must not be {@code null}
+     * @param flavorMap map of flavor names to {@link Flavor} instances for named flavor lookup;
+     *                  must not be {@code null}
+     */
+    public MCRXSLStyleURIResolver(Flavor defaultFlavor, Map<String, Flavor> flavorMap) {
+        this.defaultFlavor = defaultFlavor;
+        this.flavorMap = flavorMap;
         LOGGER.info("Working with default flavor {}", defaultFlavor);
-
-        flavors = new HashMap<>();
-        for (String flavorName : getFlavorNames()) {
-            String factoryClassProperty = CONFIG_PREFIX + flavorName + ".TransformerFactoryClass";
-            Class<? extends TransformerFactory> factoryClass = MCRConfiguration2
-                .<TransformerFactory>getClass(factoryClassProperty)
-                .orElseThrow(() -> MCRConfiguration2.createConfigurationException(factoryClassProperty));
-
-            String xslFolderProperty = CONFIG_PREFIX + flavorName + ".XSLFolder";
-            String xslFolder = MCRConfiguration2.getStringOrThrow(xslFolderProperty);
-
-            Flavor flavor = new Flavor(factoryClass, xslFolder);
+        flavorMap.forEach((flavorName, flavor) -> {
             LOGGER.info("Working with {} flavor {}", flavorName, flavor);
-            flavors.put(flavorName, flavor);
-        }
-    }
-
-    private static Set<String> getFlavorNames() {
-        return MCRConfiguration2
-            .getSubPropertiesMap(CONFIG_PREFIX)
-            .keySet()
-            .stream()
-            .map(key -> key.substring(0, key.indexOf('.')))
-            .collect(Collectors.toSet());
+        });
     }
 
     /**
@@ -136,7 +122,7 @@ public class MCRXSLStyleURIResolver implements URIResolver {
         }
 
         if (!flavorName.isEmpty()) {
-            flavor = flavors.get(flavorName);
+            flavor = flavorMap.get(flavorName);
             if (flavor == null) {
                 throw new MCRUsageException("Unknown flavor " + flavorName + " in " + href);
             }
@@ -167,7 +153,7 @@ public class MCRXSLStyleURIResolver implements URIResolver {
 
             if (flavorName.isEmpty() && flavorParameter != null && !flavorParameter.isBlank()) {
                 flavorName = flavorParameter;
-                flavor = flavors.get(flavorName);
+                flavor = flavorMap.get(flavorName);
                 if (flavor == null) {
                     throw new MCRUsageException("Unknown flavor " + flavorName + " in " + href);
                 }
@@ -176,8 +162,8 @@ public class MCRXSLStyleURIResolver implements URIResolver {
             // prepare transformer
             String[] stylesheets = augmentStylesheetsPaths(stylesheetPaths.split(","),
                 flavor.xslFolder);
-            MCRXSLTransformer transformer = MCRXSLTransformer.obtainInstance(flavor.transformerFactory,
-                stylesheets);
+            MCRXSLTransformer transformer =
+                MCRXSLTransformer.obtainInstance(flavor.getTransformerFactory(), stylesheets);
 
             //prepare parameter collector
             MCRParameterCollector parameterCollector = MCRParameterCollector.ofCurrentSession();
@@ -198,7 +184,85 @@ public class MCRXSLStyleURIResolver implements URIResolver {
         return stylesheets;
     }
 
-    private record Flavor(Class<? extends TransformerFactory> transformerFactory, String xslFolder) {
+    /**
+     * Represents a named combination of a {@link TransformerFactory} class and an XSL folder.
+     */
+    public static class Flavor {
+
+        private Class<? extends TransformerFactory> transformerFactory;
+
+        private String xslFolder;
+
+        public Flavor() {
+
+        }
+
+        public Flavor(Class<? extends TransformerFactory> transformerFactory, String xslFolder) {
+            this.transformerFactory = transformerFactory;
+            this.xslFolder = xslFolder;
+        }
+
+        public Class<? extends TransformerFactory> getTransformerFactory() {
+            return transformerFactory;
+        }
+
+        public void setTransformerFactory(Class<? extends TransformerFactory> transformerFactory) {
+            this.transformerFactory = transformerFactory;
+        }
+
+        @MCRInstance(name = "TransformerFactory", valueClass = TransformerFactory.class)
+        public void setTransformerFactoryInstance(TransformerFactory transformerFactory) {
+            this.transformerFactory = transformerFactory.getClass();
+        }
+
+        public String getXslFolder() {
+            return xslFolder;
+        }
+
+        @MCRProperty(name = "XSLFolder")
+        public void setXslFolder(String xslFolder) {
+            this.xslFolder = xslFolder;
+        }
+
+        @Override
+        public String toString() {
+            return "Flavor[transformerFactory=" + transformerFactory + ", xslFolder=" + xslFolder + "]";
+        }
+
+    }
+
+    /**
+     * Factory that creates {@link MCRXSLStyleURIResolver} instances from MyCoRe configuration properties.
+     */
+    public static class Factory implements Supplier<MCRXSLStyleURIResolver> {
+
+        /**
+         * Optional explicit default flavor. If {@code null}, the default flavor is derived
+         * from {@code MCR.LayoutService.TransformerFactoryClass} and
+         * {@link MCRXSLResourceHelper#getXSLFolder()}.
+         */
+        @MCRInstance(name = "DefaultFlavor", valueClass = Flavor.class, required = false)
+        public Flavor defaultFlavor;
+
+        /**
+         * Optional map of named flavors, keyed by flavor name.
+         */
+        @MCRInstanceMap(name = "Flavor", required = false, valueClass = Flavor.class)
+        public Map<String, Flavor> flavorMap;
+
+        @Override
+        public MCRXSLStyleURIResolver get() {
+            return new MCRXSLStyleURIResolver(Objects.requireNonNullElseGet(defaultFlavor, this::getDefaultFlavor),
+                flavorMap);
+        }
+
+        private Flavor getDefaultFlavor() {
+            Class<? extends TransformerFactory> factory =
+                MCRConfiguration2.<TransformerFactory>getClass("MCR.LayoutService.TransformerFactoryClass")
+                    .orElseGet(TransformerFactory.newInstance()::getClass);
+            return new Flavor(factory, MCRXSLResourceHelper.getXSLFolder());
+        }
+
     }
 
 }

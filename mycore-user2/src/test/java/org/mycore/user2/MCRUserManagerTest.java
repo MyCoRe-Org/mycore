@@ -50,8 +50,8 @@ import org.mycore.user2.utils.MCRUserTransformer;
 @MyCoReTest
 @ExtendWith({ MCRJPAExtension.class, MCRUserExtension.class })
 @MCRTestConfiguration(properties = {
-    @MCRTestProperty(key = "MCR.URIResolver.CachingResolver.Capacity", string = "0"),
-    @MCRTestProperty(key = "MCR.URIResolver.CachingResolver.MaxAge", string = "0")
+    @MCRTestProperty(key = "MCR.URIResolver.ModuleResolver.cache.CacheCapacity", string = "0"),
+    @MCRTestProperty(key = "MCR.URIResolver.ModuleResolver.cache.MaxAge", string = "0")
 })
 public class MCRUserManagerTest {
     MCRUser user;
@@ -138,7 +138,7 @@ public class MCRUserManagerTest {
         MCRUserManager.updateUser(this.user);
         MCRJPATestHelper.startNewTransaction();
         MCRUser user = MCRUserManager.getUser(this.user.getUserName(), this.user.getRealm());
-        assertEquals( eMail, user.getEMail(), "User information was not updated");
+        assertEquals(eMail, user.getEMail(), "User information was not updated");
         assertEquals(1, MCRUserManager.countUsers(null, null, null, null), "User was created not updated");
         assertTrue(user.getSystemRoleIDs().contains(groupName), "User is not in group " + groupName);
 

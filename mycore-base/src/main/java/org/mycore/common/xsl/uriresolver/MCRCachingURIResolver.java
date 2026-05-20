@@ -18,6 +18,8 @@
 
 package org.mycore.common.xsl.uriresolver;
 
+import java.util.function.Supplier;
+
 import javax.xml.transform.Source;
 import javax.xml.transform.URIResolver;
 
@@ -26,16 +28,13 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.common.MCRCache;
-import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRProperty;
 
 /**
  * {@link URIResolver} that resolves XML content from a URI and caches the result for re-use.
- * <p>Cache capacity and maximum age are configured via:
- * <ul>
- *   <li>{@code MCR.URIResolver.CachingResolver.Capacity}: maximum number of cached entries</li>
- *   <li>{@code MCR.URIResolver.CachingResolver.MaxAge}: maximum age of a cache entry in milliseconds</li>
- * </ul>
  */
+@MCRConfigurationProxy(proxyClass = MCRCachingURIResolver.Factory.class)
 public class MCRCachingURIResolver implements URIResolver {
 
     private final static Logger LOGGER = LogManager.getLogger();
@@ -44,11 +43,16 @@ public class MCRCachingURIResolver implements URIResolver {
 
     private final long maxAge;
 
-    public MCRCachingURIResolver() {
-        String configPrefix = "MCR.URIResolver.CachingResolver";
-        int capacity = MCRConfiguration2.getOrThrow(configPrefix + ".Capacity", Integer::parseInt);
-        maxAge = MCRConfiguration2.getOrThrow(configPrefix + ".MaxAge", Long::parseLong);
-        cache = new MCRCache<>(capacity, MCRCachingURIResolver.class.getName());
+    /**
+     * Creates a new {@code MCRCachingURIResolver} with the given cache capacity and maximum entry age.
+     *
+     * @param cacheCapacity maximum number of entries the cache may hold
+     * @param maxAge maximum age of a cache entry in milliseconds;
+     *               entries older than this are resolved again on the next access
+     */
+    public MCRCachingURIResolver(int cacheCapacity, long maxAge) {
+        this.cache = new MCRCache<>(cacheCapacity, MCRCachingURIResolver.class.getName());
+        this.maxAge = maxAge;
     }
 
     /**
@@ -89,6 +93,30 @@ public class MCRCachingURIResolver implements URIResolver {
         }
 
         return new JDOMSource(resolvedXML);
+    }
+
+    /**
+     * Factory that creates {@link MCRCachingURIResolver} instances from MyCoRe configuration properties.
+     */
+    public static class Factory implements Supplier<MCRCachingURIResolver> {
+
+        /**
+         * Maximum number of entries the cache may hold.
+         */
+        @MCRProperty(name = "CacheCapacity")
+        public String capacity;
+
+        /**
+         * Maximum age of a cache entry in milliseconds before it is considered stale.
+         */
+        @MCRProperty(name = "CacheMaxAge")
+        public String maxAge;
+
+        @Override
+        public MCRCachingURIResolver get() {
+            return new MCRCachingURIResolver(Integer.parseInt(capacity), Long.parseLong(maxAge));
+        }
+
     }
 
 }

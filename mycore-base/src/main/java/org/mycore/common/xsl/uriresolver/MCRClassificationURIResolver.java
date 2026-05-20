@@ -19,8 +19,10 @@
 package org.mycore.common.xsl.uriresolver;
 
 import java.net.URISyntaxException;
+import java.util.Map;
 import java.util.Objects;
 import java.util.StringTokenizer;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,7 +34,10 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.common.MCRCache;
-import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.config.annotation.MCRPropertyMap;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
@@ -45,22 +50,35 @@ import org.mycore.datamodel.common.MCRXMLMetadataManager;
  * <p>Results are cached and invalidated based on the last modification time of the
  * classification and XML metadata store.
  */
+@MCRConfigurationProxy(proxyClass = MCRClassificationURIResolver.Factory.class)
 public class MCRClassificationURIResolver implements URIResolver {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final Pattern EDITORFORMAT_PATTERN = Pattern.compile("(\\[)([^\\]]*)(\\])");
 
-    private static final String CONFIG_PREFIX = "MCR.URIResolver.Classification.";
+    private final Map<String, String> formatMap;
+
+    private final Map<String, Boolean> sortMap;
 
     private final MCRCache<String, Element> categoryCache;
 
     private final MCRCategoryDAO dao;
 
-    public MCRClassificationURIResolver() {
-        int cacheCapacity = MCRConfiguration2.getOrThrow(CONFIG_PREFIX + "CacheSize", Integer::parseInt);
+    /**
+     * Creates a new {@code MCRClassificationURIResolver} with the given settings.
+     *
+     * @param cacheCapacity maximum number of entries the cache may hold
+     * @param formatMap map of format alias names to label format strings
+     * @param sortMap map of classification IDs to sort flags;
+     *                if a classification ID is absent, categories are sorted by default
+     */
+    public MCRClassificationURIResolver(int cacheCapacity, Map<String, String> formatMap,
+        Map<String, Boolean> sortMap) {
         categoryCache = new MCRCache<>(cacheCapacity, "URIResolver categories");
         dao = MCRCategoryDAO.obtainInstance();
+        this.formatMap = formatMap;
+        this.sortMap = sortMap;
     }
 
     /**
@@ -110,17 +128,21 @@ public class MCRClassificationURIResolver implements URIResolver {
         return uri;
     }
 
-    private static String getLabelFormat(String editorString) {
+    private String getLabelFormat(String editorString) {
         Matcher m = EDITORFORMAT_PATTERN.matcher(editorString);
         if (m.find() && m.groupCount() == 3) {
             String formatDef = m.group(2);
-            return MCRConfiguration2.getStringOrThrow(CONFIG_PREFIX + "Format." + formatDef);
+            String result = formatMap.get(formatDef);
+            if (result == null) {
+                throw new MCRConfigurationException("Format " + formatDef + " is not configured");
+            }
+            return result;
         }
         return null;
     }
 
-    private static boolean shouldSortCategories(String classId) {
-        return MCRConfiguration2.getBoolean(CONFIG_PREFIX + "Sort." + classId).orElse(true);
+    private boolean shouldSortCategories(String classId) {
+        return sortMap.getOrDefault(classId, true);
     }
 
     private long getSystemLastModified() {
@@ -203,7 +225,7 @@ public class MCRClassificationURIResolver implements URIResolver {
         return cl;
     }
 
-    private static Element getElement(String uri, String format, String classID, MCRCategory cl,
+    private Element getElement(String uri, String format, String classID, MCRCategory cl,
         boolean emptyLeaves) {
         Element returns;
         LOGGER.debug("start transformation of ClassificationQuery");
@@ -225,6 +247,37 @@ public class MCRClassificationURIResolver implements URIResolver {
         }
         LOGGER.debug("end resolving {}", uri);
         return returns;
+    }
+
+    /**
+     * Factory that creates {@link MCRClassificationURIResolver} instances from MyCoRe configuration properties.
+     */
+    public static class Factory implements Supplier<MCRClassificationURIResolver> {
+
+        /**
+         * Maximum number of entries the cache may hold.
+         */
+        @MCRProperty(name = "CacheCapacity")
+        public String capacity;
+
+        /**
+         * Map of format alias names to label format strings.
+         */
+        @MCRPropertyMap(name = "Format")
+        public Map<String, String> formatMap;
+
+        /**
+         * Optional map of classification IDs to sort flags.
+         * Classifications absent from this map are sorted by default.
+         */
+        @MCRPropertyMap(name = "Sort", required = false)
+        public Map<String, Boolean> sortMap;
+
+        @Override
+        public MCRClassificationURIResolver get() {
+            return new MCRClassificationURIResolver(Integer.parseInt(capacity), formatMap, sortMap);
+        }
+
     }
 
 }

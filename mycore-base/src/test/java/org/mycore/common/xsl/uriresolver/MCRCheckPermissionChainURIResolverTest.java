@@ -42,7 +42,8 @@ import org.mycore.test.MyCoReTest;
 @MCRTestConfiguration(properties = {
     @MCRTestProperty(key = "MCR.Access.Class", classNameOf = MCRAccessMock.class),
     @MCRTestProperty(
-        key = "MCR.URIResolver.ModuleResolver." + MCRCheckPermissionChainURIResolverTest.MOCK_RESOLVER_PREFIX,
+        key = "MCR.URIResolver.ModuleResolver." + MCRCheckPermissionChainURIResolverTest.MOCK_RESOLVER_PREFIX
+            + ".Class",
         classNameOf = MCRMockResolver.class),
     @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true")
 })

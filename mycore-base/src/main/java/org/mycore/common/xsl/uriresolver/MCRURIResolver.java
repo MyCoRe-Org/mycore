@@ -38,6 +38,7 @@ import org.apache.logging.log4j.MarkerManager;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRFactory;
 import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.xml.MCREntityResolver;
@@ -64,7 +65,7 @@ public class MCRURIResolver implements URIResolver {
 
     private Map<String, URIResolver> supportedSchemes;
 
-    private MCRResolverProvider extResolver;
+    private MCRURIResolverProvider extResolver;
 
     public MCRURIResolver() {
         reinitialize();
@@ -84,9 +85,9 @@ public class MCRURIResolver implements URIResolver {
         }
     }
 
-    private static MCRResolverProvider getExternalResolverProvider() {
+    private static MCRURIResolverProvider getExternalResolverProvider() {
         return MCRConfiguration2
-            .getInstanceOf(MCRResolverProvider.class, CONFIG_PREFIX + "ExternalResolver.Class")
+            .getInstanceOf(MCRURIResolverProvider.class, CONFIG_PREFIX + "ExternalResolver.Class")
             .orElse(HashMap::new);
     }
 
@@ -125,7 +126,7 @@ public class MCRURIResolver implements URIResolver {
 
     private Map<String, URIResolver> getResolverMapping() {
         final Map<String, URIResolver> extResolverMapping = extResolver.getURIResolverMapping();
-        extResolverMapping.putAll(new MCRModuleResolverProvider().getURIResolverMapping());
+        extResolverMapping.putAll(new MCRURIModuleResolverProvider().getURIResolverMapping());
         // set Map to final size with loadfactor: full
         Map<String, URIResolver> supportedSchemes = new HashMap<>(10 + extResolverMapping.size(), 1);
         supportedSchemes.putAll(extResolverMapping);
@@ -303,7 +304,7 @@ public class MCRURIResolver implements URIResolver {
      *
      * @author Thomas Scheffler
      */
-    public interface MCRResolverProvider {
+    public interface MCRURIResolverProvider {
         /**
          * provides a Map of URIResolver mappings. Key is the scheme, e.g. <code>http</code>, where value is an
          * implementation of {@link URIResolver}.
@@ -314,12 +315,19 @@ public class MCRURIResolver implements URIResolver {
         Map<String, URIResolver> getURIResolverMapping();
     }
 
-    private static class MCRModuleResolverProvider implements MCRResolverProvider {
+    private static class MCRURIModuleResolverProvider implements MCRURIResolverProvider {
         private final Map<String, URIResolver> resolverMap = new HashMap<>();
 
-        MCRModuleResolverProvider() {
-            MCRConfiguration2.getSubPropertiesMap(CONFIG_PREFIX + "ModuleResolver.")
-                .forEach(this::registerUriResolver);
+        MCRURIModuleResolverProvider() {
+            MCRConfiguration2.getInstantiatablePropertyKeys(CONFIG_PREFIX + "ModuleResolver.")
+                .forEach(k -> {
+                    if (!k.endsWith(".Class")) {
+                        throw new MCRConfigurationException(k + " is not a valid module resolver");
+                    }
+                    String[] parts = k.split("\\.");
+                    String scheme = parts[parts.length - 2];
+                    registerUriResolver(scheme, k);
+                });
         }
 
         @Override
@@ -327,11 +335,11 @@ public class MCRURIResolver implements URIResolver {
             return resolverMap;
         }
 
-        private void registerUriResolver(String scheme, String className) {
+        private void registerUriResolver(String scheme, String propertyName) {
             try {
-                resolverMap.put(scheme, MCRConfiguration2.instantiateClass(URIResolver.class, className));
-            } catch (RuntimeException re) {
-                throw new MCRException("Cannot instantiate " + className + " for URI scheme " + scheme, re);
+                resolverMap.put(scheme, MCRConfiguration2.getInstanceOfOrThrow(URIResolver.class, propertyName));
+            } catch (MCRConfigurationException re) {
+                throw new MCRException("Cannot instantiate " + propertyName + " for URI scheme " + scheme, re);
             }
         }
 

@@ -20,26 +20,33 @@ package org.mycore.common.xsl.uriresolver;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.function.Supplier;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 
 import org.mycore.common.MCRHTTPClient;
-import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRInstance;
 
 /**
  * {@link URIResolver} that fetches XML content from a remote HTTP or HTTPS endpoint.
- * <p>The HTTP client used for requests is configured via {@code MCR.HTTPClient.Class}.
+ *
+ * @see MCRHTTPClient
  */
+@MCRConfigurationProxy(proxyClass = MCRHTTPURIResolver.Factory.class)
 public class MCRHTTPURIResolver implements URIResolver {
-
-    private static final String HTTP_CLIENT_CLASS = "MCR.HTTPClient.Class";
 
     private final MCRHTTPClient client;
 
-    public MCRHTTPURIResolver() {
-        this.client = MCRConfiguration2.getInstanceOfOrThrow(MCRHTTPClient.class, HTTP_CLIENT_CLASS);
+    /**
+     * Creates a new {@code MCRHTTPURIResolver} that uses the given HTTP client for all requests.
+     *
+     * @param client the HTTP client to use; must not be {@code null}
+     */
+    public MCRHTTPURIResolver(MCRHTTPClient client) {
+        this.client = client;
     }
 
     /**
@@ -71,4 +78,21 @@ public class MCRHTTPURIResolver implements URIResolver {
         }
     }
 
+    /**
+     * Factory that creates {@link MCRHTTPURIResolver} instances from MyCoRe configuration properties.
+     */
+    public static class Factory implements Supplier<MCRHTTPURIResolver> {
+
+        /**
+         * The HTTP client implementation used to perform GET requests.
+         */
+        @MCRInstance(name = "Client", valueClass = MCRHTTPClient.class)
+        public MCRHTTPClient client;
+
+        @Override
+        public MCRHTTPURIResolver get() {
+            return new MCRHTTPURIResolver(client);
+        }
+
+    }
 }
