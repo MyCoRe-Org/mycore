@@ -62,8 +62,8 @@ public class MCRUserIdentifierServiceTest {
     }
 
     @Test
-    public final void testFindAllIdentifiers() {
-        Set<MCRIdentifier> allIdentifiers = service.findAllIdentifiers(
+    public final void testGetAllIdentifiers() {
+        Set<MCRIdentifier> allIdentifiers = service.getAllIdentifiers(
             new MCRIdentifier(MCRIdentifier.USER_ID_TYPE, user.getUserID()));
         Set<MCRIdentifier> expected = Set.of(new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_1),
             new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_2),
@@ -82,15 +82,15 @@ public class MCRUserIdentifierServiceTest {
 
         final MCRIdentifier userid = new MCRIdentifier(MCRIdentifier.USER_ID_TYPE, user1.getUserID());
 
-        Set<MCRIdentifier> allIdentifiers = service.findAllIdentifiers(userid);
+        Set<MCRIdentifier> allIdentifiers = service.getAllIdentifiers(userid);
         assertEquals(2, allIdentifiers.size());
 
         service.addIdentifier(userid, new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_1)); // don't add id twice
-        allIdentifiers = service.findAllIdentifiers(userid);
+        allIdentifiers = service.getAllIdentifiers(userid);
         assertEquals(2, allIdentifiers.size());
 
         service.addIdentifier(userid, new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_3));
-        allIdentifiers = service.findAllIdentifiers(userid);
+        allIdentifiers = service.getAllIdentifiers(userid);
         assertEquals(3, allIdentifiers.size());
         Set<MCRIdentifier> expected = Set.of(new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_1),
             new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_2),
@@ -102,7 +102,7 @@ public class MCRUserIdentifierServiceTest {
     public final void testNoUser() {
         MCRIdentifier nonameUserid = new MCRIdentifier(MCRIdentifier.USER_ID_TYPE, "noname");
 
-        MCRException exception = assertThrows(MCRException.class, () -> service.findAllIdentifiers(nonameUserid));
+        MCRException exception = assertThrows(MCRException.class, () -> service.getAllIdentifiers(nonameUserid));
         assertTrue(exception.getMessage().contains("User not found for identifier:"));
         assertTrue(exception.getMessage().contains("userid:noname"));
 
@@ -114,7 +114,7 @@ public class MCRUserIdentifierServiceTest {
         user = new MCRUser("noname");
         MCRUserManager.createUser(user);
 
-        Set<MCRIdentifier> allIdentifiers = service.findAllIdentifiers(nonameUserid);
+        Set<MCRIdentifier> allIdentifiers = service.getAllIdentifiers(nonameUserid);
         assertEquals(0, allIdentifiers.size());
     }
 }

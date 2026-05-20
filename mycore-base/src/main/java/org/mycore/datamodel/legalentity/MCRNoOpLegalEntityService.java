@@ -22,12 +22,12 @@ import java.util.Set;
 
 /**
  * This implementation is a fallback only. Another implementation of {@link MCRLegalEntityService} should
- * be configured when using the service.
+ * be configured when using the service. This implementation is silent an will not throw exceptions.
  */
 public class MCRNoOpLegalEntityService implements MCRLegalEntityService {
 
     @Override
-    public Set<MCRIdentifier> findAllIdentifiers(MCRIdentifier identifier) {
+    public Set<MCRIdentifier> getAllIdentifiers(MCRIdentifier identifier) {
         return Set.of();
     }
 

@@ -86,8 +86,8 @@ public class MCRMODSPersonIdentifierServiceTest {
     }
 
     @Test
-    public final void testFindAllIdentifiers() {
-        Set<MCRIdentifier> allIdentifiers = service.findAllIdentifiers(
+    public final void testGetAllIdentifiers() {
+        Set<MCRIdentifier> allIdentifiers = service.getAllIdentifiers(
             new MCRIdentifier(MCRIdentifier.USER_ID_TYPE, user.getUserID()));
         Set<MCRIdentifier> expected = Set.of(new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_1),
             new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_2),
@@ -111,15 +111,15 @@ public class MCRMODSPersonIdentifierServiceTest {
         MCRUserManager.createUser(user2);
 
         final MCRIdentifier userid = new MCRIdentifier(MCRIdentifier.USER_ID_TYPE, user2.getUserID());
-        Set<MCRIdentifier> allIdentifiers = service.findAllIdentifiers(userid);
+        Set<MCRIdentifier> allIdentifiers = service.getAllIdentifiers(userid);
         assertEquals(2, allIdentifiers.size());
 
         service.addIdentifier(userid, new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_1)); // don't add id twice
-        allIdentifiers = service.findAllIdentifiers(userid);
+        allIdentifiers = service.getAllIdentifiers(userid);
         assertEquals(2, allIdentifiers.size());
 
         service.addIdentifier(userid, new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_3));
-        allIdentifiers = service.findAllIdentifiers(userid);
+        allIdentifiers = service.getAllIdentifiers(userid);
         assertEquals(3, allIdentifiers.size());
         Set<MCRIdentifier> expected = Set.of(new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_1),
             new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_2),
@@ -129,7 +129,7 @@ public class MCRMODSPersonIdentifierServiceTest {
 
     @Test
     public final void testAddIdentifierNoModsperson() throws MCRAccessException, IOException, JDOMException {
-        MCRException exception = assertThrows(MCRException.class, () -> service.findAllIdentifiers(
+        MCRException exception = assertThrows(MCRException.class, () -> service.getAllIdentifiers(
             new MCRIdentifier(MCRIdentifier.USER_ID_TYPE, "noname")));
         assertTrue(exception.getMessage().contains("No user found with user id"));
         assertTrue(exception.getMessage().contains("userid:noname"));
@@ -140,7 +140,7 @@ public class MCRMODSPersonIdentifierServiceTest {
         MCRUserManager.createUser(user3);
 
         final MCRIdentifier userid = new MCRIdentifier(MCRIdentifier.USER_ID_TYPE, user3.getUserID());
-        exception = assertThrows(MCRException.class, () -> service.findAllIdentifiers(userid));
+        exception = assertThrows(MCRException.class, () -> service.getAllIdentifiers(userid));
         assertTrue(exception.getMessage().contains("No modsperson found for user"));
 
         exception = assertThrows(MCRException.class, () -> service.addIdentifier(userid,
@@ -149,7 +149,7 @@ public class MCRMODSPersonIdentifierServiceTest {
 
         user3.setUserAttribute("id_modsperson", "junit_modsperson_00000404");
         MCRUserManager.updateUser(user3);
-        exception = assertThrows(MCRException.class, () -> service.findAllIdentifiers(userid));
+        exception = assertThrows(MCRException.class, () -> service.getAllIdentifiers(userid));
         assertTrue(exception.getMessage().contains("Error accessing the modsperson object for id"));
 
         URL url3 = MCRObjectMetadataTest.class.getResource(
@@ -161,7 +161,7 @@ public class MCRMODSPersonIdentifierServiceTest {
         user3.setUserAttribute("id_modsperson", "junit_modsperson_00000003");
         MCRUserManager.updateUser(user3);
 
-        Set<MCRIdentifier> allIdentifiers = service.findAllIdentifiers(userid);
+        Set<MCRIdentifier> allIdentifiers = service.getAllIdentifiers(userid);
         assertEquals(1, allIdentifiers.size());
         Set<MCRIdentifier> expected = Set.of(new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_1));
         assertEquals(expected, allIdentifiers);
@@ -181,7 +181,7 @@ public class MCRMODSPersonIdentifierServiceTest {
         user4.setUserAttribute("id_modsperson", "junit_modsperson_00000004");
         MCRUserManager.createUser(user4);
         MCRException exception = assertThrows(MCRException.class, () ->
-            service.findAllIdentifiers(new MCRIdentifier(MCRIdentifier.USER_ID_TYPE, "noname")));
+            service.getAllIdentifiers(new MCRIdentifier(MCRIdentifier.USER_ID_TYPE, "noname")));
         assertEquals("Malformed modsperson object: junit_modsperson_00000004", exception.getMessage());
     }
 

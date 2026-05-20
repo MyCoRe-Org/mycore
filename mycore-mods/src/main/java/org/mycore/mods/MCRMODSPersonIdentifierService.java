@@ -21,6 +21,8 @@ package org.mycore.mods;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRConstants;
@@ -44,6 +46,8 @@ import org.mycore.user2.MCRUserManager;
  */
 public class MCRMODSPersonIdentifierService implements MCRLegalEntityService {
 
+    private static final Logger LOGGER = LogManager.getLogger();
+
     private static final String MODSPERSON_ATTR_NAME = "id_modsperson";
 
     private static final String MODS_NAME = "name";
@@ -51,7 +55,6 @@ public class MCRMODSPersonIdentifierService implements MCRLegalEntityService {
     private static final String MODS_NAMEIDENTIFIER = "nameIdentifier";
 
     private static final String TYPE = "type";
-
 
     /**
      * Gets all {@link MCRIdentifier MCRIdentifiers} of a modsperson by reference to a {@link org.mycore.user2.MCRUser}
@@ -62,7 +65,7 @@ public class MCRMODSPersonIdentifierService implements MCRLegalEntityService {
      * @throws MCRException if the reference to the modsperson isn't found
      */
     @Override
-    public Set<MCRIdentifier> findAllIdentifiers(MCRIdentifier userId) throws MCRException {
+    public Set<MCRIdentifier> getAllIdentifiers(MCRIdentifier userId) throws MCRException {
         return getIdentifiers(userId, null);
     }
 
@@ -83,15 +86,25 @@ public class MCRMODSPersonIdentifierService implements MCRLegalEntityService {
         if (modsName == null) {
             throw new MCRException("Malformed modsperson object: " + modspersonId);
         }
-        Element nameIdentifier = new Element(MODS_NAMEIDENTIFIER, MCRConstants.MODS_NAMESPACE)
-            .setAttribute(TYPE, attributeToAdd.getType())
-            .setText(attributeToAdd.getValue());
-        modsName.addContent(nameIdentifier);
-        try {
-            MCRMetadataManager.update(modsperson);
-        } catch (MCRAccessException | MCRPersistenceException e) {
-            throw new MCRException("Failed to update modsperson object "
-                + modspersonId + " for identifier: " + userId, e);
+        boolean containsAttribute = modsName.getChildren(MODS_NAMEIDENTIFIER, MCRConstants.MODS_NAMESPACE)
+            .stream()
+            .map(e -> new MCRIdentifier(e.getAttributeValue(TYPE), e.getText()))
+            .collect(Collectors.toSet())
+            .contains(attributeToAdd);
+
+        if (!containsAttribute) {
+            Element nameIdentifier = new Element(MODS_NAMEIDENTIFIER, MCRConstants.MODS_NAMESPACE)
+                .setAttribute(TYPE, attributeToAdd.getType())
+                .setText(attributeToAdd.getValue());
+            modsName.addContent(nameIdentifier);
+            try {
+                MCRMetadataManager.update(modsperson);
+            } catch (MCRAccessException | MCRPersistenceException e) {
+                throw new MCRException("Failed to update modsperson object "
+                    + modspersonId + " for identifier: " + userId, e);
+            }
+        } else {
+            LOGGER.warn("The attribute {} already exists in {}", attributeToAdd, modspersonId);
         }
     }
 

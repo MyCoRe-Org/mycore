@@ -21,6 +21,8 @@ package org.mycore.user2;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.legalentity.MCRIdentifier;
 import org.mycore.datamodel.legalentity.MCRLegalEntityService;
@@ -31,6 +33,8 @@ import org.mycore.datamodel.legalentity.MCRLegalEntityService;
  * entity.
  */
 public class MCRUserIdentifierService implements MCRLegalEntityService {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String ATTR_ID_PREFIX = "id_";
 
@@ -43,7 +47,7 @@ public class MCRUserIdentifierService implements MCRLegalEntityService {
      * @throws MCRException if the referenced user isn't found
      */
     @Override
-    public Set<MCRIdentifier> findAllIdentifiers(MCRIdentifier userId) {
+    public Set<MCRIdentifier> getAllIdentifiers(MCRIdentifier userId) {
         MCRUser user = findUserByUserID(userId);
 
         return user.getAttributes().stream()
@@ -72,6 +76,8 @@ public class MCRUserIdentifierService implements MCRLegalEntityService {
             } catch (Exception e) {
                 throw new MCRException("Failed to update user for identifier: " + userId, e);
             }
+        } else {
+            LOGGER.warn("The attribute {} already exists in user {}", attributeToAdd, userId);
         }
     }
 

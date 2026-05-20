@@ -22,7 +22,7 @@ public class MCRLegalEntityServiceMock implements MCRLegalEntityService {
     }
 
     @Override
-    public Set<MCRIdentifier> findAllIdentifiers(MCRIdentifier identifier) {
+    public Set<MCRIdentifier> getAllIdentifiers(MCRIdentifier identifier) {
         return userMock.getAttributes().stream()
             .map(a -> new MCRIdentifier(a.getName().startsWith(ATTR_ID_PREFIX)
                                         ? a.getName().substring(ATTR_ID_PREFIX.length()) : a.getName(), a.getValue()))
