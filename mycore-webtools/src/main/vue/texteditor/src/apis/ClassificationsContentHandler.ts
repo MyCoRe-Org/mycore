@@ -22,7 +22,9 @@ export class ClassificationsContentHandler extends BaseContentHandler {
    * @param options - options for loading the classification
    */
   async load(classificationId: string, options?: LoadOptions): Promise<Content> {
-    const response = await fetch(`${this.mcrApplicationBaseURL}api/v2/classifications/${classificationId}`);
+    const response = await fetch(`${this.mcrApplicationBaseURL}api/v2/classifications/${classificationId}`, {
+      cache: "no-store"
+    });
     const xml = await response.text();
     const prettifiedXml = this.prettifyXml(xml);
     if (response.ok) {

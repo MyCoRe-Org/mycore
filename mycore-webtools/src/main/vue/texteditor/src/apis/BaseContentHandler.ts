@@ -19,11 +19,15 @@ export abstract class BaseContentHandler implements ContentHandler {
 
   abstract hasWriteAccess(path: string): Promise<boolean>;
 
-  abstract load(path: string): Promise<Content>;
+  abstract load(path: string, options?: unknown): Promise<Content>;
 
   abstract save(path: string, content: Content): Promise<void>;
 
   abstract dirtyAfterSave(path: string): boolean
+
+  supportsExpandedView(path: string): boolean {
+    return false;
+  }
 
   /**
    * Builds a descriptive Error from a failed HTTP response, extracting MyCoRe-specific
