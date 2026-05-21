@@ -18,6 +18,7 @@
 
 package org.mycore.mods;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -65,8 +66,10 @@ public class MCRMODSPersonIdentifierService implements MCRLegalEntityService {
      * @throws MCRException if the reference to the modsperson isn't found
      */
     @Override
-    public Set<MCRIdentifier> getAllIdentifiers(MCRIdentifier userId) throws MCRException {
-        return getIdentifiers(userId, null);
+    public Set<MCRIdentifier> getAllIdentifiers(MCRIdentifier userId) {
+        return findModspersonByUsername(userId)
+            .map(this::getIdentifiersFromModsperson)
+            .orElseGet(() -> getAllIdentifiersFromFallback(userId));
     }
 
     /**
@@ -79,72 +82,23 @@ public class MCRMODSPersonIdentifierService implements MCRLegalEntityService {
      */
     @Override
     public void addIdentifier(MCRIdentifier userId, MCRIdentifier attributeToAdd) throws MCRException {
-        MCRObject modsperson = findModspersonByUsername(userId);
-        MCRObjectID modspersonId = modsperson.getId();
-        MCRMODSWrapper wrapper = new MCRMODSWrapper(modsperson);
-        Element modsName = wrapper.getMODS().getChild(MODS_NAME, MCRConstants.MODS_NAMESPACE);
-        if (modsName == null) {
-            throw new MCRException("Malformed modsperson object: " + modspersonId);
-        }
-        boolean containsAttribute = modsName.getChildren(MODS_NAMEIDENTIFIER, MCRConstants.MODS_NAMESPACE)
-            .stream()
-            .map(e -> new MCRIdentifier(e.getAttributeValue(TYPE), e.getText()))
-            .collect(Collectors.toSet())
-            .contains(attributeToAdd);
+        Optional<MCRObject> modspersonOptional = findModspersonByUsername(userId);
 
-        if (!containsAttribute) {
-            Element nameIdentifier = new Element(MODS_NAMEIDENTIFIER, MCRConstants.MODS_NAMESPACE)
-                .setAttribute(TYPE, attributeToAdd.getType())
-                .setText(attributeToAdd.getValue());
-            modsName.addContent(nameIdentifier);
-            try {
-                MCRMetadataManager.update(modsperson);
-            } catch (MCRAccessException | MCRPersistenceException e) {
-                throw new MCRException("Failed to update modsperson object "
-                    + modspersonId + " for identifier: " + userId, e);
-            }
+        if (modspersonOptional.isPresent()) {
+            addIdentifierToModsperson(userId, attributeToAdd,modspersonOptional.get());
         } else {
-            LOGGER.warn("The attribute {} already exists in {}", attributeToAdd, modspersonId);
+            addIdentifierToFallback(userId, attributeToAdd);
         }
-    }
-
-    /**
-     * Helper method to search for identifiers in a modsperson by a user-ID.
-     * @param userId the user id connected to the modsperson
-     * @param identifierType optional type filter, leave null for no filter
-     * @return a set of all identifiers found
-     *
-     * @throws MCRException if the reference to the modsperson isn't found
-     */
-    private Set<MCRIdentifier> getIdentifiers(MCRIdentifier userId, String identifierType) {
-        MCRObject modsperson = findModspersonByUsername(userId);
-
-        MCRMODSWrapper wrapper = new MCRMODSWrapper(modsperson);
-        Element modsName = wrapper.getMODS().getChild(MODS_NAME, MCRConstants.MODS_NAMESPACE);
-        MCRObjectID modspersonId = modsperson.getId();
-
-        if (modsName == null) {
-            throw new MCRException("Malformed modsperson object: " + modspersonId);
-        }
-        if (identifierType != null) {
-            return modsName.getChildren(MODS_NAMEIDENTIFIER, MCRConstants.MODS_NAMESPACE)
-                .stream().filter(e -> identifierType.equals(e.getAttributeValue(TYPE)))
-                .map(e -> new MCRIdentifier(e.getAttributeValue(TYPE), e.getText()))
-                .collect(Collectors.toSet());
-        }
-        return modsName.getChildren(MODS_NAMEIDENTIFIER, MCRConstants.MODS_NAMESPACE)
-            .stream().map(e -> new MCRIdentifier(e.getAttributeValue(TYPE), e.getText()))
-            .collect(Collectors.toSet());
     }
 
     /**
      * Takes a username and returns an Optional with the referenced modsperson.
      * @param userId the user id
-     * @return a modsperson object
+     * @return an Optional of a modsperson object
      *
      * @throws MCRException if the modsperson cannot be found via the user id or another error occurs
      */
-    private MCRObject findModspersonByUsername(MCRIdentifier userId) {
+    private Optional<MCRObject> findModspersonByUsername(MCRIdentifier userId) {
         if (userId == null || !MCRIdentifier.USER_ID_TYPE.equals(userId.getType())) {
             throw new MCRException("Invalid user id: " + userId);
         }
@@ -154,12 +108,94 @@ public class MCRMODSPersonIdentifierService implements MCRLegalEntityService {
         }
         String modspersonId = user.getUserAttribute(MODSPERSON_ATTR_NAME);
         if (modspersonId == null) {
-            throw new MCRException("No modsperson found for user: " + userId);
+            return Optional.empty();
         }
         try {
-            return MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(modspersonId));
+            return Optional.of(MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(modspersonId)));
         } catch (MCRPersistenceException e) {
-            throw new MCRException("Error accessing the modsperson object for id " + userId + ":", e);
+            LOGGER.warn("Could not retrieve modsperson object {} for user id {}. Falling back.",
+                modspersonId, userId, e);
+            return Optional.empty();
+        }
+    }
+
+    private Set<MCRIdentifier> getIdentifiersFromModsperson(MCRObject modsperson) {
+        Element modsName = getModsName(modsperson);
+        return modsName.getChildren(MODS_NAMEIDENTIFIER, MCRConstants.MODS_NAMESPACE)
+            .stream()
+            .map(e -> new MCRIdentifier(e.getAttributeValue(TYPE), e.getText()))
+            .collect(Collectors.toSet());
+    }
+
+    private Element getModsName(MCRObject modsperson) {
+        MCRMODSWrapper wrapper = new MCRMODSWrapper(modsperson);
+        Element modsName = wrapper.getMODS().getChild(MODS_NAME, MCRConstants.MODS_NAMESPACE);
+        if (modsName == null) {
+            throw new MCRException("Malformed modsperson object: " + modsperson.getId());
+        }
+        return modsName;
+    }
+
+    /**
+     * Helper method to add an {@link MCRIdentifier attribute} to a given Modsperson-{@link MCRObject object}.
+     * @param userId ID of the user for logging context
+     * @param attributeToAdd attribute to add to the modsperson
+     * @param modsperson the modsperson object
+     *
+     * @throws MCRException if there's a problem while updating the modsperson
+     */
+    private void addIdentifierToModsperson(MCRIdentifier userId, MCRIdentifier attributeToAdd, MCRObject modsperson) {
+        MCRObjectID modspersonId = modsperson.getId();
+        Element modsName = getModsName(modsperson);
+
+        boolean containsAttribute = getIdentifiersFromModsperson(modsperson).contains(attributeToAdd);
+
+        if (containsAttribute) {
+            LOGGER.warn("The attribute {} already exists in {}. Will not be added twice.",
+                attributeToAdd, modspersonId);
+            return;
+        }
+
+        Element nameIdentifier = new Element(MODS_NAMEIDENTIFIER, MCRConstants.MODS_NAMESPACE)
+            .setAttribute(TYPE, attributeToAdd.getType())
+            .setText(attributeToAdd.getValue());
+
+        modsName.addContent(nameIdentifier);
+
+        try {
+            MCRMetadataManager.update(modsperson);
+        } catch (MCRAccessException | MCRPersistenceException e) {
+            throw new MCRException("Failed to update modsperson object "
+                + modspersonId + " for identifier: " + userId, e);
+        }
+    }
+
+    private Set<MCRIdentifier> getAllIdentifiersFromFallback(MCRIdentifier userId) {
+        Optional<MCRLegalEntityService> fallbackServiceOptional = MCRLegalEntityService.obtainFallbackInstance();
+
+        if (fallbackServiceOptional.isPresent()) {
+            MCRLegalEntityService fallbackService =  fallbackServiceOptional.get();
+            LOGGER.info("No modsperson found for user id: {} . Calling fallback service {}",
+                userId, fallbackService.getClass().getSimpleName());
+            return fallbackService.getAllIdentifiers(userId);
+        } else {
+            LOGGER.warn("No modsperson found for user id: {} and no fallback configured. "
+                + "Returning empty Set.", userId);
+        }
+        return Set.of();
+    }
+
+    private void addIdentifierToFallback(MCRIdentifier userId, MCRIdentifier attributeToAdd) {
+        Optional<MCRLegalEntityService> fallbackServiceOptional = MCRLegalEntityService.obtainFallbackInstance();
+
+        if (fallbackServiceOptional.isPresent()) {
+            MCRLegalEntityService fallbackService =  fallbackServiceOptional.get();
+            LOGGER.info("No modsperson found for user id: {} . Calling fallback service {}",
+                userId, fallbackService.getClass().getSimpleName());
+            fallbackService.addIdentifier(userId, attributeToAdd);
+        } else {
+            LOGGER.warn("No modsperson found for user id: {} and no fallback configured. "
+                + "Identifier not added. ", userId);
         }
     }
 }

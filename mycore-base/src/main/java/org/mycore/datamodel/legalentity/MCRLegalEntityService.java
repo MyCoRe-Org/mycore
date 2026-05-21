@@ -18,6 +18,7 @@
 
 package org.mycore.datamodel.legalentity;
 
+import java.util.Optional;
 import java.util.Set;
 
 import org.mycore.common.MCRException;
@@ -61,6 +62,14 @@ public interface MCRLegalEntityService {
     static MCRLegalEntityService obtainInstance() {
         return MCRConfiguration2.getSingleInstanceOfOrThrow(
             MCRLegalEntityService.class, "MCR.LegalEntityService.Class");
+    }
+
+    /**
+     * Get configured fallback service.
+     */
+    static Optional<MCRLegalEntityService> obtainFallbackInstance() {
+        return MCRConfiguration2.getSingleInstanceOf(
+            MCRLegalEntityService.class, "MCR.LegalEntityService.Fallback.Class");
     }
 
 }
