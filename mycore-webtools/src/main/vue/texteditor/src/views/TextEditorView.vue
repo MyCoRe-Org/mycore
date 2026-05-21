@@ -5,11 +5,19 @@ import TextEditor from "@/components/TextEditor.vue";
 import type {Content, ContentHandler, LockResult} from "@/apis/ContentHandler.ts";
 import {getMCRApplicationBaseURL} from "@/router";
 import {useRouter} from "vue-router";
+import {isDerivate as isObjectDerivate, isObjectContentFile, isObjectContents} from "@/apis/ObjectPath";
+import {
+  isUpdateButtonDisabled,
+  isUpdateButtonVisible,
+  readExpandedViewPreference,
+  resolveExpandedViewOnNavigation,
+  viewModeButtonClass,
+  writeExpandedViewPreference
+} from "@/views/TextEditorViewState";
 
 const props = defineProps<{
   type: string,
-  id: string,
-  expanded: boolean
+  id: string
 }>();
 const model = ref<Content>({
   data: "",
@@ -21,6 +29,8 @@ const error = ref<string | undefined>();
 const updateEnabled = ref(false);
 const writeAccess = ref(false);
 const lockResult = ref<LockResult | undefined>(undefined);
+const expandedViewPreference = ref(readExpandedViewPreference(window.localStorage));
+const expandedView = ref(false);
 let undoKeyPressed = false;
 let originalModel: string = "";
 let refreshInterval: number | undefined;
@@ -40,10 +50,17 @@ const handleBeforeUnload = () => {
   unlockIfPossible();
 };
 
-const isContentFile = computed(() => props.type === 'objects' && props.id.includes('/contents/'));
-const isContents = computed(() => props.type === 'objects' && props.id.endsWith('/contents'));
-const isDerivate = computed(() => props.type === 'objects' && props.id.includes('/derivates/') && !isContents.value && !isContentFile.value);
+const isContentFile = computed(() => props.type === 'objects' && isObjectContentFile(props.id));
+const isContents = computed(() => props.type === 'objects' && isObjectContents(props.id));
+const isDerivate = computed(() => props.type === 'objects' && isObjectDerivate(props.id));
 const isObject = computed(() => props.type === 'objects' && !isDerivate.value && !isContents.value && !isContentFile.value);
+const supportsExpandedView = computed(() => {
+  const contentHandler: ContentHandler | undefined = ContentHandlerSelector.get(props.type);
+  return contentHandler?.supportsExpandedView(props.id) ?? false;
+});
+const canEdit = computed(() => writeAccess.value && !expandedView.value);
+const showUpdateButton = computed(() => isUpdateButtonVisible(writeAccess.value, isContents.value));
+const updateButtonDisabled = computed(() => isUpdateButtonDisabled(updateEnabled.value, expandedView.value));
 
 interface Breadcrumb {
   label: string;
@@ -108,7 +125,7 @@ const load = async () => {
   }
   try {
     const content: Content = await contentHandler.load(props.id, {
-      expanded: props.expanded
+      expanded: supportsExpandedView.value && expandedView.value
     });
     model.value.data = content.data;
     model.value.type = content.type;
@@ -163,7 +180,8 @@ const isLockingPossible = () => {
   const canWrite = writeAccess.value;
   const supportsLocking = contentHandler.supportsLocking(props.id);
   const isValidDocument = model.value.type !== "";
-  return isValidDocument && canWrite && supportsLocking;
+  const isEditableView = !expandedView.value;
+  return isValidDocument && isEditableView && canWrite && supportsLocking;
 }
 
 /**
@@ -220,7 +238,35 @@ const onKeyDown = async (evt: KeyboardEvent) => {
   }
 }
 
+const switchExpandedView = async (expanded: boolean) => {
+  if (expandedView.value === expanded || loading.value) {
+    return;
+  }
+  if (updateEnabled.value && !window.confirm("Discard unsaved changes and switch view?")) {
+    return;
+  }
+  if (expanded && isLockingPossible()) {
+    unlockIfPossible();
+    stopLockRefresh();
+  }
+  expandedView.value = expanded;
+  expandedViewPreference.value = expanded;
+  writeExpandedViewPreference(window.localStorage, expanded);
+  loading.value = true;
+  success.value = undefined;
+  error.value = undefined;
+  updateEnabled.value = false;
+  await load();
+  if (!expanded) {
+    await lockIfPossible();
+    if (isLockingPossible()) {
+      startLockRefresh();
+    }
+  }
+}
+
 watch(() => [props.type, props.id], async () => {
+  expandedView.value = resolveExpandedViewOnNavigation(expandedViewPreference.value, supportsExpandedView.value);
   loading.value = true;
   success.value = undefined;
   error.value = undefined;
@@ -250,10 +296,16 @@ watch(() => [props.type, props.id], async () => {
       </template>
     </div>
     <div class="toolbar-right">
-      <button @click="save" v-if="writeAccess && !isContents" class="btn btn-sm btn-primary" :disabled="!updateEnabled">Update</button>
+      <div v-if="supportsExpandedView" class="btn-group btn-group-sm" role="group" aria-label="Object view">
+        <button type="button" class="btn" :class="viewModeButtonClass(!expandedView)"
+                :aria-pressed="!expandedView" :disabled="loading" @click="switchExpandedView(false)">Original</button>
+        <button type="button" class="btn" :class="viewModeButtonClass(expandedView)"
+                :aria-pressed="expandedView" :disabled="loading" @click="switchExpandedView(true)">Expanded</button>
+      </div>
+      <button @click="save" v-if="showUpdateButton" class="btn btn-sm btn-primary" :disabled="updateButtonDisabled">Update</button>
     </div>
   </div>
-  <text-editor @keydown="onKeyDown" v-model="model" :loading="loading" :writeAccess="writeAccess"></text-editor>
+  <text-editor @keydown="onKeyDown" v-model="model" :loading="loading" :writeAccess="canEdit"></text-editor>
   <div class="hint-bar">
     <span class="hint"><kbd>Ctrl</kbd>+Click on links to navigate</span>
   </div>

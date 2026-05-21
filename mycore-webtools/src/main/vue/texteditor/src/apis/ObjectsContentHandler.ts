@@ -1,6 +1,7 @@
 import {BaseContentHandler} from "@/apis/BaseContentHandler";
 import {getAuthorizationHeader} from "@/apis/Auth";
 import type {Content, LoadOptions, LockResult} from "@/apis/ContentHandler.ts";
+import {isObjectContent, supportsExpandedObjectView} from "@/apis/ObjectPath";
 
 /**
  * Content handler for MyCoRe objects, derivates and their file contents.
@@ -30,6 +31,7 @@ export class ObjectsContentHandler extends BaseContentHandler {
     const expanded = options?.expanded ?? false;
     const response = await fetch(`${this.mcrApplicationBaseURL}api/v2/objects/${path}?expanded=${expanded}`, {
       method: "GET",
+      cache: "no-store",
       headers: {
         "Authorization": authorizationHeader
       },
@@ -102,8 +104,12 @@ export class ObjectsContentHandler extends BaseContentHandler {
    * @param path - The resource path.
    */
   dirtyAfterSave(path: string): boolean {
-    const isContent = this.containsContent(path);
+    const isContent = isObjectContent(path);
     return !isContent;
+  }
+
+  supportsExpandedView(path: string): boolean {
+    return supportsExpandedObjectView(path);
   }
 
   supportsLocking(path: string): boolean {
@@ -156,7 +162,7 @@ export class ObjectsContentHandler extends BaseContentHandler {
    * @return true if the path accesses content
    */
   private containsContent(path: string) {
-    return path.indexOf("/contents") !== -1;
+    return isObjectContent(path);
   }
 
   /**

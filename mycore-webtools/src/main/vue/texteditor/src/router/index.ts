@@ -37,12 +37,9 @@ const router = createRouter({
       component: TextEditorView,
       props: (route) => {
         let id = route.params.id;
-        const expandedQuery = route.query.expanded;
-        const expanded = expandedQuery === "true" || expandedQuery === "1";
         return {
           type: route.params.type,
-          id: typeof id === "string" ? id : (Array.isArray(id) ? id.join("/") : ""),
-          expanded
+          id: typeof id === "string" ? id : (Array.isArray(id) ? id.join("/") : "")
         }
       }
     },
