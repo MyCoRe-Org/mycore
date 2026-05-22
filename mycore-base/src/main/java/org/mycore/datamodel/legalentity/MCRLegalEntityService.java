@@ -28,12 +28,6 @@ import org.mycore.common.config.MCRConfiguration2;
  * using a specific, identifying {@link MCRIdentifier}, or add an identifier to the legal entity. The identifier
  * can be any key-value pair that can uniquely identify a legal entity. The interface is intentionally generic to allow
  * different identifier schemes and lookup implementations.
- * <br><br>
- * As of now, all implementations for this interface pertain to the access of user attributes
- * for a <code>org.mycore.orcid2.user.MCRORCIDUser</code>. Comp.
- * <code>org.mycore.mods.MCRMODSPersonIdentifierService</code> and
- * <code>org.mycore.user2.MCRUserIdentifierService</code>.
- * Further use cases for other legal entities (Körperschaften) are possible.
  */
 public interface MCRLegalEntityService {
 
