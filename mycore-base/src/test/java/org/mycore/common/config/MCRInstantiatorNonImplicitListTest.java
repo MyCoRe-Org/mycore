@@ -38,6 +38,7 @@ import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.annotation.MCRInstanceList;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.config.annotation.MCRSentinel;
+import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.test.MyCoReTest;
 
 /**
@@ -93,36 +94,36 @@ import org.mycore.test.MyCoReTest;
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;">none or impl. enabled</td>
  *     <td style="border: 1px solid;"><code>1.a=</code></td>
- *     <td style="border: 1px solid;"><code>[()]</code></td>
- *     <td style="border: 1px solid;"><code>[()]</code></td>
+ *     <td style="border: 1px solid;"><code>[]</code></td>
+ *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;">none or impl. enabled</td>
  *     <td style="border: 1px solid;"><code>1.a=Value</code></td>
- *     <td style="border: 1px solid;"><code>[(Value)]</code></td>
- *     <td style="border: 1px solid;"><code>[(Value)]</code></td>
+ *     <td style="border: 1px solid;"><code>[]</code></td>
+ *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;">expl. enabled</td>
  *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;"><code>[_]</code></td>
- *     <td style="border: 1px solid;"><code>[_]</code></td>
+ *     <td style="border: 1px solid;"><code>[]</code></td>
+ *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;">expl. enabled</td>
  *     <td style="border: 1px solid;"><code>1.a=</code></td>
- *     <td style="border: 1px solid;"><code>[()]</code></td>
- *     <td style="border: 1px solid;"><code>[()]</code></td>
+ *     <td style="border: 1px solid;"><code>[]</code></td>
+ *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;">expl. enabled</td>
- *     <td style="border: 1px solid;"><code>1.a=Value</code></td>
- *     <td style="border: 1px solid;"><code>[(Value)]</code></td>
- *     <td style="border: 1px solid;"><code>[(Value)]</code></td>
+ *     <td style="border: 1px solid;"><code>Value</code></td>
+ *     <td style="border: 1px solid;"><code>[]</code></td>
+ *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;">set</td>
@@ -142,13 +143,13 @@ import org.mycore.test.MyCoReTest;
  *     <td style="border: 1px solid;">set</td>
  *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;"><code>1.a=Value</code></td>
- *     <td style="border: 1px solid;"><code>[(Value)]</code></td>
+ *     <td style="border: 1px solid;"><code>(Value)</code></td>
  *     <td style="border: 1px solid;"><code>[(Value)]</code></td>
  *   </tr>
  * </table>
  */
 @MyCoReTest
-public class MCRConfigurableInstanceHelperImplicitListTest {
+public class MCRInstantiatorNonImplicitListTest {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -240,21 +241,14 @@ public class MCRConfigurableInstanceHelperImplicitListTest {
         Configurable instance = null;
         MCRConfigurationException exception = null;
         try {
-            MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName(CONFIGURED_CLASS_PROPERTY);
-            instance = MCRConfigurableInstanceHelper.getInstance(Configurable.class, configuration);
+            instance = MCRInstanceConfiguration.ofName(Configurable.class, CONFIGURED_CLASS_PROPERTY).instantiate();
         } catch (MCRConfigurationException e) {
             exception = e;
         }
 
-        // all the indications a nested class should be instantiated (implicitly)
-        boolean shouldInstantiateNestedClass = false;
-        shouldInstantiateNestedClass |= classProperty != ClassProperty.NOT_SET;
-        shouldInstantiateNestedClass |= valueProperty != ValueProperty.NOT_SET;
-        shouldInstantiateNestedClass |= sentinel == Sentinel.EXPLICITLY_ENABLED;
-
         // all the indications a nested class should not be instantiated (or instantiation should be suppressed)
         boolean shouldNotInstantiateNestedClass = false;
-        shouldNotInstantiateNestedClass |= !shouldInstantiateNestedClass;
+        shouldNotInstantiateNestedClass |= classProperty == ClassProperty.NOT_SET;
         shouldNotInstantiateNestedClass |= classProperty == ClassProperty.SET_EMPTY;
         shouldNotInstantiateNestedClass |= sentinel == Sentinel.IMPLICITLY_DISABLED;
         shouldNotInstantiateNestedClass |= sentinel == Sentinel.EXPLICITLY_DISABLED;
@@ -416,7 +410,7 @@ public class MCRConfigurableInstanceHelperImplicitListTest {
 
     }
 
-    public static final class Nested {
+    public static class Nested {
 
         @MCRProperty(name = "Value", required = false)
         public String value;

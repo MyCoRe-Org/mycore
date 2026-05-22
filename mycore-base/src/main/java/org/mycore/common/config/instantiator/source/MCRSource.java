@@ -27,7 +27,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
-import org.mycore.common.config.MCRInstanceConfiguration;
 import org.mycore.common.config.annotation.MCRInstance;
 import org.mycore.common.config.annotation.MCRInstanceList;
 import org.mycore.common.config.annotation.MCRInstanceMap;
@@ -36,6 +35,7 @@ import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.config.annotation.MCRPropertyList;
 import org.mycore.common.config.annotation.MCRPropertyMap;
 import org.mycore.common.config.annotation.MCRRawProperties;
+import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
 /**
@@ -55,7 +55,7 @@ public sealed interface MCRSource permits MCRInstanceListSource, MCRInstanceMapS
 
     Class<?> valueClass();
 
-    Object get(MCRInstanceConfiguration configuration, MCRTarget target);
+    Object get(MCRInstanceConfiguration<?> configuration, MCRTarget target);
 
     enum Type {
 

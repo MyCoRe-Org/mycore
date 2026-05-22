@@ -21,6 +21,7 @@ package org.mycore.common.config;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,9 +35,10 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
-import org.mycore.common.config.annotation.MCRInstance;
+import org.mycore.common.config.annotation.MCRInstanceMap;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.config.annotation.MCRSentinel;
+import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.test.MyCoReTest;
 
 /**
@@ -52,7 +54,7 @@ import org.mycore.test.MyCoReTest;
  *     <li>a disabling sentinel, but no configured sentinel value (implicitly disabling sentinel)</li>
  *     <li>a sentinel and a disabling configured sentinel value (explicitly disabling sentinel)</li>
  *   </ol>
- *   <li>Value-property value is not set, set empty or set non-empty</li>
+ *   <li>Value-property value (for a single element-map) is not set, set empty or set non-empty</li>
  * </ol>
  * <table style="border-collapse: collapse;">
  *   <caption>
@@ -71,93 +73,93 @@ import org.mycore.test.MyCoReTest;
  *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;">impl. or expl. disabled</td>
  *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;"><code>null</code></td>
+ *     <td style="border: 1px solid;"><code>{}</code></td>
  *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;">set empty</td>
  *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;"><code>null</code></td>
+ *     <td style="border: 1px solid;"><code>{}</code></td>
  *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;">none or impl. enabled</td>
  *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;"><code>_</code></td>
- *     <td style="border: 1px solid;"><code>_</code></td>
+ *     <td style="border: 1px solid;"><code>{}</code></td>
+ *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;">none or impl. enabled</td>
- *     <td style="border: 1px solid;"><code>a=</code></td>
- *     <td style="border: 1px solid;"><code>()</code></td>
- *     <td style="border: 1px solid;"><code>()</code></td>
+ *     <td style="border: 1px solid;"><code>A.a=</code></td>
+ *     <td style="border: 1px solid;"><code>{}</code></td>
+ *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;">none or impl. enabled</td>
- *     <td style="border: 1px solid;"><code>a=Value</code></td>
- *     <td style="border: 1px solid;"><code>(Value)</code></td>
- *     <td style="border: 1px solid;"><code>(Value)</code></td>
+ *     <td style="border: 1px solid;"><code>A.a=Value</code></td>
+ *     <td style="border: 1px solid;"><code>{}</code></td>
+ *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;">expl. enabled</td>
  *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;"><code>_</code></td>
- *     <td style="border: 1px solid;"><code>_</code></td>
+ *     <td style="border: 1px solid;"><code>{}</code></td>
+ *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;">expl. enabled</td>
- *     <td style="border: 1px solid;"><code>a=</code></td>
- *     <td style="border: 1px solid;"><code>()</code></td>
- *     <td style="border: 1px solid;"><code>()</code></td>
+ *     <td style="border: 1px solid;"><code>A.a=</code></td>
+ *     <td style="border: 1px solid;"><code>{}</code></td>
+ *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;">expl. enabled</td>
- *     <td style="border: 1px solid;"><code>a=Value</code></td>
- *     <td style="border: 1px solid;"><code>(Value)</code></td>
- *     <td style="border: 1px solid;"><code>(Value)</code></td>
+ *     <td style="border: 1px solid;"><code>A=Value</code></td>
+ *     <td style="border: 1px solid;"><code>{}</code></td>
+ *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;">set</td>
  *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;"><code>_</code></td>
- *     <td style="border: 1px solid;"><code>_</code></td>
+ *     <td style="border: 1px solid;"><code>{A=_}</code></td>
+ *     <td style="border: 1px solid;"><code>{A=_}</code></td>
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;">set</td>
  *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;"><code>a=</code></td>
- *     <td style="border: 1px solid;"><code>()</code></td>
- *     <td style="border: 1px solid;"><code>()</code></td>
+ *     <td style="border: 1px solid;"><code>A.a=</code></td>
+ *     <td style="border: 1px solid;"><code>{A=()}</code></td>
+ *     <td style="border: 1px solid;"><code>{A=()}</code></td>
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;">set</td>
  *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;"><code>a=Value</code></td>
- *     <td style="border: 1px solid;"><code>(Value)</code></td>
- *     <td style="border: 1px solid;"><code>(Value)</code></td>
+ *     <td style="border: 1px solid;"><code>A.a=Value</code></td>
+ *     <td style="border: 1px solid;"><code>A=(Value)</code></td>
+ *     <td style="border: 1px solid;"><code>{A=(Value)}</code></td>
  *   </tr>
  * </table>
  */
 @MyCoReTest
-public class MCRConfigurableInstanceHelperImplicitTest {
+public class MCRInstantiatorNonImplicitMapTest {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     public static final String CONFIGURED_CLASS_PROPERTY = "Foo.Class";
 
-    public static final String NESTED_CLASS_PROPERTY = "Foo.Nested.Class";
+    public static final String NESTED_CLASS_PROPERTY = "Foo.Nested.foo.Class";
 
-    public static final String NESTED_SENTINEL_PROPERTY = "Foo.Nested.Enabled";
+    public static final String NESTED_SENTINEL_PROPERTY = "Foo.Nested.foo.Enabled";
 
-    public static final String NESTED_VALUE_PROPERTY = "Foo.Nested.Value";
+    public static final String NESTED_VALUE_PROPERTY = "Foo.Nested.foo.Value";
 
     private static Stream<Arguments> provideAllParameterCombinations() {
         List<Arguments> argumentsList = new ArrayList<>();
@@ -239,23 +241,14 @@ public class MCRConfigurableInstanceHelperImplicitTest {
         Configurable instance = null;
         MCRConfigurationException exception = null;
         try {
-            MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName(CONFIGURED_CLASS_PROPERTY);
-            instance = MCRConfigurableInstanceHelper.getInstance(Configurable.class, configuration);
+            instance = MCRInstanceConfiguration.ofName(Configurable.class, CONFIGURED_CLASS_PROPERTY).instantiate();
         } catch (MCRConfigurationException e) {
             exception = e;
         }
 
-        // all the indications a nested class should be instantiated (implicitly)
-        boolean shouldInstantiateNestedClass = false;
-        shouldInstantiateNestedClass |= classProperty != ClassProperty.NOT_SET;
-        shouldInstantiateNestedClass |= valueProperty != ValueProperty.NOT_SET;
-        shouldInstantiateNestedClass |= sentinel == Sentinel.NONE;
-        shouldInstantiateNestedClass |= sentinel == Sentinel.IMPLICITLY_ENABLED;
-        shouldInstantiateNestedClass |= sentinel == Sentinel.EXPLICITLY_ENABLED;
-
         // all the indications a nested class should not be instantiated (or instantiation should be suppressed)
         boolean shouldNotInstantiateNestedClass = false;
-        shouldNotInstantiateNestedClass |= !shouldInstantiateNestedClass;
+        shouldNotInstantiateNestedClass |= classProperty == ClassProperty.NOT_SET;
         shouldNotInstantiateNestedClass |= classProperty == ClassProperty.SET_EMPTY;
         shouldNotInstantiateNestedClass |= sentinel == Sentinel.IMPLICITLY_DISABLED;
         shouldNotInstantiateNestedClass |= sentinel == Sentinel.EXPLICITLY_DISABLED;
@@ -265,23 +258,26 @@ public class MCRConfigurableInstanceHelperImplicitTest {
             assertNull(instance);
             assertNotNull(exception);
 
-            assertEquals("Instance, configured in Foo.Nested (and its sub-properties)," +
-                " for target field 'nested' in configured class " + configuredClass.getName()
-                + " is missing", exception.getMessage());
+            assertEquals("Instance map, configured in Foo.Nested (and its sub-properties)," +
+                " for target field 'nestedMap' in configured class " + configuredClass.getName()
+                + " is empty", exception.getMessage());
 
         } else {
 
             assertNull(exception);
             assertNotNull(instance);
 
-            Nested nested = instance.nested();
+            Map<String, Nested> nestedMap = instance.nestedMap();
+            assertNotNull(nestedMap);
 
             if (shouldNotInstantiateNestedClass) {
 
-                assertNull(nested);
+                assertTrue(nestedMap.isEmpty());
 
             } else {
 
+                assertEquals(1, nestedMap.size());
+                Nested nested = nestedMap.get("foo");
                 assertNotNull(nested);
 
                 switch (valueProperty) {
@@ -337,84 +333,85 @@ public class MCRConfigurableInstanceHelperImplicitTest {
 
     public interface Configurable {
 
-        Nested nested();
+        Map<String, Nested> nestedMap();
 
     }
 
     public static class NotRequiredNoSentinel implements Configurable {
 
-        @MCRInstance(name = "Nested", valueClass = Nested.class, required = false)
-        public Nested nested;
+        @MCRInstanceMap(name = "Nested", valueClass = Nested.class, required = false)
+        public Map<String, Nested> nestedMap;
 
         @Override
-        public Nested nested() {
-            return nested;
+        public Map<String, Nested> nestedMap() {
+            return nestedMap;
         }
 
     }
 
     public static class NotRequiredEnablingSentinel implements Configurable {
 
-        @MCRInstance(name = "Nested", valueClass = Nested.class, required = false, sentinel = @MCRSentinel)
-        public Nested nested;
+        @MCRInstanceMap(name = "Nested", valueClass = Nested.class, required = false, sentinel = @MCRSentinel)
+        public Map<String, Nested> nestedMap;
 
         @Override
-        public Nested nested() {
-            return nested;
+        public Map<String, Nested> nestedMap() {
+            return nestedMap;
         }
 
     }
 
     public static class NotRequiredDisablingSentinel implements Configurable {
 
-        @MCRInstance(name = "Nested", valueClass = Nested.class, required = false,
+        @MCRInstanceMap(name = "Nested", valueClass = Nested.class, required = false,
             sentinel = @MCRSentinel(defaultValue = false))
-        public Nested nested;
+        public Map<String, Nested> nestedMap;
 
         @Override
-        public Nested nested() {
-            return nested;
+        public Map<String, Nested> nestedMap() {
+            return nestedMap;
         }
 
     }
 
     public static class RequiredNoSentinel implements Configurable {
 
-        @MCRInstance(name = "Nested", valueClass = Nested.class)
-        public Nested nested;
+        @MCRInstanceMap(name = "Nested", valueClass = Nested.class)
+        public Map<String, Nested> nestedMap;
 
         @Override
-        public Nested nested() {
-            return nested;
+        public Map<String, Nested> nestedMap() {
+            return nestedMap;
         }
 
     }
 
     public static class RequiredEnablingSentinel implements Configurable {
 
-        @MCRInstance(name = "Nested", valueClass = Nested.class, sentinel = @MCRSentinel)
-        public Nested nested;
+        @MCRInstanceMap(name = "Nested", valueClass = Nested.class, sentinel = @MCRSentinel)
+        public Map<String, Nested> nestedMap;
 
         @Override
-        public Nested nested() {
-            return nested;
+        public Map<String, Nested> nestedMap() {
+            return nestedMap;
         }
 
     }
 
     public static class RequiredDisablingSentinel implements Configurable {
 
-        @MCRInstance(name = "Nested", valueClass = Nested.class, sentinel = @MCRSentinel(defaultValue = false))
-        public Nested nested;
+        @MCRInstanceMap(name = "Nested", valueClass = Nested.class,
+            sentinel = @MCRSentinel(defaultValue = false))
+        public Map<String, Nested> nestedMap;
 
         @Override
-        public Nested nested() {
-            return nested;
+        public Map<String, Nested> nestedMap() {
+            return nestedMap;
         }
 
     }
 
-    public static final class Nested {
+    public static class Nested {
 
         @MCRProperty(name = "Value", required = false)
         public String value;

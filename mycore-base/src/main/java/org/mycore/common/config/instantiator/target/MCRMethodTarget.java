@@ -76,4 +76,10 @@ public final class MCRMethodTarget implements MCRTarget {
                 + method.getDeclaringClass().getName(), e);
         }
     }
+
+    @Override
+    public String toString() {
+        return method.getDeclaringClass().getSimpleName() + "#" + method.getName() + "()";
+    }
+
 }

@@ -21,6 +21,7 @@ package org.mycore.common.config;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
+import org.mycore.common.config.instantiator.MCRInstanceName;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
