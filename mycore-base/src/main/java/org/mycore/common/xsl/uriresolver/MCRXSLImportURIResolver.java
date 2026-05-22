@@ -31,6 +31,7 @@ import org.jdom2.transform.JDOMSource;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.common.xsl.MCRXSLResourceHelper;
 import org.mycore.datamodel.metadata.MCRXMLConstants;
+import org.mycore.resource.uriresolver.MCRResourceURIResolver;
 
 /**
  * {@link URIResolver} that resolves XSL import chains configured via properties.

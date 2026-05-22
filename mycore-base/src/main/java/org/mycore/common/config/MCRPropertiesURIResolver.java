@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.common.xml;
+package org.mycore.common.config;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.URIResolver;
@@ -25,35 +25,47 @@ import org.jdom2.DocType;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
-import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.config.MCRPropertiesURIResolver;
 
 /**
- * Resolves the property values for the given key or key prefix.<br><br>
- * <br>
- * Syntax: <code>property:{key-prefix}*</code> or <br>
- *         <code>property:{key}</code>
- * <br>
- * Result for a key prefix: <code> <br>
- *     &lt;!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd"&gt; <br>
- *     &lt;properties&gt; <br>
- *   &lt;entry key=&quot;key1&quot;&gt;value1&lt;/property&gt; <br>
- *   &lt;entry key=&quot;key2&quot;&gt;value2&lt;/property&gt; <br>
- *   &lt;entry key=&quot;key3&quot;&gt;value3&lt;/property&gt; <br>
- * &lt;/properties&gt; <br>
- * </code>
- * If no entries with the given key prefix exist, a properties element without entry elements is returned.
- * <br>
- * Result for a key: <code> <br>
- *     &lt;entry key=&quot;key&quot;&gt;value&lt;/property&gt;
- * </code>
- * If no entry with the given key exists, an entry element without text content is returned.
- *
- * @deprecated Use {@link MCRPropertiesURIResolver} instead.
+ * {@link URIResolver} that returns configuration properties as an XML source.
  */
-@Deprecated(forRemoval = true)
-public class MCRPropertiesResolver implements URIResolver {
+public class MCRPropertiesURIResolver implements URIResolver {
 
+    /**
+     * Resolves one or all properties matching the given key or key prefix.
+     * <p>If a key prefix ending with {@code *} is given, all matching properties are returned
+     * wrapped in a {@code <properties>} document. If no matches exist, an empty
+     * {@code <properties>} element is returned.
+     * If a plain key is given, a single {@code <entry>} element is returned. If the key does
+     * not exist, the element has no text content.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{key}
+     *   &lt;scheme&gt;:{key-prefix}*
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   property:MCR.Metadata.Type.document
+     *   property:MCR.Metadata.*
+     * </pre>
+     * <p>Example response for a key prefix:
+     * <pre>{@code
+     *   <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+     *   <properties>
+     *     <entry key="MCR.Metadata.Type.document">document</entry>
+     *     <entry key="MCR.Metadata.Type.person">person</entry>
+     *   </properties>
+     * }</pre>
+     * <p>Example response for a single key:
+     * <pre>{@code
+     *   <entry key="MCR.Metadata.Type.document">document</entry>
+     * }</pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link JDOMSource} wrapping either a {@code <properties>} document or
+     *         a single {@code <entry>} element
+     */
     @Override
     public Source resolve(String href, String base) {
         String target = href.substring(href.indexOf(':') + 1);
@@ -100,4 +112,5 @@ public class MCRPropertiesResolver implements URIResolver {
 
         return new JDOMSource(entryElement);
     }
+
 }
