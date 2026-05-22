@@ -91,6 +91,9 @@ public final class MCRProcessableSupplier<R> extends MCRProcessableTask<Callable
     @Override
     public R get() {
         try {
+            if (super.getName() == null) {
+                setName(resolveTaskName());
+            }
             this.setStatus(MCRProcessableStatus.PROCESSING);
             this.startTime = Instant.now();
             R result = getTask().call();
@@ -175,15 +178,16 @@ public final class MCRProcessableSupplier<R> extends MCRProcessableTask<Callable
     @Override
     public String getName() {
         String name = super.getName();
-        if (name == null) {
-            return MCRDecorator.resolve(this.task).map(object -> {
-                if (object instanceof MCRProcessable processable) {
-                    return processable.getName();
-                }
-                return object.toString();
-            }).orElse(this.task.toString());
-        }
-        return name;
+        return name == null ? resolveTaskName() : name;
+    }
+
+    private String resolveTaskName() {
+        return MCRDecorator.resolve(this.task).map(object -> {
+            if (object instanceof MCRProcessable processable) {
+                return processable.getName();
+            }
+            return object.toString();
+        }).orElse(this.task.toString());
     }
 
 }

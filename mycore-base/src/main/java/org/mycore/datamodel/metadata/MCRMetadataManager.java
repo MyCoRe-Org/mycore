@@ -54,6 +54,7 @@ import org.mycore.datamodel.common.MCRLinkType;
 import org.mycore.datamodel.common.MCRMarkManager;
 import org.mycore.datamodel.common.MCRMarkManager.Operation;
 import org.mycore.datamodel.common.MCRObjectIDGenerator;
+import org.mycore.datamodel.common.MCRTrackingObjectIDGenerator;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.normalization.MCRObjectNormalizer;
 import org.mycore.datamodel.metadata.validator.MCRObjectValidator;
@@ -86,6 +87,19 @@ public final class MCRMetadataManager {
 
     public static MCRObjectIDGenerator getMCRObjectIDGenerator() {
         return MCROBJECTID_GENERATOR;
+    }
+
+    /**
+     * If the configured {@link MCRObjectIDGenerator} implements {@link MCRTrackingObjectIDGenerator},
+     * notify it that the given ID has been assigned externally (i.e. not via
+     * {@link MCRObjectIDGenerator#getNextFreeId(String, int)}). This keeps the generator's internal
+     * "last used ID" state in sync with the actual store, so that subsequent calls to
+     * {@code getNextFreeId} cannot return colliding IDs.
+     */
+    private static void recordIDIfTracking(MCRObjectID id) {
+        if (MCROBJECTID_GENERATOR instanceof MCRTrackingObjectIDGenerator tracking) {
+            tracking.recordID(id);
+        }
     }
 
     /**
@@ -126,6 +140,8 @@ public final class MCRMetadataManager {
             derivateId = getMCRObjectIDGenerator().getNextFreeId(derivateId.getBase());
             mcrDerivate.setId(derivateId);
             LOGGER.info("Assigned new derivate id {}", derivateId);
+        } else {
+            recordIDIfTracking(derivateId);
         }
         return derivateId;
     }
@@ -274,6 +290,10 @@ public final class MCRMetadataManager {
         normalizeObject(mcrObject);
 
         validateObject(mcrObject);
+
+        if(objectId.getNumberAsInteger() > 0) {
+            recordIDIfTracking(objectId);
+        }
 
         // handle events
         fireEvent(mcrObject, null, MCREvent.EventType.CREATE);

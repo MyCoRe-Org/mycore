@@ -78,7 +78,7 @@ public final class MCRScopedSession extends MCRSession {
      * @return the result of the action
      */
     public <T> T doAs(ScopedValues scopeValues, Supplier<T> action) {
-        Objects.requireNonNull(scopeValues).map.put(SCOPED_HINT, scopeValues);
+        Objects.requireNonNull(scopeValues).map.put(SCOPED_HINT, Boolean.TRUE);
         scopedValues.set(scopeValues);
         try {
             return action.get();
