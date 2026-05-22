@@ -42,7 +42,7 @@ public interface MCRLegalEntityService {
      * @param identifier unique identifier of legal entity, not null
      * @return a set of identifiers a legal entity owns
      *
-     * @throws MCRException if the reference to the entity isn't found
+     * @throws MCRException if the entity isn't found
      */
     Set<MCRIdentifier> getAllIdentifiers(MCRIdentifier identifier);
 
@@ -51,7 +51,7 @@ public interface MCRLegalEntityService {
      * @param primaryIdentifier unique identifier of legal entity, not null
      * @param identifierToAdd the identifier to add, not null
      *
-     * @throws MCRException if an identifier cannot be added to the entity
+     * @throws MCRException if the entity isn't found or an identifier cannot be added to the entity
      */
     void addIdentifier(MCRIdentifier primaryIdentifier, MCRIdentifier identifierToAdd);
 

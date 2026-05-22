@@ -161,7 +161,7 @@ public class MCRMODSPersonIdentifierService implements MCRLegalEntityService {
         boolean containsAttribute = getIdentifiersFromModsperson(modsperson).contains(attributeToAdd);
 
         if (containsAttribute) {
-            LOGGER.warn("The attribute {} already exists in {}. Will not be added twice.",
+            LOGGER.warn("The attribute {} already exists in {} and will not be added again",
                 attributeToAdd, modspersonId);
             return;
         }

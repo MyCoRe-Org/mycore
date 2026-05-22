@@ -77,7 +77,8 @@ public class MCRUserIdentifierService implements MCRLegalEntityService {
                 throw new MCRException("Failed to update user for identifier: " + userId, e);
             }
         } else {
-            LOGGER.warn("The attribute {} already exists in user {}", attributeToAdd, userId);
+            LOGGER.warn("The attribute {} already exists in user {} and will not be added again"
+                , attributeToAdd, userId);
         }
     }
 

@@ -22,7 +22,7 @@ import java.util.Set;
 
 /**
  * This implementation is a fallback only. Another implementation of {@link MCRLegalEntityService} should
- * be configured when using the service. This implementation is silent an will not throw exceptions.
+ * be configured when using the service. This implementation is silent and will not throw exceptions.
  */
 public class MCRNoOpLegalEntityService implements MCRLegalEntityService {
 
