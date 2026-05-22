@@ -29,7 +29,10 @@ import java.util.Locale;
 
 import javax.imageio.ImageIO;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -42,7 +45,12 @@ import org.mycore.services.queuedjob.MCRJobAction;
 
 public class MCRPDFThumbnailJobAction extends MCRJobAction {
 
+    private static final Logger LOGGER = LogManager.getLogger();
+
     public static final String DERIVATE_PARAMETER = "derivate";
+
+    private static final Long MAX_INPUT_FILE_SIZE =
+        MCRConfiguration2.getLong("MCR.IView2.PDF.Thumbnail.MaxInputFileSize").orElse(null);
 
     public MCRPDFThumbnailJobAction(MCRJob job) {
         super(job);
@@ -72,6 +80,16 @@ public class MCRPDFThumbnailJobAction extends MCRJobAction {
         if (tileInfo.imagePath().toLowerCase(Locale.ROOT).endsWith(".pdf")) {
             try {
                 Path p = MCRPath.getPath(tileInfo.derivate(), tileInfo.imagePath());
+
+                if (MAX_INPUT_FILE_SIZE != null) {
+                    long fileSize = Files.size(p);
+                    if (fileSize > MAX_INPUT_FILE_SIZE) {
+                        LOGGER.warn("Skipping thumbnail generation for {}, file size {} exceeds limit of {} bytes", p,
+                            fileSize, MAX_INPUT_FILE_SIZE);
+                        return;
+                    }
+                }
+
                 BufferedImage bImage = MCRPDFTools.getThumbnail(-1, p, false);
                 Path pImg = Files.createTempFile("MyCoRe-Thumbnail-", ".png");
                 try (OutputStream os = Files.newOutputStream(pImg)) {

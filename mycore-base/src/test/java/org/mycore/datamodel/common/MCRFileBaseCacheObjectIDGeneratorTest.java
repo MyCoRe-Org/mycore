@@ -19,6 +19,7 @@
 package org.mycore.datamodel.common;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -46,6 +47,44 @@ public class MCRFileBaseCacheObjectIDGeneratorTest {
     public static final int TEST_IDS = 100;
 
     private static final Logger LOGGER = LogManager.getLogger();
+
+    @Test
+    public void recordIDAdvancesCacheWhenIdIsHigher() throws IOException {
+        Files.createDirectories(MCRFileBaseCacheObjectIDGenerator.getDataDirPath());
+
+        MCRFileBaseCacheObjectIDGenerator generator = new MCRFileBaseCacheObjectIDGenerator();
+        String baseId = "trackone_test";
+
+        // initial state: no cache file populated
+        assertNull(generator.getLastID(baseId));
+
+        // simulate an externally supplied fixed ID being used
+        MCRObjectID externalId = MCRObjectID.getInstance(MCRObjectID.formatID(baseId, 42));
+        generator.recordID(externalId);
+
+        assertEquals(42, generator.getLastID(baseId).getNumberAsInteger());
+
+        // next generated ID must be strictly greater than the externally supplied one
+        MCRObjectID next = generator.getNextFreeId(baseId);
+        assertEquals(43, next.getNumberAsInteger());
+    }
+
+    @Test
+    public void recordIDIgnoresLowerOrEqualId() throws IOException {
+        Files.createDirectories(MCRFileBaseCacheObjectIDGenerator.getDataDirPath());
+
+        MCRFileBaseCacheObjectIDGenerator generator = new MCRFileBaseCacheObjectIDGenerator();
+        String baseId = "tracktwo_test";
+
+        generator.recordID(MCRObjectID.getInstance(MCRObjectID.formatID(baseId, 100)));
+        // lower ID must be ignored
+        generator.recordID(MCRObjectID.getInstance(MCRObjectID.formatID(baseId, 50)));
+        // equal ID must be ignored
+        generator.recordID(MCRObjectID.getInstance(MCRObjectID.formatID(baseId, 100)));
+
+        assertEquals(100, generator.getLastID(baseId).getNumberAsInteger());
+        assertEquals(101, generator.getNextFreeId(baseId).getNumberAsInteger());
+    }
 
     @Test
     public void getNextFreeId() throws IOException {

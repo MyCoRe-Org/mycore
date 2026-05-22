@@ -89,6 +89,21 @@ public class MCRProcessableSupplierTest {
         es.awaitTermination(10, TimeUnit.SECONDS);
     }
 
+    @Test
+    public void nameStaysStableAfterExecution() throws Exception {
+        ExecutorService es = Executors.newSingleThreadExecutor();
+        MCRProcessableExecutor pes = MCRProcessableFactory.newPool(es);
+        DynamicNameCallable task = new DynamicNameCallable();
+
+        MCRProcessableSupplier<?> supplier = pes.submit(task, 0);
+        supplier.getFuture().get();
+
+        assertEquals("list selected", supplier.getName(), "Name should keep the value from the start of the task");
+
+        es.shutdown();
+        es.awaitTermination(10, TimeUnit.SECONDS);
+    }
+
     private static class TestRunnable extends MCRAbstractProgressable implements Runnable {
 
         @Override
@@ -96,12 +111,29 @@ public class MCRProcessableSupplierTest {
             setProgress(0);
             setProgressText("start");
             try {
-                Thread.sleep(100);
+                Thread.sleep(10);
                 setProgress(100);
                 setProgressText("end");
             } catch (InterruptedException e) {
                 LOGGER.warn("test thread interrupted", e);
             }
+        }
+
+    }
+
+    private static class DynamicNameCallable implements java.util.concurrent.Callable<Boolean> {
+
+        private String name = "list selected";
+
+        @Override
+        public Boolean call() {
+            name = "no active command";
+            return true;
+        }
+
+        @Override
+        public String toString() {
+            return name;
         }
 
     }
