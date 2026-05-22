@@ -209,7 +209,7 @@ public class MCRMODSPersonIdentifierService implements MCRLegalEntityService {
 
     public static class Factory implements Supplier<MCRMODSPersonIdentifierService> {
 
-        @MCRInstance(name = "Fallback", valueClass = MCRLegalEntityService.class)
+        @MCRInstance(name = "Fallback", valueClass = MCRLegalEntityService.class, required = false)
         public MCRLegalEntityService fallbackService;
 
         @Override
