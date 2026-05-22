@@ -187,7 +187,8 @@ public class MCRMODSPersonIdentifierService implements MCRLegalEntityService {
      *
      * @throws MCRException if there's a problem while updating the modsperson
      */
-    private boolean addIdentifierToModsperson(MCRIdentifier userId, MCRIdentifier attributeToAdd, MCRObject modsperson) {
+    private boolean addIdentifierToModsperson(MCRIdentifier userId,
+                    MCRIdentifier attributeToAdd, MCRObject modsperson) {
         MCRObjectID modspersonId = modsperson.getId();
         Element modsName = getModsName(modsperson);
 
