@@ -18,53 +18,124 @@
 
 package org.mycore.orcid2.user;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import java.util.Set;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
+import org.mycore.datamodel.legalentity.MCRIdentifier;
+import org.mycore.datamodel.legalentity.MCRLegalEntityService;
 import org.mycore.orcid2.client.MCRORCIDCredential;
+import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.test.MCRJPAExtension;
 import org.mycore.test.MyCoReTest;
 import org.mycore.user2.MCRUser;
-import org.mycore.user2.MCRUserManager;
+import org.mycore.user2.MCRUserAttribute;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @MyCoReTest
 @ExtendWith(MCRJPAExtension.class)
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.LegalEntityService.Class", string = "org.mycore.orcid2.user.MCRLegalEntityServiceMock")
+})
 public class MCRORCIDUserTest {
 
     private static final String ORCID = "0000-0001-2345-6789";
+    private static final String ORCID_2 = "0000-0002-2345-6789";
+    private static final String ORCID_3 = "0000-0003-2345-6789";
 
     private static final String ACCESS_TOKEN = "accessToken";
 
+    private static MCRORCIDUser orcidUser;
+
+    private static MCRUser userMock;
+
+    @BeforeEach
+    public void prepare() {
+        userMock = new MCRUser("junit");
+        orcidUser = new MCRORCIDUser(userMock);
+
+        MCRLegalEntityServiceMock legalEntityServiceMock =
+            (MCRLegalEntityServiceMock) MCRLegalEntityService.obtainInstance();
+        legalEntityServiceMock.setUserMock(userMock);
+    }
+
     @Test
     public void testStoreGetCredentials() {
-        MCRUser user = new MCRUser("junit");
-        MCRUserManager.createUser(user);
-        MCRORCIDUser orcidUser = new MCRORCIDUser(user);
         assertEquals(0, orcidUser.getCredentials().size());
         final MCRORCIDCredential credential = new MCRORCIDCredential(ACCESS_TOKEN);
         orcidUser.addCredential(ORCID, credential);
         // id_orcid + orcid_credential_orcid
-        assertEquals(2, user.getAttributes().size());
-        assertNotNull(user.getUserAttribute("orcid_credential_" + ORCID));
-        assertEquals(ORCID, user.getUserAttribute("id_orcid"));
+        assertEquals(2, userMock.getAttributes().size());
+        assertNotNull(userMock.getUserAttribute("orcid_credential_" + ORCID));
+        assertEquals(ORCID, userMock.getUserAttribute("id_orcid"));
         assertEquals(credential, orcidUser.getCredentialByORCID(ORCID));
     }
 
     @Test
     public void testRemoveAllCredentials() {
-        MCRUser user = new MCRUser("junit");
-        MCRUserManager.createUser(user);
-        MCRORCIDUser orcidUser = new MCRORCIDUser(user);
         final MCRORCIDCredential credential = new MCRORCIDCredential(ACCESS_TOKEN);
         orcidUser.addCredential(ORCID, credential);
-        user.setUserAttribute("test", "test");
+        userMock.setUserAttribute("test", "test");
         orcidUser.removeAllCredentials();
         // id_orcid + test
-        assertEquals(2, user.getAttributes().size());
-        assertEquals(ORCID, user.getUserAttribute("id_orcid"));
-        assertEquals("test", user.getUserAttribute("test"));
+        assertEquals(2, userMock.getAttributes().size());
+        assertEquals(ORCID, userMock.getUserAttribute("id_orcid"));
+        assertEquals("test", userMock.getUserAttribute("test"));
     }
 
+    @Test
+    public void testAddInvalidCredentials() {
+        assertEquals(0, orcidUser.getCredentials().size());
+        final MCRORCIDCredential credential = new MCRORCIDCredential(null);
+        assertThrows(MCRORCIDException.class, () -> orcidUser.addCredential(ORCID, credential));
+        assertEquals(0, orcidUser.getCredentials().size());
+    }
+
+    @Test
+    public void testGetORCIDs() {
+        userMock.setUserAttribute("test", "test");
+        userMock.getAttributes().add(new MCRUserAttribute("id_orcid", ORCID));
+        userMock.getAttributes().add(new MCRUserAttribute("id_orcid", ORCID_2));
+        userMock.getAttributes().add(new MCRUserAttribute("id_orcid", ORCID_3));
+        Set<String> orcids = orcidUser.getORCIDs();
+        assertEquals(Set.of(ORCID, ORCID_2, ORCID_3), orcids);
+    }
+
+    @Test
+    public void testAddORCID() {
+        assertEquals(0, orcidUser.getORCIDs().size());
+        orcidUser.addORCID(ORCID);
+        assertEquals(1, orcidUser.getORCIDs().size());
+        assertEquals(Set.of(ORCID), orcidUser.getORCIDs());
+
+        orcidUser.addORCID(ORCID);
+        assertEquals(1, orcidUser.getORCIDs().size());
+    }
+
+    @Test
+    public void testAddInvalidORCID() {
+        assertEquals(0, orcidUser.getORCIDs().size());
+        assertThrows(MCRORCIDException.class, () -> orcidUser.addORCID("1234"));
+        assertEquals(0, orcidUser.getORCIDs().size());
+    }
+
+    @Test
+    public void testGetIdentifiers() {
+        userMock.setUserAttribute("test", "test");
+        userMock.getAttributes().add(new MCRUserAttribute("id_orcid", ORCID));
+        Set<MCRIdentifier> identifiers = orcidUser.getIdentifiers();
+        assertEquals(Set.of(new MCRIdentifier("test", "test"),
+        new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID)), identifiers);
+    }
+
+    private String stripPrefix(String name) {
+        return name.startsWith(MCRORCIDUser.ATTR_ID_PREFIX) ?
+               name.substring(MCRORCIDUser.ATTR_ID_PREFIX.length()) : name;
+    }
 }

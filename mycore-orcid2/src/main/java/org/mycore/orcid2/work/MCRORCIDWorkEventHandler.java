@@ -36,6 +36,7 @@ import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.datamodel.legalentity.MCRIdentifier;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -53,7 +54,6 @@ import org.mycore.orcid2.metadata.MCRORCIDUserInfo;
 import org.mycore.orcid2.user.MCRORCIDUser;
 import org.mycore.orcid2.user.MCRORCIDUserProperties;
 import org.mycore.orcid2.user.MCRORCIDUserUtils;
-import org.mycore.orcid2.util.MCRIdentifier;
 import org.mycore.user2.MCRUser;
 import org.orcid.jaxb.model.message.ScopeConstants;
 

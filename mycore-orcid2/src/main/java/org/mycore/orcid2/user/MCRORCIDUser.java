@@ -27,11 +27,15 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.datamodel.legalentity.MCRIdentifier;
+import org.mycore.datamodel.legalentity.MCRLegalEntityService;
 import org.mycore.orcid2.MCRORCIDConstants;
 import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.orcid2.exception.MCRORCIDException;
-import org.mycore.orcid2.util.MCRIdentifier;
 import org.mycore.orcid2.util.MCRORCIDJSONMapper;
 import org.mycore.orcid2.validation.MCRORCIDValidationHelper;
 import org.mycore.user2.MCRUser;
@@ -42,6 +46,8 @@ import org.mycore.user2.MCRUserAttribute;
  * Handles the updating of user.
  */
 public class MCRORCIDUser {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * List of trusted name identifier types.
@@ -68,7 +74,7 @@ public class MCRORCIDUser {
     /**
      * ORCID iD user attribute name.
      */
-    public static final String ATTR_ORCID_ID = ATTR_ID_PREFIX + "orcid";
+    public static final String ATTR_ORCID_ID = ATTR_ID_PREFIX + MCRIdentifier.ORCID_ID_TYPE;
 
     private final MCRUser user;
 
@@ -94,16 +100,23 @@ public class MCRORCIDUser {
      * Adds ORCID iD to user's user attributes.
      *
      * @param orcid the ORCID iD
-     * @throws MCRORCIDException if ORCID iD is invalid
+     * @throws MCRORCIDException if ORCID iD is invalid or there was an error while adding it
      */
     public void addORCID(String orcid) {
         if (!MCRORCIDValidationHelper.validateORCID(orcid)) {
             throw new MCRORCIDException("Invalid ORCID iD");
         }
-        final MCRUserAttribute attribute = new MCRUserAttribute(ATTR_ORCID_ID, orcid);
-        // allow more than one ORCID iD per user
-        if (!user.getAttributes().contains(attribute)) {
-            user.getAttributes().add(new MCRUserAttribute(ATTR_ORCID_ID, orcid));
+        final MCRIdentifier newOrcid = new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, orcid);
+        final MCRIdentifier userid = new MCRIdentifier(MCRIdentifier.USER_ID_TYPE, user.getUserID());
+
+        try {
+            boolean added = MCRLegalEntityService.obtainInstance().addIdentifier(userid, newOrcid);
+            if (!added) {
+                LOGGER.warn("The ORCID iD {} already exists in user {} and will not be added again",
+                    newOrcid, userid);
+            }
+        } catch (MCRException e) {
+            throw new MCRORCIDException("ORCID iD could not be added:" + e.getMessage(), e);
         }
     }
 
@@ -112,9 +125,11 @@ public class MCRORCIDUser {
      * @return ORCID iDs as set
      */
     public Set<String> getORCIDs() {
-        return user.getAttributes().stream()
-            .filter(a -> Objects.equals(a.getName(), ATTR_ORCID_ID))
-            .map(MCRUserAttribute::getValue).collect(Collectors.toSet());
+        final MCRIdentifier userid = new MCRIdentifier(MCRIdentifier.USER_ID_TYPE, user.getUserID());
+        Set<MCRIdentifier> orcidIdentifiers = MCRLegalEntityService.obtainInstance().getAllIdentifiers(userid);
+        return orcidIdentifiers.stream()
+            .filter(identifiers -> identifiers.getType().equals(MCRIdentifier.ORCID_ID_TYPE))
+            .map(MCRIdentifier::getValue).collect(Collectors.toSet());
     }
 
     /**
@@ -232,9 +247,8 @@ public class MCRORCIDUser {
      * @return Set of MCRIdentifier
      */
     public Set<MCRIdentifier> getIdentifiers() {
-        return user.getAttributes().stream().filter(a -> a.getName().startsWith(ATTR_ID_PREFIX))
-            .map(a -> new MCRIdentifier(a.getName().substring(ATTR_ID_PREFIX.length()), a.getValue()))
-            .collect(Collectors.toSet());
+        final MCRIdentifier userId = new MCRIdentifier(MCRIdentifier.USER_ID_TYPE, user.getUserID());
+        return MCRLegalEntityService.obtainInstance().getAllIdentifiers(userId);
     }
 
     /**

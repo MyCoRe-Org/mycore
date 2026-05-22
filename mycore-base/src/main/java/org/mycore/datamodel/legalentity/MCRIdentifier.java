@@ -16,21 +16,23 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.orcid2.util;
+package org.mycore.datamodel.legalentity;
 
 import java.util.Locale;
 import java.util.Objects;
 
 /**
  * Class to store IDs.
- * @deprecated moved to mycore-base / org.mycore.datamodel.legalentity
  */
-@Deprecated
 public class MCRIdentifier {
 
     private final String type;
 
     private final String value;
+
+    public static final String USER_ID_TYPE = "userid";
+
+    public static final String ORCID_ID_TYPE = "orcid";
 
     /**
      * Constructs new MCRIdentifier object with type and value.
