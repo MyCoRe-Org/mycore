@@ -1962,9 +1962,9 @@ Applications based on MyCoRe use a common core, which provides the functionality
       </dependency>
       <dependency>
         <!-- required for commons-vfs -->
-        <groupId>com.jcraft</groupId>
+        <groupId>com.github.mwiede</groupId>
         <artifactId>jsch</artifactId>
-        <version>0.1.55</version>
+        <version>2.28.0</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>

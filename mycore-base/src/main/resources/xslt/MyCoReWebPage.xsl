@@ -145,13 +145,13 @@
   <!-- =============================================================================== -->
 
   <xsl:template match="desktop">
-    <xsl:if test="not(mcrlayoututils:isMobileDevice($UserAgent))">
+    <xsl:if test="not(mcrlayoututils:is-mobile-device($UserAgent))">
       <xsl:apply-templates/>
     </xsl:if>
   </xsl:template>
 
   <xsl:template match="mobile">
-    <xsl:if test="mcrlayoututils:isMobileDevice($UserAgent)">
+    <xsl:if test="mcrlayoututils:is-mobile-device($UserAgent)">
       <xsl:apply-templates/>
     </xsl:if>
   </xsl:template>

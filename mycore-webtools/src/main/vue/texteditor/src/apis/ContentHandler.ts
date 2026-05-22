@@ -52,6 +52,8 @@ export interface ContentHandler {
    */
   dirtyAfterSave(path: string): boolean;
 
+  supportsExpandedView(path: string): boolean;
+
   supportsLocking(path: string): boolean;
 
   lock(path: string): Promise<LockResult>;
