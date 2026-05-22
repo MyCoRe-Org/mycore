@@ -20,6 +20,7 @@ package org.mycore.util.concurrent.processing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNull;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -75,13 +76,28 @@ public class MCRProcessableSupplierTest extends MCRTestCase {
             supplier.getStatus());
         assertEquals("the progressable should be at 100", Integer.valueOf(100), supplier.getProgress());
         assertEquals("end", supplier.getProgressText());
-        assertEquals("there shouldn't be any error", null, supplier.getError());
+        assertNull("there shouldn't be any error", supplier.getError());
         assertNotEquals("there should be a start time", null, supplier.getStartTime());
         assertNotEquals("there should be an end time", null, supplier.getEndTime());
         assertNotEquals(null, supplier.took());
 
         assertNotEquals("the status listener wasn't called", 0, STATUS_LISTENER_COUNTER);
         assertNotEquals("the progressable listener wasn't called", 0, PROGRESS_LISTENER_COUNTER);
+
+        es.shutdown();
+        es.awaitTermination(10, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void nameStaysStableAfterExecution() throws Exception {
+        ExecutorService es = Executors.newSingleThreadExecutor();
+        MCRProcessableExecutor pes = MCRProcessableFactory.newPool(es);
+        DynamicNameCallable task = new DynamicNameCallable();
+
+        MCRProcessableSupplier<?> supplier = pes.submit(task, 0);
+        supplier.getFuture().get();
+
+        assertEquals("Name should keep the value from the start of the task", "list selected", supplier.getName());
 
         es.shutdown();
         es.awaitTermination(10, TimeUnit.SECONDS);
@@ -94,12 +110,29 @@ public class MCRProcessableSupplierTest extends MCRTestCase {
             setProgress(0);
             setProgressText("start");
             try {
-                Thread.sleep(100);
+                Thread.sleep(10);
                 setProgress(100);
                 setProgressText("end");
             } catch (InterruptedException e) {
                 LOGGER.warn("test thread interrupted", e);
             }
+        }
+
+    }
+
+    private static class DynamicNameCallable implements java.util.concurrent.Callable<Boolean> {
+
+        private String name = "list selected";
+
+        @Override
+        public Boolean call() {
+            name = "no active command";
+            return true;
+        }
+
+        @Override
+        public String toString() {
+            return name;
         }
 
     }
