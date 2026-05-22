@@ -87,26 +87,26 @@ public class MCRMODSPersonIdentifierService implements MCRLegalEntityService {
      * and its modsperson id.
      * @param userId the user id connected to the modsperson
      * @param attributeToAdd the nameIdentifier to add to the modsperson
+     * @return true, if the attribute was successfully added
      *
      * @throws MCRException if an identifier cannot be added to the modsperson
      */
     @Override
-    public void addIdentifier(MCRIdentifier userId, MCRIdentifier attributeToAdd) throws MCRException {
+    public boolean addIdentifier(MCRIdentifier userId, MCRIdentifier attributeToAdd) throws MCRException {
         Optional<MCRObject> modspersonOptional = findModspersonByUsername(userId);
 
         if (modspersonOptional.isPresent()) {
-            addIdentifierToModsperson(userId, attributeToAdd,modspersonOptional.get());
+            return addIdentifierToModsperson(userId, attributeToAdd, modspersonOptional.get());
         } else {
-            addIdentifierToFallback(userId, attributeToAdd);
+            return addIdentifierToFallback(userId, attributeToAdd);
         }
     }
 
     private Set<MCRIdentifier> getAllIdentifiersFromFallback(MCRIdentifier userId) {
         if (fallbackService != null) {
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("No modsperson found for user id: {} . Calling fallback service {}",
-                    userId, fallbackService.getClass().getSimpleName());
-            }
+            LOGGER.info(() -> "No modsperson found for user id: " + userId + " . "
+                + "Calling fallback service " + fallbackService.getClass().getSimpleName());
+
             return fallbackService.getAllIdentifiers(userId);
         } else {
             throw new MCRException("No modsperson found for user id: " + userId + " and no fallback configured. "
@@ -114,13 +114,17 @@ public class MCRMODSPersonIdentifierService implements MCRLegalEntityService {
         }
     }
 
-    private void addIdentifierToFallback(MCRIdentifier userId, MCRIdentifier attributeToAdd) {
+    /**
+     * Helper method to add an attribute using the configured fallback service.
+     * @param userId the user id connected to the modsperson
+     * @param attributeToAdd the nameIdentifier to add to the modsperson
+     * @return true, if the attribute was successfully added
+     */
+    private boolean addIdentifierToFallback(MCRIdentifier userId, MCRIdentifier attributeToAdd) {
         if (fallbackService != null) {
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("No modsperson found for user id: {} . Calling fallback service {}",
-                    userId, fallbackService.getClass().getSimpleName());
-            }
-            fallbackService.addIdentifier(userId, attributeToAdd);
+            LOGGER.info(() -> "No modsperson found for user id: " + userId + " . "
+                + "Calling fallback service " + fallbackService.getClass().getSimpleName());
+            return fallbackService.addIdentifier(userId, attributeToAdd);
         } else {
             throw new MCRException("No modsperson found for user id: " + userId + " and no fallback configured. "
                 + "Cannot add identifier.");
@@ -177,19 +181,18 @@ public class MCRMODSPersonIdentifierService implements MCRLegalEntityService {
      * @param userId ID of the user for logging context
      * @param attributeToAdd attribute to add to the modsperson
      * @param modsperson the modsperson object
+     * @return true, if the attribute was successfully added
      *
      * @throws MCRException if there's a problem while updating the modsperson
      */
-    private void addIdentifierToModsperson(MCRIdentifier userId, MCRIdentifier attributeToAdd, MCRObject modsperson) {
+    private boolean addIdentifierToModsperson(MCRIdentifier userId, MCRIdentifier attributeToAdd, MCRObject modsperson) {
         MCRObjectID modspersonId = modsperson.getId();
         Element modsName = getModsName(modsperson);
 
         boolean containsAttribute = getIdentifiersFromModsperson(modsperson).contains(attributeToAdd);
 
         if (containsAttribute) {
-            LOGGER.warn("The attribute {} already exists in {} and will not be added again",
-                attributeToAdd, modspersonId);
-            return;
+            return false;
         }
 
         Element nameIdentifier = new Element(MODS_NAMEIDENTIFIER, MCRConstants.MODS_NAMESPACE)
@@ -204,6 +207,7 @@ public class MCRMODSPersonIdentifierService implements MCRLegalEntityService {
             throw new MCRException("Failed to update modsperson object "
                 + modspersonId + " for identifier: " + userId, e);
         }
+        return true;
     }
 
     public static class Factory implements Supplier<MCRMODSPersonIdentifierService> {

@@ -38,22 +38,23 @@ import org.mycore.common.config.MCRConfiguration2;
 public interface MCRLegalEntityService {
 
     /**
-     * Returns all identifiers of a legal entity determined by a specific identifier.
-     * @param identifier unique identifier of legal entity, not null
+     * Returns all identifiers of a legal entity determined by a specific primary identifier.
+     * @param primaryIdentifier unique identifier of legal entity, not null
      * @return a set of identifiers a legal entity owns
      *
      * @throws MCRException if the entity isn't found
      */
-    Set<MCRIdentifier> getAllIdentifiers(MCRIdentifier identifier);
+    Set<MCRIdentifier> getAllIdentifiers(MCRIdentifier primaryIdentifier);
 
     /**
      * Adds an identifier to a legal entity. The entity is determined by a specific, given identifier
      * @param primaryIdentifier unique identifier of legal entity, not null
      * @param identifierToAdd the identifier to add, not null
+     * @return true, if the identifier was successfully added
      *
      * @throws MCRException if the entity isn't found or an identifier cannot be added to the entity
      */
-    void addIdentifier(MCRIdentifier primaryIdentifier, MCRIdentifier identifierToAdd);
+    boolean addIdentifier(MCRIdentifier primaryIdentifier, MCRIdentifier identifierToAdd);
 
     /**
      * Get configured singleton service implementation.

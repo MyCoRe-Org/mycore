@@ -21,8 +21,6 @@ package org.mycore.user2;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.legalentity.MCRIdentifier;
 import org.mycore.datamodel.legalentity.MCRLegalEntityService;
@@ -33,8 +31,6 @@ import org.mycore.datamodel.legalentity.MCRLegalEntityService;
  * entity.
  */
 public class MCRUserIdentifierService implements MCRLegalEntityService {
-
-    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String ATTR_ID_PREFIX = "id_";
 
@@ -60,11 +56,12 @@ public class MCRUserIdentifierService implements MCRLegalEntityService {
      * Adds an attribute to a user by its {@link MCRUser#getUserID() user ID}.
      * @param userId the user id
      * @param attributeToAdd the attribute to add in the form of a {@link MCRIdentifier}
+     * @return true, if the attribute was successfully added
      *
      * @throws MCRException if an identifier cannot be added to the user
      */
     @Override
-    public void addIdentifier(MCRIdentifier userId, MCRIdentifier attributeToAdd) {
+    public boolean addIdentifier(MCRIdentifier userId, MCRIdentifier attributeToAdd) {
         MCRUser user = findUserByUserID(userId);
 
         MCRUserAttribute newAttribute = new MCRUserAttribute(
@@ -76,9 +73,9 @@ public class MCRUserIdentifierService implements MCRLegalEntityService {
             } catch (Exception e) {
                 throw new MCRException("Failed to update user for identifier: " + userId, e);
             }
+            return true;
         } else {
-            LOGGER.warn("The attribute {} already exists in user {} and will not be added again"
-                , attributeToAdd, userId);
+            return false;
         }
     }
 

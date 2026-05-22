@@ -27,12 +27,12 @@ import java.util.Set;
 public class MCRNoOpLegalEntityService implements MCRLegalEntityService {
 
     @Override
-    public Set<MCRIdentifier> getAllIdentifiers(MCRIdentifier identifier) {
+    public Set<MCRIdentifier> getAllIdentifiers(MCRIdentifier primaryIdentifier) {
         return Set.of();
     }
 
     @Override
-    public void addIdentifier(MCRIdentifier primaryIdentifier, MCRIdentifier identifierToAdd) {
-        // no-op
+    public boolean addIdentifier(MCRIdentifier primaryIdentifier, MCRIdentifier identifierToAdd) {
+        return false;
     }
 }

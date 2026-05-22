@@ -46,6 +46,7 @@ import org.mycore.user2.MCRUserIdentifierService;
 import org.mycore.user2.MCRUserManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -118,11 +119,14 @@ public class MCRMODSPersonIdentifierServiceTest {
         Set<MCRIdentifier> allIdentifiers = service.getAllIdentifiers(userid);
         assertEquals(2, allIdentifiers.size());
 
-        service.addIdentifier(userid, new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_1)); // don't add id twice
+        boolean added = service.addIdentifier(userid,
+            new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_1)); // don't add id twice
+        assertFalse(added);
         allIdentifiers = service.getAllIdentifiers(userid);
         assertEquals(2, allIdentifiers.size());
 
-        service.addIdentifier(userid, new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_3));
+        added = service.addIdentifier(userid, new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_3));
+        assertTrue(added);
         allIdentifiers = service.getAllIdentifiers(userid);
         assertEquals(3, allIdentifiers.size());
         Set<MCRIdentifier> expected = Set.of(new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_1),
@@ -148,7 +152,8 @@ public class MCRMODSPersonIdentifierServiceTest {
         Set<MCRIdentifier> expected = Set.of(new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_1));
         assertEquals(expected, allIdentifiers);
 
-        service.addIdentifier(userid, new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_2));
+        boolean added = service.addIdentifier(userid, new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_2));
+        assertTrue(added);
         user3 = MCRUserManager.getUser("james");
         assertEquals(2, user3.getAttributes().size());
         Set<MCRUserAttribute> expectedUserAttributes = Set.of(new MCRUserAttribute("id_orcid", ORCID_1),

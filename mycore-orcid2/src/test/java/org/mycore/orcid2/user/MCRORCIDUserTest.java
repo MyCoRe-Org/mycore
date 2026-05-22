@@ -113,6 +113,9 @@ public class MCRORCIDUserTest {
         orcidUser.addORCID(ORCID);
         assertEquals(1, orcidUser.getORCIDs().size());
         assertEquals(Set.of(ORCID), orcidUser.getORCIDs());
+
+        orcidUser.addORCID(ORCID);
+        assertEquals(1, orcidUser.getORCIDs().size());
     }
 
     @Test

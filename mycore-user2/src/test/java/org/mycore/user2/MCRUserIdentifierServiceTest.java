@@ -29,6 +29,7 @@ import org.mycore.test.MCRJPAExtension;
 import org.mycore.test.MyCoReTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -85,11 +86,14 @@ public class MCRUserIdentifierServiceTest {
         Set<MCRIdentifier> allIdentifiers = service.getAllIdentifiers(userid);
         assertEquals(2, allIdentifiers.size());
 
-        service.addIdentifier(userid, new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_1)); // don't add id twice
+        boolean added = service.addIdentifier(userid,
+            new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_1)); // don't add id twice
+        assertFalse(added);
         allIdentifiers = service.getAllIdentifiers(userid);
         assertEquals(2, allIdentifiers.size());
 
-        service.addIdentifier(userid, new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_3));
+        added = service.addIdentifier(userid, new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_3));
+        assertTrue(added);
         allIdentifiers = service.getAllIdentifiers(userid);
         assertEquals(3, allIdentifiers.size());
         Set<MCRIdentifier> expected = Set.of(new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_1),

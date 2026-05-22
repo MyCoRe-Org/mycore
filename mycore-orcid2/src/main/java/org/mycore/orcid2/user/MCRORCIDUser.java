@@ -27,6 +27,8 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.legalentity.MCRIdentifier;
@@ -44,6 +46,8 @@ import org.mycore.user2.MCRUserAttribute;
  * Handles the updating of user.
  */
 public class MCRORCIDUser {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * List of trusted name identifier types.
@@ -106,7 +110,11 @@ public class MCRORCIDUser {
         final MCRIdentifier userid = new MCRIdentifier(MCRIdentifier.USER_ID_TYPE, user.getUserID());
 
         try {
-            MCRLegalEntityService.obtainInstance().addIdentifier(userid, newOrcid);
+            boolean added = MCRLegalEntityService.obtainInstance().addIdentifier(userid, newOrcid);
+            if (!added) {
+                LOGGER.warn("The ORCID iD {} already exists in user {} and will not be added again",
+                    newOrcid, userid);
+            }
         } catch (MCRException e) {
             throw new MCRORCIDException("ORCID iD could not be added:" + e.getMessage(), e);
         }
