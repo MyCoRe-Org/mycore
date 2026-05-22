@@ -20,6 +20,7 @@ package org.mycore.mods;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -29,6 +30,8 @@ import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRInstance;
 import org.mycore.datamodel.legalentity.MCRIdentifier;
 import org.mycore.datamodel.legalentity.MCRLegalEntityService;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -45,6 +48,7 @@ import org.mycore.user2.MCRUserManager;
  * If this attribute is not present, an empty set is returned.
  * New attributes are added to the modsperson metadata and are not added to the user entity.
  */
+@MCRConfigurationProxy(proxyClass = MCRMODSPersonIdentifierService.Factory.class)
 public class MCRMODSPersonIdentifierService implements MCRLegalEntityService {
 
     private static final Logger LOGGER = LogManager.getLogger();
@@ -56,6 +60,12 @@ public class MCRMODSPersonIdentifierService implements MCRLegalEntityService {
     private static final String MODS_NAMEIDENTIFIER = "nameIdentifier";
 
     private static final String TYPE = "type";
+
+    private final MCRLegalEntityService fallbackService;
+
+    public MCRMODSPersonIdentifierService(MCRLegalEntityService fallbackService) {
+        this.fallbackService = fallbackService;
+    }
 
     /**
      * Gets all {@link MCRIdentifier MCRIdentifiers} of a modsperson by reference to a {@link org.mycore.user2.MCRUser}
@@ -113,7 +123,7 @@ public class MCRMODSPersonIdentifierService implements MCRLegalEntityService {
         try {
             return Optional.of(MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(modspersonId)));
         } catch (MCRPersistenceException e) {
-            LOGGER.warn("Could not retrieve modsperson object {} for user id {}. Falling back.",
+            LOGGER.warn("Could not retrieve modsperson object {} for user id {}. Falling back: ",
                 modspersonId, userId, e);
             return Optional.empty();
         }
@@ -171,12 +181,11 @@ public class MCRMODSPersonIdentifierService implements MCRLegalEntityService {
     }
 
     private Set<MCRIdentifier> getAllIdentifiersFromFallback(MCRIdentifier userId) {
-        Optional<MCRLegalEntityService> fallbackServiceOptional = MCRLegalEntityService.obtainFallbackInstance();
-
-        if (fallbackServiceOptional.isPresent()) {
-            MCRLegalEntityService fallbackService =  fallbackServiceOptional.get();
-            LOGGER.info("No modsperson found for user id: {} . Calling fallback service {}",
-                userId, fallbackService.getClass().getSimpleName());
+        if (fallbackService != null) {
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("No modsperson found for user id: {} . Calling fallback service {}",
+                    userId, fallbackService.getClass().getSimpleName());
+            }
             return fallbackService.getAllIdentifiers(userId);
         } else {
             LOGGER.warn("No modsperson found for user id: {} and no fallback configured. "
@@ -186,16 +195,26 @@ public class MCRMODSPersonIdentifierService implements MCRLegalEntityService {
     }
 
     private void addIdentifierToFallback(MCRIdentifier userId, MCRIdentifier attributeToAdd) {
-        Optional<MCRLegalEntityService> fallbackServiceOptional = MCRLegalEntityService.obtainFallbackInstance();
-
-        if (fallbackServiceOptional.isPresent()) {
-            MCRLegalEntityService fallbackService =  fallbackServiceOptional.get();
-            LOGGER.info("No modsperson found for user id: {} . Calling fallback service {}",
-                userId, fallbackService.getClass().getSimpleName());
+        if (fallbackService != null) {
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("No modsperson found for user id: {} . Calling fallback service {}",
+                    userId, fallbackService.getClass().getSimpleName());
+            }
             fallbackService.addIdentifier(userId, attributeToAdd);
         } else {
             LOGGER.warn("No modsperson found for user id: {} and no fallback configured. "
                 + "Identifier not added. ", userId);
+        }
+    }
+
+    public static class Factory implements Supplier<MCRMODSPersonIdentifierService> {
+
+        @MCRInstance(name = "Fallback", valueClass = MCRLegalEntityService.class)
+        public MCRLegalEntityService fallbackService;
+
+        @Override
+        public MCRMODSPersonIdentifierService get() {
+            return new MCRMODSPersonIdentifierService(fallbackService);
         }
     }
 }
