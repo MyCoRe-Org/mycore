@@ -194,10 +194,18 @@ public class MCRMODSPersonIdentifierServiceTest {
         MCRUserManager.createUser(user3);
 
         final MCRIdentifier userid = new MCRIdentifier(MCRIdentifier.USER_ID_TYPE, user3.getUserID());
-        Set<MCRIdentifier> allIdentifiers = service.getAllIdentifiers(userid);
-        assertEquals(0, allIdentifiers.size());
+        exception = assertThrows(MCRException.class, () ->
+            service.getAllIdentifiers(userid));
+        assertTrue(exception.getMessage().contains("No modsperson found for user id"));
+        assertTrue(exception.getMessage().contains("userid:james"));
+        assertTrue(exception.getMessage().contains("no fallback configured"));
 
-        service.addIdentifier(userid, new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_2));
+        exception = assertThrows(MCRException.class, () ->
+            service.addIdentifier(userid, new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_2)));
+        assertTrue(exception.getMessage().contains("No modsperson found for user id"));
+        assertTrue(exception.getMessage().contains("userid:james"));
+        assertTrue(exception.getMessage().contains("no fallback configured"));
+
         user3 = MCRUserManager.getUser("james");
         assertEquals(1, user3.getAttributes().size());
         Set<MCRUserAttribute> expectedUserAttributes = Set.of(new MCRUserAttribute("id_orcid", ORCID_1));
@@ -205,8 +213,11 @@ public class MCRMODSPersonIdentifierServiceTest {
 
         user3.setUserAttribute("id_modsperson", "junit_modsperson_00000404");
         MCRUserManager.updateUser(user3);
-        allIdentifiers = service.getAllIdentifiers(userid);
-        assertEquals(0, allIdentifiers.size());
+        exception = assertThrows(MCRException.class, () ->
+            service.getAllIdentifiers(userid));
+        assertTrue(exception.getMessage().contains("No modsperson found for user id"));
+        assertTrue(exception.getMessage().contains("userid:james"));
+        assertTrue(exception.getMessage().contains("no fallback configured"));
 
         URL url3 = MCRObjectMetadataTest.class.getResource(
             "/MCRMODSPersonIdentifierServiceTest/junit_modsperson_00000003.xml");
@@ -217,7 +228,7 @@ public class MCRMODSPersonIdentifierServiceTest {
         user3.setUserAttribute("id_modsperson", "junit_modsperson_00000003");
         MCRUserManager.updateUser(user3);
 
-        allIdentifiers = service.getAllIdentifiers(userid);
+        Set<MCRIdentifier> allIdentifiers = service.getAllIdentifiers(userid);
         assertEquals(2, allIdentifiers.size());
         Set<MCRIdentifier> expected = Set.of(new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_1),
             new MCRIdentifier(MCRIdentifier.ORCID_ID_TYPE, ORCID_4));

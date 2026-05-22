@@ -101,6 +101,32 @@ public class MCRMODSPersonIdentifierService implements MCRLegalEntityService {
         }
     }
 
+    private Set<MCRIdentifier> getAllIdentifiersFromFallback(MCRIdentifier userId) {
+        if (fallbackService != null) {
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("No modsperson found for user id: {} . Calling fallback service {}",
+                    userId, fallbackService.getClass().getSimpleName());
+            }
+            return fallbackService.getAllIdentifiers(userId);
+        } else {
+            throw new MCRException("No modsperson found for user id: " + userId + " and no fallback configured. "
+                + "Cannot get identifiers.");
+        }
+    }
+
+    private void addIdentifierToFallback(MCRIdentifier userId, MCRIdentifier attributeToAdd) {
+        if (fallbackService != null) {
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("No modsperson found for user id: {} . Calling fallback service {}",
+                    userId, fallbackService.getClass().getSimpleName());
+            }
+            fallbackService.addIdentifier(userId, attributeToAdd);
+        } else {
+            throw new MCRException("No modsperson found for user id: " + userId + " and no fallback configured. "
+                + "Cannot add identifier.");
+        }
+    }
+
     /**
      * Takes a username and returns an Optional with the referenced modsperson.
      * @param userId the user id
@@ -177,33 +203,6 @@ public class MCRMODSPersonIdentifierService implements MCRLegalEntityService {
         } catch (MCRAccessException | MCRPersistenceException e) {
             throw new MCRException("Failed to update modsperson object "
                 + modspersonId + " for identifier: " + userId, e);
-        }
-    }
-
-    private Set<MCRIdentifier> getAllIdentifiersFromFallback(MCRIdentifier userId) {
-        if (fallbackService != null) {
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("No modsperson found for user id: {} . Calling fallback service {}",
-                    userId, fallbackService.getClass().getSimpleName());
-            }
-            return fallbackService.getAllIdentifiers(userId);
-        } else {
-            LOGGER.warn("No modsperson found for user id: {} and no fallback configured. "
-                + "Returning empty Set.", userId);
-        }
-        return Set.of();
-    }
-
-    private void addIdentifierToFallback(MCRIdentifier userId, MCRIdentifier attributeToAdd) {
-        if (fallbackService != null) {
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("No modsperson found for user id: {} . Calling fallback service {}",
-                    userId, fallbackService.getClass().getSimpleName());
-            }
-            fallbackService.addIdentifier(userId, attributeToAdd);
-        } else {
-            LOGGER.warn("No modsperson found for user id: {} and no fallback configured. "
-                + "Identifier not added. ", userId);
         }
     }
 
