@@ -62,6 +62,13 @@ public final class MCRHighestComponentPriorityResourceSelector extends MCRResour
         for (MCRComponent component : componentsByComponentPriority(hints)) {
             int priority = component.getPriority();
             tracer.trace(() -> "Testing component " + component.getName() + " with priority " + priority);
+
+            if (component.getJarFile() == null) {
+                tracer.trace(() -> "Component " + component.getName()
+                    + " has no JAR file (directory-based), skipping");
+                continue;
+            }
+
             if (highestPriority != -1 && highestPriority != priority) {
                 int highestPrioritySoFar = highestPriority;
                 tracer.trace(() -> "Found component with priority lower than "
