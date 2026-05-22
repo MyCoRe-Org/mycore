@@ -61,6 +61,8 @@ public class MCRMODSPersonIdentifierService implements MCRLegalEntityService {
 
     private static final String TYPE = "type";
 
+    private static final String LOG_NO_MODSPERSON = "No modsperson found for user id:";
+
     private final MCRLegalEntityService fallbackService;
 
     public MCRMODSPersonIdentifierService(MCRLegalEntityService fallbackService) {
@@ -104,12 +106,12 @@ public class MCRMODSPersonIdentifierService implements MCRLegalEntityService {
 
     private Set<MCRIdentifier> getAllIdentifiersFromFallback(MCRIdentifier userId) {
         if (fallbackService != null) {
-            LOGGER.info(() -> "No modsperson found for user id: " + userId + " . "
+            LOGGER.info(() -> LOG_NO_MODSPERSON + userId + " . "
                 + "Calling fallback service " + fallbackService.getClass().getSimpleName());
 
             return fallbackService.getAllIdentifiers(userId);
         } else {
-            throw new MCRException("No modsperson found for user id: " + userId + " and no fallback configured. "
+            throw new MCRException(LOG_NO_MODSPERSON + userId + " and no fallback configured. "
                 + "Cannot get identifiers.");
         }
     }
@@ -122,11 +124,11 @@ public class MCRMODSPersonIdentifierService implements MCRLegalEntityService {
      */
     private boolean addIdentifierToFallback(MCRIdentifier userId, MCRIdentifier attributeToAdd) {
         if (fallbackService != null) {
-            LOGGER.info(() -> "No modsperson found for user id: " + userId + " . "
+            LOGGER.info(() -> LOG_NO_MODSPERSON + userId + " . "
                 + "Calling fallback service " + fallbackService.getClass().getSimpleName());
             return fallbackService.addIdentifier(userId, attributeToAdd);
         } else {
-            throw new MCRException("No modsperson found for user id: " + userId + " and no fallback configured. "
+            throw new MCRException(LOG_NO_MODSPERSON + userId + " and no fallback configured. "
                 + "Cannot add identifier.");
         }
     }
