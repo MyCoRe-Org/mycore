@@ -29,7 +29,7 @@ public final class MCRInstanceName {
 
     private final String actual;
 
-    public MCRInstanceName(String canonical, String actual) {
+    private MCRInstanceName(String canonical, String actual) {
         this.canonical = canonical;
         this.actual = actual;
     }
@@ -39,12 +39,14 @@ public final class MCRInstanceName {
      * <p>
      * If the given <em>name</em> ends with <code>.Class</code>, that suffix is removed
      * and the remainder used as the {@link MCRInstanceName#canonical()} name.
-     * <p>
      *
      * @param name the name
      * @return the name
      */
     public static MCRInstanceName of(String name) {
+        if (name == null || name.isEmpty() || CLASS_SUFFIX.equals(name)) {
+            throw new IllegalArgumentException("Instance name must not be empty");
+        }
         if (name.endsWith(CLASS_SUFFIX)) {
             return new MCRInstanceName(name.substring(0, name.length() - CLASS_SUFFIX.length()), name);
         } else {

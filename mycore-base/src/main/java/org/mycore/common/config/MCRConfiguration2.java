@@ -19,7 +19,6 @@
 package org.mycore.common.config;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -222,7 +221,7 @@ public class MCRConfiguration2 {
         try {
             return ((MCRInstanceConfiguration<S>) CONFIGURATIONS.get(
                 new ConfigurationKey(superClass.getName(), name),
-                () -> MCRInstanceConfiguration.ofName(superClass, name, getPropertiesMap(), Options.IMPLICIT))).copy();
+                () -> MCRInstanceConfiguration.ofName(superClass, name, Options.IMPLICIT))).copy();
         } catch (ExecutionException | UncheckedExecutionException e) {
             Throwables.throwIfUnchecked(e.getCause());
             throw new MCRException("Failed to create instance configuration for " + name, e.getCause());
@@ -472,8 +471,8 @@ public class MCRConfiguration2 {
     }
 
     public static <S> S instantiateClass(Class<S> superClass, String className) {
-        return MCRInstanceConfiguration.ofClassName(superClass, className, "MCR.AnonymousInstance." + className,
-           new HashMap<>(), getPropertiesMap()).instantiate();
+        return MCRInstanceConfiguration.ofClassName(superClass, className, "MCR.AnonymousInstance." + className)
+            .instantiate();
     }
 
     public static <S> Stream<S> instantiateClasses(Class<S> superClass, String propertyName) {

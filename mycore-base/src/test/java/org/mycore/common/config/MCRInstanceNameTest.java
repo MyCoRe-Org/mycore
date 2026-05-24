@@ -19,11 +19,19 @@
 package org.mycore.common.config;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 import org.mycore.common.config.instantiator.MCRInstanceName;
 
 public class MCRInstanceNameTest {
+
+    @Test
+    public void emptyName() {
+
+        assertThrows(IllegalArgumentException.class, () -> MCRInstanceName.of(""));
+
+    }
 
     @Test
     public void nameWithoutSuffix() {

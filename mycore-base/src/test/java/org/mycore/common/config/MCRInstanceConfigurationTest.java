@@ -268,7 +268,7 @@ public class MCRInstanceConfigurationTest {
         Map<String, String> properties = new HashMap<>();
 
         MCRInstanceConfiguration<?> configuration =
-            ofClass(Object.class, TestClass.class, "Instance", properties, properties);
+            ofClass(Object.class, TestClass.class, "Instance", properties);
 
         assertEquals("Instance.Class", configuration.name().actual());
         assertEquals("Instance", configuration.name().canonical());
@@ -281,12 +281,12 @@ public class MCRInstanceConfigurationTest {
     public void directConfigurationRemovesClassEntry() {
 
         Map<String, String> properties = new HashMap<>();
-        properties.put("Class", "ClassValue");
-        properties.put("class", "ClassValue");
-        properties.put("", "ClassValue");
+        properties.put("Instance.Class", "ClassValue");
+        properties.put("Instance.class", "ClassValue");
+        properties.put("Instance", "ClassValue");
 
         MCRInstanceConfiguration<?> configuration =
-            ofClass(Object.class, TestClass.class, "Instance", properties, properties);
+            ofClass(Object.class, TestClass.class, "Instance", properties);
 
         assertFalse(configuration.properties().containsKey("Class"));
         assertEquals("ClassValue", configuration.properties().get("class"));
@@ -299,10 +299,10 @@ public class MCRInstanceConfigurationTest {
     public void nestedDirectConfiguration() {
 
         Map<String, String> properties = new HashMap<>();
-        properties.put("Baz.Class", NESTED_TEST_CLASS);
+        properties.put("Instance.Baz.Class", NESTED_TEST_CLASS);
 
         MCRInstanceConfiguration<?> configuration =
-            ofClass(Object.class, TestClass.class, "Instance", properties, properties);
+            ofClass(Object.class, TestClass.class, "Instance", properties);
         MCRInstanceConfiguration<?> nestedConfiguration =
             configuration.nested(Object.class, "Baz");
 
@@ -317,12 +317,12 @@ public class MCRInstanceConfigurationTest {
     public void nestedDirectConfigurationMap() {
 
         Map<String, String> properties = new HashMap<>();
-        properties.put("A.Class", NESTED_TEST_CLASS_A);
-        properties.put("B.Class", NESTED_TEST_CLASS_B);
-        properties.put("C.Class", NESTED_TEST_CLASS_C);
+        properties.put("Instance.A.Class", NESTED_TEST_CLASS_A);
+        properties.put("Instance.B.Class", NESTED_TEST_CLASS_B);
+        properties.put("Instance.C.Class", NESTED_TEST_CLASS_C);
 
         MCRInstanceConfiguration<?> configuration =
-            ofClass(Object.class, TestClass.class, "Instance", properties, properties);
+            ofClass(Object.class, TestClass.class, "Instance", properties);
         Map<String, ? extends MCRInstanceConfiguration<?>> nestedConfigurations =
             configuration.nestedMap(Object.class);
         MCRInstanceConfiguration<?> nestedConfigurationA =
@@ -355,18 +355,18 @@ public class MCRInstanceConfigurationTest {
     public void nestedDirectConfigurationMapRemovesClassEntries() {
 
         Map<String, String> properties = new HashMap<>();
-        properties.put("A.Class", NESTED_TEST_CLASS_A);
-        properties.put("A.class", "ClassValue");
-        properties.put("A", "ClassValue");
-        properties.put("B.Class", NESTED_TEST_CLASS_B);
-        properties.put("B.class", "ClassValue");
-        properties.put("B", "ClassValue");
-        properties.put("C.Class", NESTED_TEST_CLASS_C);
-        properties.put("C.class", "ClassValue");
-        properties.put("C", "ClassValue");
+        properties.put("Instance.A.Class", NESTED_TEST_CLASS_A);
+        properties.put("Instance.A.class", "ClassValue");
+        properties.put("Instance.A", "ClassValue");
+        properties.put("Instance.B.Class", NESTED_TEST_CLASS_B);
+        properties.put("Instance.B.class", "ClassValue");
+        properties.put("Instance.B", "ClassValue");
+        properties.put("Instance.C.Class", NESTED_TEST_CLASS_C);
+        properties.put("Instance.C.class", "ClassValue");
+        properties.put("Instance.C", "ClassValue");
 
         MCRInstanceConfiguration<?> configuration =
-            ofClass(Object.class, TestClass.class, "Instance", properties, properties);
+            ofClass(Object.class, TestClass.class, "Instance", properties);
         Map<String, ? extends MCRInstanceConfiguration<?>> nestedConfigurations =
             configuration.nestedMap(Object.class);
         MCRInstanceConfiguration<?> nestedConfigurationA =
@@ -399,12 +399,12 @@ public class MCRInstanceConfigurationTest {
     public void nestedDirectConfigurationMapWithPrefix() {
 
         Map<String, String> properties = new HashMap<>();
-        properties.put("Baz.A.Class", NESTED_TEST_CLASS_A);
-        properties.put("Baz.B.Class", NESTED_TEST_CLASS_B);
-        properties.put("Baz.C.Class", NESTED_TEST_CLASS_C);
+        properties.put("Instance.Baz.A.Class", NESTED_TEST_CLASS_A);
+        properties.put("Instance.Baz.B.Class", NESTED_TEST_CLASS_B);
+        properties.put("Instance.Baz.C.Class", NESTED_TEST_CLASS_C);
 
         MCRInstanceConfiguration<?> configuration =
-            ofClass(Object.class, TestClass.class, "Instance", properties, properties);
+            ofClass(Object.class, TestClass.class, "Instance", properties);
         Map<String, ? extends MCRInstanceConfiguration<?>> nestedConfigurations =
             configuration.nestedMap(Object.class, "Baz");
         MCRInstanceConfiguration<?> nestedConfigurationA =
@@ -437,18 +437,18 @@ public class MCRInstanceConfigurationTest {
     public void nestedDirectConfigurationMapWithPrefixRemovesClassEntries() {
 
         Map<String, String> properties = new HashMap<>();
-        properties.put("Baz.A.Class", NESTED_TEST_CLASS_A);
-        properties.put("Baz.A.class", "ClassValue");
-        properties.put("Baz.A", "ClassValue");
-        properties.put("Baz.B.Class", NESTED_TEST_CLASS_B);
-        properties.put("Baz.B.class", "ClassValue");
-        properties.put("Baz.B", "ClassValue");
-        properties.put("Baz.C.Class", NESTED_TEST_CLASS_C);
-        properties.put("Baz.C.class", "ClassValue");
-        properties.put("Baz.C", "ClassValue");
+        properties.put("Instance.Baz.A.Class", NESTED_TEST_CLASS_A);
+        properties.put("Instance.Baz.A.class", "ClassValue");
+        properties.put("Instance.Baz.A", "ClassValue");
+        properties.put("Instance.Baz.B.Class", NESTED_TEST_CLASS_B);
+        properties.put("Instance.Baz.B.class", "ClassValue");
+        properties.put("Instance.Baz.B", "ClassValue");
+        properties.put("Instance.Baz.C.Class", NESTED_TEST_CLASS_C);
+        properties.put("Instance.Baz.C.class", "ClassValue");
+        properties.put("Instance.Baz.C", "ClassValue");
 
         MCRInstanceConfiguration<?> configuration =
-            ofClass(Object.class, TestClass.class, "Instance", properties, properties);
+            ofClass(Object.class, TestClass.class, "Instance", properties);
         Map<String, ? extends MCRInstanceConfiguration<?>> nestedConfigurations =
             configuration.nestedMap(Object.class, "Baz");
         MCRInstanceConfiguration<?> nestedConfigurationA =

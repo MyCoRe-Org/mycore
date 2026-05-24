@@ -112,7 +112,7 @@ public final class MCRNeo4JUtil {
         Map<String, String> propertiesMap, String filterClassKey) {
         final Map<String, MCRNeo4JAbstractDataModelParser> parserMap;
         parserMap = new HashMap<>();
-        propertiesMap.forEach((k, v) -> {
+        propertiesMap.forEach((k,_) -> {
             // avoid loop instantiation
             if (!Objects.equals(k, filterClassKey)) {
                 String type = k;

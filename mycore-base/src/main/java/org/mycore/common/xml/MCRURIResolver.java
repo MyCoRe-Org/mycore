@@ -1246,8 +1246,8 @@ public final class MCRURIResolver implements URIResolver {
      * </p>
      * Example: MCR.URIResolver.xslIncludes.components=iview.xsl,wcms.xsl
      * <p>
-     * Or retrieve the include hrefs from a class implementing
-     * {@link org.mycore.common.xml.MCRURIResolver.MCRXslIncludeHrefs}. The </code>class.</code> part has to be set,
+     * Or retrieve the hrefs to be included from a class implementing
+     * {@link org.mycore.common.xml.MCRURIResolver.MCRXslIncludeHrefs}. The <code>class.</code> part has to be set,
      * everything after <code>class.</code> can be chosen freely.
      * </p>
      * Example: MCR.URIResolver.xslIncludes.class.template=org.foo.XSLHrefs
