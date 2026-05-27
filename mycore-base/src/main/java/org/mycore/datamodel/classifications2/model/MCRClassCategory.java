@@ -87,7 +87,7 @@ public class MCRClassCategory {
         return this.category;
     }
 
-    @JsonGetter
+    @JsonGetter("ID")
     public String getID() {
         return id;
     }

@@ -96,7 +96,7 @@ public class MCRClass {
         this.categories = value;
     }
 
-    @JsonGetter
+    @JsonGetter("ID")
     public String getID() {
         return id;
     }
@@ -139,7 +139,7 @@ public class MCRClass {
                 .toList());
         category.setChildren(new ArrayList<>());
         this.getCategories()
-                .forEach((c) -> buildCategory(getID(), c, category));
+            .forEach((c) -> buildCategory(getID(), c, category));
 
         return category;
     }
