@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.stream.Stream;
 
@@ -161,8 +162,8 @@ public class MCRInstantiatorConfigTest {
 
         String fullInstanceName = withClassSuffix(instanceName);
 
-        List<String> list = MCRConfiguration2.getInstantiatablePropertyKeys(fullInstanceName).toList();
-        assertTrue(list.contains(fullInstanceName), "Properties should contain " + instanceName);
+        Optional<String> fullInstanceValue = MCRConfiguration2.getString(fullInstanceName);
+        assertTrue(fullInstanceValue.isPresent(), "Properties should contain " + instanceName);
 
         ConfigurableTestInstance instance = ofName(ConfigurableTestInstance.class, fullInstanceName).instantiate();
         assertNotNull(instance, "Test " + fullInstanceName + " should be present");

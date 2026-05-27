@@ -18,12 +18,12 @@
 
 package org.mycore.common.config.instantiator;
 
+import static org.mycore.common.config.instantiator.MCRInstanceConfiguration.CLASS_SUFFIX;
+
 /**
  * Represents a property name that can be used to convey the class name of a class that should be instantiated.
  */
 public final class MCRInstanceName {
-
-    private static final String CLASS_SUFFIX = ".Class";
 
     private final String canonical;
 

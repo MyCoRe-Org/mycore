@@ -38,14 +38,7 @@ public final class MCRPIServiceManager {
 
     public List<String> getServiceIDList() {
         return MCRConfiguration2.getInstantiatablePropertyKeys(REGISTRATION_SERVICE_CONFIG_PREFIX)
-            .map(s -> s.substring(REGISTRATION_SERVICE_CONFIG_PREFIX.length()))
-            .map(s -> {
-                if (s.endsWith(".Class")) {
-                    return s.substring(0, s.length() - ".Class".length());
-                }
-                return s;
-            })
-            .collect(Collectors.toList());
+            .map(s -> s.substring(REGISTRATION_SERVICE_CONFIG_PREFIX.length())).toList();
     }
 
     public List<MCRPIService<MCRPersistentIdentifier>> getServiceList() {

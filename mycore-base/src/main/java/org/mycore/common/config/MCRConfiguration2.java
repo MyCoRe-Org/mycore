@@ -45,6 +45,8 @@ import com.google.common.util.concurrent.UncheckedExecutionException;
 
 import jakarta.inject.Singleton;
 
+import static org.mycore.common.config.instantiator.MCRInstanceConfiguration.CLASS_SUFFIX;
+
 /**
  * Provides methods to manage and read all configuration properties from the MyCoRe configuration files.
  * The Properties used by this class are used from {@link MCRConfigurationBase}.
@@ -323,16 +325,13 @@ public class MCRConfiguration2 {
     public static Stream<String> getInstantiatablePropertyKeys(String prefix) {
         return getSubPropertiesMap(prefix).entrySet()
             .stream()
-            .filter(es -> {
-                boolean result;
-                String s = es.getKey();
-                if (!s.contains(".")) {
-                    result = true;
-                } else {
-                    result = (s.endsWith(".Class")) &&
-                        !s.substring(0, s.length() - ".Class".length()).contains(".");
+            .filter(entry -> {
+                String s = entry.getKey();
+                if (!s.endsWith(CLASS_SUFFIX)) {
+                    return false;
                 }
-                return result;
+                String key = s.substring(0, s.length() - CLASS_SUFFIX.length());
+                return !key.contains(".");
             })
             .filter(es -> es.getValue() != null)
             .filter(es -> !es.getValue().isBlank())

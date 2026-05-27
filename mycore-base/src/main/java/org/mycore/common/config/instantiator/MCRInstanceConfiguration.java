@@ -48,6 +48,10 @@ import org.mycore.common.config.MCRConfigurationException;
  */
 public final class MCRInstanceConfiguration<S> {
 
+    public static final String CLASS_KEY = "Class";
+
+    public static final String CLASS_SUFFIX = "." + CLASS_KEY;
+
     private static final Logger LOGGER = LogManager.getLogger();
 
     private final Class<S> superClass;
@@ -67,7 +71,7 @@ public final class MCRInstanceConfiguration<S> {
         this.name = name;
         this.properties = properties;
         this.fullProperties = fullProperties;
-        properties.remove("Class");
+        properties.remove(CLASS_KEY);
     }
 
     public boolean instantiatable() {

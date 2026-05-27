@@ -118,7 +118,7 @@ public class MCROCFLS3RepositoryProvider implements MCROCFLRepositoryProvider {
      * @param prop the property key used to identify this repository configuration.
      * @throws IOException if an error occurs during initialization.
      */
-    @MCRPostConstruction
+    @MCRPostConstruction(MCRPostConstruction.Value.CANONICAL)
     public void init(String prop) throws IOException {
         String id = prop.substring(REPOSITORY_PROPERTY_PREFIX.length());
 

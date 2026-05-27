@@ -62,7 +62,7 @@ public abstract class MCROCFLLocalRepositoryProvider implements MCROCFLRepositor
      * @param prop the repository configuration property key, used to determine the repository ID.
      * @throws IOException if an I/O error occurs while creating the necessary directories.
      */
-    @MCRPostConstruction
+    @MCRPostConstruction(MCRPostConstruction.Value.CANONICAL)
     public void init(String prop) throws IOException {
         Files.createDirectories(workDir);
         Files.createDirectories(repositoryRoot);
