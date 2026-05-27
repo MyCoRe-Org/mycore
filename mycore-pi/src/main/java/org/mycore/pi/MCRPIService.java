@@ -200,7 +200,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
             });
     }
 
-    @MCRPostConstruction(MCRPostConstruction.Value.CANONICAL)
+    @MCRPostConstruction
     public void init(String prop) {
         registrationServiceID = prop.substring(MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX.length());
     }

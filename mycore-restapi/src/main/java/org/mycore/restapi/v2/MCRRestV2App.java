@@ -154,7 +154,7 @@ public class MCRRestV2App extends MCRJerseyRestApp {
 
             private String property;
 
-            @MCRPostConstruction(MCRPostConstruction.Value.CANONICAL)
+            @MCRPostConstruction
             public void init(String property) {
                 this.property = property;
             }

@@ -72,7 +72,7 @@ public abstract class MCRCronjob implements Runnable {
         this.id = id;
     }
 
-    @MCRPostConstruction(MCRPostConstruction.Value.CANONICAL)
+    @MCRPostConstruction
     public void checkConfiguration(String property) {
         this.property = property;
         setID(property.substring(MCRCronjobManager.JOBS_CONFIG_PREFIX.length()));

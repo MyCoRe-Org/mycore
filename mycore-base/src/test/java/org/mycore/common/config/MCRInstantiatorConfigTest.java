@@ -489,7 +489,7 @@ public class MCRInstantiatorConfigTest {
             return orderedMethodValues;
         }
 
-        @MCRPostConstruction
+        @MCRPostConstruction(MCRPostConstruction.Value.ACTUAL)
         public void callPostConstruction(String property) throws MCRConfigurationException {
             postConstructionProperty = property;
         }

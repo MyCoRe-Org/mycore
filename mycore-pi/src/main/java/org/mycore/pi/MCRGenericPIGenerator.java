@@ -147,7 +147,7 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
     }
 
     @Override
-    @MCRPostConstruction(MCRPostConstruction.Value.CANONICAL)
+    @MCRPostConstruction
     public void init(String property) {
         super.init(property);
         final Map<String, String> properties = getProperties();

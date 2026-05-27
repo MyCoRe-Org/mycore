@@ -36,7 +36,7 @@ import jakarta.inject.Singleton;
 public class MCROCFLMCRRepositoryProvider extends MCROCFLLocalRepositoryProvider {
 
     @Override
-    @MCRPostConstruction(MCRPostConstruction.Value.CANONICAL)
+    @MCRPostConstruction
     public void init(String prop) throws IOException {
         OcflExtensionRegistry.register(MCRStorageLayoutExtension.EXTENSION_NAME, MCRStorageLayoutExtension.class);
         super.init(prop);

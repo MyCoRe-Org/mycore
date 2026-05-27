@@ -42,7 +42,7 @@ public @interface MCRPostConstruction {
     /**
      * @return Weather to inject the actual or the canonical property.
      */
-    Value value() default Value.ACTUAL;
+    Value value() default Value.CANONICAL;
 
     /**
      * @return The order in which the annotated methods are processed. The higher the value, the later the

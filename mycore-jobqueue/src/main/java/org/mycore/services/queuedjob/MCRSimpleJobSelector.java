@@ -172,7 +172,7 @@ public final class MCRSimpleJobSelector implements MCRJobSelector {
 
         private String property;
 
-        @MCRPostConstruction(MCRPostConstruction.Value.CANONICAL)
+        @MCRPostConstruction
         public void init(String property) {
             this.property = property;
         }
