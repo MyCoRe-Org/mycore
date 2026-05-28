@@ -54,11 +54,11 @@ public class MCRNeo4JParserTest extends AbstractNeo4JParserTest {
             "/mycoreobject/metadata/def.mss82");
         MCRConfiguration2.set("MCR.Neo4J.NodeAttribute.manuscript.signature",
             "/mycoreobject/metadata/def.mss02");
-        MCRConfiguration2.set("MCR.Neo4J.ParserClass.MCRMetaLangText",
+        MCRConfiguration2.set("MCR.Neo4J.Parser.MCRMetaLangText.Class",
             "org.mycore.mcr.neo4j.datamodel.metadata.neo4jparser.MCRNeo4JMetaLangTextParser");
-        MCRConfiguration2.set("MCR.Neo4J.ParserClass.MCRMetaClassification",
+        MCRConfiguration2.set("MCR.Neo4J.Parser.MCRMetaClassification.Class",
             "org.mycore.mcr.neo4j.datamodel.metadata.neo4jparser.MCRNeo4JMetaClassificationParser");
-        MCRConfiguration2.set("MCR.Neo4J.ParserClass.MCRMetaHistoryDate",
+        MCRConfiguration2.set("MCR.Neo4J.Parser.MCRMetaHistoryDate.Class",
             "org.mycore.mcr.neo4j.datamodel.metadata.neo4jparser.MCRNeo4JMetaHistoryDateParser");
 
         final MCRNeo4JParser parser = new MCRNeo4JParser();

@@ -213,7 +213,7 @@ public class MCRDeveloperOverrideResourceProviderTest {
             fooBaseDir.toAbsolutePath() + "," + barBaseDir.toAbsolutePath());
 
         MCRResourceProvider provider = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRDeveloperOverrideResourceProvider.class, "Test.Class");
+            MCRDeveloperOverrideResourceProvider.class, "Test");
 
         Optional<URL> fooResourceUrl = provider.provide(FOO_PATH, MCRHints.EMPTY);
         Optional<URL> barResourceUrl = provider.provide(BAR_PATH, MCRHints.EMPTY);

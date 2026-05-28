@@ -84,7 +84,7 @@ public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckS
     private Map<String, String> properties;
 
     @MCRPostConstruction
-    public void init(String property) {
+    public void init() {
         rules = buildRulesFromXML();
         computers = buildComputersFromRules();
     }

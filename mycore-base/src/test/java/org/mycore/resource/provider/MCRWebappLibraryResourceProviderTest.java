@@ -139,7 +139,7 @@ public class MCRWebappLibraryResourceProviderTest {
 
         MCRHints hints = toHints(fooWebappDir, allResourceUrls);
         MCRResourceProvider provider = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRWebappLibraryResourceProvider.class, "Test.Class");
+            MCRWebappLibraryResourceProvider.class, "Test");
 
         Optional<URL> fooResourceUrl = provider.provide(FOO_BAR_PATH, hints);
         Optional<URL> barResourceUrl = provider.provide(BAR_FOO_PATH, hints);

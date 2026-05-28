@@ -89,6 +89,7 @@ public final class MCRCronjobManager implements MCRShutdownHandler.Closeable {
         MCRShutdownHandler.getInstance().addCloseable(this);
         MCRTableMessage<Pair<MCRCronjob, Boolean>> schedule = new MCRTableMessage<>(
             new Column<>("Property", p -> p.getLeft().getProperty()),
+            new Column<>("ID", p -> p.getLeft().getID()),
             new Column<>("Description", p -> p.getLeft().getDescription()),
             new Column<>("State", p -> p.getRight() ? "ACTIVE" : "INACTIVE"),
             new Column<>("Cron", p -> p.getLeft().getCronDescription()));

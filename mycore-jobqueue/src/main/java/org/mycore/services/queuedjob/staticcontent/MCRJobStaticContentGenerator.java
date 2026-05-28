@@ -88,7 +88,7 @@ public class MCRJobStaticContentGenerator extends MCRObjectStaticContentGenerato
 
         private String configId;
 
-        @MCRPostConstruction(MCRPostConstruction.Value.CANONICAL)
+        @MCRPostConstruction
         public void setConfigId(String property) {
             this.configId = property.substring(property.lastIndexOf('.') + 1 );
         }

@@ -59,7 +59,7 @@ public interface MCRObjectQueryResolver {
 
     static MCRObjectQueryResolver obtainInstance() {
         return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRObjectQueryResolver.class,
-            "MCR.Object.QueryResolver.Class");
+            "MCR.Object.QueryResolver");
     }
 
 }

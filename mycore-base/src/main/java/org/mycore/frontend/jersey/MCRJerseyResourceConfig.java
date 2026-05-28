@@ -24,7 +24,7 @@ import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * Entry point for mycore jersey configuration. Loads the {@link MCRJerseyConfiguration} defined in
- * 'MCR.Jersey.Configuration' or the default {@link MCRJerseyDefaultConfiguration}.
+ * 'MCR.Jersey.Configuration.Class' or the default {@link MCRJerseyDefaultConfiguration}.
  * 
  * @author Matthias Eichner
  */

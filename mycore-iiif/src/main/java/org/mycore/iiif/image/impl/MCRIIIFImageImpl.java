@@ -56,7 +56,7 @@ public abstract class MCRIIIFImageImpl {
             return IMPLHOLDER.get(implName);
         }
 
-        String classPropertyName = MCR_IIIF_IMAGE_CONFIG_PREFIX + implName;
+        String classPropertyName = MCR_IIIF_IMAGE_CONFIG_PREFIX + implName + ".Class";
         Class<? extends MCRIIIFImageImpl> classObject = MCRConfiguration2.<MCRIIIFImageImpl>getClass(classPropertyName)
             .orElseThrow(() -> MCRConfiguration2.createConfigurationException(classPropertyName));
 

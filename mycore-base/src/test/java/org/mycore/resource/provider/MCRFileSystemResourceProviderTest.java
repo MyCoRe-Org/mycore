@@ -251,7 +251,7 @@ public class MCRFileSystemResourceProviderTest {
         MCRConfiguration2.set("Test.BaseDirs", fooBaseDir.toAbsolutePath() + "," + barBaseDir.toAbsolutePath());
 
         MCRResourceProvider provider = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRFileSystemResourceProvider.class, "Test.Class");
+            MCRFileSystemResourceProvider.class, "Test");
 
         Optional<URL> fooResourceUrl = provider.provide(FOO_PATH, MCRHints.EMPTY);
         Optional<URL> barResourceUrl = provider.provide(BAR_PATH, MCRHints.EMPTY);

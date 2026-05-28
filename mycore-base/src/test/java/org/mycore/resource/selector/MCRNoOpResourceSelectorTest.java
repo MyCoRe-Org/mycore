@@ -73,7 +73,7 @@ public class MCRNoOpResourceSelectorTest {
     public void configuration() {
 
         MCRResourceSelector selector = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRNoOpResourceSelector.class, "Test.Class");
+            MCRNoOpResourceSelector.class, "Test");
 
         List<URL> resourceUrls = selector.select(allResourceUrls, MCRHints.EMPTY);
 

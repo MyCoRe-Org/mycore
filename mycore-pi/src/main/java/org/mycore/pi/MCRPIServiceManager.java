@@ -38,8 +38,7 @@ public final class MCRPIServiceManager {
 
     public List<String> getServiceIDList() {
         return MCRConfiguration2.getInstantiatablePropertyKeys(REGISTRATION_SERVICE_CONFIG_PREFIX)
-            .map(s -> s.substring(REGISTRATION_SERVICE_CONFIG_PREFIX.length()))
-            .collect(Collectors.toList());
+            .map(s -> s.substring(REGISTRATION_SERVICE_CONFIG_PREFIX.length())).toList();
     }
 
     public List<MCRPIService<MCRPersistentIdentifier>> getServiceList() {
@@ -59,6 +58,7 @@ public final class MCRPIServiceManager {
             .collect(Collectors.toList());
     }
 
+    @SuppressWarnings("unchecked")
     public <T extends MCRPersistentIdentifier> MCRPIService<T> getRegistrationService(String id) {
         return MCRConfiguration2.getSingleInstanceOfOrThrow(
             MCRPIService.class, REGISTRATION_SERVICE_CONFIG_PREFIX + id);

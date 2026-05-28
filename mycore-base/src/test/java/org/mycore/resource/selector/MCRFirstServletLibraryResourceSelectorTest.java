@@ -209,7 +209,7 @@ public class MCRFirstServletLibraryResourceSelectorTest {
 
         MCRHints hints = toHints("library1.jar", "library2.jar", "library3.jar");
         MCRResourceSelector selector = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRFirstServletLibraryResourceSelector.class, "Test.Class");
+            MCRFirstServletLibraryResourceSelector.class, "Test");
 
         List<URL> resourceUrls = selector.select(List.of(library1ResourceUrl), hints);
 

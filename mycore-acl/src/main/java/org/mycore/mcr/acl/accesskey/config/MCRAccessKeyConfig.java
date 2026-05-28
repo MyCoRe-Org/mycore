@@ -98,8 +98,8 @@ public final class MCRAccessKeyConfig {
      *
      * @return the secret processor class name
      */
-    public static String getSecretProcessorClassProperty() {
-        return "MCR.ACL.AccessKey.Service.SecretProcessor.Class";
+    public static String getSecretProcessorProperty() {
+        return "MCR.ACL.AccessKey.Service.SecretProcessor";
     }
 
 }

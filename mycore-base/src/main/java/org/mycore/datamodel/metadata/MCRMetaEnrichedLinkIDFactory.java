@@ -29,7 +29,7 @@ public abstract class MCRMetaEnrichedLinkIDFactory {
 
     public static MCRMetaEnrichedLinkIDFactory obtainInstance() {
         return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRMetaEnrichedLinkIDFactory.class,
-            "MCR.Metadata.EnrichedDerivateLinkIDFactory.Class");
+            "MCR.Metadata.EnrichedDerivateLinkIDFactory");
     }
 
     public abstract MCREditableMetaEnrichedLinkID getDerivateLink(MCRDerivate der);

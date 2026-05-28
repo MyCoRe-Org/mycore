@@ -100,7 +100,7 @@ public class MCRLibraryResourceFilterTest {
 
         MCRHints hints = toHints(fooConfigDir);
         MCRResourceFilter filter = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRLibraryResourceFilter.class, "Test.Class");
+            MCRLibraryResourceFilter.class, "Test");
 
         List<URL> resourceUrls = filter.filter(allResourceUrls.stream(), hints).toList();
 

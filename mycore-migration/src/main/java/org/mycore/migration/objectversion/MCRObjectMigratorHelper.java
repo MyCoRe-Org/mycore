@@ -53,7 +53,7 @@ public class MCRObjectMigratorHelper {
                 MCRMigrationCommands.CHILDREN_ORDER_STRATEGY_PROPERTY)
             .orElseGet(() -> {
                 LOGGER.info("No strategy configured for '{}', using default: NeverAddChildrenOrderStrategy",
-                    MCRMigrationCommands.CHILDREN_ORDER_STRATEGY_PROPERTY);
+                    MCRMigrationCommands.CHILDREN_ORDER_STRATEGY_CLASS_PROPERTY);
                 return new MCRNeverAddChildrenOrderStrategy();
             });
     }

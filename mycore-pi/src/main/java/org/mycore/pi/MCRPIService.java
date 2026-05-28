@@ -200,10 +200,6 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
             });
     }
 
-    public static Predicate<MCRBase> getPredicateInstance(String predicateProperty) {
-        return MCRConfiguration2.getInstanceOfOrThrow(Predicate.class, predicateProperty);
-    }
-
     @MCRPostConstruction
     public void init(String prop) {
         registrationServiceID = prop.substring(MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX.length());
@@ -575,6 +571,10 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
             return (o) -> true;
         }
         return getPredicateInstance(predicateProperty);
+    }
+
+    public static Predicate<MCRBase> getPredicateInstance(String predicateProperty) {
+        return MCRConfiguration2.getInstanceOfOrThrow(Predicate.class, predicateProperty);
     }
 
 }

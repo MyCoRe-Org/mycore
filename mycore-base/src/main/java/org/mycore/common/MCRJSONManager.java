@@ -74,8 +74,6 @@ public final class MCRJSONManager {
 
     public static final String TYPE_ADAPTERS_KEY = "TypeAdapters";
 
-    private static final String CLASS_PROPERTY = MANAGER_PROPERTY + ".Class";
-
     private final GsonBuilder gsonBuilder = new GsonBuilder();
 
     public MCRJSONManager(List<MCRJSONTypeAdapter<?>> typeAdapters) {
@@ -90,11 +88,11 @@ public final class MCRJSONManager {
     }
 
     public static MCRJSONManager obtainInstance() {
-        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRJSONManager.class, CLASS_PROPERTY);
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRJSONManager.class, MANAGER_PROPERTY);
     }
 
     public static MCRJSONManager createInstance() {
-        return MCRConfiguration2.getInstanceOfOrThrow(MCRJSONManager.class, CLASS_PROPERTY);
+        return MCRConfiguration2.getInstanceOfOrThrow(MCRJSONManager.class, MANAGER_PROPERTY);
     }
 
     public Gson createGson() {

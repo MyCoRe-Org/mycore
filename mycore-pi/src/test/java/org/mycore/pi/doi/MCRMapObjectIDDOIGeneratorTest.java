@@ -38,7 +38,7 @@ import org.mycore.test.MyCoReTest;
 @MyCoReTest
 @MCRTestConfiguration(properties = {
     @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true"),
-    @MCRTestProperty(key = "MCR.PI.Generator.MapObjectIDDOI", classNameOf = MCRMapObjectIDDOIGenerator.class),
+    @MCRTestProperty(key = "MCR.PI.Generator.MapObjectIDDOI.Class", classNameOf = MCRMapObjectIDDOIGenerator.class),
     @MCRTestProperty(key = "MCR.PI.Generator.MapObjectIDDOI.Prefix.junit_test", string = TEST_DOI_PREFIX),
     @MCRTestProperty(key = "MCR.PI.Generator.MapObjectIDDOI.Prefix.my_test", string = TEST_DOI_PREFIX + "/my.")
 })

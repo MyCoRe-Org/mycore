@@ -33,11 +33,11 @@ import org.mycore.test.MyCoReTest;
 @MyCoReTest
 @MCRTestConfiguration(properties = {
     @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true"),
-    @MCRTestProperty(key = GENERATOR_CONFIG_PREFIX + MCRIDPURLGeneratorTest.GENERATOR_1,
+    @MCRTestProperty(key = GENERATOR_CONFIG_PREFIX + MCRIDPURLGeneratorTest.GENERATOR_1 + ".Class",
         classNameOf = MCRIDPURLGenerator.class),
     @MCRTestProperty(key = GENERATOR_CONFIG_PREFIX + MCRIDPURLGeneratorTest.GENERATOR_1 + ".BaseURLTemplate",
         string = MCRIDPURLGeneratorTest.TEST_BASE_1),
-    @MCRTestProperty(key = GENERATOR_CONFIG_PREFIX + MCRIDPURLGeneratorTest.GENERATOR_2,
+    @MCRTestProperty(key = GENERATOR_CONFIG_PREFIX + MCRIDPURLGeneratorTest.GENERATOR_2 + ".Class",
         classNameOf = MCRIDPURLGenerator.class),
     @MCRTestProperty(key = GENERATOR_CONFIG_PREFIX + MCRIDPURLGeneratorTest.GENERATOR_2 + ".BaseURLTemplate",
         string = MCRIDPURLGeneratorTest.TEST_BASE_2)

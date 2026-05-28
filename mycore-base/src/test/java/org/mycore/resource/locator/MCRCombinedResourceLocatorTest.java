@@ -141,7 +141,7 @@ public class MCRCombinedResourceLocatorTest {
 
         MCRHints hints = toHints(factory);
         MCRResourceLocator locator = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRCombinedResourceLocator.class, "Test.Class");
+            MCRCombinedResourceLocator.class, "Test");
 
         List<URL> fooResourceUrl = locator.locate(FOO_PATH, hints).toList();
         List<URL> barResourceUrl = locator.locate(BAR_PATH, hints).toList();

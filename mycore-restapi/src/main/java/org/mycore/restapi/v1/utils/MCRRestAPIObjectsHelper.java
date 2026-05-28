@@ -115,7 +115,7 @@ public class MCRRestAPIObjectsHelper {
         = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US).withZone(ZoneOffset.UTC);
 
     private static final MCRIDMapper ID_MAPPER = MCRConfiguration2
-        .getInstanceOf(MCRIDMapper.class, MCRIDMapper.MCR_PROPERTY_CLASS).get();
+        .getInstanceOf(MCRIDMapper.class, MCRIDMapper.MAPPER_PROPERTY).get();
 
     public static Response showMCRObject(String pathParamId, String queryParamStyle, UriInfo info, Application app)
         throws MCRRestAPIException {

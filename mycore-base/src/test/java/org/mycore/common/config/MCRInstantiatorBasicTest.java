@@ -38,7 +38,7 @@ public class MCRInstantiatorBasicTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithSingletonFactory.class)
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithSingletonFactory.class)
         })
     public void singletonFactory() {
 
@@ -51,7 +51,7 @@ public class MCRInstantiatorBasicTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWitAnnotatedFactory.class)
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWitAnnotatedFactory.class)
         })
     public void annotatedFactory() {
 
@@ -64,7 +64,7 @@ public class MCRInstantiatorBasicTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWitAnnotatedFactories.class)
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWitAnnotatedFactories.class)
         })
     public void annotatedFactories() {
 
@@ -76,7 +76,7 @@ public class MCRInstantiatorBasicTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithConstructor.class)
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithConstructor.class)
         })
     public void constructorFactory() {
 
@@ -89,7 +89,7 @@ public class MCRInstantiatorBasicTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithoutConstructorOrFactory.class)
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithoutConstructorOrFactory.class)
         })
     public void noConstructorOrFactory() {
 
@@ -101,7 +101,7 @@ public class MCRInstantiatorBasicTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithMultipleFactories.class)
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithMultipleFactories.class)
         })
     public void multipleFactories() {
 
@@ -127,7 +127,7 @@ public class MCRInstantiatorBasicTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithConfigurationProxy.class),
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithConfigurationProxy.class),
             @MCRTestProperty(key = "Foo.Value", string = "Value")
         })
     public void configurationProxy() {

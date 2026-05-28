@@ -78,7 +78,7 @@ public final class MCRMetadataManager {
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final MCRObjectIDGenerator MCROBJECTID_GENERATOR = MCRConfiguration2.getSingleInstanceOfOrThrow(
-        MCRObjectIDGenerator.class, "MCR.Metadata.ObjectID.Generator.Class");
+        MCRObjectIDGenerator.class, "MCR.Metadata.ObjectID.Generator");
 
     public static final String VALIDATORS_PROPERTY_PREFIX = "MCR.Metadata.Validator.";
 

@@ -70,7 +70,7 @@ public class MCRProcessingEndpoint extends MCRAbstractEndpoint {
     private final MCRProcessableRegistry registry = MCRProcessableManager.getInstance().getRegistry();
 
     private final MCRProcessableWebsocketSender sender = MCRConfiguration2.getInstanceOfOrThrow(
-        MCRProcessableWebsocketSender.class, "MCR.Processable.WebsocketSender.Class");
+        MCRProcessableWebsocketSender.class, "MCR.Processable.WebsocketSender");
 
     @OnMessage
     public void onMessage(Session session, JsonObject request) {

@@ -2,7 +2,7 @@ package org.mycore.migration.cli;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mycore.migration.cli.MCRMigrationCommands.CHILDREN_ORDER_STRATEGY_PROPERTY;
+import static org.mycore.migration.cli.MCRMigrationCommands.CHILDREN_ORDER_STRATEGY_CLASS_PROPERTY;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -86,7 +86,7 @@ public class MCRMigrationCommandsTest {
     @MCRTestConfiguration(
         properties = {
             @MCRTestProperty(key = "MCR.Metadata.Type.mods", string = "true"),
-            @MCRTestProperty(key = CHILDREN_ORDER_STRATEGY_PROPERTY,
+            @MCRTestProperty(key = CHILDREN_ORDER_STRATEGY_CLASS_PROPERTY,
                 classNameOf = MCRAlwaysAddChildrenOrderStrategy.class),
         })
     public void migrateChildrenOrder() throws IOException, JDOMException {

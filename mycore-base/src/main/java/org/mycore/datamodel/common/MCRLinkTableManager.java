@@ -80,7 +80,7 @@ public final class MCRLinkTableManager {
         // Load the persistence class
 
         linkTableInstance = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRLinkTableInterface.class, "MCR.Persistence.LinkTable.Store.Class");
+            MCRLinkTableInterface.class, "MCR.Persistence.LinkTable.Store");
 
         linkProviders = MCRConfiguration2.getInstances(MCRBaseLinkProvider.class, LINK_PROVIDER_CONFIG_PREFIX)
             .entrySet()
