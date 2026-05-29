@@ -35,6 +35,7 @@ import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRXSL2XMLTransformer;
 import org.mycore.common.xml.MCRXMLFunctions;
+import org.mycore.common.xsl.MCRXSLResourceHelper;
 
 /**
  * PostProcessor for MyCoRe editor framework
@@ -69,7 +70,7 @@ public class MCRPostProcessorXSL implements MCRXEditorPostProcessor {
 
         Class<? extends TransformerFactory> factoryClass = oFactoryClass.orElse(null);
 
-        final String xslFolder = MCRConfiguration2.getStringOrThrow("MCR.Layout.Transformer.Factory.XSLFolder");
+        final String xslFolder = MCRXSLResourceHelper.getXSLFolder();
         MCRContent source = new MCRJDOMContent(xml);
         MCRXSL2XMLTransformer transformer =
             factoryClass == null ? MCRXSL2XMLTransformer.obtainInstance(xslFolder + "/" + stylesheet)

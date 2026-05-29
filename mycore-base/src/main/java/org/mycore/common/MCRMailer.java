@@ -50,6 +50,7 @@ import org.mycore.common.content.MCRJAXBContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.transformer.MCRXSL2XMLTransformer;
 import org.mycore.common.xsl.MCRParameterCollector;
+import org.mycore.common.xsl.MCRXSLResourceHelper;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
@@ -533,7 +534,7 @@ public class MCRMailer extends MCRServlet {
     private static Document transform(Document input, String stylesheet, Map<String, String> parameters)
         throws Exception {
         MCRJDOMContent source = new MCRJDOMContent(input);
-        final String xslFolder = MCRConfiguration2.getStringOrThrow("MCR.Layout.Transformer.Factory.XSLFolder");
+        final String xslFolder = MCRXSLResourceHelper.getXSLFolder();
         MCRXSL2XMLTransformer transformer = MCRXSL2XMLTransformer.obtainInstance(xslFolder + "/" + stylesheet + ".xsl");
         MCRParameterCollector parameterCollector = MCRParameterCollector.ofCurrentSession();
         parameterCollector.setParameters(parameters);

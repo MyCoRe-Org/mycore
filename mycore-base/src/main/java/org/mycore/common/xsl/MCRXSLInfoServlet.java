@@ -49,10 +49,9 @@ import org.jdom2.Element;
 import org.jdom2.filter.Filters;
 import org.jdom2.util.IteratorIterable;
 import org.mycore.common.MCRConstants;
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.content.MCRJDOMContent;
-import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.xml.sax.SAXException;
@@ -75,8 +74,7 @@ public final class MCRXSLInfoServlet extends MCRServlet {
     private final Map<String, Stylesheet> stylesheets = new HashMap<>();
 
     private final Set<String> unknown = new HashSet<>();
-    private final String xslFolder =
-        MCRConfiguration2.getStringOrThrow("MCR.Layout.Transformer.Factory.XSLFolder") + "/";
+    private final String xslFolder = MCRXSLResourceHelper.getXSLFolder() + "/";
 
     @Override
     protected void doGetPost(MCRServletJob job) throws Exception {

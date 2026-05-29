@@ -27,15 +27,10 @@ import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
 import org.mycore.mcr.acl.accesskey.mapper.MCRAccessKeyJsonMapper;
-import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyService;
 
 /**
- * Returns a JSON string with all {@link MCRAccessKey} for an given reference.
- * <p>Syntax:</p>
- * <ul>
- * <li><code>accesskeys:{reference}</code> to resolve a access keys as JSON string and count as attribute</li>
- * </ul>
+ * {@link URIResolver} that returns all access keys for a given reference as an XML source.
  */
 public class MCRAccessKeyURIResolver implements URIResolver {
 
@@ -60,6 +55,29 @@ public class MCRAccessKeyURIResolver implements URIResolver {
         this.accessKeyService = accessKeyService;
     }
 
+    /**
+     * Resolves all access keys for the given reference and returns them as an XML source.
+     * <p>The access keys are serialized as a JSON string inside the result element, with
+     * the total count exposed as an attribute.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{reference}
+     * </pre>
+     * <p>Example request:
+     * <pre>
+     *   accesskeys:mcr_document_00000001
+     * </pre>
+     * <p>Example response:
+     * <pre>{@code
+     *   <accesskeys count="2">[{"secret":"key1",...},{"secret":"key2",...}]</accesskeys>
+     * }</pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link JDOMSource} wrapping the {@code <accesskeys>} element containing the
+     *         JSON string and a {@code count} attribute
+     * @throws IllegalArgumentException if the URI does not contain a {@code :}
+     */
     @Override
     public Source resolve(String href, String base) {
         final String reference = extractReferenceFromHref(href);

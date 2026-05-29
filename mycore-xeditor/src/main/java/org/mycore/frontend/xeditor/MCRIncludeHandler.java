@@ -37,7 +37,7 @@ import org.jdom2.Element;
 import org.jdom2.filter.ElementFilter;
 import org.jdom2.util.IteratorIterable;
 import org.mycore.common.MCRUsageException;
-import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 
 /**
  * Handles xed:include, xed:preload and xed:modify|xed:extend to include XEditor components by URI and ID.

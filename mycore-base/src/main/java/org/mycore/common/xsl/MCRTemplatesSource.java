@@ -29,15 +29,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRClassTools;
-import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLResource;
+import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 import org.xml.sax.SAXException;
 
 /**
  * Represents an XSL file that will be used in XSL transformation and which is loaded
  * as a resource. The object provides helper methods to support caching of the compiled 
  * templates file.
- * 
+ *
  * @author Thomas Scheffler (yagee) 
  * @author Frank Lützenkirchen
  */

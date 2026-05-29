@@ -42,6 +42,7 @@ import org.mycore.common.content.transformer.MCRContentTransformerFactory;
 import org.mycore.common.content.transformer.MCRIdentityTransformer;
 import org.mycore.common.content.transformer.MCRTransformerPipe;
 import org.mycore.common.content.transformer.MCRXSLTransformer;
+import org.mycore.common.xsl.MCRXSLResourceHelper;
 import org.xml.sax.SAXException;
 
 import com.google.common.collect.Lists;
@@ -243,7 +244,7 @@ public class MCRLayoutTransformerFactory {
      * Builds the filename of the stylesheet to use, e. g. "playlist-simple.xsl"
      */
     private String buildStylesheetName(String id) {
-        final String xslFolder = MCRConfiguration2.getStringOrThrow("MCR.Layout.Transformer.Factory.XSLFolder");
+        final String xslFolder = MCRXSLResourceHelper.getXSLFolder();
         return String.format(Locale.ROOT, "%s/%s.xsl", xslFolder, id.replaceAll("-default$", ""));
     }
 

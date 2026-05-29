@@ -45,13 +45,15 @@ import jakarta.servlet.http.HttpServletResponseWrapper;
  * Servlet Filter for adding debug information to servlet output.
  *
  * @author Thomas Scheffler (yagee)
+ * @deprecated Use {@link org.mycore.common.xsl.uriresolver.MCRURIResolverFilter} instead.
  */
+@Deprecated(forRemoval = true)
 public class MCRURIResolverFilter implements Filter {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final ThreadLocal<List<String>> URI_LIST = ThreadLocal.withInitial(ArrayList::new);
-    
+
     static void addUri(String uri) {
         URI_LIST.get().add(uri);
     }
@@ -63,8 +65,8 @@ public class MCRURIResolverFilter implements Filter {
      * current request. The filter is triggered by the log4j statement of the
      * MCRURIResolver. To switch it on set the logger to DEBUG level.
      *
-     * @see jakarta.servlet.Filter#doFilter(jakarta.servlet.ServletRequest,
-     *      jakarta.servlet.ServletResponse, jakarta.servlet.FilterChain)
+     * @see Filter#doFilter(ServletRequest,
+     *      ServletResponse, FilterChain)
      */
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException,

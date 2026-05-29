@@ -78,17 +78,17 @@ public class MCRDefaultHTTPClient implements MCRHTTPClient {
         MCRShutdownHandler.getInstance().addCloseable(this::close);
     }
 
-    @MCRProperty(name = "MaxObjectSize")
+    @MCRProperty(name = "MaxObjectSize", defaultName = "MCR.HTTPClient.MaxObjectSize")
     public void setMaxObjectSize(String size) {
         this.maxObjectSize = Long.parseLong(size);
     }
 
-    @MCRProperty(name = "MaxCacheEntries")
+    @MCRProperty(name = "MaxCacheEntries", defaultName = "MCR.HTTPClient.MaxCacheEntries")
     public void setMaxCacheEntries(String size) {
         this.maxCacheEntries = Integer.parseInt(size);
     }
 
-    @MCRProperty(name = "RequestTimeout")
+    @MCRProperty(name = "RequestTimeout", defaultName = "MCR.HTTPClient.RequestTimeout")
     public void setRequestTimeout(String size) {
         this.requestTimeout = Integer.parseInt(size);
     }
