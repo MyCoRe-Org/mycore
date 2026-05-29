@@ -39,7 +39,7 @@ import org.jdom2.Element;
 import org.jdom2.Parent;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.common.MCRException;
-import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 
 import jakarta.xml.bind.util.JAXBSource;
 
@@ -122,7 +122,7 @@ public class MCRSourceContent extends MCRWrappedContent {
 
     /**
      * Build instance of MCRSourceContent by resolving via {@link MCRURIResolver}
-     * 
+     *
      * @throws TransformerException
      *             thrown by {@link MCRURIResolver#resolve(String, String)}
      */

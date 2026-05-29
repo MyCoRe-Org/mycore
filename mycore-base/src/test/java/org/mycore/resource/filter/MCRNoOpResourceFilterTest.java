@@ -73,7 +73,7 @@ public class MCRNoOpResourceFilterTest {
     public void configuration() {
 
         MCRResourceFilter filter = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRNoOpResourceFilter.class, "Test.Class");
+            MCRNoOpResourceFilter.class, "Test");
 
         List<URL> resourceUrls = filter.filter(allResourceUrls.stream(), MCRHints.EMPTY).toList();
 

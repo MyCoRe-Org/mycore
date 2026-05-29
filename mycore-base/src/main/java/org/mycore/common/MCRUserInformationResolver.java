@@ -75,8 +75,6 @@ public final class MCRUserInformationResolver {
 
     public static final String PROVIDERS_KEY = "Providers";
 
-    private static final String CLASS_PROPERTY = RESOLVER_PROPERTY + ".Class";
-
     private final Map<String, MCRUserInformationProvider> providers;
 
     public MCRUserInformationResolver(Map<String, MCRUserInformationProvider> providers) {
@@ -90,11 +88,11 @@ public final class MCRUserInformationResolver {
     }
 
     public static MCRUserInformationResolver obtainInstance() {
-        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRUserInformationResolver.class, CLASS_PROPERTY);
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRUserInformationResolver.class, RESOLVER_PROPERTY);
     }
 
     public static MCRUserInformationResolver createInstance() {
-        return MCRConfiguration2.getInstanceOfOrThrow(MCRUserInformationResolver.class, CLASS_PROPERTY);
+        return MCRConfiguration2.getInstanceOfOrThrow(MCRUserInformationResolver.class, RESOLVER_PROPERTY);
     }
 
     public MCRUserInformation getOrThrow(String schema, String userId) {

@@ -35,12 +35,15 @@ import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
-import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.common.xsl.uriresolver.MCRURIResolverResponse;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
+/**
+ * {@link URIResolver} that provides persistent identifier (PI) related queries as XML.
+ */
 public class MCRPIURIResolver implements URIResolver {
 
     private static final Logger LOGGER = LogManager.getLogger();
@@ -85,6 +88,44 @@ public class MCRPIURIResolver implements URIResolver {
             .equals(id));
     }
 
+    /**
+     * Resolves the given PI query and returns the result as an XML source.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:{method}/?{param}={value}[&amp;{param}={value}...]
+     * </pre>
+     * <p>Supported methods and their required parameters:
+     * <ul>
+     *   <li>{@code hasIdentifierCreated}: {@code service}, {@code id}, {@code additional}</li>
+     *   <li>{@code hasIdentifierRegistrationStarted}: {@code service}, {@code id}, {@code additional}</li>
+     *   <li>{@code hasIdentifierRegistered}: {@code service}, {@code id}, {@code additional}</li>
+     *   <li>{@code hasManagedPI}: {@code objectID}</li>
+     *   <li>{@code isManagedPI}: {@code pi}, {@code id}</li>
+     *   <li>{@code getPIServiceInformation}: {@code objectID}</li>
+     * </ul>
+     * <p>Example request:
+     * <pre>
+     *   pi:hasIdentifierRegistered/?service=myService&amp;id=mcr_document_00000001&amp;additional=
+     *   pi:hasManagedPI/?objectID=mcr_document_00000001
+     *   pi:getPIServiceInformation/?objectID=mcr_document_00000001
+     * </pre>
+     * <p>Example response for boolean methods:
+     * <pre>{@code
+     *   <boolean>true</boolean>
+     * }</pre>
+     * <p>Example response for {@code getPIServiceInformation}:
+     * <pre>{@code
+     *   <list>
+     *     <service id="myService" type="doi" inscribed="true" permission="true"/>
+     *   </list>
+     * }</pre>
+     *
+     * @param href the URI in the syntax above to resolve
+     * @param base the base URI of the calling stylesheet (unused)
+     * @return a {@link Source} wrapping the result element
+     * @throws TransformerException if the URI is malformed, a required argument is missing,
+     *                                  or the method is unknown
+     */
     @Override
     public Source resolve(String href, String base) throws TransformerException {
         String[] parts = href.split(":", 2);
@@ -108,32 +149,30 @@ public class MCRPIURIResolver implements URIResolver {
         return switch (method) {
             case HAS_IDENTIFIER_CREATED_METHOD -> {
                 requireArguments(argumentMap, HAS_IDENTIFIER_CREATED_METHOD, SERVICE_ARG, ID_ARG, ADDITIONAL_ARG);
-                yield MCRURIResolver.createBooleanResponse(
+                yield MCRURIResolverResponse.ofBoolean(
                     hasIdentifierCreated(argumentMap.get(SERVICE_ARG), argumentMap.get(ID_ARG), argumentMap.get(
                         ADDITIONAL_ARG)));
             }
             case HAS_IDENTIFIER_REGISTRATION_STARTED_METHOD -> {
                 requireArguments(argumentMap, HAS_IDENTIFIER_REGISTRATION_STARTED_METHOD, SERVICE_ARG, ID_ARG,
                     ADDITIONAL_ARG);
-                yield MCRURIResolver.createBooleanResponse(
+                yield MCRURIResolverResponse.ofBoolean(
                     hasIdentifierRegistrationStarted(argumentMap.get(SERVICE_ARG), argumentMap.get(ID_ARG),
                         argumentMap.get(ADDITIONAL_ARG)));
             }
             case HAS_IDENTIFIER_REGISTERED_METHOD -> {
                 requireArguments(argumentMap, HAS_IDENTIFIER_REGISTERED_METHOD, SERVICE_ARG, ID_ARG, ADDITIONAL_ARG);
-                yield MCRURIResolver.createBooleanResponse(
+                yield MCRURIResolverResponse.ofBoolean(
                     hasIdentifierRegistered(argumentMap.get(SERVICE_ARG), argumentMap.get(ID_ARG),
                         argumentMap.get(ADDITIONAL_ARG)));
             }
             case HAS_MANAGED_PI_METHOD -> {
                 requireArguments(argumentMap, HAS_MANAGED_PI_METHOD, OBJECT_ID_ARG);
-                yield MCRURIResolver.createBooleanResponse(
-                    hasManagedPI(argumentMap.get(OBJECT_ID_ARG)));
+                yield MCRURIResolverResponse.ofBoolean(hasManagedPI(argumentMap.get(OBJECT_ID_ARG)));
             }
             case IS_MANAGED_PI_METHOD -> {
                 requireArguments(argumentMap, IS_MANAGED_PI_METHOD, PI_ARG, ID_ARG);
-                yield MCRURIResolver.createBooleanResponse(
-                    isManagedPI(argumentMap.get(PI_ARG), argumentMap.get(ID_ARG)));
+                yield MCRURIResolverResponse.ofBoolean(isManagedPI(argumentMap.get(PI_ARG), argumentMap.get(ID_ARG)));
             }
             case GET_PI_SERVICE_INFORMATION_METHOD -> {
                 requireArguments(argumentMap, GET_PI_SERVICE_INFORMATION_METHOD, OBJECT_ID_ARG);

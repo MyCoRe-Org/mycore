@@ -31,7 +31,7 @@ import org.mycore.common.config.MCRConfiguration2;
 public final class MCRTikaManager {
 
     private final MCRTikaMapper defaultMapper = MCRConfiguration2.getInstanceOfOrThrow(MCRTikaMapper.class,
-        SOLR_CONFIG_PREFIX + "Tika.Mapper.Default.Class");
+        SOLR_CONFIG_PREFIX + "Tika.Mapper.Default");
 
     private final MCRCache<String, MCRTikaMapper> mapperCache = new MCRCache<>(100,
         "MCRTikaManager instance cache");
@@ -65,7 +65,7 @@ public final class MCRTikaManager {
                 instance = mapperCache.get(key);
                 if (instance == null) {
                     instance = MCRConfiguration2.getInstanceOf(MCRTikaMapper.class,
-                        SOLR_CONFIG_PREFIX + "Tika.Mapper." + key + ".Class").orElse(null);
+                        SOLR_CONFIG_PREFIX + "Tika.Mapper." + key).orElse(null);
                     if (instance != null) {
                         mapperCache.put(key, instance);
                     }

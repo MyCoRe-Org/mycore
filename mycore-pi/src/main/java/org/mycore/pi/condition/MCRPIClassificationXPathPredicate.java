@@ -25,7 +25,7 @@ import org.jdom2.Element;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.mycore.common.config.annotation.MCRProperty;
-import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 import org.mycore.datamodel.metadata.MCRBase;
 
 public class MCRPIClassificationXPathPredicate extends MCRPIPredicateBase

@@ -36,7 +36,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.transform.JDOMResult;
 import org.jdom2.transform.JDOMSource;
-import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 
 import net.sf.saxon.jaxp.TransformerImpl;
 import net.sf.saxon.s9api.Message;

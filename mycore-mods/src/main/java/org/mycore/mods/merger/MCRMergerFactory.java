@@ -26,8 +26,8 @@ import org.mycore.common.config.MCRConfiguration2;
  * Since MODS elements need to be compared and merged differently, the factory returns
  * different merger implementations for different element types.
  * <p>
- * MCR.MODS.Merger.default=[Default class to merge MODS, typically MCRMerger]
- * MCR.MODS.Merger.[elementName]=[Specific implementation by element name]
+ * MCR.MODS.Merger.default.Class=[Default class to merge MODS, typically MCRMerger]
+ * MCR.MODS.Merger.[elementName].Class=[Specific implementation by element name]
  *
  * @author Frank Lützenkirchen
  */

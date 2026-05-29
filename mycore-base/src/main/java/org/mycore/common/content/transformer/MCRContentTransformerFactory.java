@@ -49,15 +49,15 @@ public class MCRContentTransformerFactory {
      * Creates and initializes the transformer with the given ID.
      */
     private static synchronized MCRContentTransformer buildTransformer(String id) {
-        String property = "MCR.ContentTransformer." + id + ".Class";
-        if (MCRConfiguration2.getString(property).isEmpty()
-            && MCRConfiguration2.getString("MCR.ContentTransformer." + id + ".Stylesheet").isEmpty()) {
+        String property = "MCR.ContentTransformer." + id;
+        if (MCRConfiguration2.getString(property + ".Class").isEmpty()
+            && MCRConfiguration2.getString(property + ".Stylesheet").isEmpty()) {
             //check for reasonable default:
             return null;
         }
         MCRContentTransformer transformer = MCRConfiguration2.getInstanceOf(MCRContentTransformer.class, property)
             .orElseGet(() -> MCRConfiguration2.getInstanceOfOrThrow(MCRContentTransformer.class,
-                "MCR.ContentTransformer.Default.Class"));
+                "MCR.ContentTransformer.Default"));
         transformer.init(id);
         transformers.put(id, transformer);
         return transformer;

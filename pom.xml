@@ -1040,6 +1040,11 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <version>${jackson.version}</version>
       </dependency>
       <dependency>
+        <groupId>com.fasterxml.jackson.module</groupId>
+        <artifactId>jackson-module-jakarta-xmlbind-annotations</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+      <dependency>
         <groupId>com.github.java-json-tools</groupId>
         <artifactId>json-patch</artifactId>
         <version>1.13</version>

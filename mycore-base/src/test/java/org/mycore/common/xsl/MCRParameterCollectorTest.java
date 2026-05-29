@@ -54,7 +54,7 @@ import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
-import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 import org.mycore.test.MyCoReTest;
 import org.xml.sax.SAXException;
 

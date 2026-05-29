@@ -76,6 +76,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.common.xml.derivate.MCRDerivateDisplayFilter;
+import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -136,7 +137,7 @@ public class MCRXMLFunctions {
         String selectedFilter = MCRConfiguration2.getStringOrThrow(SELECTED_DERIVATE_DISPLAY_FILTER_PROPERTY);
 
         DERIVATE_DISPLAY_FILTER = MCRConfiguration2.getInstanceOfOrThrow(MCRDerivateDisplayFilter.class,
-            "MCR.Derivate.DisplayFilters." + selectedFilter + ".Class");
+            "MCR.Derivate.DisplayFilters." + selectedFilter);
 
         if (LOGGER.isInfoEnabled()) {
             String introduction = "Configuration of selected derivate display filter (" + selectedFilter + "):";

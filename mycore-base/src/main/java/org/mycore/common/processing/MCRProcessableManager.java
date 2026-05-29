@@ -29,8 +29,7 @@ public final class MCRProcessableManager {
     private final MCRProcessableRegistry registry;
 
     private MCRProcessableManager() {
-        registry = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRProcessableRegistry.class, "MCR.Processable.Registry.Class");
+        registry = MCRConfiguration2.getInstanceOfOrThrow(MCRProcessableRegistry.class, "MCR.Processable.Registry");
     }
 
     public static MCRProcessableManager getInstance() {

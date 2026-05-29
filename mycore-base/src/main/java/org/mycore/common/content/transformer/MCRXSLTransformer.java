@@ -55,13 +55,13 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRWrappedContent;
 import org.mycore.common.content.streams.MCRByteArrayOutputStream;
 import org.mycore.common.xml.MCREntityResolver;
-import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.common.xml.MCRXSLTransformerUtils;
 import org.mycore.common.xsl.MCRErrorListener;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.common.xsl.MCRTemplatesSource;
+import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 

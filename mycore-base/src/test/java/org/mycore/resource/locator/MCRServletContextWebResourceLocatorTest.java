@@ -112,7 +112,7 @@ public class MCRServletContextWebResourceLocatorTest {
 
         MCRHints hints = toHints("foo");
         MCRResourceLocator locator = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRServletContextWebResourceLocator.class, "Test.Class");
+            MCRServletContextWebResourceLocator.class, "Test");
 
         List<URL> fooResourceUrl = locator.locate(WEB_FOO_PATH, hints).toList();
         List<URL> barResourceUrl = locator.locate(WEB_BAR_PATH, hints).toList();

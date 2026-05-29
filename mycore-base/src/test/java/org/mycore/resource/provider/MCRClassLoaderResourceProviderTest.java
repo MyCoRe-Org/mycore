@@ -225,7 +225,7 @@ public class MCRClassLoaderResourceProviderTest {
         MCRConfiguration2.set("Test.BaseDirs", fooBaseDir.toAbsolutePath() + "," + barBaseDir.toAbsolutePath());
 
         MCRResourceProvider provider = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRClassLoaderResourceProvider.class, "Test.Class");
+            MCRClassLoaderResourceProvider.class, "Test");
 
         Optional<URL> fooResourceUrl = provider.provide(FOO_PATH, hints);
         Optional<URL> barResourceUrl = provider.provide(BAR_PATH, hints);

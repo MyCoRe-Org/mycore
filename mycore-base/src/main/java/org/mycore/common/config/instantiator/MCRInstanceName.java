@@ -18,58 +18,40 @@
 
 package org.mycore.common.config.instantiator;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import static org.mycore.common.config.instantiator.MCRInstanceConfiguration.CLASS_SUFFIX;
 
 /**
  * Represents a property name that can be used to convey the class name of a class that should be instantiated.
  */
 public final class MCRInstanceName {
 
-    private final String actual;
-
     private final String canonical;
 
-    private final Suffix suffix;
+    private final String actual;
 
-    private MCRInstanceName(String canonical, Suffix suffix) {
-        this.actual = suffix.appendTo(canonical);
+    private MCRInstanceName(String canonical, String actual) {
         this.canonical = canonical;
-        this.suffix = suffix;
+        this.actual = actual;
     }
 
     /**
      * Creates a {@link MCRInstanceName} given a <em>name</em>.
      * <p>
-     * If the given <em>name</em> ends with <code>.Class</code> or <code>.class</code>, that suffix is removed from
-     * the {@link MCRInstanceName#canonical()} form and made available as the {@link MCRInstanceName#suffix()}.
-     * <p>
-     * In such a case, both <code>Class</code> and <code>class</code> are reported as
-     * {@link MCRInstanceName#ignoredKeys()} that should not be included in the
-     * {@link MCRInstanceConfiguration#properties()} of an {@link MCRInstanceConfiguration} using the created
-     * {@link MCRInstanceName}.
+     * If the given <em>name</em> ends with <code>.Class</code>, that suffix is removed
+     * and the remainder used as the {@link MCRInstanceName#canonical()} name.
      *
      * @param name the name
      * @return the name
      */
     public static MCRInstanceName of(String name) {
-        int index = name.lastIndexOf('.');
-        if (index == -1) {
-            return of(name, "", name);
+        if (name == null || name.isEmpty() || CLASS_SUFFIX.equals(name)) {
+            throw new IllegalArgumentException("Instance name must not be empty");
+        }
+        if (name.endsWith(CLASS_SUFFIX)) {
+            return new MCRInstanceName(name.substring(0, name.length() - CLASS_SUFFIX.length()), name);
         } else {
-            return of(name, name.substring(0, index), name.substring(index + 1));
+            return new MCRInstanceName(name, name + CLASS_SUFFIX);
         }
-    }
-
-    private static MCRInstanceName of(String fullName, String leadingSegments, String lastSegment) {
-        for (Suffix suffix : Suffix.representedValues()) {
-            if (Objects.equals(lastSegment, suffix.representation)) {
-                return new MCRInstanceName(leadingSegments, suffix);
-            }
-        }
-        return new MCRInstanceName(fullName, Suffix.NONE);
     }
 
     public String actual() {
@@ -80,70 +62,15 @@ public final class MCRInstanceName {
         return canonical;
     }
 
-    public Suffix suffix() {
-        return suffix;
-    }
+    public MCRInstanceName nested(String segment) {
+        String nestedCanonical = canonical + "." + segment;
+        return new MCRInstanceName(nestedCanonical, nestedCanonical + CLASS_SUFFIX);
 
-    public List<String> ignoredKeys() {
-        return suffix.ignoredKeys;
-    }
-
-    public MCRInstanceName subName(String segment) {
-        if (canonical.isEmpty()) {
-            return new MCRInstanceName(segment, suffix);
-        } else {
-            return new MCRInstanceName(canonical + "." + segment, suffix);
-        }
     }
 
     @Override
     public String toString() {
-        return "MCRInstanceName {" +
-            "actual=" + actual + ", " +
-            "canonical=" + canonical + ", " +
-            "suffix=" + suffix + "}";
-    }
-
-    public enum Suffix {
-
-        NONE(null, List.of("")),
-
-        UPPER_CASE("Class", List.of("Class", "class")),
-
-        LOWER_CASE("class", List.of("Class", "class"));
-
-        private static final Suffix[] REPRESENTED_VALUES = Arrays.stream(values())
-            .filter(suffix -> suffix.representation != null)
-            .toArray(Suffix[]::new);
-
-        private final String representation;
-
-        private final List<String> ignoredKeys;
-
-        Suffix(String representation, List<String> ignoredKeys) {
-            this.representation = representation;
-            this.ignoredKeys = ignoredKeys;
-        }
-
-        public Optional<String> representation() {
-            return Optional.ofNullable(representation);
-        }
-
-        public static Suffix[] representedValues() {
-            return REPRESENTED_VALUES.clone();
-        }
-
-        public String appendTo(String string) {
-            if (representation == null) {
-                return string;
-            }
-            if (string.isEmpty()) {
-                return representation;
-            }
-            return string + "." + representation;
-
-        }
-
+        return "MCRInstanceName {" + "canonical=" + canonical + ", " + "actual=" + actual + "}";
     }
 
 }

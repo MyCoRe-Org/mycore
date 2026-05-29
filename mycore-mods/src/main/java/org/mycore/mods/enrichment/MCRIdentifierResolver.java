@@ -28,8 +28,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 import org.mycore.mods.MCRMODSCommands;
 import org.xml.sax.SAXException;
 

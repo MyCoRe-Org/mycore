@@ -22,7 +22,7 @@
 
   <filter>
     <filter-name>UriResolverDebugFilter</filter-name>
-    <filter-class>org.mycore.common.xml.MCRURIResolverFilter</filter-class>
+    <filter-class>org.mycore.common.xsl.uriresolver.MCRURIResolverFilter</filter-class>
   </filter>
 
   <filter>

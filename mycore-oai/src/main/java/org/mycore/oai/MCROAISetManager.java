@@ -36,7 +36,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRShutdownHandler;
-import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.oai.classmapping.MCRClassificationAndSetMapper;
 import org.mycore.oai.pmh.Description;

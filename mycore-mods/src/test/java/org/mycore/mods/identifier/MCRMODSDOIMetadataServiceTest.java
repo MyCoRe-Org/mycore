@@ -42,12 +42,12 @@ import org.mycore.test.MyCoReTest;
     @MCRTestProperty(key = MCRPIService.METADATA_SERVICE_CONFIG_PREFIX
         + MCRMODSDOIMetadataServiceTest.TEST_DOI_METADATA_SERVICE_1 + ".Type", string = "doi"),
     @MCRTestProperty(key = MCRPIService.METADATA_SERVICE_CONFIG_PREFIX
-        + MCRMODSDOIMetadataServiceTest.TEST_DOI_METADATA_SERVICE_1,
+        + MCRMODSDOIMetadataServiceTest.TEST_DOI_METADATA_SERVICE_1 + ".Class",
         classNameOf = MCRMODSDOIMetadataService.class),
     @MCRTestProperty(key = MCRPIService.METADATA_SERVICE_CONFIG_PREFIX
         + MCRMODSDOIMetadataServiceTest.TEST_DOI_METADATA_SERVICE_1 + ".Prefix", string = "10.1"),
     @MCRTestProperty(key = MCRPIService.METADATA_SERVICE_CONFIG_PREFIX
-        + MCRMODSDOIMetadataServiceTest.TEST_DOI_METADATA_SERVICE_2,
+        + MCRMODSDOIMetadataServiceTest.TEST_DOI_METADATA_SERVICE_2 + ".Class",
         classNameOf = MCRMODSDOIMetadataService.class),
     @MCRTestProperty(key = MCRPIService.METADATA_SERVICE_CONFIG_PREFIX
         + MCRMODSDOIMetadataServiceTest.TEST_DOI_METADATA_SERVICE_2 + ".Type", string = "doi"),

@@ -22,11 +22,11 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jdom2.Element;
-import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 
 /**
  * Helps transforming xed:load-resource elements. 
- * 
+ *
  * @author Frank Lützenkirchen
  */
 public class MCRLoadResourceTransformerHelper extends MCRTransformerHelperBase {

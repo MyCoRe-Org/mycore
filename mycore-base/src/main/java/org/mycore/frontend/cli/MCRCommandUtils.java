@@ -39,8 +39,8 @@ import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRUsageException;
-import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.common.xsl.MCRXSLResourceHelper;
+import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -193,9 +193,7 @@ public class MCRCommandUtils {
         Element element = MCRURIResolver.obtainInstance().resolve("resource:" + xslFilePath);
         if (element == null) {
             LOGGER.warn("Couldn't find resource {} for style {}, using default.", xslFilePath, style);
-            final String xslFolder = MCRConfiguration2.getStringOrThrow("MCR.Layout.Transformer.Factory.XSLFolder");
-            xslFilePath = xslFolder + "/" + defaultStyle;
-            element = MCRURIResolver.obtainInstance().resolve("resource:" + xslFilePath);
+            element = MCRURIResolver.obtainInstance().resolve(MCRXSLResourceHelper.getXSLResourceURI(defaultStyle));
         }
 
         try {

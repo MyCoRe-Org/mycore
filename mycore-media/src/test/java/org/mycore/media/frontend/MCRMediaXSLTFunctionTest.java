@@ -32,7 +32,7 @@ import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
 @MCRTestConfiguration(properties = {
-    @MCRTestProperty(key = "MCR.URIResolver.ModuleResolver.mediasources",
+    @MCRTestProperty(key = "MCR.URIResolver.ModuleResolver.mediasources.Class",
         classNameOf = MCRMockMediaSourcesURIResolver.class)
 })
 public class MCRMediaXSLTFunctionTest {

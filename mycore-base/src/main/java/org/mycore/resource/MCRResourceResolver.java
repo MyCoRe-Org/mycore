@@ -109,8 +109,6 @@ public final class MCRResourceResolver {
 
     public static final String SELECTED_PROVIDER_KEY = "SelectedProvider";
 
-    private static final String CLASS_PROPERTY = RESOLVER_PROPERTY + ".Class";
-
     private final MCRHints hints;
 
     private final MCRResourceProvider provider;
@@ -121,11 +119,11 @@ public final class MCRResourceResolver {
     }
 
     public static MCRResourceResolver obtainInstance() {
-        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRResourceResolver.class, CLASS_PROPERTY);
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRResourceResolver.class, RESOLVER_PROPERTY);
     }
 
     public static MCRResourceResolver createInstance() {
-        return MCRConfiguration2.getInstanceOfOrThrow(MCRResourceResolver.class, CLASS_PROPERTY);
+        return MCRConfiguration2.getInstanceOfOrThrow(MCRResourceResolver.class, RESOLVER_PROPERTY);
     }
 
     /**

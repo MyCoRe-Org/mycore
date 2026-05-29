@@ -30,10 +30,12 @@ import javax.xml.transform.URIResolver;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRClassTools;
+import org.mycore.common.xsl.uriresolver.MCRFunctionURIResolver;
+import org.mycore.common.xsl.uriresolver.MCRURIResolverResponse;
 
 /**
  * Resolves arbitrary static methods of arbitrary classes. Parameters are considerd to be of type
- * {@link java.lang.String}. Encoding parameter values is recommended.
+ * {@link String}. Encoding parameter values is recommended.
  * <br/><br/>
  * <strong>Invocation</strong>
  * <pre><code>function:&lt;class name&gt;:&lt;method name&gt;:&lt;param1&gt;:&lt;param2&gt;</code></pre>
@@ -42,7 +44,9 @@ import org.mycore.common.MCRClassTools;
  * <pre><code>function:de.uni_jena.thunibib.user.ThUniBibUtils:getLeadId:id_connection:foobar;</code></pre>
  *
  * @author shermann (Silvio Hermann)
+ * @deprecated Use {@link MCRFunctionURIResolver} instead.
  * */
+@Deprecated(forRemoval = true)
 public class MCRFunctionResolver implements URIResolver {
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -66,8 +70,7 @@ public class MCRFunctionResolver implements URIResolver {
             Method method = MCRClassTools.forName(className).getMethod(methodName, types);
             Object result = method.invoke(null, params);
 
-            return MCRURIResolver.createStringResponse(
-                result == null ? "" : String.valueOf(result));
+            return MCRURIResolverResponse.ofString(result == null ? "" : String.valueOf(result));
         } catch (Exception e) {
             throw new TransformerException(e);
         }

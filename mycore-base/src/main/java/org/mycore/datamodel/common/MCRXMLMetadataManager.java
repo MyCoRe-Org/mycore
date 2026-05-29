@@ -101,7 +101,7 @@ public interface MCRXMLMetadataManager {
      * @return the XML metadata manager
      */
     static MCRXMLMetadataManager obtainInstance() {
-        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRXMLMetadataManager.class, "MCR.Metadata.Manager.Class");
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRXMLMetadataManager.class, "MCR.Metadata.Manager");
     }
 
     /**

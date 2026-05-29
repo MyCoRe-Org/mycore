@@ -49,10 +49,10 @@ import org.xml.sax.SAXException;
  */
 @MyCoReTest
 @MCRTestConfiguration(properties = {
-    @MCRTestProperty(key = "MCR.URIResolver.CachingResolver.Capacity", string = "100"),
-    @MCRTestProperty(key = "MCR.URIResolver.CachingResolver.MaxAge", string = "3600000"),
-    @MCRTestProperty(key = "MCR.URIResolver.ModuleResolver.xedTransformerHelper",
-        string = "org.mycore.frontend.xeditor.transformer.MCRTransformerHelperResolver")
+    @MCRTestProperty(key = "MCR.URIResolver.ModuleResolver.cache.CacheCapacity", string = "100"),
+    @MCRTestProperty(key = "MCR.URIResolver.ModuleResolver.cache.CacheMaxAge", string = "3600000"),
+    @MCRTestProperty(key = "MCR.URIResolver.ModuleResolver.xedTransformerHelper.Class",
+        string = "org.mycore.frontend.xeditor.transformer.MCRTransformerHelperURIResolver")
 })
 public class MCRXEditorTransformerTest {
 
@@ -63,7 +63,7 @@ public class MCRXEditorTransformerTest {
         }
         MCRParameterCollector collector = new MCRParameterCollector(false);
         collector.setParameter("input", editedXMLFile);
-        
+
         MCREditorSession editorSession = new MCREditorSession(parameters, collector);
         editorSession.setID("1");
         MCREditorSessionStoreUtils.getSessionStore().storeSession(editorSession);

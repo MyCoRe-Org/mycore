@@ -41,7 +41,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ExtendWith(MCRJPAExtension.class)
 @MCRTestConfiguration(properties = {
     @MCRTestProperty(key = "MCR.Processable.Registry.Class", classNameOf = MCRCentralProcessableRegistry.class),
-    @MCRTestProperty(key = MCRCronjobManager.JOBS_CONFIG_PREFIX + "Command", classNameOf = MCRCommandCronJob.class),
+    @MCRTestProperty(key = MCRCronjobManager.JOBS_CONFIG_PREFIX + "Command.Class",
+        classNameOf = MCRCommandCronJob.class),
     @MCRTestProperty(key = MCRCronjobManager.JOBS_CONFIG_PREFIX + "Command.Contexts", string = "CLI"),
     @MCRTestProperty(key = MCRCronjobManager.JOBS_CONFIG_PREFIX + "Command.CronType", string = "QUARTZ"),
     @MCRTestProperty(key = MCRCronjobManager.JOBS_CONFIG_PREFIX + "Command.Cron", string = "* * * * * ? *"),

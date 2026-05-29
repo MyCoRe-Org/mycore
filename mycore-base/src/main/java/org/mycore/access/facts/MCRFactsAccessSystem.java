@@ -47,7 +47,7 @@ import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.config.annotation.MCRRawProperties;
 import org.mycore.common.content.MCRJDOMContent;
-import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -84,7 +84,7 @@ public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckS
     private Map<String, String> properties;
 
     @MCRPostConstruction
-    public void init(String property) {
+    public void init() {
         rules = buildRulesFromXML();
         computers = buildComputersFromRules();
     }

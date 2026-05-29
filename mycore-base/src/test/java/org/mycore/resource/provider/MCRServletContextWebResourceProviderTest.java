@@ -165,7 +165,7 @@ public class MCRServletContextWebResourceProviderTest {
 
         MCRHints hints = toHints("foo");
         MCRResourceProvider provider = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRServletContextWebResourceProvider.class, "Test.Class");
+            MCRServletContextWebResourceProvider.class, "Test");
 
         Optional<URL> fooResourceUrl = provider.provide(WEB_FOO_PATH, hints);
         Optional<URL> barResourceUrl = provider.provide(WEB_BAR_PATH, hints);

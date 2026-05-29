@@ -66,7 +66,7 @@ public class MCRPackerJobAction extends MCRJobAction {
         String packerId = getPackerId();
         Map<String, String> packerConfiguration = getConfiguration(packerId);
         packerInstance = MCRConfiguration2.getInstanceOfOrThrow(MCRPacker.class,
-            MCRPacker.PACKER_CONFIGURATION_PREFIX + packerId + ".Class");
+            MCRPacker.PACKER_CONFIGURATION_PREFIX + packerId);
 
         Map<String, String> parameters = getParameters();
 

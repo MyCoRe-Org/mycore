@@ -194,7 +194,7 @@ public class MCRCachingResourceProviderTest {
 
         MCRHints hints = toHints(factory);
         MCRCachingResourceProvider provider = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRCachingResourceProvider.class, "Test.Class");
+            MCRCachingResourceProvider.class, "Test");
 
         Optional<URL> fooResourceUrl = provider.provide(FOO_PATH, hints);
         Optional<URL> barResourceUrl = provider.provide(BAR_PATH, hints);

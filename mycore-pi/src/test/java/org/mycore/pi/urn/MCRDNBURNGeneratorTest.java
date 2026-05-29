@@ -42,7 +42,7 @@ import org.mycore.test.MyCoReTest;
     @MCRTestProperty(key = "MCR.Access.Class", classNameOf = MCRAccessBaseImpl.class),
     @MCRTestProperty(key = "MCR.Metadata.Type.mock", string = "true"),
     @MCRTestProperty(key = "MCR.Metadata.Type.unregisterd", string = "true"),
-    @MCRTestProperty(key = "MCR.PI.Generator." + MCRDNBURNGeneratorTest.GENERATOR_ID,
+    @MCRTestProperty(key = "MCR.PI.Generator." + MCRDNBURNGeneratorTest.GENERATOR_ID + ".Class",
         classNameOf = MCRFLURNGenerator.class),
     @MCRTestProperty(key = "MCR.PI.Generator." + MCRDNBURNGeneratorTest.GENERATOR_ID + ".Namespace",
         string = "urn:nbn:de:gbv")

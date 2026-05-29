@@ -107,7 +107,7 @@ public class MCRLibraryResourceProviderTest {
 
         MCRHints hints = toHints(fooConfigDir, allResourceUrls);
         MCRResourceProvider provider = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRLibraryResourceProvider.class, "Test.Class");
+            MCRLibraryResourceProvider.class, "Test");
 
         Optional<URL> fooResourceUrl = provider.provide(FOO_BAR_PATH, hints);
         Optional<URL> barResourceUrl = provider.provide(BAR_FOO_PATH, hints);

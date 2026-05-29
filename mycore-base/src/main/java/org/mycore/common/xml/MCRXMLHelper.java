@@ -56,6 +56,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.streams.MCRByteArrayOutputStream;
 import org.mycore.common.xsl.MCRLazyStreamSource;
+import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;

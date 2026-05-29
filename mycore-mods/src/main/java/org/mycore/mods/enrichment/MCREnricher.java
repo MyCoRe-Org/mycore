@@ -34,7 +34,7 @@ import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.mods.MCRMODSSorter;
+import org.mycore.mods.MCRMODSSorterURIResolver;
 import org.mycore.mods.merger.MCRMergeTool;
 import org.mycore.util.concurrent.MCRTransactionableCallable;
 
@@ -129,7 +129,7 @@ public class MCREnricher {
             resolveExternalData();
             mergeNewIdentifiers(publication);
             mergeExternalData(publication);
-            MCRMODSSorter.sort(publication);
+            MCRMODSSorterURIResolver.sort(publication);
 
             debugger.endIteration();
         }
@@ -145,7 +145,7 @@ public class MCREnricher {
 
     private Map<String, MCRDataSourceCall> prepareDataSourceCalls() {
         id2call = new HashMap<>();
-        for (StringTokenizer st = new StringTokenizer(dsConfig, DELIMITERS, false); st.hasMoreTokens();) {
+        for (StringTokenizer st = new StringTokenizer(dsConfig, DELIMITERS, false); st.hasMoreTokens(); ) {
             String dataSourceID = st.nextToken();
             MCRDataSource dataSource = MCRDataSourceFactory.getInstance().getDataSource(dataSourceID);
             MCRDataSourceCall call = new MCRDataSourceCall(dataSource, idPool);
@@ -172,7 +172,7 @@ public class MCREnricher {
     private void mergeExternalData(Element publication) {
         boolean withinGroup = false;
 
-        for (StringTokenizer st = new StringTokenizer(dsConfig, DELIMITERS, true); st.hasMoreTokens();) {
+        for (StringTokenizer st = new StringTokenizer(dsConfig, DELIMITERS, true); st.hasMoreTokens(); ) {
             String token = st.nextToken(DELIMITERS).trim();
             switch (token) {
                 case "" -> {

@@ -169,7 +169,7 @@ public class MCRCombinedResourceSelectorTest {
     public void configuration() {
 
         MCRResourceSelector selector = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRCombinedResourceSelector.class, "Test.Class");
+            MCRCombinedResourceSelector.class, "Test");
 
         List<URL> resourceUrls = selector.select(allResourceUrls, MCRHints.EMPTY);
 

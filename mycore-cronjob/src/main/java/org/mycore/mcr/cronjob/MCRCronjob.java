@@ -74,6 +74,7 @@ public abstract class MCRCronjob implements Runnable {
 
     @MCRPostConstruction
     public void checkConfiguration(String property) {
+        this.property = property;
         setID(property.substring(MCRCronjobManager.JOBS_CONFIG_PREFIX.length()));
         this.processable = new CronJobProcessable();
         this.processable.setStatus(MCRProcessableStatus.CREATED);
@@ -142,11 +143,6 @@ public abstract class MCRCronjob implements Runnable {
 
     public Cron getCron() {
         return cron;
-    }
-
-    @MCRPostConstruction
-    public void setProperty(String property) {
-        this.property = property;
     }
 
     public String getProperty() {

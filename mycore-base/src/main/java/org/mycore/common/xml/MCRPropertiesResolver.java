@@ -26,6 +26,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRPropertiesURIResolver;
 
 /**
  * Resolves the property values for the given key or key prefix.<br><br>
@@ -47,7 +48,10 @@ import org.mycore.common.config.MCRConfiguration2;
  *     &lt;entry key=&quot;key&quot;&gt;value&lt;/property&gt;
  * </code>
  * If no entry with the given key exists, an entry element without text content is returned.
+ *
+ * @deprecated Use {@link MCRPropertiesURIResolver} instead.
  */
+@Deprecated(forRemoval = true)
 public class MCRPropertiesResolver implements URIResolver {
 
     @Override

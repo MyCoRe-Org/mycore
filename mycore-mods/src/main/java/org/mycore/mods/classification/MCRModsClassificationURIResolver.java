@@ -31,59 +31,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
-import org.mycore.common.xml.MCRURIResolver;
-import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 
 /**
- * Resolves a classification in parent style.
- * Uses the URI <code>classification:metadata:0:parents:{@link MCRCategoryID#toString()}</code> to resolve the result.
- * If no matching classification is found an &lt;empty /&gt; element is returned.
- * This URIResolver can used by this URI syntax:<br>
- *     <ul>
- *         <li>
- *             mycoremods:/{sourcePath}/{subPath}
- *             <ul>
- *                 <li>sourcePath is either:
- *                 <ul>
- *                  <li>uri
- *                  <ul>
- *                      <li>subPath is {{@literal @}authorityURI}/{{@literal @}valueURI} in URI encoded form</li>
- *                  </ul>
- *                  </li>
- *                  <li>authority
- *                  <ul>
- *                      <li>subPath is {{@literal @}authority}/{text()} in URI encoded form</li>
- *                  </ul>
- *                  </li>
- *                  <li>accessCondition
- *                  <ul>
- *                      <li>subPath is {{@literal @}xlink:href} in URI encoded form</li>
- *                  </ul>
- *                  </li>
- *                  <li>typeOfResource
- *                  <ul>
- *                      <li>subPath is {text()} in URI encoded form</li>
- *                  </ul>
- *                  </li>
- *                 </ul>
- *                 </li>
- *             </ul>
- *         </li>
- *         <li>
- *             examples:
- *             <ul>
- *                 <li>
- *modsclass:/uri/http%3A%2F%2Fwww.example.org%2Fclassifications/http%3A%2F%2Fwww.example.org%2Fpub-type%23Sound
- *                 </li>
- *                 <li>modsclass:/authority/marcrelator/aut</li>
- *                 <li>
- *modsclass:/accessCondition/http%3A%2F%2Fwww.mycore.org%2Fclassifications%2Fmir_licenses%23cc_by-sa_4.0
- *                 </li>
- *                 <li>modsclass:/typeOfResource/sound%20recording</li>
- *             </ul>
- *         </li>
- *     </ul>
- *
+ * {@link URIResolver} that resolves a MODS authority or URI reference to a classification
+ * in parent style.
  */
 public class MCRModsClassificationURIResolver implements URIResolver {
 
@@ -126,6 +78,45 @@ public class MCRModsClassificationURIResolver implements URIResolver {
         return Optional.ofNullable(authInfo);
     }
 
+    /**
+     * Resolves the given MODS authority reference to a classification and returns it as an XML source.
+     * <p>URI Syntax:
+     * <pre>
+     *   &lt;scheme&gt;:/{sourcePath}/{subPath}
+     * </pre>
+     * <p>Supported source paths:
+     * <ul>
+     *   <li>{@code uri} – subPath is {@code {authorityURI}/{valueURI}} (URI-encoded)</li>
+     *   <li>{@code authority} – subPath is {@code {authority}/{text()}} (URI-encoded)</li>
+     *   <li>{@code accessCondition} – subPath is {@code {xlink:href}} (URI-encoded)</li>
+     *   <li>{@code typeOfResource} – subPath is {@code {text()}} (URI-encoded)</li>
+     * </ul>
+     * <p>Example request:
+     * <pre>
+     *   modsclass:/authority/marcrelator/aut
+     *   modsclass:/uri/http%3A%2F%2Fwww.example.org%2Fclassifications/http%3A%2F%2Fwww.example.org%2Fpub-type%23Sound
+     *   modsclass:/accessCondition/http%3A%2F%2Fwww.mycore.org%2Fclassifications%2Fmir_licenses%23cc_by-sa_4.0
+     *   modsclass:/typeOfResource/sound%20recording
+     * </pre>
+     * <p>Example response:
+     * <pre>{@code
+     *   <categories>
+     *     <category ID="marcrelator:aut">
+     *       ...
+     *     </category>
+     *   </categories>
+     * }</pre>
+     * <p>Example response if no classification is found:
+     * <pre>{@code
+     *   <empty/>
+     * }</pre>
+     *
+     * @param href the URI to resolve; parsed as a path with source type and URI-encoded arguments
+     * @param base the base URI of the calling stylesheet, passed through to the delegated resolver
+     * @return a {@link Source} wrapping the classification result, or an {@code <empty/>} element
+     *         if no matching category is found
+     * @throws TransformerException if the delegated resolution fails
+     */
     @Override
     public Source resolve(String href, String base) throws TransformerException {
         final Optional<String> categoryURI = getAuthorityInfo(href)
@@ -139,4 +130,5 @@ public class MCRModsClassificationURIResolver implements URIResolver {
         LOGGER.debug("no category found for {}", href);
         return new JDOMSource(new Element("empty"));
     }
+
 }

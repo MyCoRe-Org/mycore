@@ -101,8 +101,6 @@ public final class MCRLDAPClient {
 
     public static final String CLIENT_PROPERTY = "MCR.user2.LDAP";
 
-    private static final String CLASS_PROPERTY = CLIENT_PROPERTY + ".Class";
-
     private final SearchSettings searchSettings;
 
     @SuppressWarnings({ "PMD.LooseCoupling" })
@@ -121,11 +119,11 @@ public final class MCRLDAPClient {
     }
 
     public static MCRLDAPClient obtainInstance() {
-        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRLDAPClient.class, CLASS_PROPERTY);
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRLDAPClient.class, CLIENT_PROPERTY);
     }
 
     public static MCRLDAPClient createInstance() {
-        return MCRConfiguration2.getInstanceOfOrThrow(MCRLDAPClient.class, CLASS_PROPERTY);
+        return MCRConfiguration2.getInstanceOfOrThrow(MCRLDAPClient.class, CLIENT_PROPERTY);
     }
 
     public boolean updateUserProperties(MCRUser user) throws NamingException {

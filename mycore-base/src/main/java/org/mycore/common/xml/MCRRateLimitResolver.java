@@ -31,6 +31,8 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRRateLimitBuckets;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.common.xsl.uriresolver.MCRRateLimitURIResolver;
+import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.ConsumptionProbe;
@@ -39,7 +41,10 @@ import io.github.bucket4j.ConsumptionProbe;
  * URI-Resolver that can limit the processing of downstream URI-Resolver operations.
  * Format ist "ratelimit:&lt;configID&gt;:&lt;anyMyCoReURI&gt;". Specific rate limits can be configured in
  * {@link Bucket Buckets}, see also {@link MCRRateLimitBuckets}.
+ *
+ * @deprecated Use {@link MCRRateLimitURIResolver} instead.
  */
+@Deprecated(forRemoval = true)
 public class MCRRateLimitResolver implements URIResolver {
 
     private static final String CONFIG_PREFIX = "MCR.RateLimitResolver.";

@@ -33,7 +33,8 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  *
  */
 public interface MCRIDMapper {
-    String MCR_PROPERTY_CLASS = "MCR.Object.IDMapper.Class";
+
+    String MAPPER_PROPERTY = "MCR.Object.IDMapper";
 
     /**
      * Detection of the MyCoRe object id  

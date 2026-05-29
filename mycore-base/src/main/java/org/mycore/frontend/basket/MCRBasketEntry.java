@@ -19,7 +19,7 @@
 package org.mycore.frontend.basket;
 
 import org.jdom2.Element;
-import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 
 /**
  * Represents an entry in a basket. Each entry has at least
@@ -30,7 +30,7 @@ import org.mycore.common.xml.MCRURIResolver;
  * methods to resolve the object's XML and to set in the
  * basket entry. This can be used by applications that wish
  * to edit XML in the basket itself.
- * 
+ *
  * @author Frank Lützenkirchen
  */
 public class MCRBasketEntry {
@@ -51,7 +51,7 @@ public class MCRBasketEntry {
      * Creates a new basket entry. The XML that represents the object
      * is not immediately read from the given URI. Call resolveContent() to
      * read the content. 
-     * 
+     *
      * @param id the ID of the object to add to the basket.
      * @param uri the URI where to read the object's xml data from
      */
@@ -70,7 +70,7 @@ public class MCRBasketEntry {
         return uri;
     }
 
-    /** 
+    /**
      * Reads the XML data of the object in the basket entry, using the given URI, 
      * and stores it in the basket entry.
      */

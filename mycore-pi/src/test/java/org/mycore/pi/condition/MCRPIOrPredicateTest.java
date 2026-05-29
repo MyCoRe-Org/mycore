@@ -35,58 +35,60 @@ import org.mycore.test.MyCoReTest;
 })
 public class MCRPIOrPredicateTest {
 
-    private static final String KEY_CREATION_PREDICATE = "MCR.PI.Service.Mock.CreationPredicate";
+    public static final String PREFIX = "MCR.PI.Service.Mock.CreationPredicate";
 
-    private static final String KEY_CREATION_PREDICATE_1 = KEY_CREATION_PREDICATE + ".1";
+    private static final String KEY_CREATION_PREDICATE_CLASS = PREFIX + ".Class";
 
-    private static final String KEY_CREATION_PREDICATE_1_1 = KEY_CREATION_PREDICATE + ".1.1";
+    private static final String KEY_CREATION_PREDICATE_1_CLASS = PREFIX + ".1.Class";
 
-    private static final String KEY_CREATION_PREDICATE_1_2 = KEY_CREATION_PREDICATE + ".1.2";
+    private static final String KEY_CREATION_PREDICATE_1_1_CLASS = PREFIX + ".1.1.Class";
 
-    private static final String KEY_CREATION_PREDICATE_2 = KEY_CREATION_PREDICATE + ".2";
+    private static final String KEY_CREATION_PREDICATE_1_2_CLASS = PREFIX + ".1.2.Class";
+
+    private static final String KEY_CREATION_PREDICATE_2_CLASS = PREFIX + ".2.Class";
 
     @Test
     @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = KEY_CREATION_PREDICATE, classNameOf = MCRPIOrPredicate.class),
-        @MCRTestProperty(key = KEY_CREATION_PREDICATE_1, classNameOf = MCRFalsePredicate.class),
-        @MCRTestProperty(key = KEY_CREATION_PREDICATE_2, classNameOf = MCRFalsePredicate.class)
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE_CLASS, classNameOf = MCRPIOrPredicate.class),
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE_1_CLASS, classNameOf = MCRFalsePredicate.class),
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE_2_CLASS, classNameOf = MCRFalsePredicate.class)
     })
     void testFalseOrFalse() {
-        assertFalse(MCRPIJobService.getPredicateInstance(KEY_CREATION_PREDICATE).test(getTestObject()));
+        assertFalse(MCRPIJobService.getPredicateInstance(PREFIX).test(getTestObject()));
     }
 
     @Test
     @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = KEY_CREATION_PREDICATE, classNameOf = MCRPIOrPredicate.class),
-        @MCRTestProperty(key = KEY_CREATION_PREDICATE_1, classNameOf = MCRFalsePredicate.class),
-        @MCRTestProperty(key = KEY_CREATION_PREDICATE_2, classNameOf = MCRTruePredicate.class)
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE_CLASS, classNameOf = MCRPIOrPredicate.class),
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE_1_CLASS, classNameOf = MCRFalsePredicate.class),
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE_2_CLASS, classNameOf = MCRTruePredicate.class)
     })
     void testFalseOrTrue() {
-        assertTrue(MCRPIJobService.getPredicateInstance(KEY_CREATION_PREDICATE).test(getTestObject()));
+        assertTrue(MCRPIJobService.getPredicateInstance(PREFIX).test(getTestObject()));
     }
 
     @Test
     @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = KEY_CREATION_PREDICATE, classNameOf = MCRPIOrPredicate.class),
-        @MCRTestProperty(key = KEY_CREATION_PREDICATE_1, classNameOf = MCRPIOrPredicate.class),
-        @MCRTestProperty(key = KEY_CREATION_PREDICATE_1_1, classNameOf = MCRFalsePredicate.class),
-        @MCRTestProperty(key = KEY_CREATION_PREDICATE_1_2, classNameOf = MCRFalsePredicate.class),
-        @MCRTestProperty(key = KEY_CREATION_PREDICATE_2, classNameOf = MCRFalsePredicate.class)
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE_CLASS, classNameOf = MCRPIOrPredicate.class),
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE_1_CLASS, classNameOf = MCRPIOrPredicate.class),
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE_1_1_CLASS, classNameOf = MCRFalsePredicate.class),
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE_1_2_CLASS, classNameOf = MCRFalsePredicate.class),
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE_2_CLASS, classNameOf = MCRFalsePredicate.class)
     })
     void testNestedFalseOrFalse() {
-        assertFalse(MCRPIJobService.getPredicateInstance(KEY_CREATION_PREDICATE).test(getTestObject()));
+        assertFalse(MCRPIJobService.getPredicateInstance(PREFIX).test(getTestObject()));
     }
 
     @Test
     @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = KEY_CREATION_PREDICATE, classNameOf = MCRPIOrPredicate.class),
-        @MCRTestProperty(key = KEY_CREATION_PREDICATE_1, classNameOf = MCRPIOrPredicate.class),
-        @MCRTestProperty(key = KEY_CREATION_PREDICATE_1_1, classNameOf = MCRFalsePredicate.class),
-        @MCRTestProperty(key = KEY_CREATION_PREDICATE_1_2, classNameOf = MCRTruePredicate.class),
-        @MCRTestProperty(key = KEY_CREATION_PREDICATE_2, classNameOf = MCRFalsePredicate.class)
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE_CLASS, classNameOf = MCRPIOrPredicate.class),
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE_1_CLASS, classNameOf = MCRPIOrPredicate.class),
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE_1_1_CLASS, classNameOf = MCRFalsePredicate.class),
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE_1_2_CLASS, classNameOf = MCRTruePredicate.class),
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE_2_CLASS, classNameOf = MCRFalsePredicate.class)
     })
     void testNestedFalseOrTrue() {
-        assertTrue(MCRPIJobService.getPredicateInstance(KEY_CREATION_PREDICATE).test(getTestObject()));
+        assertTrue(MCRPIJobService.getPredicateInstance(PREFIX).test(getTestObject()));
     }
 
     private static MCRObject getTestObject() {
