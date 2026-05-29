@@ -336,6 +336,7 @@ public class MCRConfiguration2 {
             .filter(es -> es.getValue() != null)
             .filter(es -> !es.getValue().isBlank())
             .map(Map.Entry::getKey)
+            .map(key -> key.substring(0, key.length() - CLASS_SUFFIX.length()))
             .map(prefix::concat);
     }
 

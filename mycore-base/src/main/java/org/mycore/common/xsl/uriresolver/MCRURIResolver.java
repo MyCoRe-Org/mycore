@@ -319,14 +319,11 @@ public class MCRURIResolver implements URIResolver {
         private final Map<String, URIResolver> resolverMap = new HashMap<>();
 
         MCRURIModuleResolverProvider() {
-            MCRConfiguration2.getInstantiatablePropertyKeys(CONFIG_PREFIX + "ModuleResolver.")
-                .forEach(k -> {
-                    if (!k.endsWith(".Class")) {
-                        throw new MCRConfigurationException(k + " is not a valid module resolver");
-                    }
-                    String[] parts = k.split("\\.");
-                    String scheme = parts[parts.length - 2];
-                    registerUriResolver(scheme, k);
+            String prefix = CONFIG_PREFIX + "ModuleResolver.";
+            MCRConfiguration2.getInstantiatablePropertyKeys(prefix)
+                .forEach(property -> {
+                    String scheme = property.substring(prefix.length());
+                    registerUriResolver(scheme, property);
                 });
         }
 

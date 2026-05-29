@@ -34,7 +34,6 @@ import org.apache.logging.log4j.Logger;
 import org.hibernate.jpa.boot.spi.PersistenceUnitDescriptor;
 import org.hibernate.jpa.boot.spi.PersistenceXmlParser;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.config.instantiator.MCRInstanceName;
 import org.mycore.common.events.MCRStartupHandler.AutoExecutable;
 import org.mycore.resource.MCRResourceResolver;
 import org.mycore.resource.provider.MCRResourceProvider;
@@ -80,7 +79,6 @@ public class MCRJPAConfigurationCheck implements AutoExecutable {
 
         Set<String> unitsFromMycoreProperties = MCRConfiguration2
             .getInstantiatablePropertyKeys(JPA_PERSISTENCE_UNIT_PROPERTY_NAME)
-            .map(name -> MCRInstanceName.of(name).canonical())
             .map(name -> name.substring(JPA_PERSISTENCE_UNIT_PROPERTY_NAME.length()))
             .collect(Collectors.toSet());
 
