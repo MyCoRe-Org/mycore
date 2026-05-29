@@ -87,7 +87,7 @@ public class MCRURIResolver implements URIResolver {
 
     private static MCRURIResolverProvider getExternalResolverProvider() {
         return MCRConfiguration2
-            .getInstanceOf(MCRURIResolverProvider.class, CONFIG_PREFIX + "ExternalResolver.Class")
+            .getInstanceOf(MCRURIResolverProvider.class, CONFIG_PREFIX + "ExternalResolver")
             .orElse(HashMap::new);
     }
 
