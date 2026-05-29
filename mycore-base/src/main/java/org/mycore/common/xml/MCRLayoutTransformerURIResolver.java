@@ -49,7 +49,7 @@ public class MCRLayoutTransformerURIResolver implements URIResolver {
 
     public MCRLayoutTransformerURIResolver() {
         layoutTransformerFactory = MCRConfiguration2.getInstanceOfOrThrow(MCRLayoutTransformerFactory.class,
-            "MCR.Layout.Transformer.Factory.Class");
+            "MCR.Layout.Transformer.Factory");
     }
 
     /**
