@@ -88,6 +88,11 @@ public abstract class MCRDigest {
         return Arrays.hashCode(value);
     }
 
+    @Override
+    public String toString() {
+        return toHexString();
+    }
+
     /**
      * Validates the digest value.
      *
@@ -144,5 +149,11 @@ public abstract class MCRDigest {
         public int hashCode() {
             return name.hashCode();
         }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+
     }
 }
