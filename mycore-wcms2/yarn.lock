@@ -732,10 +732,10 @@ tinymce-i18n@^24.7.15:
   resolved "https://registry.npmjs.org/tinymce-i18n/-/tinymce-i18n-24.7.15.tgz"
   integrity sha512-capZBGG8q5hSMb3C5SeVfr5SZmo7jv3mdLZPJdV8mNpe/DNCYcIzWQSFW7/CW1o9rpQ2xZz9DVSfLPLV8xCoNQ==
 
-tinymce@^7.2.1:
-  version "7.2.1"
-  resolved "https://registry.npmjs.org/tinymce/-/tinymce-7.2.1.tgz"
-  integrity sha512-ADd1cvdIuq6NWyii0ZOZRuu+9sHIdQfcRNWBcBps2K8vy7OjlRkX6iw7zz1WlL9kY4z4L1DvIP+xOrVX/46aHA==
+tinymce@^7.9.3:
+  version "7.9.3"
+  resolved "https://registry.yarnpkg.com/tinymce/-/tinymce-7.9.3.tgz#74f0a04bdf662f90910512d3fe792f0d5f1111e3"
+  integrity sha512-Mtm54U5YJ6Pyo/GaAx+JSHXTGEuxrg2AowVWCD9zy1eBolp5Ub7S1rTtsyQdxhPegfhLuR3VLiTKGw1tacv09g==
 
 to-regex-range@^5.0.1:
   version "5.0.1"
