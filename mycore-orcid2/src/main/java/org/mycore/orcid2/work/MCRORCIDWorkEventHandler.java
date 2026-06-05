@@ -154,8 +154,16 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
         toPublish.putAll(userOrcidPairFromObject);
         toPublish.keySet().removeAll(toDelete.keySet());
         final T work = transformObject(new MCRJDOMContent(filteredObject.createXML()));
-        if (RESTRICT_TO_WORK_CONTRIBUTORS) {
-            toPublish.keySet().retainAll(listRelatedOrcidIdentifiers(work));
+
+        if (toPublish.isEmpty()) {
+            LOGGER.debug("Publication work for {} has no contributors. "
+                + "Won't evaluate contributor mapping.", objectID);
+        } else if (RESTRICT_TO_WORK_CONTRIBUTORS) {
+            final List<String> relatedOrcids = listRelatedOrcidIdentifiers(work);
+            if (relatedOrcids.isEmpty()) {
+                LOGGER.info("Publication work for {} has no mapped contributors. ", objectID);
+            }
+            toPublish.keySet().retainAll(relatedOrcids);
         }
         if (toDelete.isEmpty() && toPublish.isEmpty()) {
             LOGGER.info("Nothing to delete or publish. Skipping {}...", objectID);
