@@ -21,6 +21,8 @@ package org.mycore.orcid2.v3.work;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.orcid2.metadata.MCRORCIDPutCodeInfo;
@@ -33,6 +35,8 @@ import org.orcid.jaxb.model.v3.release.record.Work;
  * See {@link org.mycore.orcid2.work.MCRORCIDWorkEventHandler}.
  */
 public class MCRORCIDWorkEventHandlerImpl extends MCRORCIDWorkEventHandler<Work> {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     protected void removeWork(MCRORCIDPutCodeInfo workInfo, String orcid, MCRORCIDCredential credential) {
@@ -77,9 +81,13 @@ public class MCRORCIDWorkEventHandlerImpl extends MCRORCIDWorkEventHandler<Work>
 
     @Override
     protected List<String> listRelatedOrcidIdentifiers(Work work) {
-        return work.getWorkContributors().getContributor().stream().filter(c -> c.getContributorOrcid() != null)
-            .filter(c -> c.getContributorAttributes() != null)
-            .filter(c -> c.getContributorAttributes().getContributorRole() != null)
-            .map(c -> c.getContributorOrcid().getPath()).toList();
+        if (work.getWorkContributors() != null && work.getWorkContributors().getContributor() != null) {
+            return work.getWorkContributors().getContributor().stream().filter(c -> c.getContributorOrcid() != null)
+                .filter(c -> c.getContributorAttributes() != null)
+                .filter(c -> c.getContributorAttributes().getContributorRole() != null)
+                .map(c -> c.getContributorOrcid().getPath()).toList();
+        }
+        LOGGER.warn("Publication work {} has no mapped contributors.", work.getPutCode());
+        return List.of();
     }
 }
