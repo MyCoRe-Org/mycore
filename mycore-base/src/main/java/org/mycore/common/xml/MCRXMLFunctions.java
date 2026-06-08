@@ -393,14 +393,6 @@ public class MCRXMLFunctions {
     }
 
     /**
-     * @deprecated Use {@link MCRAccessManager#checkDerivateDisplayPermission(String)} instead.
-     */
-    @Deprecated(forRemoval = true)
-    public static boolean isDisplayedEnabledDerivate(String derivateId) {
-        return MCRAccessManager.checkDerivateDisplayPermission(derivateId);
-    }
-
-    /**
      * Returns, weather the derivate identified by the given derivate ID
      * should be included when displaying derivates for the given intent
      * (which is controlled by the configured {@link MCRDerivateDisplayFilter},

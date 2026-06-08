@@ -135,9 +135,14 @@ public class MCRPersistenceUnitDescriptor implements PersistenceUnitDescriptor {
         this.excludeUnlistedClasses = excludeUnlistedClasses;
     }
 
+    /**
+     * @deprecated Use {@link MCRPersistenceUnitDescriptor#getPersistenceUnitTransactionType()} instead.<br>
+     *             This method will be removed, once it has been removed from
+     *             <code>org.hibernate.orm:hibernate-core</code>.
+     */
     @Override
+    @SuppressWarnings("removal")
     @Deprecated(forRemoval = true)
-    @SuppressWarnings({"deprecation","removal"})
     public jakarta.persistence.spi.PersistenceUnitTransactionType getTransactionType() {
         return switch (transactionType) {
             case JTA -> jakarta.persistence.spi.PersistenceUnitTransactionType.JTA;

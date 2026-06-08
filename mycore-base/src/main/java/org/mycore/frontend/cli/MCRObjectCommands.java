@@ -127,22 +127,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
     private static final Predicate<String> OBJECT_ID_PREDICATE = id -> !id.contains("_derivate_");
 
-    /**
-     * @deprecated Use {@link MCRBasicCommands#setSelectedValues(List)} instead.
-     */
-    @Deprecated(forRemoval = true)
-    public static void setSelectedObjectIDs(List<String> selected) {
-        MCRBasicCommands.setSelectedValues(selected);
-    }
-
-    /**
-     * @deprecated Use {@link MCRBasicCommands#getSelectedValues()} instead.
-     */
-    @Deprecated(forRemoval = true)
-    public static List<String> getSelectedObjectIDs() {
-        return MCRBasicCommands.getSelectedValues();
-    }
-
     @MCRCommand(
         syntax = "select objects with xpath {0}",
         help = "Selects MCRObjects with XPath {0}," +
