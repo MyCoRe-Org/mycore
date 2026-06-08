@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jdom2.Element;
@@ -76,11 +75,7 @@ public class MCRORCIDWorkSummaryUtils {
             return Stream.empty();
         }
         return workSummaries.stream()
-            .filter(
-                w -> hasMatch(
-                    w.getExternalIdentifiers().getExternalIdentifier().stream()
-                        .map(i -> new MCRIdentifier(i.getType(), i.getValue())).collect(Collectors.toSet()),
-                    identifiers));
+            .filter(w -> hasMatch(MCRORCIDWorkUtils.toMCRIdentifiers(w.getExternalIdentifiers()), identifiers));
     }
 
     /**
