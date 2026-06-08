@@ -6,12 +6,7 @@
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   exclude-result-prefixes="#all">
 
-  <xsl:function name="mcrproperty:all" as="element()">
-    <xsl:param name="keyPrefix" as="xs:string"/>
-    <xsl:sequence select="fn:document(concat('property:', $keyPrefix, '*'))/properties" />
-  </xsl:function>
-
-  <xsl:function name="mcrproperty:one" as="xs:string?">
+  <xsl:function name="mcrproperty:get" as="xs:string?">
     <xsl:param name="key" as="xs:string"/>
     <xsl:variable name="entryDoc" select="fn:document(concat('property:', $key))"/>
     <xsl:sequence select="$entryDoc/entry/text()"/>
