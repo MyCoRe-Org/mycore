@@ -6,19 +6,32 @@
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   exclude-result-prefixes="#all">
 
-  <xsl:function name="mcrproperty:all" as="element()">
-    <xsl:param name="keyPrefix" as="xs:string"/>
-    <xsl:sequence select="fn:document(concat('property:', $keyPrefix, '*'))/properties" />
-  </xsl:function>
-
-  <xsl:function name="mcrproperty:one" as="xs:string?">
+  <xsl:function name="mcrproperty:get" as="xs:string?">
     <xsl:param name="key" as="xs:string"/>
     <xsl:variable name="entryDoc" select="fn:document(concat('property:', $key))"/>
     <xsl:sequence select="$entryDoc/entry/text()"/>
   </xsl:function>
-  
+
+  <xsl:function name="mcrproperty:one" as="xs:string?">
+    <xsl:param name="key" as="xs:string"/>
+    <xsl:message>mcrproperty:one is deprecated, use mcrproperty:get instead</xsl:message>
+    <xsl:variable name="entryDoc" select="fn:document(concat('property:', $key))"/>
+    <xsl:sequence select="$entryDoc/entry/text()"/>
+  </xsl:function>
+
+  <xsl:function name="mcrproperty:get-sub-properties" as="map(xs:string, xs:string)">
+    <xsl:param name="keyPrefix" as="xs:string"/>
+    <xsl:variable name="propDoc" select="fn:document(concat('property:', $keyPrefix, '*'))" />
+    <xsl:map>
+      <xsl:for-each select="$propDoc/properties/entry">
+        <xsl:map-entry key="fn:string(@key)" select="fn:string(./text())" />
+      </xsl:for-each>
+    </xsl:map>
+  </xsl:function>
+
   <xsl:function name="mcrproperty:map" as="map(xs:string, xs:string)">
     <xsl:param name="keyPrefix" as="xs:string"/>
+    <xsl:message>mcrproperty:map is deprecated, use mcrproperty:get-sub-properties instead</xsl:message>
     <xsl:variable name="propDoc" select="fn:document(concat('property:', $keyPrefix, '*'))" />
     <xsl:map>
       <xsl:for-each select="$propDoc/properties/entry">
