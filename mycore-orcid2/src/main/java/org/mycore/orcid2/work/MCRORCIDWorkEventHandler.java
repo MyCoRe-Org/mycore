@@ -199,15 +199,8 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
         }
     }
 
-    private boolean statesDiffer(Optional<String> newState, Optional<String> oldState) {
-        if (!newState.isPresent() || !oldState.isPresent()) {
-            return false;
-        }
-
-        String s1 = newState.get();
-        String s2 = oldState.get();
-
-        return !s1.equals(s2);
+    private boolean statesDiffer(String newState, String oldState) {
+        return newState != null && !newState.equals(oldState);
     }
 
     private void deleteWorks(Map<String, MCRORCIDUser> userOrcidPair, Set<MCRIdentifier> identifiers,
