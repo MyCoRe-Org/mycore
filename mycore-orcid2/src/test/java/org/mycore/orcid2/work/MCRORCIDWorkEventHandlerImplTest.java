@@ -33,6 +33,10 @@ import org.mycore.orcid2.v3.work.MCRORCIDWorkEventHandlerImpl;
 
 public class MCRORCIDWorkEventHandlerImplTest extends MCRJPATestCase {
 
+    /**
+     * Tests for fixed NPE in {@link MCRORCIDWorkEventHandlerImpl}, comp. MCR-3715.
+     * Test should log a warning for missing contributor.
+     */
     @Test
     public void testNoContributor() throws IOException, JDOMException {
         MCRSessionMgr.getCurrentSession();
@@ -53,6 +57,10 @@ public class MCRORCIDWorkEventHandlerImplTest extends MCRJPATestCase {
         eventHandler.handleObjectCreated(null, mcro);
     }
 
+    /**
+     * Test data should map to a contributor in work.
+     * Test should not log a warning for missing contributor.
+     */
     @Test
     public void testContributor() throws IOException, JDOMException {
         MCRSessionMgr.getCurrentSession();
