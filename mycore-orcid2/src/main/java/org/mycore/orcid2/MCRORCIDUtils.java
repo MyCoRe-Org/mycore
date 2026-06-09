@@ -215,7 +215,6 @@ public class MCRORCIDUtils {
      * @return the category id value of the object's state as a {@code String}, or {@code null} if no state is available
      */
     public static String getStateValue(MCRObject object) {
-        Optional<String> v = Optional.ofNullable(object.getService().getState()).map(MCRCategoryID::getId);
-        return v.isPresent() ? v.get() : null;
+        return Optional.ofNullable(object.getService().getState()).map(MCRCategoryID::getId).orElse(null);
     }
 }

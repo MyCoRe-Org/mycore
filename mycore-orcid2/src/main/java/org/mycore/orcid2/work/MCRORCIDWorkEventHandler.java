@@ -200,7 +200,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
     }
 
     private boolean statesDiffer(String newState, String oldState) {
-        return newState != null && !newState.equals(oldState);
+        return !Objects.equals(newState, oldState);
     }
 
     private void deleteWorks(Map<String, MCRORCIDUser> userOrcidPair, Set<MCRIdentifier> identifiers,
