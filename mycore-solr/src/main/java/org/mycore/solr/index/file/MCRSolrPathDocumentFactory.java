@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
+import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
@@ -73,7 +74,7 @@ public class MCRSolrPathDocumentFactory {
             .flatMap(MCRConfiguration2::splitValue)
             .map((accumulatorClassRef) -> {
                 try {
-                    Class<? extends MCRSolrFileIndexAccumulator> accumulatorClass = Class
+                    Class<? extends MCRSolrFileIndexAccumulator> accumulatorClass = MCRClassTools
                         .forName(accumulatorClassRef)
                         .asSubclass(MCRSolrFileIndexAccumulator.class);
 
