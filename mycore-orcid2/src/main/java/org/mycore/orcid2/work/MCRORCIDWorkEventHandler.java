@@ -146,9 +146,15 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
         }
         if (MCRMetadataManager.exists(objectID)) {
             final MCRObject outdatedObject = MCRMetadataManager.retrieveMCRObject(objectID);
-            if (MCRXMLHelper.deepEqual(new MCRMODSWrapper(object).getMODS(),
-                new MCRMODSWrapper(outdatedObject).getMODS())) {
-                LOGGER.info("Metadata does not changed. Skipping {}...", objectID);
+
+            boolean stateChanged = !Objects.equals(MCRORCIDUtils.getStateValue(object),
+                MCRORCIDUtils.getStateValue(outdatedObject));
+
+            boolean changedMetadata = MCRXMLHelper.deepEqual(new MCRMODSWrapper(object).getMODS(),
+                new MCRMODSWrapper(outdatedObject).getMODS());
+
+            if (!changedMetadata && !stateChanged) {
+                LOGGER.info("Neither metadata nor state of publication changed. Skipping {}...", objectID);
                 tryCollectAndSaveExternalPutCodes(filteredObject);
                 return;
             }

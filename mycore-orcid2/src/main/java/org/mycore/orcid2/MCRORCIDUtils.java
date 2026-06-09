@@ -78,10 +78,11 @@ public class MCRORCIDUtils {
      * Checks if MCRObjects' state is ready to publish.
      *
      * @param object the MCRObject
-     * @return true if state is ready to publish or there is not state
+     * @return true if state is ready to publish or there is not a state present
      */
     public static boolean checkPublishState(MCRObject object) {
-        return getStateValue(object).map(MCRORCIDUtils::checkPublishState).orElse(true);
+        String stateValue = getStateValue(object);
+        return stateValue == null ? true : checkPublishState(stateValue);
     }
 
     /**
@@ -207,7 +208,13 @@ public class MCRORCIDUtils {
         return new MCRIdentifier(element.getAttributeValue("type"), element.getTextTrim());
     }
 
-    private static Optional<String> getStateValue(MCRObject object) {
-        return Optional.ofNullable(object.getService().getState()).map(MCRCategoryID::getId);
+    /**
+     * Retrieves the state value of the given {@link MCRObject}.
+     *
+     * @param object the {@link MCRObject} whose state value is to be retrieved
+     * @return the category id value of the object's state as a {@code String}, or {@code null} if no state is available
+     */
+    public static String getStateValue(MCRObject object) {
+        return Optional.ofNullable(object.getService().getState()).map(MCRCategoryID::getId).orElse(null);
     }
 }
