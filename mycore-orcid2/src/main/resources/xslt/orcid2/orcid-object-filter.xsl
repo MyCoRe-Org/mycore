@@ -4,7 +4,7 @@
   xmlns:mods="http://www.loc.gov/mods/v3"
   exclude-result-prefixes="xsl">
 
-  <xsl:include href="copynodes.xsl" />
+  <xsl:mode on-no-match="shallow-copy" />
 
   <xsl:template match="/">
     <xsl:apply-templates />

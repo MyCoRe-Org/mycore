@@ -67,7 +67,7 @@ public class MCRORCIDWorkEventHandlerImplTest extends MCRJPATestCase {
         MCRMODSWrapper mw = new MCRMODSWrapper(mcro);
 
         mw.setMODS(document.getRootElement().detach());
-        mw.setID("junit", 1);
+        mw.setID("junit", 2);
 
         MCRORCIDWorkEventHandlerImpl eventHandler = new MCRORCIDWorkEventHandlerImpl();
         eventHandler.handleObjectCreated(null, mcro);
