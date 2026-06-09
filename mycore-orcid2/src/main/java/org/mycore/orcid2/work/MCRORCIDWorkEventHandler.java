@@ -160,7 +160,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
                 new MCRMODSWrapper(outdatedObject).getMODS());
 
             if (!changedMetadata && !changedStateToPublished) {
-                LOGGER.info("Metadata did not change. Skipping {}...", objectID);
+                LOGGER.info("Neither metadata nor state of publication changed. Skipping {}...", objectID);
                 tryCollectAndSaveExternalPutCodes(filteredObject);
                 return;
             }
