@@ -147,7 +147,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
         if (MCRMetadataManager.exists(objectID)) {
             final MCRObject outdatedObject = MCRMetadataManager.retrieveMCRObject(objectID);
 
-            boolean stateChanged = statesDiffer(MCRORCIDUtils.getStateValue(object),
+            boolean stateChanged = !Objects.equals(MCRORCIDUtils.getStateValue(object),
                 MCRORCIDUtils.getStateValue(outdatedObject));
 
             boolean changedMetadata = MCRXMLHelper.deepEqual(new MCRMODSWrapper(object).getMODS(),
@@ -197,10 +197,6 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
                 LOGGER.warn("Error while setting ORCID flag content to {}.", objectID, e);
             }
         }
-    }
-
-    private boolean statesDiffer(String newState, String oldState) {
-        return !Objects.equals(newState, oldState);
     }
 
     private void deleteWorks(Map<String, MCRORCIDUser> userOrcidPair, Set<MCRIdentifier> identifiers,
