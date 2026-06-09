@@ -207,7 +207,7 @@ public class MCRORCIDUtils {
         return new MCRIdentifier(element.getAttributeValue("type"), element.getTextTrim());
     }
 
-    private static Optional<String> getStateValue(MCRObject object) {
+    public static Optional<String> getStateValue(MCRObject object) {
         return Optional.ofNullable(object.getService().getState()).map(MCRCategoryID::getId);
     }
 }
