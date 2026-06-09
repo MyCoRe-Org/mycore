@@ -20,6 +20,7 @@ package org.mycore.orcid2.v3.work;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -89,6 +90,21 @@ public class MCRORCIDWorkUtils {
         return work.getExternalIdentifiers().getExternalIdentifier().stream()
             .filter(i -> Objects.equals(i.getRelationship(), Relationship.SELF))
             .filter(i -> MCRORCIDUtils.checkTrustedIdentifier(i.getType()))
+            .map(i -> new MCRIdentifier(i.getType(), i.getValue())).collect(Collectors.toSet());
+    }
+
+    /**
+     * Converts {@link ExternalIDs} to a Set of {@link MCRIdentifier}.
+     * A work may have no external identifiers at all, in which case ORCID returns {@code null}.
+     *
+     * @param externalIDs the ExternalIDs, may be {@code null}
+     * @return Set of MCRIdentifier, empty if externalIDs is {@code null}
+     */
+    static Set<MCRIdentifier> toMCRIdentifiers(ExternalIDs externalIDs) {
+        if (externalIDs == null) {
+            return new HashSet<>();
+        }
+        return externalIDs.getExternalIdentifier().stream()
             .map(i -> new MCRIdentifier(i.getType(), i.getValue())).collect(Collectors.toSet());
     }
 
