@@ -89,12 +89,6 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
     private static final boolean SAVE_OTHER_PUT_CODES = MCRConfiguration2
         .getBoolean("MCR.ORCID2.Metadata.WorkInfo.SaveOtherPutCodes").orElse(false);
 
-    /**
-     * The list of states when an object is ready to be published to ORCID.
-     * */
-    private static final List<String> PUBLISH_STATES = MCRConfiguration2.getOrThrow("MCR.ORCID2.Work.PublishStates",
-        MCRConfiguration2::splitValue).toList();
-
     @Override
     protected void handleObjectCreated(MCREvent evt, MCRObject object) {
         handlePublication(object);
@@ -153,13 +147,13 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
         if (MCRMetadataManager.exists(objectID)) {
             final MCRObject outdatedObject = MCRMetadataManager.retrieveMCRObject(objectID);
 
-            boolean changedStateToPublished = changedToPublished(MCRORCIDUtils.getStateValue(object),
+            boolean stateChanged = statesDiffer(MCRORCIDUtils.getStateValue(object),
                 MCRORCIDUtils.getStateValue(outdatedObject));
 
             boolean changedMetadata = MCRXMLHelper.deepEqual(new MCRMODSWrapper(object).getMODS(),
                 new MCRMODSWrapper(outdatedObject).getMODS());
 
-            if (!changedMetadata && !changedStateToPublished) {
+            if (!changedMetadata && !stateChanged) {
                 LOGGER.info("Neither metadata nor state of publication changed. Skipping {}...", objectID);
                 tryCollectAndSaveExternalPutCodes(filteredObject);
                 return;
@@ -205,7 +199,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
         }
     }
 
-    private boolean changedToPublished(Optional<String> newState, Optional<String> oldState) {
+    private boolean statesDiffer(Optional<String> newState, Optional<String> oldState) {
         if (!newState.isPresent() || !oldState.isPresent()) {
             return false;
         }
@@ -213,7 +207,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
         String s1 = newState.get();
         String s2 = oldState.get();
 
-        return PUBLISH_STATES.contains(s1) && !s1.equals(s2);
+        return !s1.equals(s2);
     }
 
     private void deleteWorks(Map<String, MCRORCIDUser> userOrcidPair, Set<MCRIdentifier> identifiers,
