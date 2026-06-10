@@ -21,7 +21,6 @@ package org.mycore.pi;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRException;
@@ -45,24 +44,32 @@ public class MCRPICreationEventHandler extends MCREventHandlerBase {
     private void processPIServices(MCRObject obj) {
         List<MCRPIRegistrationInfo> registered = MCRPIManager.getInstance().getRegistered(obj);
 
-        final List<String> services = registered.stream().map(MCRPIRegistrationInfo::getService)
-            .collect(Collectors.toList());
+        final List<String> services = registered.stream().map(MCRPIRegistrationInfo::getService).toList();
 
-        List<MCRPIService<MCRPersistentIdentifier>> listOfServicesWithCreatablePIs = MCRPIServiceManager
-            .getInstance().getAutoCreationList().stream()
-            .filter(Predicate.not(s -> services.contains(s.getServiceID())))
-            .filter(Predicate.not(s -> MCRPIService.hasFlag(obj, "", s)))
-            .filter(s -> s.getCreationPredicate().test(obj))
-            .collect(Collectors.toList());
+        List<MCRPIService<MCRPersistentIdentifier>> autoCreatingPIServices = MCRPIServiceManager
+            .getInstance().getAutoCreationList();
 
-        listOfServicesWithCreatablePIs
-            .forEach((serviceToRegister) -> {
+        boolean mayCreatePI = true;
+        while (mayCreatePI) {
+
+            mayCreatePI = false;
+
+            List<MCRPIService<MCRPersistentIdentifier>> listOfServicesWithCreatablePIs = autoCreatingPIServices.stream()
+                .filter(Predicate.not(s -> services.contains(s.getServiceID())))
+                .filter(Predicate.not(s -> MCRPIService.hasFlag(obj, "", s)))
+                .filter(s -> s.getCreationPredicate().test(obj))
+                .toList();
+
+            for (MCRPIService<MCRPersistentIdentifier> serviceToRegister : listOfServicesWithCreatablePIs) {
                 try {
                     serviceToRegister.register(obj, "", false);
+                    mayCreatePI = true;
                 } catch (MCRAccessException | MCRPersistentIdentifierException | ExecutionException
                     | InterruptedException e) {
                     throw new MCRException("Error while register pi for object " + obj.getId().toString(), e);
                 }
-            });
+            }
+        }
+
     }
 }
