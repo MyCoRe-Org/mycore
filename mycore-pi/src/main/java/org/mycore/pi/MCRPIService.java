@@ -165,21 +165,47 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         MCRObjectService service = obj.getService();
         List<String> flags = service.getFlags(PI_FLAG);
         Gson gson = getGson();
-        return flags.stream().anyMatch(s -> {
-            MCRPI flag = gson.fromJson(s, MCRPI.class);
-            return flag.getAdditional().equals(additional) && flag.getIdentifier().equals(mcrpi.getIdentifier());
-        });
+        return flags.stream()
+            .map(s -> gson.fromJson(s, MCRPI.class))
+            .anyMatch(flag -> matches(flag, mcrpi, additional));
+    }
+
+    public static List<MCRPI> getFlags(MCRBase obj, String additional, MCRPIRegistrationInfo mcrpi) {
+        MCRObjectService service = obj.getService();
+        List<String> flags = service.getFlags(PI_FLAG);
+        Gson gson = getGson();
+        return flags.stream()
+            .map(s -> gson.fromJson(s, MCRPI.class))
+            .filter(flag -> matches(flag, mcrpi, additional))
+            .toList();
+    }
+
+    private static boolean matches(MCRPI flag, MCRPIRegistrationInfo mcrpi, String additional) {
+        return flag.getAdditional().equals(additional) && flag.getIdentifier().equals(mcrpi.getIdentifier());
     }
 
     public static boolean hasFlag(MCRBase obj, String additional, MCRPIService<?> piService) {
         MCRObjectService service = obj.getService();
         List<String> flags = service.getFlags(PI_FLAG);
         Gson gson = getGson();
-        return flags.stream().anyMatch(s -> {
-            MCRPI flag = gson.fromJson(s, MCRPI.class);
-            return flag.getAdditional().equals(additional)
-                && Objects.equals(flag.getService(), piService.getServiceID());
-        });
+        return flags.stream()
+            .map(s -> gson.fromJson(s, MCRPI.class))
+            .anyMatch(flag -> matches(flag, piService, additional));
+    }
+
+    public static List<MCRPI> getFlags(MCRBase obj, String additional, MCRPIService<?> piService) {
+        MCRObjectService service = obj.getService();
+        List<String> flags = service.getFlags(PI_FLAG);
+        Gson gson = getGson();
+        return flags.stream()
+            .map(s -> gson.fromJson(s, MCRPI.class))
+            .filter(flag -> matches(flag, piService, additional))
+            .toList();
+    }
+
+    private static boolean matches(MCRPI flag, MCRPIService<?> piService, String additional) {
+        return flag.getAdditional().equals(additional)
+            && Objects.equals(flag.getService(), piService.getServiceID());
     }
 
     public static void updateFlagsInDatabase(MCRBase obj) {
