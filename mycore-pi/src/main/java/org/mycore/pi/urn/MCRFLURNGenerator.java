@@ -23,9 +23,9 @@ import java.util.function.Supplier;
 
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.date.MCRFLDateScrambler;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.pi.MCRPIGenerator;
-import org.mycore.pi.util.MCRFLDateScrambler;
 
 /**
  * {@link MCRFLURNGenerator} is a {@link MCRPIGenerator} for {@link MCRDNBURN} identifiers
@@ -68,7 +68,7 @@ public class MCRFLURNGenerator extends MCRDNBURNGeneratorBase {
     protected synchronized String buildNISS(MCRBase base, String additional) {
 
         Date date = new Date((System.currentTimeMillis() / 1000) * 1000);
-        String niss = MCRFLDateScrambler.scrambleDate(date);
+        String niss = new MCRFLDateScrambler().format(date);
 
         if (niss.equals(lastNIss)) {
             try {

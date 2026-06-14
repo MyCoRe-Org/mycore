@@ -402,6 +402,11 @@
       <artifactId>xalan</artifactId>
     </dependency>
     <dependency>
+      <groupId>de.thetaphi</groupId>
+      <artifactId>forbiddenapis</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>at.yawk.lz4</groupId>
       <artifactId>lz4-java</artifactId>
       <scope>runtime</scope>
