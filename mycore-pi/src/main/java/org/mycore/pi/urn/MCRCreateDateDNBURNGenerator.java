@@ -23,7 +23,6 @@ import static org.mycore.pi.util.MCRPIGeneratorUtils.getCountPattern;
 import static org.mycore.pi.util.MCRPIGeneratorUtils.getCreateDate;
 import static org.mycore.pi.util.MCRPIGeneratorUtils.readCountFromDatabase;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -33,9 +32,12 @@ import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRInstance;
 import org.mycore.common.config.annotation.MCRProperty;
-import org.mycore.datamodel.common.MCRISO8601Date;
+import org.mycore.common.date.MCRDateFormatter;
+import org.mycore.common.date.MCRISO8601DateFormatter;
 import org.mycore.datamodel.metadata.MCRBase;
+import org.mycore.pi.MCRGenericPIGenerator;
 import org.mycore.pi.MCRPIGenerator;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
@@ -45,8 +47,10 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
  * <p>
  * The following configuration options are available:
  * <ul>
- * <li> The property suffix {@link MCRCreateDateDNBURNGenerator#DATE_FORMAT_KEY} can be used to
- * specify the date format to be used (optional, defaults to {@link MCRCreateDateDNBURNGenerator#DEFAULT_DATE_FORMAT}).
+ * <li> The property suffix {@link MCRGenericPIGenerator#DATE_FORMATTER_KEY} can be used to
+ * specify the date formatter to be used (optional, defaults to {@link MCRISO8601DateFormatter} with format
+ * {@link MCRCreateDateDNBURNGenerator#DEFAULT_DATE_FORMAT} and locale
+ * {@link MCRCreateDateDNBURNGenerator#DEFAULT_DATE_LOCALE}).
  * <li> The property suffix {@link MCRCreateDateDNBURNGenerator#NAMESPACE_KEY} can be used to
  * specify the namespace.
  * <li> The property suffix {@link MCRCreateDateDNBURNGenerator#DELIMITER_KEY} can be used to
@@ -58,7 +62,8 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
  * Example:
  * <pre><code>
  * [...].Class=org.mycore.pi.urn.MCRCreateDateDNBURNGenerator
- * [...].DateFormat=yyyy-MM-dd
+ * [...].DateFormatter.Class=org.mycore.common.date.MCRSimpleDateFormatter
+ * [...].DateFormatter.Format=yyyy-MM-dd
  * [...].Namespace=urn:nbn:de:gbv:xyz
  * [...].Delimiter=-
  * [...].CountPrecision=6
@@ -71,7 +76,7 @@ public class MCRCreateDateDNBURNGenerator extends MCRDNBURNGeneratorBase {
 
     public static final Locale DEFAULT_DATE_LOCALE = Locale.ENGLISH;
 
-    public static final String DATE_FORMAT_KEY = "DateFormat";
+    public static final String DATE_FORMATTER_KEY = "Formatter";
 
     public static final String NAMESPACE_KEY = "Namespace";
 
@@ -81,16 +86,16 @@ public class MCRCreateDateDNBURNGenerator extends MCRDNBURNGeneratorBase {
 
     private static final Map<String, AtomicInteger> PATTERN_COUNT_MAP = new HashMap<>();
 
-    private final String dateFormat;
+    private final MCRDateFormatter dateFormatter;
 
     private final int countPrecision;
 
     private final String countPattern;
 
-    public MCRCreateDateDNBURNGenerator(String dateFormat, String namespace,
+    public MCRCreateDateDNBURNGenerator(MCRDateFormatter dateFormatter, String namespace,
         String delimiter, int countPrecision) {
         super(namespace, delimiter);
-        this.dateFormat = Objects.requireNonNull(dateFormat, "Date format must not be null");
+        this.dateFormatter = Objects.requireNonNull(dateFormatter, "Date formatter must not be null");
         this.countPrecision = countPrecision;
         this.countPattern = getCountPattern(countPrecision);
     }
@@ -98,20 +103,11 @@ public class MCRCreateDateDNBURNGenerator extends MCRDNBURNGeneratorBase {
     @Override
     protected String buildNISS(MCRBase base, String additional) throws MCRPersistentIdentifierException {
 
-        String prefixWithDate = formatDate(getCreateDate(base)) + "-";
+        String prefixWithDate = dateFormatter.format(getCreateDate(base)) + "-";
         int count = getCount(Pattern.quote(namespace() + delimiter() + prefixWithDate)
             + countPattern + Pattern.quote(delimiter()) + "[0-9]");
 
         return prefixWithDate + formatCount(count, countPrecision);
-
-    }
-
-    private String formatDate(Date date) {
-
-        MCRISO8601Date isoDate = new MCRISO8601Date();
-        isoDate.setDate(date);
-
-        return isoDate.format(dateFormat, DEFAULT_DATE_LOCALE);
 
     }
 
@@ -123,8 +119,8 @@ public class MCRCreateDateDNBURNGenerator extends MCRDNBURNGeneratorBase {
 
     public static class Factory implements Supplier<MCRCreateDateDNBURNGenerator> {
 
-        @MCRProperty(name = DATE_FORMAT_KEY, required = false)
-        public String dateFormat;
+        @MCRInstance(name = DATE_FORMATTER_KEY, valueClass = MCRDateFormatter.class, required = false)
+        public MCRDateFormatter dateFormatter;
 
         @MCRProperty(name = NAMESPACE_KEY)
         public String namespace;
@@ -137,12 +133,13 @@ public class MCRCreateDateDNBURNGenerator extends MCRDNBURNGeneratorBase {
 
         @Override
         public MCRCreateDateDNBURNGenerator get() {
-            return new MCRCreateDateDNBURNGenerator(getDateFormat(), namespace, delimiter,
+            return new MCRCreateDateDNBURNGenerator(getDateFormatter(), namespace, delimiter,
                 Integer.parseInt(countPrecision));
         }
 
-        private String getDateFormat() {
-            return dateFormat != null ? dateFormat : DEFAULT_DATE_FORMAT;
+        private MCRDateFormatter getDateFormatter() {
+            return dateFormatter != null ? dateFormatter
+                : new MCRISO8601DateFormatter(DEFAULT_DATE_FORMAT, DEFAULT_DATE_LOCALE);
         }
 
     }

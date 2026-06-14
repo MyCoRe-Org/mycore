@@ -23,10 +23,12 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRInstance;
 import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.date.MCRDateFormatter;
+import org.mycore.common.date.MCRFLDateScrambler;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.pi.MCRPIGenerator;
-import org.mycore.pi.util.MCRFLDateScrambler;
 
 /**
  * {@link MCRCurrentDateDOIGenerator} is a {@link MCRPIGenerator} for {@link MCRDigitalObjectIdentifier} identifiers
@@ -36,26 +38,35 @@ import org.mycore.pi.util.MCRFLDateScrambler;
  * <p>
  * The following configuration options are available:
  * <ul>
+ * <li> The property suffix {@link MCRCurrentDateDOIGenerator#DATE_FORMATTER_KEY} can be used to
+ * specify the date formatter to be used (optional, defaults to {@link MCRFLDateScrambler}).
  * <li> The property suffix {@link MCRCurrentDateDOIGenerator#PREFIX_KEY} can be used to
  * specify the prefix.
  * </ul>
  * Example:
  * <pre><code>
  * [...].Class=org.mycore.pi.doi.MCRCurrentDateDOIGenerator
+ * [...].DateFormatter.Class=org.mycore.common.date.MCRSimpleDateFormatter
+ * [...].DateFormatter.Format=yyyy-MM-dd
  * [...].Prefix=10.1234
  * </code></pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRCurrentDateDOIGenerator.Factory.class)
 public class MCRCurrentDateDOIGenerator extends MCRDOIGeneratorBase {
 
+    public static final String DATE_FORMATTER_KEY = "DateFormatter";
+
     public static final String PREFIX_KEY = "Prefix";
 
     private final String prefix;
 
+    private final MCRDateFormatter dateFormatter;
+
     private String lastSuffix;
 
-    public MCRCurrentDateDOIGenerator(MCRDOIParser parser, String prefix) {
+    public MCRCurrentDateDOIGenerator(MCRDOIParser parser, MCRDateFormatter dateFormatter, String prefix) {
         super(parser);
+        this.dateFormatter = Objects.requireNonNull(dateFormatter, "Date formatter must not be null");
         this.prefix = Objects.requireNonNull(prefix, "Prefix must not be null");
     }
 
@@ -63,7 +74,7 @@ public class MCRCurrentDateDOIGenerator extends MCRDOIGeneratorBase {
     protected synchronized String buildDOI(MCRBase base, String additional) {
 
         Date date = new Date((System.currentTimeMillis() / 1000) * 1000);
-        String suffix = MCRFLDateScrambler.scrambleDate(date);
+        String suffix = dateFormatter.format(date);
 
         if (suffix.equals(lastSuffix)) {
             try {
@@ -81,12 +92,19 @@ public class MCRCurrentDateDOIGenerator extends MCRDOIGeneratorBase {
 
     public static class Factory implements Supplier<MCRCurrentDateDOIGenerator> {
 
+        @MCRInstance(name = DATE_FORMATTER_KEY, valueClass = MCRDateFormatter.class, required = false)
+        public MCRDateFormatter dateFormatter;
+
         @MCRProperty(name = PREFIX_KEY, defaultName = "MCR.DOI.Prefix")
         public String prefix;
 
         @Override
         public MCRCurrentDateDOIGenerator get() {
-            return new MCRCurrentDateDOIGenerator(new MCRDOIParser(), prefix);
+            return new MCRCurrentDateDOIGenerator(new MCRDOIParser(), getDateFormatter(), prefix);
+        }
+
+        private MCRDateFormatter getDateFormatter() {
+            return dateFormatter != null ? dateFormatter : new MCRFLDateScrambler();
         }
 
     }

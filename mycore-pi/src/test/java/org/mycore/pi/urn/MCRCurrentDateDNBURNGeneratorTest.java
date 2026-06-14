@@ -26,8 +26,11 @@ import org.junit.jupiter.api.Test;
 import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
+import org.mycore.common.date.MCRDateFormatter;
+import org.mycore.common.date.MCRFLDateScrambler;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.common.date.MCRMockDateFormatter;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.test.MyCoReTest;
 
@@ -47,7 +50,8 @@ public class MCRCurrentDateDNBURNGeneratorTest {
         object.setSchema("http://www.w3.org/2001/XMLSchema");
         object.setId(MCRObjectID.getInstance("my_test_00000123"));
 
-        MCRCurrentDateDNBURNGenerator generator = new MCRCurrentDateDNBURNGenerator(NAMESPACE, "-");
+        MCRMockDateFormatter formatter = new MCRMockDateFormatter();
+        MCRCurrentDateDNBURNGenerator generator = new MCRCurrentDateDNBURNGenerator(formatter, NAMESPACE, "-");
         String urn = generator.generate(object, "").asString();
 
         assertTrue(urn.startsWith(NAMESPACE));
@@ -57,6 +61,7 @@ public class MCRCurrentDateDNBURNGeneratorTest {
         String value = urn.substring(NAMESPACE.length() + 1, urn.length() - 2);
         char checksum = Character.forDigit(new MCRDNBURN("gbv:xyz", "-" + value + "-").calculateChecksum(), 10);
 
+        assertEquals(formatter.lastFormattedDate(), value);
         assertEquals(checksum, urn.charAt(urn.length() - 1));
 
     }
@@ -68,7 +73,8 @@ public class MCRCurrentDateDNBURNGeneratorTest {
         object.setSchema("http://www.w3.org/2001/XMLSchema");
         object.setId(MCRObjectID.getInstance("my_test_00000123"));
 
-        MCRCurrentDateDNBURNGenerator generator = new MCRCurrentDateDNBURNGenerator(NAMESPACE, "-");
+        MCRDateFormatter formatter = new MCRFLDateScrambler();
+        MCRCurrentDateDNBURNGenerator generator = new MCRCurrentDateDNBURNGenerator(formatter, NAMESPACE, "-");
         String urn1 = generator.generate(object, "").asString();
         String urn2 = generator.generate(object, "").asString();
         String urn3 = generator.generate(object, "").asString();

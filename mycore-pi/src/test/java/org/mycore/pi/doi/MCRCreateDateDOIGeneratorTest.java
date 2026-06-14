@@ -22,14 +22,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Date;
-import java.util.Locale;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
-import org.mycore.datamodel.common.MCRISO8601Date;
+import org.mycore.common.date.MCRDateFormatter;
+import org.mycore.common.date.MCRFLDateScrambler;
+import org.mycore.common.date.MCRMockDateFormatter;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
@@ -43,8 +42,6 @@ import org.mycore.test.MyCoReTest;
 })
 public class MCRCreateDateDOIGeneratorTest {
 
-    public static final String DATE_FORMAT = "yyyyMMdd";
-
     public static final String PREFIX = "10.1234";
 
     @Test
@@ -54,7 +51,8 @@ public class MCRCreateDateDOIGeneratorTest {
         object.setSchema("http://www.w3.org/2001/XMLSchema");
         object.setId(MCRObjectID.getInstance("my_test_00000123"));
 
-        MCRCreateDateDOIGenerator generator = new MCRCreateDateDOIGenerator(new MCRDOIParser(), DATE_FORMAT, PREFIX, 3);
+        MCRMockDateFormatter formatter = new MCRMockDateFormatter();
+        MCRCreateDateDOIGenerator generator = new MCRCreateDateDOIGenerator(new MCRDOIParser(), formatter, PREFIX, 3);
         String doi = generator.generate(object, "").asString();
 
         assertTrue(doi.startsWith(PREFIX));
@@ -62,17 +60,8 @@ public class MCRCreateDateDOIGeneratorTest {
 
         String value = doi.substring(PREFIX.length() + 1);
 
-        assertTrue(value.startsWith(formatDate(new Date()) + "-"));
+        assertTrue(value.startsWith(formatter.lastFormattedDate() + "-"));
         assertTrue(value.endsWith("-000"));
-
-    }
-
-    private String formatDate(Date date) {
-
-        MCRISO8601Date isoDate = new MCRISO8601Date();
-        isoDate.setDate(date);
-
-        return isoDate.format(DATE_FORMAT, Locale.ROOT);
 
     }
 
@@ -83,8 +72,8 @@ public class MCRCreateDateDOIGeneratorTest {
         object.setSchema("http://www.w3.org/2001/XMLSchema");
         object.setId(MCRObjectID.getInstance("my_test_00000123"));
 
-        MCRCreateDateDOIGenerator generator =
-            new MCRCreateDateDOIGenerator(new MCRDOIParser(), DATE_FORMAT, PREFIX, -1);
+        MCRDateFormatter formatter = new MCRFLDateScrambler();
+        MCRCreateDateDOIGenerator generator = new MCRCreateDateDOIGenerator(new MCRDOIParser(), formatter, PREFIX, -1);
         String doi1 = generator.generate(object, "").asString();
         String doi2 = generator.generate(object, "").asString();
         String doi3 = generator.generate(object, "").asString();

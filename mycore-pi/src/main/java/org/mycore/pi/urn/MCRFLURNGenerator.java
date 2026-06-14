@@ -22,6 +22,7 @@ import java.util.function.Supplier;
 
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.date.MCRFLDateScrambler;
 
 /**
  * @deprecated Use {@link MCRCurrentDateDNBURNGenerator} instead.
@@ -31,7 +32,7 @@ import org.mycore.common.config.annotation.MCRProperty;
 public class MCRFLURNGenerator extends MCRCurrentDateDNBURNGenerator {
 
     public MCRFLURNGenerator(String namespace, String delimiter) {
-        super(namespace, delimiter);
+        super(new MCRFLDateScrambler(), namespace, delimiter);
     }
 
     public static class Factory implements Supplier<MCRFLURNGenerator> {

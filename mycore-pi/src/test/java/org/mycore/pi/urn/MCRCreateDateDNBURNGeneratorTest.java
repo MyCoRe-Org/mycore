@@ -22,14 +22,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Date;
-import java.util.Locale;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
-import org.mycore.datamodel.common.MCRISO8601Date;
+import org.mycore.common.date.MCRDateFormatter;
+import org.mycore.common.date.MCRFLDateScrambler;
+import org.mycore.common.date.MCRMockDateFormatter;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
@@ -43,8 +42,6 @@ import org.mycore.test.MyCoReTest;
 })
 public class MCRCreateDateDNBURNGeneratorTest {
 
-    public static final String DATE_FORMAT = "yyyyMMdd";
-
     public static final String NAMESPACE = "urn:nbn:de:gbv:xyz";
 
     @Test
@@ -54,7 +51,8 @@ public class MCRCreateDateDNBURNGeneratorTest {
         object.setSchema("http://www.w3.org/2001/XMLSchema");
         object.setId(MCRObjectID.getInstance("my_test_00000123"));
 
-        MCRCreateDateDNBURNGenerator generator = new MCRCreateDateDNBURNGenerator(DATE_FORMAT, NAMESPACE, "-", 3);
+        MCRMockDateFormatter formatter = new MCRMockDateFormatter();
+        MCRCreateDateDNBURNGenerator generator = new MCRCreateDateDNBURNGenerator(formatter, NAMESPACE, "-", 3);
         String urn = generator.generate(object, "").asString();
 
         assertTrue(urn.startsWith(NAMESPACE));
@@ -64,18 +62,9 @@ public class MCRCreateDateDNBURNGeneratorTest {
         String value = urn.substring(NAMESPACE.length() + 1, urn.length() - 2);
         char checksum = Character.forDigit(new MCRDNBURN("gbv:xyz", "-" + value + "-").calculateChecksum(), 10);
 
-        assertTrue(value.startsWith(formatDate(new Date()) + "-"));
+        assertTrue(value.startsWith(formatter.lastFormattedDate() + "-"));
         assertTrue(value.endsWith("-000"));
         assertEquals(checksum, urn.charAt(urn.length() - 1));
-
-    }
-
-    private String formatDate(Date date) {
-
-        MCRISO8601Date isoDate = new MCRISO8601Date();
-        isoDate.setDate(date);
-
-        return isoDate.format(DATE_FORMAT, Locale.ROOT);
 
     }
 
@@ -86,7 +75,8 @@ public class MCRCreateDateDNBURNGeneratorTest {
         object.setSchema("http://www.w3.org/2001/XMLSchema");
         object.setId(MCRObjectID.getInstance("my_test_00000123"));
 
-        MCRCreateDateDNBURNGenerator generator = new MCRCreateDateDNBURNGenerator(DATE_FORMAT, NAMESPACE, "", -1);
+        MCRDateFormatter formatter = new MCRFLDateScrambler();
+        MCRCreateDateDNBURNGenerator generator = new MCRCreateDateDNBURNGenerator(formatter, NAMESPACE, "", -1);
         String urn1 = generator.generate(object, "").asString();
         String urn2 = generator.generate(object, "").asString();
         String urn3 = generator.generate(object, "").asString();

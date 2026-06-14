@@ -26,8 +26,11 @@ import org.junit.jupiter.api.Test;
 import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
+import org.mycore.common.date.MCRDateFormatter;
+import org.mycore.common.date.MCRFLDateScrambler;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.common.date.MCRMockDateFormatter;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.test.MyCoReTest;
 
@@ -47,11 +50,16 @@ public class MCRCurrentDateDOIGeneratorTest {
         object.setSchema("http://www.w3.org/2001/XMLSchema");
         object.setId(MCRObjectID.getInstance("my_test_00000123"));
 
-        MCRCurrentDateDOIGenerator generator = new MCRCurrentDateDOIGenerator(new MCRDOIParser(), PREFIX);
+        MCRMockDateFormatter formatter = new MCRMockDateFormatter();
+        MCRCurrentDateDOIGenerator generator = new MCRCurrentDateDOIGenerator(new MCRDOIParser(), formatter, PREFIX);
         String doi = generator.generate(object, "").asString();
 
         assertTrue(doi.startsWith(PREFIX));
         assertEquals('/', doi.charAt(PREFIX.length()));
+
+        String value = doi.substring(PREFIX.length() + 1);
+
+        assertEquals(formatter.lastFormattedDate(), value);
 
     }
 
@@ -62,7 +70,8 @@ public class MCRCurrentDateDOIGeneratorTest {
         object.setSchema("http://www.w3.org/2001/XMLSchema");
         object.setId(MCRObjectID.getInstance("my_test_00000123"));
 
-        MCRCurrentDateDOIGenerator generator = new MCRCurrentDateDOIGenerator(new MCRDOIParser(), PREFIX);
+        MCRDateFormatter formatter = new MCRFLDateScrambler();
+        MCRCurrentDateDOIGenerator generator = new MCRCurrentDateDOIGenerator(new MCRDOIParser(), formatter, PREFIX);
         String doi1 = generator.generate(object, "").asString();
         String doi2 = generator.generate(object, "").asString();
         String doi3 = generator.generate(object, "").asString();
