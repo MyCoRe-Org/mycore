@@ -18,55 +18,75 @@
 
 package org.mycore.pi.doi;
 
+import java.util.Date;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.function.Supplier;
 
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.pi.MCRPIGenerator;
+import org.mycore.pi.util.MCRFLDateScrambler;
 
 /**
- * {@link MCRUUIDDOIGenerator} is a {@link MCRPIGenerator} for {@link MCRDigitalObjectIdentifier} identifiers
- * that generates identifiers using a given prefix and a {@link UUID} as the suffix.
+ * {@link MCRCurrentDateDOIGenerator} is a {@link MCRPIGenerator} for {@link MCRDigitalObjectIdentifier} identifiers
+ * that generates identifiers using a given prefix and the current date (in seconds) value as the suffix.
+ * <p>
+ * Only one suffix per second will be generated.
  * <p>
  * The following configuration options are available:
  * <ul>
- * <li> The property suffix {@link MCRUUIDDOIGenerator#PREFIX_KEY} can be used to
+ * <li> The property suffix {@link MCRCurrentDateDOIGenerator#PREFIX_KEY} can be used to
  * specify the prefix.
  * </ul>
  * Example:
  * <pre><code>
- * [...].Class=org.mycore.pi.doi.MCRUUIDDOIGenerator
+ * [...].Class=org.mycore.pi.doi.MCRCurrentDateDOIGenerator
  * [...].Prefix=10.1234
  * </code></pre>
  */
-@MCRConfigurationProxy(proxyClass = MCRUUIDDOIGenerator.Factory.class)
-public class MCRUUIDDOIGenerator extends MCRDOIGeneratorBase {
+@MCRConfigurationProxy(proxyClass = MCRCurrentDateDOIGenerator.Factory.class)
+public class MCRCurrentDateDOIGenerator extends MCRDOIGeneratorBase {
 
     public static final String PREFIX_KEY = "Prefix";
 
     private final String prefix;
 
-    public MCRUUIDDOIGenerator(MCRDOIParser parser, String prefix) {
+    private String lastSuffix;
+
+    public MCRCurrentDateDOIGenerator(MCRDOIParser parser, String prefix) {
         super(parser);
         this.prefix = Objects.requireNonNull(prefix, "Prefix must not be null");
     }
 
     @Override
-    protected String buildDOI(MCRBase base, String additional) {
-        return prefix + "/" + UUID.randomUUID();
+    protected synchronized String buildDOI(MCRBase base, String additional) {
+
+        Date date = new Date((System.currentTimeMillis() / 1000) * 1000);
+        String suffix = MCRFLDateScrambler.scrambleDate(date);
+
+        if (suffix.equals(lastSuffix)) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException ignored) {
+            }
+            return buildDOI(base, additional);
+        }
+
+        lastSuffix = suffix;
+
+        return prefix + "/" + suffix;
+
     }
 
-    public static class Factory implements Supplier<MCRUUIDDOIGenerator> {
+    public static class Factory implements Supplier<MCRCurrentDateDOIGenerator> {
 
         @MCRProperty(name = PREFIX_KEY, defaultName = "MCR.DOI.Prefix")
         public String prefix;
 
         @Override
-        public MCRUUIDDOIGenerator get() {
-            return new MCRUUIDDOIGenerator(new MCRDOIParser(), prefix);
+        public MCRCurrentDateDOIGenerator get() {
+            return new MCRCurrentDateDOIGenerator(new MCRDOIParser(), prefix);
         }
 
     }
