@@ -31,13 +31,13 @@ import org.mycore.datamodel.metadata.MCRObject;
 
 /**
  * A {@link MCRXPathClassificationMappingCondition} is a {@link Condition} that
- * determines the condition of a MyCoRe object based on a configurable X-Path evaluating the
+ * determines the condition of a MyCoRe object based on a configurable XPath evaluating the
  * XML representation of the MyCoRe object.
  * <p>
  * The following configuration options are available:
  * <ul>
  * <li> The property suffix {@link MCRXPathClassificationMappingCondition#X_PATH_KEY} can be used to
- * specify the X-Path to be used.
+ * specify the XPath to be used.
  * </ul>
  * Example:
  * <pre><code>
@@ -53,7 +53,7 @@ public final class MCRXPathClassificationMappingCondition implements Condition {
     private final String xPath;
 
     public MCRXPathClassificationMappingCondition(String xPath) {
-        this.xPath = Objects.requireNonNull(xPath, "X-Path must not be null");
+        this.xPath = Objects.requireNonNull(xPath, "XPath must not be null");
     }
 
     @Override
