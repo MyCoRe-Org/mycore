@@ -24,8 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mycore.pi.MCRGenericPIGenerator.DEFAULT_DATE_FORMAT;
 import static org.mycore.pi.MCRGenericPIGenerator.DEFAULT_DATE_LOCALE;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -34,6 +32,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
+import org.mycore.common.date.MCRMockDateFormatter;
+import org.mycore.common.date.MCRSimpleDateFormatter;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.doi.MCRDigitalObjectIdentifier;
@@ -68,9 +68,10 @@ public class MCRGenericPIGeneratorTest {
 
         object.getMetadata().setFromDOM(metadata);
 
+        MCRMockDateFormatter formatter = new MCRMockDateFormatter();
         MCRGenericPIGenerator generator = new MCRGenericPIGenerator(
             "urn:nbn:de:gbv:xyz:$CurrentDate-$1-$2-$ObjectType-$ObjectProject-$ObjectNumber-$Count-",
-            DEFAULT_DATE_FORMAT,
+            formatter,
             Map.of("my", "MY"),
             Map.of("test", "TEST"),
             3,
@@ -79,10 +80,7 @@ public class MCRGenericPIGeneratorTest {
 
         String pi = generator.generate(object, "").asString();
 
-        SimpleDateFormat dateFormatter = new SimpleDateFormat(DEFAULT_DATE_FORMAT, DEFAULT_DATE_LOCALE);
-        String currenDate = dateFormatter.format(new Date());
-
-        assertEquals("urn:nbn:de:gbv:xyz:" + currenDate + "-result1-result2-TEST-MY-00000123-000-",
+        assertEquals("urn:nbn:de:gbv:xyz:" + formatter.lastFormattedDate() + "-result1-result2-TEST-MY-00000123-000-",
             pi.substring(0, pi.length() - 1));
 
     }
@@ -94,9 +92,10 @@ public class MCRGenericPIGeneratorTest {
         object.setSchema("http://www.w3.org/2001/XMLSchema");
         object.setId(MCRObjectID.getInstance("my_test_00000123"));
 
+        MCRSimpleDateFormatter formatter = new MCRSimpleDateFormatter(DEFAULT_DATE_FORMAT, DEFAULT_DATE_LOCALE);
         MCRGenericPIGenerator generator = new MCRGenericPIGenerator(
             "10.1234/$ObjectType-$Count",
-            DEFAULT_DATE_FORMAT,
+            formatter,
             Map.of(),
             Map.of(),
             -1,

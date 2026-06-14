@@ -19,13 +19,16 @@
 package org.mycore.pi.urn;
 
 import java.util.Date;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRInstance;
 import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.date.MCRDateFormatter;
+import org.mycore.common.date.MCRFLDateScrambler;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.pi.MCRPIGenerator;
-import org.mycore.pi.util.MCRFLDateScrambler;
 
 /**
  * {@link MCRCurrentDateDNBURNGenerator} is a {@link MCRPIGenerator} for {@link MCRDNBURN} identifiers
@@ -35,6 +38,8 @@ import org.mycore.pi.util.MCRFLDateScrambler;
  * <p>
  * The following configuration options are available:
  * <ul>
+ * <li> The property suffix {@link MCRCurrentDateDNBURNGenerator#DATE_FORMATTER_KEY} can be used to
+ * specify the date formatter to be used (optional, defaults to {@link MCRFLDateScrambler}).
  * <li> The property suffix {@link MCRCurrentDateDNBURNGenerator#NAMESPACE_KEY} can be used to
  * specify the namespace.
  * <li> The property suffix {@link MCRCurrentDateDNBURNGenerator#DELIMITER_KEY} can be used to
@@ -43,6 +48,8 @@ import org.mycore.pi.util.MCRFLDateScrambler;
  * Example:
  * <pre><code>
  * [...].Class=org.mycore.pi.urn.MCRCurrentDateDNBURNGenerator
+ * [...].DateFormatter.Class=org.mycore.common.date.MCRSimpleDateFormatter
+ * [...].DateFormatter.Format=yyyy-MM-dd
  * [...].Namespace=urn:nbn:de:gbv:xyz
  * [...].Delimiter=-
  * </code></pre>
@@ -50,21 +57,26 @@ import org.mycore.pi.util.MCRFLDateScrambler;
 @MCRConfigurationProxy(proxyClass = MCRCurrentDateDNBURNGenerator.Factory.class)
 public class MCRCurrentDateDNBURNGenerator extends MCRDNBURNGeneratorBase {
 
+    public static final String DATE_FORMATTER_KEY = "DateFormatter";
+
     public static final String NAMESPACE_KEY = "Namespace";
 
     public static final String DELIMITER_KEY = "Delimiter";
 
+    private final MCRDateFormatter dateFormatter;
+
     private String lastNIss;
 
-    public MCRCurrentDateDNBURNGenerator(String namespace, String delimiter) {
+    public MCRCurrentDateDNBURNGenerator(MCRDateFormatter dateFormatter, String namespace, String delimiter) {
         super(namespace, delimiter);
+        this.dateFormatter = Objects.requireNonNull(dateFormatter, "Date formatter must not be null");
     }
 
     @Override
     protected synchronized String buildNISS(MCRBase base, String additional) {
 
         Date date = new Date((System.currentTimeMillis() / 1000) * 1000);
-        String niss = MCRFLDateScrambler.scrambleDate(date);
+        String niss = dateFormatter.format(date);
 
         if (niss.equals(lastNIss)) {
             try {
@@ -82,6 +94,9 @@ public class MCRCurrentDateDNBURNGenerator extends MCRDNBURNGeneratorBase {
 
     public static class Factory implements Supplier<MCRCurrentDateDNBURNGenerator> {
 
+        @MCRInstance(name = DATE_FORMATTER_KEY, valueClass = MCRDateFormatter.class, required = false)
+        public MCRDateFormatter formatter;
+
         @MCRProperty(name = NAMESPACE_KEY)
         public String namespace;
 
@@ -90,7 +105,11 @@ public class MCRCurrentDateDNBURNGenerator extends MCRDNBURNGeneratorBase {
 
         @Override
         public MCRCurrentDateDNBURNGenerator get() {
-            return new MCRCurrentDateDNBURNGenerator(namespace, delimiter);
+            return new MCRCurrentDateDNBURNGenerator(getFormatter(), namespace, delimiter);
+        }
+
+        private MCRDateFormatter getFormatter() {
+            return formatter != null ? formatter : new MCRFLDateScrambler();
         }
 
     }

@@ -23,7 +23,6 @@ import static org.mycore.pi.util.MCRPIGeneratorUtils.getCountPattern;
 import static org.mycore.pi.util.MCRPIGeneratorUtils.getCreateDate;
 import static org.mycore.pi.util.MCRPIGeneratorUtils.readCountFromDatabase;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -33,9 +32,12 @@ import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRInstance;
 import org.mycore.common.config.annotation.MCRProperty;
-import org.mycore.datamodel.common.MCRISO8601Date;
+import org.mycore.common.date.MCRDateFormatter;
+import org.mycore.common.date.MCRISO8601DateFormatter;
 import org.mycore.datamodel.metadata.MCRBase;
+import org.mycore.pi.MCRGenericPIGenerator;
 import org.mycore.pi.MCRPIGenerator;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
@@ -45,8 +47,10 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
  * <p>
  * The following configuration options are available:
  * <ul>
- * <li> The property suffix {@link MCRCreateDateDOIGenerator#DATE_FORMAT_KEY} can be used to
- * specify the date format to be used (optional, defaults to {@link MCRCreateDateDOIGenerator#DEFAULT_DATE_FORMAT}).
+ * <li> The property suffix {@link MCRGenericPIGenerator#DATE_FORMATTER_KEY} can be used to
+ * specify the date formatter to be used (optional, defaults to {@link MCRISO8601DateFormatter} with format
+ * {@link MCRCreateDateDOIGenerator#DEFAULT_DATE_FORMAT} and locale
+ * {@link MCRCreateDateDOIGenerator#DEFAULT_DATE_LOCALE}).
  * <li> The property suffix {@link MCRCreateDateDOIGenerator#PREFIX_KEY} can be used to
  * specify the prefix.
  * <li> The property suffix {@link MCRCreateDateDOIGenerator#COUNT_PRECISION_KEY} can be used to
@@ -56,7 +60,8 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
  * Example:
  * <pre><code>
  * [...].Class=org.mycore.pi.doi.MCRCreateDateDOIGenerator
- * [...].DateFormat=yyyy-MM-dd
+ * [...].DateFormatter.Class=org.mycore.common.date.MCRSimpleDateFormatter
+ * [...].DateFormatter.Format=yyyy-MM-dd
  * [...].Prefix=10.1234
  * [...].CountPrecision=6
  * </code></pre>
@@ -68,7 +73,7 @@ public class MCRCreateDateDOIGenerator extends MCRDOIGeneratorBase {
 
     public static final Locale DEFAULT_DATE_LOCALE = Locale.ENGLISH;
 
-    public static final String DATE_FORMAT_KEY = "DateFormat";
+    public static final String DATE_FORMATTER_KEY = "Formatter";
 
     public static final String PREFIX_KEY = "Prefix";
 
@@ -76,7 +81,7 @@ public class MCRCreateDateDOIGenerator extends MCRDOIGeneratorBase {
 
     private static final Map<String, AtomicInteger> PATTERN_COUNT_MAP = new HashMap<>();
 
-    private final String dateFormat;
+    private final MCRDateFormatter dateFormatter;
 
     private final String prefix;
 
@@ -84,10 +89,10 @@ public class MCRCreateDateDOIGenerator extends MCRDOIGeneratorBase {
 
     private final String countPattern;
 
-    public MCRCreateDateDOIGenerator(MCRDOIParser parser, String dateFormat, String prefix,
+    public MCRCreateDateDOIGenerator(MCRDOIParser parser, MCRDateFormatter dateFormatter, String prefix,
         int countPrecision) {
         super(parser);
-        this.dateFormat = Objects.requireNonNull(dateFormat, "Date format must not be null");
+        this.dateFormatter = Objects.requireNonNull(dateFormatter, "Date formatter must not be null");
         this.prefix = Objects.requireNonNull(prefix, "Prefix must not be null");
         this.countPrecision = countPrecision;
         this.countPattern = getCountPattern(countPrecision);
@@ -96,19 +101,10 @@ public class MCRCreateDateDOIGenerator extends MCRDOIGeneratorBase {
     @Override
     protected String buildDOI(MCRBase base, String additional) throws MCRPersistentIdentifierException {
 
-        String prefixWithDate = prefix + "/" + formatDate(getCreateDate(base)) + "-";
+        String prefixWithDate = prefix + "/" + dateFormatter.format(getCreateDate(base)) + "-";
         int count = getCount(Pattern.quote(prefixWithDate) + countPattern);
 
         return prefixWithDate + formatCount(count, countPrecision);
-
-    }
-
-    private String formatDate(Date date) {
-
-        MCRISO8601Date isoDate = new MCRISO8601Date();
-        isoDate.setDate(date);
-
-        return isoDate.format(dateFormat, DEFAULT_DATE_LOCALE);
 
     }
 
@@ -120,8 +116,8 @@ public class MCRCreateDateDOIGenerator extends MCRDOIGeneratorBase {
 
     public static class Factory implements Supplier<MCRCreateDateDOIGenerator> {
 
-        @MCRProperty(name = DATE_FORMAT_KEY, required = false)
-        public String dateFormat;
+        @MCRInstance(name = DATE_FORMATTER_KEY, valueClass = MCRDateFormatter.class, required = false)
+        public MCRDateFormatter dateFormatter;
 
         @MCRProperty(name = PREFIX_KEY, defaultName = "MCR.DOI.Prefix")
         public String prefix;
@@ -131,12 +127,13 @@ public class MCRCreateDateDOIGenerator extends MCRDOIGeneratorBase {
 
         @Override
         public MCRCreateDateDOIGenerator get() {
-            return new MCRCreateDateDOIGenerator(new MCRDOIParser(), getDateFormat(), prefix,
+            return new MCRCreateDateDOIGenerator(new MCRDOIParser(), getDateFormatter(), prefix,
                 Integer.parseInt(countPrecision));
         }
 
-        private String getDateFormat() {
-            return dateFormat != null ? dateFormat : DEFAULT_DATE_FORMAT;
+        private MCRDateFormatter getDateFormatter() {
+            return dateFormatter != null ? dateFormatter
+                : new MCRISO8601DateFormatter(DEFAULT_DATE_FORMAT, DEFAULT_DATE_LOCALE);
         }
 
     }

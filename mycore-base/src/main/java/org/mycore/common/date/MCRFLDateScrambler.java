@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.pi.util;
+package org.mycore.common.date;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -25,16 +25,21 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 /**
- * Utility class that provides a date scrambling algorithm <a href=
+ * A {@link MCRFLDateScrambler} is a {@link MCRDateFormatter} that uses a scrambling algorithm <a href=
  * "https://github.com/MyCoRe-Org/mycore/blob/d5d31302d663c0b47747905e0347a89b5bcf821c/sources/org/mycore/services/urn/MCRNISSBuilderFL.java#L37"
- * >introduced by <strong>F</strong>rank <strong>L</strong>ützenkirchen</a>.
+ * >introduced by <strong>F</strong>rank <strong>L</strong>ützenkirchen</a> to format a date.
+ * <p>
+ * No configuration options are available.
+ * <p>
+ * Example:
+ * <pre><code>
+ * [...].Class=org.mycore.common.date.MCRFLDateScrambler
+ * </code></pre>
  */
-public final class MCRFLDateScrambler {
+public final class MCRFLDateScrambler extends MCRDateFormatterBase {
 
-    private MCRFLDateScrambler() {
-    }
-
-    public static String scrambleDate(Date date) {
+    @Override
+    public String format(Date date) {
 
         Calendar calendar = new GregorianCalendar(TimeZone.getTimeZone("GMT+01:00"), Locale.ENGLISH);
         calendar.setTime(date);
