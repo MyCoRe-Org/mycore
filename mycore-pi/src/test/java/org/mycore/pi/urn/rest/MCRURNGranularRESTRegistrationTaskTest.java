@@ -51,8 +51,7 @@ import org.mycore.test.MyCoReTest;
 @MyCoReTest
 @ExtendWith(MCRMetadataExtension.class)
 @MCRTestConfiguration(properties = {
-    @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true"),
-    @MCRTestProperty(key = "MCR.PI.Generator.testGenerator.Namespace", string = "frontend-")
+    @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true")
 })
 public class MCRURNGranularRESTRegistrationTaskTest {
     private static final String countRegistered = "select count(u) from MCRPI u "
@@ -66,9 +65,8 @@ public class MCRURNGranularRESTRegistrationTaskTest {
     @Disabled
     @Test
     public void run() throws MCRPersistentIdentifierException {
-        MCRPI urn1 = generateMCRPI(randomFilename(), countRegistered);
-        MCREntityManagerProvider.getCurrentEntityManager()
-            .persist(urn1);
+        MCRPI urn1 = generateMCRPI(randomFilename(), countRegistered, "frontend-");
+        MCREntityManagerProvider.getCurrentEntityManager().persist(urn1);
 
         assertNull(urn1.getRegistered(), "Registered date should be null.");
 

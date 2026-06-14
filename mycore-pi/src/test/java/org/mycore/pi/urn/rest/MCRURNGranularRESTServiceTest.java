@@ -58,7 +58,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.pi.MCRPIRegistrationInfo;
 import org.mycore.pi.urn.MCRDNBURN;
-import org.mycore.pi.urn.MCRUUIDURNGenerator;
+import org.mycore.pi.urn.MCRUUIDDNBURNGenerator;
 import org.mycore.test.MCRJPAExtension;
 import org.mycore.test.MCRMetadataExtension;
 import org.mycore.test.MyCoReTest;
@@ -82,7 +82,7 @@ import org.mycore.test.MyCoReTest;
     @MCRTestProperty(key = "MCR.IFS2.Store.mycore_derivate.SlotLayout", string = "4-2-2"),
     @MCRTestProperty(key = "MCR.EventHandler.MCRDerivate.020.Class", classNameOf = MCRXMLMetadataEventHandler.class),
     @MCRTestProperty(key = "MCR.EventHandler.MCRDerivate.030.Class", classNameOf = MCRLinkTableEventHandler.class),
-    @MCRTestProperty(key = "MCR.PI.Generator.UUID.Class", classNameOf = MCRUUIDURNGenerator.class),
+    @MCRTestProperty(key = "MCR.PI.Generator.UUID.Class", classNameOf = MCRUUIDDNBURNGenerator.class),
     @MCRTestProperty(key = "MCR.PI.Generator.UUID.Namespace", string = "frontend-"),
     @MCRTestProperty(key = "MCR.PI.DNB.Credentials.Login", string = "test"),
     @MCRTestProperty(key = "MCR.PI.DNB.Credentials.Password", string = "test")
