@@ -18,44 +18,73 @@
 
 package org.mycore.pi.doi;
 
-import java.util.Optional;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Supplier;
 
+import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRPropertyMap;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.MCRPIGenerator;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 /**
- * Uses mapping from MCRObjectID base to DOI prefix to generate DOIs.
- * e.g. <code>MCR.PI.Generator.MapObjectIDDOI.Prefix.mycore_mods = 10.5072/my.</code> will map
- * <code>mycore_mods_00004711</code> to <code>10.5072/my.4711</code>
- *
- * @author Thomas Scheffler (yagee)
+ * {@link MCRMapObjectIDDOIGenerator} is a {@link MCRPIGenerator} for {@link MCRDigitalObjectIdentifier} identifiers
+ * that generates identifiers by concatenating a {@link MCRObjectID#getBase}-dependent value and the numerical
+ * part of the {@link MCRObjectID} of the {@link MCRBase}.
+ * <p>
+ * Example: Prefix mapping <code>mycore_mods=10.1234/MODS.</code> will map <code>mycore_mods_00000123</code>
+ * to <code>10.1234/MODS.123</code>
+ * <p>
+ * The following configuration options are available:
+ * <ul>
+ * <li> The property suffix {@link MCRMapObjectIDDOIGenerator#PREFIX_KEY} can be used to
+ * specify the prefix mappings to be used. 
+ * </ul>
+ * Example:
+ * <pre><code>
+ * [...].Class=org.mycore.pi.doi.MCRMapObjectIDDOIGenerator
+ * [...].Prefix.mycore_mods=10.1234/MODS.
+ * [...].Prefix.mycore_alto=10.9876/ALTO.
+ * </code></pre>
  */
-public class MCRMapObjectIDDOIGenerator extends MCRPIGenerator<MCRDigitalObjectIdentifier> {
+@MCRConfigurationProxy(proxyClass = MCRMapObjectIDDOIGenerator.Factory.class)
+public class MCRMapObjectIDDOIGenerator extends MCRDOIGeneratorBase {
 
-    private final MCRDOIParser mcrdoiParser;
+    public static final String PREFIX_KEY = "Prefix";
 
-    private String generatorID;
+    private final Map<String, String> prefixMap;
 
-    public MCRMapObjectIDDOIGenerator() {
-        super();
-        mcrdoiParser = new MCRDOIParser();
+    public MCRMapObjectIDDOIGenerator(MCRDOIParser parser, Map<String, String> prefixMap) {
+        super(parser);
+        this.prefixMap = Objects.requireNonNull(prefixMap, "Prefix map  must not be null");
     }
 
     @Override
-    public MCRDigitalObjectIdentifier generate(MCRBase mcrObject, String additional)
-        throws MCRPersistentIdentifierException {
-        final MCRObjectID objectId = mcrObject.getId();
-        return Optional.ofNullable(getProperties().get("Prefix." + objectId.getBase()))
-            .map(prefix -> {
-                final int objectIdNumberAsInteger = objectId.getNumberAsInteger();
-                return prefix.contains("/") ? prefix + objectIdNumberAsInteger
-                    : prefix + '/' + objectIdNumberAsInteger;
-            })
-            .flatMap(mcrdoiParser::parse).map(MCRDigitalObjectIdentifier.class::cast)
-            .orElseThrow(() -> new MCRPersistentIdentifierException("Prefix." + objectId.getBase() +
-                " is not defined in " + generatorID + "."));
+    protected String buildDOI(MCRBase base, String additional) throws MCRPersistentIdentifierException {
+
+        MCRObjectID objectId = base.getId();
+        String prefix = prefixMap.get(objectId.getBase());
+
+        if (prefix == null) {
+            throw new MCRPersistentIdentifierException("Missing prefix for base " + objectId.getBase());
+        }
+
+        int objectIdNumberAsInteger = objectId.getNumberAsInteger();
+        return prefix.contains("/") ? prefix + objectIdNumberAsInteger : prefix + '/' + objectIdNumberAsInteger;
+
     }
 
+    public static class Factory implements Supplier<MCRMapObjectIDDOIGenerator> {
+
+        @MCRPropertyMap(name = PREFIX_KEY)
+        public Map<String, String> prefixMap;
+
+        @Override
+        public MCRMapObjectIDDOIGenerator get() {
+            return new MCRMapObjectIDDOIGenerator(new MCRDOIParser(), prefixMap);
+        }
+
+    }
 }

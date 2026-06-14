@@ -16,23 +16,32 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.pi.purl;
+package org.mycore.pi.doi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
+import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
+import org.mycore.common.date.MCRDateFormatter;
+import org.mycore.common.date.MCRFLDateScrambler;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.common.date.MCRMockDateFormatter;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
 @MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.Access.Class", classNameOf = MCRAccessBaseImpl.class),
     @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true"),
 })
-public class MCRIDPURLGeneratorTest {
+public class MCRCurrentDateDOIGeneratorTest {
+
+    public static final String PREFIX = "10.1234";
 
     @Test
     public void generate() throws MCRPersistentIdentifierException {
@@ -41,24 +50,35 @@ public class MCRIDPURLGeneratorTest {
         object.setSchema("http://www.w3.org/2001/XMLSchema");
         object.setId(MCRObjectID.getInstance("my_test_00000123"));
 
-        MCRIDPURLGenerator generator = new MCRIDPURLGenerator("https://purl.example.com/$ID");
-        String purl = generator.generate(object, "").asString();
+        MCRMockDateFormatter formatter = new MCRMockDateFormatter();
+        MCRCurrentDateDOIGenerator generator = new MCRCurrentDateDOIGenerator(new MCRDOIParser(), formatter, PREFIX);
+        String doi = generator.generate(object, "").asString();
 
-        assertEquals("https://purl.example.com/my_test_00000123", purl, "");
+        assertTrue(doi.startsWith(PREFIX));
+        assertEquals('/', doi.charAt(PREFIX.length()));
+
+        String value = doi.substring(PREFIX.length() + 1);
+
+        assertEquals(formatter.lastFormattedDate(), value);
 
     }
 
     @Test
-    public void generateWithMultipleReplacements() throws MCRPersistentIdentifierException {
+    public void generateMultiple() throws MCRPersistentIdentifierException {
 
         MCRObject object = new MCRObject();
         object.setSchema("http://www.w3.org/2001/XMLSchema");
         object.setId(MCRObjectID.getInstance("my_test_00000123"));
 
-        MCRIDPURLGenerator generator = new MCRIDPURLGenerator("https://purl.example.com/$ID/$ID/XYZ");
-        String purl = generator.generate(object, "").asString();
+        MCRDateFormatter formatter = new MCRFLDateScrambler();
+        MCRCurrentDateDOIGenerator generator = new MCRCurrentDateDOIGenerator(new MCRDOIParser(), formatter, PREFIX);
+        String doi1 = generator.generate(object, "").asString();
+        String doi2 = generator.generate(object, "").asString();
+        String doi3 = generator.generate(object, "").asString();
 
-        assertEquals("https://purl.example.com/my_test_00000123/my_test_00000123/XYZ", purl, "");
+        assertNotEquals(doi1, doi2);
+        assertNotEquals(doi2, doi3);
+        assertNotEquals(doi3, doi1);
 
     }
 

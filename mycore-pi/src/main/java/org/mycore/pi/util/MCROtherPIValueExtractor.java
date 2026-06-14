@@ -24,12 +24,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.MCRPIManager;
 import org.mycore.pi.MCRPIRegistrationInfo;
 
-public class MCROtherPIValueExtractor {
+public final class MCROtherPIValueExtractor {
 
     private final String type;
 
@@ -40,19 +39,20 @@ public class MCROtherPIValueExtractor {
     public MCROtherPIValueExtractor(String type, String service, String pattern) {
         this.type = Objects.requireNonNull(type);
         this.service = Objects.requireNonNull(service);
-        this.pattern = Pattern.compile(Objects.requireNonNull(pattern));
-        checkPattern();
+        this.pattern = checkPattern(Pattern.compile(Objects.requireNonNull(pattern)));
     }
 
-    private void checkPattern() {
+    private static Pattern checkPattern(Pattern pattern) {
 
         Matcher matcher = pattern.matcher("");
 
         boolean hasExactlyOneCaptureGroup = matcher.groupCount() == 1;
         if (!hasExactlyOneCaptureGroup) {
-            throw new MCRConfigurationException("Pattern doesn't have exactly one capture group: " +
+            throw new IllegalArgumentException("Pattern doesn't have exactly one capture group: " +
                 pattern.pattern());
         }
+
+        return pattern;
 
     }
 

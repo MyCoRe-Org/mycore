@@ -1161,6 +1161,11 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <version>4.4.0</version>
       </dependency>
       <dependency>
+        <groupId>de.thetaphi</groupId>
+        <artifactId>forbiddenapis</artifactId>
+        <version>${forbiddenapis.version}</version>
+      </dependency>
+      <dependency>
         <groupId>de.undercouch</groupId>
         <artifactId>citeproc-java</artifactId>
         <version>3.5.0</version>
