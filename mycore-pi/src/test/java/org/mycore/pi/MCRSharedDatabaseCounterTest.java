@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
+import org.mycore.common.date.MCRSimpleDateFormatter;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.doi.MCRCreateDateDOIGenerator;
@@ -80,7 +81,7 @@ public class MCRSharedDatabaseCounterTest {
         MCRGenericPIGenerator generator2 = new MCRGenericPIGenerator(
             MCRPIGeneratorUtils.SHARED_COUNTER,
             PREFIX + "/$ObjectDate-$Count",
-            DATE_FORMAT,
+            new MCRSimpleDateFormatter(DATE_FORMAT),
             Map.of(),
             Map.of(),
             3,

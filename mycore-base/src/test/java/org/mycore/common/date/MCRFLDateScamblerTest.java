@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.pi.util;
+package org.mycore.common.date;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -60,7 +60,7 @@ public class MCRFLDateScamblerTest {
     @MethodSource("provideDates")
     public void formatDate(Date date, String expectedScramble) {
 
-        String scambled = MCRFLDateScrambler.scrambleDate(date);
+        String scambled = new MCRFLDateScrambler().format(date);
         String unscrambled = unscramble(scambled);
 
         LOGGER.info("Date: {} => {} => {}", date, scambled, unscrambled);
@@ -81,6 +81,19 @@ public class MCRFLDateScamblerTest {
     private static Instant toInstant(int year, int month, int day, int hour, int minute) {
         LocalDateTime localDateTime = LocalDateTime.of(year, month, day, hour, minute);
         return localDateTime.atZone(ZONE_ID).toInstant();
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideInstants")
+    public void formatInstant(Instant instant, String expectedScramble) {
+
+        String scambled = new MCRFLDateScrambler().format(instant);
+        String unscrambled = unscramble(scambled);
+
+        LOGGER.info("Instant: {} => {} => {}", instant, scambled, unscrambled);
+
+        assertEquals(expectedScramble, scambled);
+
     }
 
     @SuppressWarnings("unused")
