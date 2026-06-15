@@ -40,8 +40,11 @@ final class MCRInstanceListSource implements MCRSource {
 
     private final MCRInstanceList annotation;
 
-    MCRInstanceListSource(MCRInstanceList annotation) {
+    private final MCRSentinel sentinel;
+
+    MCRInstanceListSource(MCRInstanceList annotation, MCRAnnotationProvider annotationProvider) {
         this.annotation = annotation;
+        this.sentinel = annotationProvider.get(MCRSentinel.class);
     }
 
     @Override
@@ -77,8 +80,6 @@ final class MCRInstanceListSource implements MCRSource {
 
         List<String> keyList = orderedKeys(property(configuration, annotation.name()), target,
             nestedConfigurationMap, "instance list");
-
-        MCRSentinel sentinel = annotation.sentinel();
 
         List<Object> instanceList = new ArrayList<>(nestedConfigurationMap.size());
         for (String key : keyList) {

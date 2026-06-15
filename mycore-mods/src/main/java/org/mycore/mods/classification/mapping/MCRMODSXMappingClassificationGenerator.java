@@ -96,8 +96,8 @@ public final class MCRMODSXMappingClassificationGenerator extends MCRXMappingCla
 
     public static class Factory implements Supplier<MCRMODSXMappingClassificationGenerator> {
 
-        @MCRInstance(name = EVALUATOR_KEY, valueClass = Evaluator.class, required = false,
-            sentinel = @MCRSentinel(name = MCRSentinel.DEFAULT_KEY, rejectionValue = true, defaultValue = false))
+        @MCRSentinel(name = MCRSentinel.DEFAULT_KEY, rejectionValue = true, defaultValue = false)
+        @MCRInstance(name = EVALUATOR_KEY, valueClass = Evaluator.class, required = false)
         public Evaluator evaluator;
 
         @MCRProperty(name = ON_MISSING_MAPPED_CATEGORY_KEY)

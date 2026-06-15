@@ -123,8 +123,8 @@ public class MCRCombinedResourceProvider extends MCRResourceProviderBase {
         @MCRProperty(name = COVERAGE_KEY, defaultName = "MCR.Resource.Provider.Default.Combined.Coverage")
         public String coverage;
 
-        @MCRInstanceList(name = PROVIDERS_KEY, valueClass = MCRResourceProvider.class, required = false,
-            sentinel = @MCRSentinel)
+        @MCRSentinel
+        @MCRInstanceList(name = PROVIDERS_KEY, valueClass = MCRResourceProvider.class, required = false)
         public List<MCRResourceProvider> providers;
 
         @Override

@@ -25,6 +25,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.mycore.common.config.annotation.MCRInstance;
@@ -59,7 +60,8 @@ public sealed interface MCRSource permits MCRInstanceListSource, MCRInstanceMapS
 
     enum Type {
 
-        PROPERTY(Group.VALUE_INJECTION,
+        PROPERTY(
+            Group.VALUE_INJECTION,
             new Mapper<>(MCRProperty.class, MCRPropertySource::new)),
 
         PROPERTY_MAP(
@@ -103,14 +105,8 @@ public sealed interface MCRSource permits MCRInstanceListSource, MCRInstanceMapS
             return group.ordinal();
         }
 
-        public Optional<MCRSource> toSource(AnnotationProvider annotationProvider) {
+        public Optional<MCRSource> toSource(MCRAnnotationProvider annotationProvider) {
             return mapper.toSource(annotationProvider);
-        }
-
-        public interface AnnotationProvider {
-
-            <A extends Annotation> A get(Class<A> annotationClass);
-
         }
 
         private enum Group {
@@ -121,14 +117,19 @@ public sealed interface MCRSource permits MCRInstanceListSource, MCRInstanceMapS
 
         }
 
-        private record Mapper<A extends Annotation>(Class<A> annotationClass, Function<A, MCRSource> factory)
-            implements Serializable {
+        private record Mapper<A extends Annotation>(Class<A> annotationClass,
+            BiFunction<A, MCRAnnotationProvider, MCRSource> factory) implements Serializable {
 
             @Serial
             private static final long serialVersionUID = 1L;
 
-            private Optional<MCRSource> toSource(AnnotationProvider annotationProvider) {
-                return Optional.ofNullable(annotationProvider.get(annotationClass())).map(factory);
+            private Mapper(Class<A> annotationClass, Function<A, MCRSource> factory) {
+                this(annotationClass, (annotation, _) -> factory.apply(annotation));
+            }
+
+            private Optional<MCRSource> toSource(MCRAnnotationProvider annotationProvider) {
+                return Optional.ofNullable(annotationProvider.get(annotationClass()))
+                    .map(annotation -> factory.apply(annotation, annotationProvider));
             }
 
         }

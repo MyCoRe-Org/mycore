@@ -38,8 +38,11 @@ final class MCRInstanceMapSource implements MCRSource {
 
     private final MCRInstanceMap annotation;
 
-    MCRInstanceMapSource(MCRInstanceMap annotation) {
+    private final MCRSentinel sentinel;
+
+    MCRInstanceMapSource(MCRInstanceMap annotation, MCRAnnotationProvider annotationProvider) {
         this.annotation = annotation;
+        this.sentinel = annotationProvider.get(MCRSentinel.class);
     }
 
     @Override
@@ -72,8 +75,6 @@ final class MCRInstanceMapSource implements MCRSource {
 
         Map<String, ? extends MCRInstanceConfiguration<?>> nestedConfigurationMap =
             configuration.nestedMap(annotation.valueClass(), annotation.name());
-
-        MCRSentinel sentinel = annotation.sentinel();
 
         Map<String, Object> instanceMap = new HashMap<>();
         for (String key : nestedConfigurationMap.keySet()) {
