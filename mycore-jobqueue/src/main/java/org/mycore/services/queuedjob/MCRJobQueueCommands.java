@@ -65,7 +65,7 @@ public class MCRJobQueueCommands {
     @MCRCommand(
         syntax = "reset max try jobs",
         help = "Reset all jobs with status MAX_TRIES to status NEW",
-        order = 20)
+        order = 40)
     public static void resetMaxTryJobs() {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         int count = em
@@ -85,7 +85,7 @@ public class MCRJobQueueCommands {
     @MCRCommand(
         syntax = "reset max try jobs with action {0}",
         help = "Reset all jobs with status MAX_TRIES and action {0} to status NEW",
-        order = 30)
+        order = 20)
     public static void resetMaxTryJobsWithAction(String action) {
         if (action == null || action.isEmpty()) {
             LOGGER.error("Action is required!");
@@ -110,7 +110,7 @@ public class MCRJobQueueCommands {
     @MCRCommand(
         syntax = "reset max try jobs with id {0}",
         help = "reset all jobs with status MAX_TRIES and id {0} to status NEW",
-        order = 40)
+        order = 30)
     public static void resetMaxTryJobsWithId(String id) {
         if (id == null || id.isEmpty()) {
             LOGGER.error("Id is required!");
