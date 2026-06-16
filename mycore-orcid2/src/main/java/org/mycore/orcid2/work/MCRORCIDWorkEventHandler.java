@@ -69,8 +69,13 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    private static final String CONF_PREFIX = "MCR.ORCID2.WorkEventHandler.";
+
     private static final boolean COLLECT_EXTERNAL_PUT_CODES = MCRConfiguration2
-        .getBoolean("MCR.ORCID2.WorkEventHandler.CollectExternalPutCodes").orElse(false);
+        .getBoolean(CONF_PREFIX + "CollectExternalPutCodes").orElse(false);
+
+    private static final boolean RESTRICT_TO_WORK_CONTRIBUTORS = MCRConfiguration2
+        .getBoolean(CONF_PREFIX + "RestrictToWorkContributors").orElse(false);
 
     private static final boolean SAVE_OTHER_PUT_CODES = MCRConfiguration2
         .getBoolean("MCR.ORCID2.Metadata.WorkInfo.SaveOtherPutCodes").orElse(false);
@@ -149,7 +154,9 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
         toPublish.putAll(userOrcidPairFromObject);
         toPublish.keySet().removeAll(toDelete.keySet());
         final T work = transformObject(new MCRJDOMContent(filteredObject.createXML()));
-        toPublish.keySet().removeAll(listRelatedOrcidIdentifiers(work));
+        if (RESTRICT_TO_WORK_CONTRIBUTORS) {
+            toPublish.keySet().retainAll(listRelatedOrcidIdentifiers(work));
+        }
         if (toDelete.isEmpty() && toPublish.isEmpty()) {
             LOGGER.info("Nothing to delete or publish. Skipping {}...", objectID);
             tryCollectAndSaveExternalPutCodes(filteredObject);
