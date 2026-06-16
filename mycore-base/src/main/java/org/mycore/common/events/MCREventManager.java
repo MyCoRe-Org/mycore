@@ -306,15 +306,6 @@ public final class MCREventManager {
         return this;
     }
 
-    /**
-     * @deprecated Support for modes other than "Class" has been dropped.
-     * Use {@link #getEventHandler(String)} instead.
-     */
-    @Deprecated(forRemoval = true)
-    public MCREventHandler getEventHandler(String mode, String propertyKey) {
-        return getEventHandler(propertyKey);
-    }
-
     public MCREventHandler getEventHandler(String propertyKey) {
         return MCRConfiguration2.getSingleInstanceOfOrThrow(MCREventHandler.class, propertyKey);
     }
