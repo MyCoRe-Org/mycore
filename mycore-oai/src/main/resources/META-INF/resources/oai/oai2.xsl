@@ -49,6 +49,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
     xmlns:oai="http://www.openarchives.org/OAI/2.0/"
 >
 
+  <!-- TODO make indent="yes" compatible -->
 <xsl:output method="html"/>
 
 <xsl:include href="url-encode.xsl" />

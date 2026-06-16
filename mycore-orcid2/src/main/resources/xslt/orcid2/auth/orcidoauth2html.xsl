@@ -3,7 +3,7 @@
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   exclude-result-prefixes="#all">
 
-    <xsl:output method="html" encoding="UTF-8" media-type="text/html" indent="yes"/>
+    <xsl:import href="resource:xslt/output-html.xsl" />
 
     <xsl:param name="CurrentLang"/>
     <xsl:param name="WebApplicationBaseURL"/>

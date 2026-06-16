@@ -3,8 +3,6 @@
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   exclude-result-prefixes="#all">
 
-  <xsl:output method="html" media-type="text/html" encoding="UTF-8" indent="yes"/>
-
   <xsl:param name="WebApplicationBaseURL"/>
   <xsl:param name="MCR.Neo4J.VISNetworkJSURL"/>
   <xsl:param name="MCR.Neo4J.colors"/>
