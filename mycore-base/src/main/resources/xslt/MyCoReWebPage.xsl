@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE xsl:stylesheet [
-  <!ENTITY html-output SYSTEM "xsl/xsl-output-html.fragment">
-]>
 <xsl:stylesheet version="3.0"
   xmlns:mcri18n="http://www.mycore.de/xslt/i18n"
   xmlns:mcrlayoututils="http://www.mycore.de/xslt/layoututils"
   xmlns:mcrwebpage="http://www.mycore.de/MyCoReWebPage"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   exclude-result-prefixes="#all">
-
-  &html-output;
 
   <xsl:include href="MyCoReLayout.xsl" />
   <xsl:include href="xslInclude:MyCoReWebPage" />

@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE xsl:stylesheet [
-  <!ENTITY html-output SYSTEM "xsl/xsl-output-html.fragment">
-]>
 <xsl:stylesheet version="3.0"
   xmlns:mcri18n="http://www.mycore.de/xslt/i18n"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   exclude-result-prefixes="#all">
 
-  &html-output;
   <xsl:include href="resource:xslt/mycoreobject.xsl" />
   <xsl:include href="resource:xslt/solr/response/response-utils.xsl" />
   <xsl:include href="xslInclude:solrResponse" />
