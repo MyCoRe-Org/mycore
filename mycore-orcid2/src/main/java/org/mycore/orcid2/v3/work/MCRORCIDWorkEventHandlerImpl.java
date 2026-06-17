@@ -21,8 +21,6 @@ package org.mycore.orcid2.v3.work;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.orcid2.metadata.MCRORCIDPutCodeInfo;
@@ -35,8 +33,6 @@ import org.orcid.jaxb.model.v3.release.record.Work;
  * See {@link org.mycore.orcid2.work.MCRORCIDWorkEventHandler}.
  */
 public class MCRORCIDWorkEventHandlerImpl extends MCRORCIDWorkEventHandler<Work> {
-
-    private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     protected void removeWork(MCRORCIDPutCodeInfo workInfo, String orcid, MCRORCIDCredential credential) {
