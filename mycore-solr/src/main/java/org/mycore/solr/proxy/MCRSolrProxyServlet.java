@@ -45,10 +45,10 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.solr.client.solrj.request.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.response.InputStreamResponseParser;
 import org.apache.solr.client.solrj.request.QueryRequest;
+import org.apache.solr.client.solrj.request.SolrQuery;
+import org.apache.solr.client.solrj.response.InputStreamResponseParser;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.params.MultiMapSolrParams;
 import org.apache.solr.common.util.NamedList;
@@ -197,7 +197,13 @@ public class MCRSolrProxyServlet extends MCRServlet {
         for (Element param : children) {
             String attribute = param.getAttributeValue("name");
             if (attribute != null) {
-                parameters.put(attribute, new String[] { param.getTextTrim() });
+                String value = param.getTextTrim();
+                parameters.merge(attribute, new String[] { value }, (existing, newVal) -> {
+                    String[] merged = new String[existing.length + 1];
+                    System.arraycopy(existing, 0, merged, 0, existing.length);
+                    merged[existing.length] = newVal[0];
+                    return merged;
+                });
             }
         }
         String queryHandlerPath = parameters.get(QUERY_HANDLER_PAR_NAME)[0];
