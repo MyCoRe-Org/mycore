@@ -101,39 +101,6 @@
   <xsl:template match="mods:location" mode="mods2mods">
   </xsl:template>
 
-  <xsl:template match="mods:genre[@type='intern']" mode="mods2mods">
-    <xsl:choose>
-      <xsl:when test="contains(@valueURI,'#journal')">
-      <!-- additional journals data -->
-        <mods:originInfo eventType="publication">
-          <mods:issuance>continuing</mods:issuance>
-        </mods:originInfo>
-        <mods:genre authority="marcgt">journal</mods:genre>
-      </xsl:when>
-      <xsl:when test="contains(@valueURI,'#article')">
-      <!-- additional journals data -->
-        <mods:genre authority="marcgt">article</mods:genre>
-      </xsl:when>
-      <xsl:when test="contains(@valueURI,'#book')">
-      <!-- additional journals data -->
-        <mods:genre authority="marcgt">book</mods:genre>
-      </xsl:when>
-      <xsl:when
-        test="contains(@valueURI,'thesis') or contains(@valueURI,'#dissertation') or contains(@valueURI,'#habilitation') or contains(@valueURI,'#student_resarch_project')">
-      <!-- additional journals data -->
-        <mods:genre authority="marcgt">thesis</mods:genre>
-      </xsl:when>
-      <xsl:when test="contains(@valueURI,'#confpub')">
-      <!-- additional journals data -->
-        <mods:genre authority="marcgt">conference publication</mods:genre>
-      </xsl:when>
-    </xsl:choose>
-    <xsl:copy>
-      <xsl:copy-of select="@*" />
-      <xsl:apply-templates mode="mods2mods" />
-    </xsl:copy>
-  </xsl:template>
-
   <xsl:template match="mods:role" mode="mods2mods">
     <xsl:copy>
       <xsl:copy-of select="@*" />
