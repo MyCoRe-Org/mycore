@@ -87,7 +87,6 @@ public class MCRORCIDWorkEventHandlerImpl extends MCRORCIDWorkEventHandler<Work>
                 .filter(c -> c.getContributorAttributes().getContributorRole() != null)
                 .map(c -> c.getContributorOrcid().getPath()).toList();
         }
-        LOGGER.warn("Publication work has no mapped contributors.");
         return List.of();
     }
 }
