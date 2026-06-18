@@ -17,11 +17,12 @@
  */
 package org.mycore.pi.condition;
 
-import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.datamodel.metadata.MCRBase;
-import org.mycore.pi.MCRPIManager;
+import org.mycore.pi.MCRPIService;
 import org.mycore.pi.MCRPIServiceManager;
+import org.mycore.pi.MCRPersistentIdentifier;
+import org.mycore.pi.backend.MCRPI;
 
 /**
  * PI Predicate, that checks if another PersistentIdentifier was registered within the PI component
@@ -43,19 +44,23 @@ import org.mycore.pi.MCRPIServiceManager;
 public class MCRPIOtherPIRegisteredPredicate extends MCRPIPredicateBase
     implements MCRPICreationPredicate, MCRPIObjectRegistrationPredicate {
 
-    private String type;
-
     @MCRProperty(name = "Service")
     public String service;
 
-    @MCRPostConstruction
-    public void init() {
-        type = MCRPIServiceManager.getInstance().getRegistrationService(service).getType();
-    }
-
     @Override
     public boolean test(MCRBase mcrBase) {
-        return MCRPIManager.getInstance().isRegistered(mcrBase.getId(), "", type, service);
+
+        MCRPIServiceManager serviceManager = MCRPIServiceManager.getInstance();
+        MCRPIService<MCRPersistentIdentifier> service = serviceManager.getRegistrationService(this.service);
+
+        for (MCRPI pi : MCRPIService.getFlags(mcrBase, "", service)) {
+            if (pi.getRegistered() != null) {
+                return true;
+            }
+        }
+
+        return false;
+
     }
 
 }
