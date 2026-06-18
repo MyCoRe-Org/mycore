@@ -168,19 +168,17 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
                         "No mapped contributors and therefore no profiles found for publication work {}.",
                         objectID
                     );
-                } else {
-                    toPublish.keySet().retainAll(relatedOrcids);
                 }
+                toPublish.keySet().retainAll(relatedOrcids);
             }
         }
         if (toDelete.isEmpty() && toPublish.isEmpty()) {
             LOGGER.info("Nothing to delete or publish. Skipping {}...", objectID);
             tryCollectAndSaveExternalPutCodes(filteredObject);
             return;
-        } else {
-            LOGGER.info("Found {} profiles to publish.", toPublish.size());
-            LOGGER.info("Found {} profiles to delete.", toDelete.size());
         }
+        LOGGER.info("Found {} profiles to publish.", toPublish.size());
+        LOGGER.info("Found {} profiles to delete.", toDelete.size());
         try {
             final Set<MCRIdentifier> identifiers = listTrustedIdentifiers(work);
             if (!toDelete.isEmpty()) {
