@@ -18,6 +18,7 @@
 
 package org.mycore.orcid2.v3.work;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -28,6 +29,7 @@ import org.mycore.orcid2.util.MCRIdentifier;
 import org.mycore.orcid2.v3.transformer.MCRORCIDWorkTransformerHelper;
 import org.mycore.orcid2.work.MCRORCIDWorkEventHandler;
 import org.orcid.jaxb.model.v3.release.record.Work;
+import org.orcid.jaxb.model.v3.release.record.WorkContributors;
 
 /**
  * See {@link org.mycore.orcid2.work.MCRORCIDWorkEventHandler}.
@@ -77,7 +79,12 @@ public class MCRORCIDWorkEventHandlerImpl extends MCRORCIDWorkEventHandler<Work>
 
     @Override
     protected List<String> listRelatedOrcidIdentifiers(Work work) {
-        return work.getWorkContributors().getContributor().stream().filter(c -> c.getContributorOrcid() != null)
+        WorkContributors contributors = work.getWorkContributors();
+        if (contributors == null) {
+            return Collections.emptyList();
+        }
+
+        return contributors.getContributor().stream().filter(c -> c.getContributorOrcid() != null)
             .filter(c -> c.getContributorAttributes() != null)
             .filter(c -> c.getContributorAttributes().getContributorRole() != null)
             .map(c -> c.getContributorOrcid().getPath()).toList();
