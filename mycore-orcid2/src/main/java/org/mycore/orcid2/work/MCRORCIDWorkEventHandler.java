@@ -155,20 +155,31 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
         toPublish.keySet().removeAll(toDelete.keySet());
         final T work = transformObject(new MCRJDOMContent(filteredObject.createXML()));
 
-        if (toPublish.isEmpty()) {
-            LOGGER.debug("Publication work for {} has no contributors. "
-                + "Won't evaluate contributor mapping.", objectID);
-        } else if (RESTRICT_TO_WORK_CONTRIBUTORS) {
-            final List<String> relatedOrcids = listRelatedOrcidIdentifiers(work);
-            if (relatedOrcids.isEmpty()) {
-                LOGGER.info("Publication work for {} has no mapped contributors. ", objectID);
+        if (RESTRICT_TO_WORK_CONTRIBUTORS) {
+            if (toPublish.isEmpty()) {
+                LOGGER.debug(
+                    "No profiles found to publish for publication work {}. Ignoring contributor mapping...",
+                    objectID
+                );
+            } else {
+                final List<String> relatedOrcids = listRelatedOrcidIdentifiers(work);
+                if (relatedOrcids.isEmpty()) {
+                    LOGGER.debug(
+                        "No mapped contributors and therefore no profiles found for publication work {}.",
+                        objectID
+                    );
+                } else {
+                    toPublish.keySet().retainAll(relatedOrcids);
+                }
             }
-            toPublish.keySet().retainAll(relatedOrcids);
         }
         if (toDelete.isEmpty() && toPublish.isEmpty()) {
             LOGGER.info("Nothing to delete or publish. Skipping {}...", objectID);
             tryCollectAndSaveExternalPutCodes(filteredObject);
             return;
+        } else {
+            LOGGER.info("Found {} profiles to publish.", toPublish.size());
+            LOGGER.info("Found {} profiles to delete.", toDelete.size());
         }
         try {
             final Set<MCRIdentifier> identifiers = listTrustedIdentifiers(work);
