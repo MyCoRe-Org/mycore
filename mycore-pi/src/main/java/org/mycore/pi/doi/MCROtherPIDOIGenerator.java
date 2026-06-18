@@ -75,7 +75,7 @@ public class MCROtherPIDOIGenerator extends MCRDOIGeneratorBase {
 
     @Override
     protected String buildDOI(MCRBase base, String additional) {
-        return prefix + "/" + extractor.extractValue(base.getId());
+        return prefix + "/" + extractor.extractValue(base);
     }
 
     public static class Factory implements Supplier<MCROtherPIDOIGenerator> {

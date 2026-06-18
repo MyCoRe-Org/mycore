@@ -77,7 +77,7 @@ public class MCROtherPIDNBURNGenerator extends MCRDNBURNGeneratorBase {
 
     @Override
     protected String buildNISS(MCRBase base, String additional) {
-        return extractor.extractValue(base.getId());
+        return extractor.extractValue(base);
     }
 
     public static class Factory implements Supplier<MCROtherPIDNBURNGenerator> {
