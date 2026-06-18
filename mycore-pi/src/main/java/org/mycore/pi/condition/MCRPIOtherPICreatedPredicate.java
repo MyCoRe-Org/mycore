@@ -19,7 +19,9 @@ package org.mycore.pi.condition;
 
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.datamodel.metadata.MCRBase;
-import org.mycore.pi.MCRPIManager;
+import org.mycore.pi.MCRPIService;
+import org.mycore.pi.MCRPIServiceManager;
+import org.mycore.pi.MCRPersistentIdentifier;
 
 /**
  * PI Predicate, that checks if another PersistentIdentifier was created within the PI component
@@ -49,7 +51,12 @@ public class MCRPIOtherPICreatedPredicate extends MCRPIPredicateBase
 
     @Override
     public boolean test(MCRBase mcrBase) {
-        return MCRPIManager.getInstance().isCreated(mcrBase.getId(), "", type, service);
+
+        MCRPIServiceManager serviceManager = MCRPIServiceManager.getInstance();
+        MCRPIService<MCRPersistentIdentifier> service = serviceManager.getRegistrationService(this.service);
+
+        return MCRPIService.hasFlag(mcrBase, "", service, this.type);
+
     }
 
 }

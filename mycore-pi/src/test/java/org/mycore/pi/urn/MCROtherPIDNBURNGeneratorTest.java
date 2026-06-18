@@ -70,9 +70,9 @@ public class MCROtherPIDNBURNGeneratorTest {
 
         MCRPIServiceManager manager = MCRPIServiceManager.getInstance();
         MCRPIService<MCRPersistentIdentifier> mockService = manager.getRegistrationService("Mock");
-        mockService.register(object, "XYZ", true);
+        mockService.register(object, "", true);
 
-        MCROtherPIValueExtractor extractor = new MCROtherPIValueExtractor("mock", "Mock", "MOCK:my_test_(.*)");
+        MCROtherPIValueExtractor extractor = new MCROtherPIValueExtractor("mock", "Mock", "MOCK:my_test_(.*):");
         MCROtherPIDNBURNGenerator generator = new MCROtherPIDNBURNGenerator(NAMESPACE, "-", extractor);
         String urn = generator.generate(object, "").asString();
 
@@ -83,7 +83,7 @@ public class MCROtherPIDNBURNGeneratorTest {
         String value = urn.substring(NAMESPACE.length() + 1, urn.length() - 2);
         char checksum = Character.forDigit(new MCRDNBURN("gbv:xyz", "-" + value + "-").calculateChecksum(), 10);
 
-        assertEquals("00000123:XYZ", value);
+        assertEquals("00000123", value);
         assertEquals(checksum, urn.charAt(urn.length() - 1));
 
     }

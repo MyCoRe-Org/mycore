@@ -24,9 +24,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.mycore.common.MCRException;
-import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.pi.MCRPIManager;
-import org.mycore.pi.MCRPIRegistrationInfo;
+import org.mycore.datamodel.metadata.MCRBase;
+import org.mycore.pi.MCRPIService;
+import org.mycore.pi.MCRPIServiceManager;
+import org.mycore.pi.MCRPersistentIdentifier;
+import org.mycore.pi.backend.MCRPI;
 
 public final class MCROtherPIValueExtractor {
 
@@ -48,39 +50,36 @@ public final class MCROtherPIValueExtractor {
 
         boolean hasExactlyOneCaptureGroup = matcher.groupCount() == 1;
         if (!hasExactlyOneCaptureGroup) {
-            throw new IllegalArgumentException("Pattern doesn't have exactly one capture group: " +
-                pattern.pattern());
+            throw new IllegalArgumentException("Pattern doesn't have exactly one capture group: " + pattern.pattern());
         }
 
         return pattern;
 
     }
 
-    public String extractValue(MCRObjectID objectID) {
+    public String extractValue(MCRBase base) {
 
-        List<MCRPIRegistrationInfo> createdIdentifiers = MCRPIManager.getInstance()
-            .getCreatedIdentifiers(objectID, type, service);
+        MCRPIServiceManager serviceManager = MCRPIServiceManager.getInstance();
+        MCRPIService<MCRPersistentIdentifier> service = serviceManager.getRegistrationService(this.service);
+        List<MCRPI> pis = MCRPIService.getFlags(base, "", service, this.type);
 
-        if (createdIdentifiers.isEmpty()) {
-            throw new MCRException("No identifier found object " + objectID + ", type " + type +
-                " and service " + service);
+        if (pis.isEmpty()) {
+            throw new MCRException("No identifier found " + base + ", type " + type + " and service " + service);
         }
 
-        String identifier = createdIdentifiers.getFirst().getIdentifier();
+        String identifier = pis.getFirst().getIdentifier();
         Matcher matcher = pattern.matcher(identifier);
 
         if (!matcher.find()) {
-            throw new MCRException("Identifier " + identifier + " found for object " + objectID +
-                ", type " + type + " and service " + service + " doesn't match pattern "
-                + pattern.pattern());
+            throw new MCRException("Identifier " + identifier + " found for " + base + ", type " + type
+                + " and service " + service + " doesn't match pattern " + pattern.pattern());
         }
 
         String value = matcher.group(1);
 
         if (value.isEmpty()) {
-            throw new MCRException("Identifier " + identifier + " found for object " + objectID +
-                ", type " + type + " and service " + service + " contains empty value for pattern "
-                + pattern.pattern());
+            throw new MCRException("Identifier " + identifier + " found for " + base + ", type " + type
+                + " and service " + service + " contains empty value for pattern " + pattern.pattern());
         }
 
         return value;

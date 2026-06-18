@@ -208,6 +208,31 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
             && Objects.equals(flag.getService(), piService.getServiceID());
     }
 
+    public static boolean hasFlag(MCRBase obj, String additional, MCRPIService<?> piService, String type) {
+        MCRObjectService service = obj.getService();
+        List<String> flags = service.getFlags(PI_FLAG);
+        Gson gson = getGson();
+        return flags.stream()
+            .map(s -> gson.fromJson(s, MCRPI.class))
+            .anyMatch(flag -> matches(flag, piService, type, additional));
+    }
+
+    public static List<MCRPI> getFlags(MCRBase obj, String additional, MCRPIService<?> piService, String type) {
+        MCRObjectService service = obj.getService();
+        List<String> flags = service.getFlags(PI_FLAG);
+        Gson gson = getGson();
+        return flags.stream()
+            .map(s -> gson.fromJson(s, MCRPI.class))
+            .filter(flag -> matches(flag, piService, type, additional))
+            .toList();
+    }
+
+    private static boolean matches(MCRPI flag, MCRPIService<?> piService, String type, String additional) {
+        return flag.getAdditional().equals(additional)
+            && Objects.equals(flag.getService(), piService.getServiceID())
+            && Objects.equals(flag.getType(), type);
+    }
+
     public static void updateFlagsInDatabase(MCRBase obj) {
         Gson gson = getGson();
         obj.getService().getFlags(PI_FLAG).stream()

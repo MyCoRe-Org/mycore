@@ -70,9 +70,9 @@ public class MCROtherPIDOIGeneratorTest {
 
         MCRPIServiceManager manager = MCRPIServiceManager.getInstance();
         MCRPIService<MCRPersistentIdentifier> mockService = manager.getRegistrationService("Mock");
-        mockService.register(object, "XYZ", true);
+        mockService.register(object, "", true);
 
-        MCROtherPIValueExtractor extractor = new MCROtherPIValueExtractor("mock", "Mock", "MOCK:my_test_(.*)");
+        MCROtherPIValueExtractor extractor = new MCROtherPIValueExtractor("mock", "Mock", "MOCK:my_test_(.*):");
         MCROtherPIDOIGenerator generator = new MCROtherPIDOIGenerator(new MCRDOIParser(), PREFIX, extractor);
         String doi = generator.generate(object, "").asString();
 
@@ -81,7 +81,7 @@ public class MCROtherPIDOIGeneratorTest {
 
         String value = doi.substring(PREFIX.length() + 1);
 
-        assertEquals("00000123:XYZ", value);
+        assertEquals("00000123", value);
 
     }
 
