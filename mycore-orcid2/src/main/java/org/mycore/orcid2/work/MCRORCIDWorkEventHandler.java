@@ -69,25 +69,30 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final String WORK_EVENT_HANDLER_PROPERTY_PREFIX = "MCR.ORCID2.WorkEventHandler.";
+    private static final String CONF_PREFIX = "MCR.ORCID2.WorkEventHandler.";
 
     private static final boolean COLLECT_EXTERNAL_PUT_CODES = MCRConfiguration2
-        .getBoolean(WORK_EVENT_HANDLER_PROPERTY_PREFIX + "CollectExternalPutCodes").orElse(false);
+        .getBoolean(CONF_PREFIX + "CollectExternalPutCodes").orElse(false);
 
     private static final boolean CREATE_FIRST = MCRConfiguration2
-        .getBoolean(WORK_EVENT_HANDLER_PROPERTY_PREFIX + "CreateFirstWork").orElse(false);
+        .getBoolean(CONF_PREFIX + "CreateFirstWork").orElse(false);
 
     private static final boolean ALWAYS_UPDATE = MCRConfiguration2
-        .getBoolean(WORK_EVENT_HANDLER_PROPERTY_PREFIX + "AlwaysUpdateWork").orElse(false);
+        .getBoolean(CONF_PREFIX + "AlwaysUpdateWork").orElse(false);
 
     private static final boolean CREATE_OWN_DUPLICATE = MCRConfiguration2
-        .getBoolean(WORK_EVENT_HANDLER_PROPERTY_PREFIX + "CreateDuplicateWork").orElse(false);
+        .getBoolean(CONF_PREFIX + "CreateDuplicateWork").orElse(false);
 
     private static final boolean RECREATE_DELETED = MCRConfiguration2
-        .getBoolean(WORK_EVENT_HANDLER_PROPERTY_PREFIX + "RecreateDeletedWork").orElse(false);
+        .getBoolean(CONF_PREFIX + "RecreateDeletedWork").orElse(false);
 
-    private static final boolean SAVE_OTHER_PUT_CODES = MCRConfiguration2
-        .getBoolean("MCR.ORCID2.Metadata.WorkInfo.SaveOtherPutCodes").orElse(false);
+    private static final boolean RESTRICT_TO_WORK_CONTRIBUTORS =
+        MCRConfiguration2.getBoolean(CONF_PREFIX + "RestrictToWorkContributors").orElseThrow(
+            () -> MCRConfiguration2.createConfigurationException(CONF_PREFIX + "RestrictToWorkContributors"));
+
+    private static final boolean SAVE_OTHER_PUT_CODES =
+        MCRConfiguration2.getBoolean("MCR.ORCID2.Metadata.WorkInfo.SaveOtherPutCodes").orElseThrow(
+            () -> MCRConfiguration2.createConfigurationException("MCR.ORCID2.Metadata.WorkInfo.SaveOtherPutCodes"));
 
     @Override
     protected void handleObjectCreated(MCREvent evt, MCRObject object) {
@@ -120,7 +125,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
         }
     }
 
-    @SuppressWarnings("PMD.NPathComplexity")
+    @SuppressWarnings({"PMD.NPathComplexity", "PMD.NcssCount"})
     private void handlePublication(MCRObject object) {
         final MCRObjectID objectID = object.getId();
         LOGGER.info("Start publishing {} to ORCID.", objectID);
@@ -169,12 +174,31 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
         toPublish.putAll(userOrcidPairFromObject);
         toPublish.keySet().removeAll(toDelete.keySet());
         final T work = transformObject(new MCRJDOMContent(filteredObject.createXML()));
-        toPublish.keySet().removeAll(listRelatedOrcidIdentifiers(work));
+
+        if (RESTRICT_TO_WORK_CONTRIBUTORS) {
+            if (toPublish.isEmpty()) {
+                LOGGER.debug(
+                    "No profiles found to publish for publication work {}. Ignoring contributor mapping...",
+                    objectID
+                );
+            } else {
+                final List<String> relatedOrcids = listRelatedOrcidIdentifiers(work);
+                if (relatedOrcids.isEmpty()) {
+                    LOGGER.debug(
+                        "No mapped contributors and therefore no profiles found for publication work {}.",
+                        objectID
+                    );
+                }
+                toPublish.keySet().retainAll(relatedOrcids);
+            }
+        }
         if (toDelete.isEmpty() && toPublish.isEmpty()) {
             LOGGER.info("Nothing to delete or publish. Skipping {}...", objectID);
             tryCollectAndSaveExternalPutCodes(filteredObject);
             return;
         }
+        LOGGER.info("Found {} profiles to publish.", toPublish::size);
+        LOGGER.info("Found {} profiles to delete.", toDelete::size);
         try {
             final Set<MCRIdentifier> identifiers = listTrustedIdentifiers(work);
             if (!toDelete.isEmpty()) {
