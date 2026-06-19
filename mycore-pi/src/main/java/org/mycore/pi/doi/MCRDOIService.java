@@ -246,7 +246,7 @@ public class MCRDOIService extends MCRDOIBaseService {
                 String contentType = Optional.ofNullable(MCRContentTypes.probeContentType(mainDocumentPath))
                     .orElse("application/octet-stream");
                 entryList.add(new AbstractMap.SimpleEntry<>(contentType, new URI(this.registerURL + MCRXMLFunctions
-                    .encodeURIPath("/servlets/MCRFileNodeServlet/" + derivateId + "/" + mainDoc, true))));
+                    .encodeURIPath("servlets/MCRFileNodeServlet/" + derivateId + "/" + mainDoc, true))));
             } catch (IOException | URISyntaxException e) {
                 LOGGER.error("Error while detecting the file to register!", e);
             }
