@@ -77,9 +77,12 @@ public class MCRORCIDWorkEventHandlerImpl extends MCRORCIDWorkEventHandler<Work>
 
     @Override
     protected List<String> listRelatedOrcidIdentifiers(Work work) {
-        return work.getWorkContributors().getContributor().stream().filter(c -> c.getContributorOrcid() != null)
-            .filter(c -> c.getContributorAttributes() != null)
-            .filter(c -> c.getContributorAttributes().getContributorRole() != null)
-            .map(c -> c.getContributorOrcid().getPath()).toList();
+        if (work.getWorkContributors() != null && work.getWorkContributors().getContributor() != null) {
+            return work.getWorkContributors().getContributor().stream().filter(c -> c.getContributorOrcid() != null)
+                .filter(c -> c.getContributorAttributes() != null)
+                .filter(c -> c.getContributorAttributes().getContributorRole() != null)
+                .map(c -> c.getContributorOrcid().getPath()).toList();
+        }
+        return List.of();
     }
 }
