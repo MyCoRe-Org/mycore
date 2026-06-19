@@ -4,8 +4,9 @@
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   exclude-result-prefixes="#all">
 
+  <xsl:import href="resource:xslt/output-html.xsl" />
+
   <xsl:include href="classificationEditorBase.xsl" />
-  <xsl:output method="html" media-type="text/html" encoding="UTF-8" indent="yes" />
 
   <xsl:template match="classificationEditor">
     <html>

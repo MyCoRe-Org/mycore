@@ -74,7 +74,7 @@ public class MCRBuildXMLURIResolver implements URIResolver {
         String key = href.substring(href.indexOf(':') + 1);
         LOGGER.debug("Building xml from {}", key);
 
-        Map<String, String> params = MCRURIResolverHelper.parseQueryParameters(href);
+        Map<String, String> params = MCRURIResolverHelper.parseQueryParameters(key);
 
         Element defaultRoot = new Element("root");
         Element root = defaultRoot;
