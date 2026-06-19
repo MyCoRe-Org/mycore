@@ -411,7 +411,7 @@ public class MCRDataciteClient {
                     case HttpStatus.SC_CREATED -> {
                         Header[] responseHeaders = response.getHeaders();
                         for (Header responseHeader : responseHeaders) {
-                            if (responseHeader.getName().equals("Location")) {
+                            if (responseHeader.getName().equalsIgnoreCase("Location")) {
                                 try {
                                     URI newLocation = new URI(responseHeader.getValue());
                                     yield MCRResultOrException.ofResult(newLocation);

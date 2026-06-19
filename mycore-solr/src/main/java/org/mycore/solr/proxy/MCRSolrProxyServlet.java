@@ -205,7 +205,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
         for (Element param : children) {
             String attribute = param.getAttributeValue("name");
             if (attribute != null) {
-                parameters.put(attribute, new String[] { param.getTextTrim() });
+                MultiMapSolrParams.addParam(attribute, param.getTextTrim(), parameters);
             }
         }
         String queryHandlerPath = parameters.get(QUERY_HANDLER_PAR_NAME)[0];
