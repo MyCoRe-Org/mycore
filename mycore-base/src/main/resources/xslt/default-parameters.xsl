@@ -10,11 +10,13 @@
             - RequestURL
             - Referer
             - UserAgent
-        * setUnmodifyableParameters
+        * setUnmodifiableParameters
             - CurrentUser
             - CurrentLang
             - WebApplicationBaseURL
             - ServletsBaseURL
+            - LoginURL
+            - LoginDetourURL
             - DefaultLang
             - User-Agent
     -->
@@ -26,6 +28,8 @@
     <xsl:param name="CurrentLang" />
     <xsl:param name="WebApplicationBaseURL" />
     <xsl:param name="ServletsBaseURL" />
+    <xsl:param name="LoginDetourURL" />
+    <xsl:param name="LoginURL" />
     <xsl:param name="DefaultLang" />
     <xsl:param name="User-Agent" />
 
