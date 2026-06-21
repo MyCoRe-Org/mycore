@@ -47,7 +47,7 @@ public class MCRAction {
             @SuppressWarnings("unchecked")
             MCRCondition<Object> cond = (MCRCondition<Object>) decision.getCondition();
             if (cond.evaluate(workflowData)) {
-                return decision.getUrl();
+                return decision.getActualUrl();
             }
         }
         return null;

@@ -6,8 +6,7 @@
   exclude-result-prefixes="#all">
 
   <xsl:variable name="response" select="/response|/mycoreobject/response" />
-  <xsl:variable name="loginURL"
-    select="concat( $ServletsBaseURL, 'MCRLoginServlet?url=', encode-for-uri( string( $RequestURL ) ) )" />
+  <xsl:variable name="loginURL" select="$LoginDetourURL" />
   <xsl:key name="derivate" match="response/response[@subresult='derivate']/result/doc" use="str[@name='returnId']" />
   <xsl:key name="files-by-object"
     match="response/response[@subresult='unmerged']/result/doc|response/lst[@name='grouped']/lst[@name='returnId']/arr[@name='groups']/lst/result/doc[str[@name='objectType']='data_file']"
