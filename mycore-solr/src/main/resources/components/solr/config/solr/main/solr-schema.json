@@ -307,6 +307,7 @@
           },
           {
             "class": "solr.StopFilterFactory",
+            "format": "snowball",
             "words": "lang/stopwords_ru.txt",
             "ignoreCase": "true"
           },
@@ -322,25 +323,53 @@
       "name": "text_ru_latin",
       "class": "solr.TextField",
       "positionIncrementGap": "100",
-      "analyzer": {
+      "indexAnalyzer": {
+        "tokenizer": {
+          "class": "solr.StandardTokenizerFactory"
+        },
+        "filters": [
+          {
+            "class": "solr.LowerCaseFilterFactory"
+          },
+          {
+            "class": "solr.StopFilterFactory",
+            "format": "snowball",
+            "words": "lang/stopwords_ru.txt",
+            "ignoreCase": "true"
+          },
+          {
+            "class": "solr.RussianLightStemFilterFactory"
+          },
+          {
+            "class": "solr.ICUTransformFilterFactory",
+            "id": "Any-Latin; NFD; [:NonspacingMark:] Remove; NFC"
+          }
+        ]
+      },
+      "queryAnalyzer": {
         "tokenizer": {
           "class": "solr.StandardTokenizerFactory"
         },
         "filters": [
           {
             "class": "solr.ICUTransformFilterFactory",
-            "id": "Any-Latin; NFD; [:NonspacingMark:] Remove; NFC"
+            "id": "Latin-Cyrillic"
           },
           {
             "class": "solr.LowerCaseFilterFactory"
           },
           {
             "class": "solr.StopFilterFactory",
+            "format": "snowball",
             "words": "lang/stopwords_ru.txt",
             "ignoreCase": "true"
           },
           {
             "class": "solr.RussianLightStemFilterFactory"
+          },
+          {
+            "class": "solr.ICUTransformFilterFactory",
+            "id": "Any-Latin; NFD; [:NonspacingMark:] Remove; NFC"
           }
         ]
       }
