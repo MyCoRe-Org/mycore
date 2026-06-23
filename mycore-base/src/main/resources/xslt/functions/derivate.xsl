@@ -3,6 +3,7 @@
   xmlns:fn="http://www.w3.org/2005/xpath-functions"
   xmlns:mcrderivate="http://www.mycore.de/xslt/derivate"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   exclude-result-prefixes="#all">
 
@@ -11,6 +12,13 @@
         <xsl:variable name="derivate" select="document(concat('mcrobject:', $derivID))" />
         <xsl:variable name="mainFile" select="$derivate/mycorederivate/derivate/internals/internal/@maindoc" />
         <xsl:value-of select="$mainFile" />
+    </xsl:function>
+
+    <xsl:function name="mcrderivate:get-owner-id" as="xs:string">
+      <xsl:param name="derivate-id" as="xs:string" />
+
+      <xsl:variable name="derivate" select="document('mcrobject:' || $derivate-id)" />
+      <xsl:sequence select="string($derivate/mycorederivate/derivate/linkmetas/linkmeta/@xlink:href)" />
     </xsl:function>
 
     <xsl:function name="mcrderivate:get-file-content-type" as="xs:string">
