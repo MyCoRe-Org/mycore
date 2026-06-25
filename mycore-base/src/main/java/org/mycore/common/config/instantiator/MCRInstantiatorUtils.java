@@ -143,8 +143,8 @@ public final class MCRInstantiatorUtils {
 
     public static MCRConfigurationException missingException(String property, Class<?> superClass) {
         return new MCRConfigurationException("Missing or empty property: " + property
-            + " (instance is required and expected class " + superClass.getName()
-            + " is not final, therefore, the class name cannot be determined implicitly)");
+            + " (intended super class " + superClass.getName() + " is not \"required and final\""
+            + " and therefore cannot be used implicitly)");
     }
 
     public static MCRConfigurationException missingException(String property, MCRTarget target,
