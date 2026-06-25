@@ -304,7 +304,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
                 if (mcrorcidUser != null) {
                     userOrcidPair.put(orcid, mcrorcidUser);
                 } else {
-                    LOGGER.debug("No user with orcid {} found, but referenced in flag", orcid);
+                    LOGGER.warn("No user with orcid {} found, but referenced in flag", orcid);
                 }
             } catch (MCRORCIDException e) {
                 LOGGER.warn("Cannot determine orcid user pair: ", e);
