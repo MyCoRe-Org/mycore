@@ -300,9 +300,14 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
         final Map<String, MCRORCIDUser> userOrcidPair = new HashMap<>();
         for (String orcid : orcids) {
             try {
-                userOrcidPair.put(orcid, MCRORCIDUserUtils.getORCIDUserByORCID(orcid));
+                final MCRORCIDUser mcrorcidUser = MCRORCIDUserUtils.getORCIDUserByORCID(orcid);
+                if (mcrorcidUser != null) {
+                    userOrcidPair.put(orcid, mcrorcidUser);
+                } else {
+                    LOGGER.warn("No user with orcid {} found, but referenced in flag", orcid);
+                }
             } catch (MCRORCIDException e) {
-                LOGGER.warn(e);
+                LOGGER.warn("Cannot determine orcid user pair: ", e);
             }
         }
         return userOrcidPair;
