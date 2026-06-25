@@ -68,8 +68,8 @@ public class MCRCrossrefService extends MCRDOIBaseService {
     }
 
     @Override
-    protected void checkConfiguration() throws MCRConfigurationException {
-        super.checkConfiguration();
+    protected void checkConfiguration(Context context) throws MCRConfigurationException {
+        super.checkConfiguration(context);
         init();
     }
 

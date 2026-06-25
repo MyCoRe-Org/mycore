@@ -240,7 +240,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
      *
      * @throws MCRConfigurationException if parameter is missing or wrong!
      */
-    protected void checkConfiguration() throws MCRConfigurationException {
+    protected void checkConfiguration(Context context) throws MCRConfigurationException {
         if (getProperties().containsKey("MetadataManager")) {
             throw new MCRConfigurationException("The MCRPIService " + getServiceID() +
                 " uses old property key MetadataManager");
@@ -601,6 +601,11 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
 
     public static Predicate<MCRBase> getPredicateInstance(String predicateProperty) {
         return MCRConfiguration2.getInstanceOfOrThrow(Predicate.class, predicateProperty);
+    }
+
+    public enum Context {
+        WEBAPP,
+        CLI
     }
 
 }
