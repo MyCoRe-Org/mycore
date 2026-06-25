@@ -83,17 +83,14 @@ final class MCRInstantiator {
         Class<S> superClass = configuration.superClass();
 
         if (configuration.valueClass() == null) {
-            throw new MCRConfigurationException("Missing or empty property: " + configuration.name().actual()
-                + " (and instance is not required or expected class " + superClass.getName()
-                + " is not final, therefore, the class name cannot be determined implicitly)");
+            throw MCRInstantiatorUtils.missingException(configuration.name().actual(), superClass);
         }
 
         Object instance = createInstanceDirectOrViaProxy(configuration);
 
         if (!superClass.isAssignableFrom(instance.getClass())) {
-            throw new MCRConfigurationException("Instance of class " + instance.getClass().getName()
-                + ", configured in " + configuration.name().actual() + ", is incompatible with" +
-                " intended super class " + superClass.getName());
+            throw MCRInstantiatorUtils.incompatibilityException(configuration.name().actual(),
+                instance.getClass(), superClass);
         }
 
         return superClass.cast(instance);

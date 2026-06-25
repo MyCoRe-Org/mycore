@@ -36,6 +36,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration.Options;
 import org.mycore.common.config.instantiator.MCRInstanceName;
+import org.mycore.common.config.instantiator.MCRInstantiatorUtils;
 import org.mycore.common.function.MCRTriConsumer;
 
 import com.google.common.base.Throwables;
@@ -163,7 +164,8 @@ public class MCRConfiguration2 {
      * or the configuration property is not set
      */
     public static <S> S getInstanceOfOrThrow(Class<S> superClass, String name) throws MCRConfigurationException {
-        return createInstanceOf(superClass, name).orElseThrow(() -> createConfigurationException(name));
+        return createInstanceOf(superClass, name).orElseThrow(() -> MCRInstantiatorUtils
+            .missingException(name + CLASS_SUFFIX, superClass));
     }
 
     /**
@@ -190,7 +192,8 @@ public class MCRConfiguration2 {
      * or the configuration property is not set
      */
     public static <S> S getSingleInstanceOfOrThrow(Class<S> superClass, String name) {
-        return createSingleInstanceOf(superClass, name).orElseThrow(() -> createConfigurationException(name));
+        return createSingleInstanceOf(superClass, name).orElseThrow(() -> MCRInstantiatorUtils
+            .missingException(name + CLASS_SUFFIX, superClass));
     }
 
     private static <S> Optional<S> createInstanceOf(Class<S> superClass, String name) {

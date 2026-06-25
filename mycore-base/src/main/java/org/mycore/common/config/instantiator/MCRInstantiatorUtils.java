@@ -126,12 +126,25 @@ public final class MCRInstantiatorUtils {
             + "' in configured class " + target.declaringClass().getName() + " must not be empty");
     }
 
+    public static MCRConfigurationException incompatibilityException(String property, Class<?> instanceClass,
+        Class<?> superClass) {
+        return new MCRConfigurationException("Instance of class " + instanceClass.getName()
+            + ", configured in " + property + ", is incompatible with" +
+            " intended super class " + superClass.getName());
+    }
+
     public static MCRConfigurationException incompatibilityException(String property, MCRTarget target,
         Class<?> annotationValueClass, Object instance) {
         return new MCRConfigurationException("Instance of class " + instance.getClass().getName()
             + "', configured in " + property + ", is incompatible with annotated value class "
             + annotationValueClass.getName() + " for target " + targetTypeName(target)
             + " '" + target.name() + "' in configured class " + target.declaringClass().getName());
+    }
+
+    public static MCRConfigurationException missingException(String property, Class<?> superClass) {
+        return new MCRConfigurationException("Missing or empty property: " + property
+            + " (instance is required and expected class " + superClass.getName()
+            + " is not final, therefore, the class name cannot be determined implicitly)");
     }
 
     public static MCRConfigurationException missingException(String property, MCRTarget target,
