@@ -8,14 +8,14 @@
   <xsl:function name="mcrlanguage:detect-language" as="xs:string?">
     <xsl:param name="text" as="xs:string" />
 
-    <xsl:variable name="result" select="document('detectLanguage:full' || $text)/string" />
+    <xsl:variable name="result" select="document('detectLanguage:full:' || $text)/string" />
     <xsl:sequence select="if ($result != '') then $result else ()" />
   </xsl:function>
 
   <xsl:function name="mcrlanguage:detect-language-by-character" as="xs:string?">
     <xsl:param name="text" as="xs:string" />
 
-    <xsl:variable name="result" select="document('detectLanguage:character' || $text)/string" />
+    <xsl:variable name="result" select="document('detectLanguage:character:' || $text)/string" />
     <xsl:sequence select="if ($result != '') then $result else ()" />
   </xsl:function>
 
