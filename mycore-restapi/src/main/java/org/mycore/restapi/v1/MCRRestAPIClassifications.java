@@ -492,11 +492,11 @@ public class MCRRestAPIClassifications {
         } else {
             writer.beginObject(); // {
             writer.name(ATTRIBUTE_ID).value(eRoot.getAttributeValue(ATTRIBUTE_ID));
-            writer.name("label");
+            writer.name("labels");
             writer.beginArray();
             for (Element eLabel : eRoot.getChildren(ELEMENT_LABEL)) {
                 if (lang == null || lang.equals(eLabel.getAttributeValue(ATTRIBUTE_LANG, Namespace.XML_NAMESPACE))) {
-                    writeLabelAttributesToJson(writer, eRoot);
+                    writeLabelAttributesToJson(writer, eLabel);
                 }
             }
             writer.endArray();
