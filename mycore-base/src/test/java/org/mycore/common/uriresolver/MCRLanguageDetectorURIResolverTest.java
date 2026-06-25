@@ -67,6 +67,13 @@ class MCRLanguageDetectorURIResolverTest {
             () -> resolver.resolve("detectLanguage:unknown:This is an english sentence", null));
     }
 
+    @Test
+    void testDetectEnglishWithColonInText() throws TransformerException {
+        Source result = resolver.resolve("detectLanguage:full:Note: This is an english sentence", null);
+        assertNotNull(result);
+        assertEquals("en", extractResult(result));
+    }
+
     private String extractResult(Source source) throws TransformerException {
         JDOMResult result = new JDOMResult();
         Transformer transformer = TransformerFactory.newInstance().newTransformer();

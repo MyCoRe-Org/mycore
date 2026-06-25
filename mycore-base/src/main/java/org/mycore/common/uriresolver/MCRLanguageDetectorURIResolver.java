@@ -58,7 +58,7 @@ public class MCRLanguageDetectorURIResolver implements URIResolver {
      */
     @Override
     public Source resolve(String href, String base) throws TransformerException {
-        String[] split = href.split(":");
+        String[] split = href.split(":", 3);
 
         if (split.length != 3) {
             throw new TransformerException("Invalid URI syntax, expected: detectLanguage:{method}:{text}");
