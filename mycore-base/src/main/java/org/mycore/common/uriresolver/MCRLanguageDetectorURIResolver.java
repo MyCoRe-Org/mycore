@@ -18,6 +18,9 @@
 
 package org.mycore.common.uriresolver;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
@@ -40,11 +43,11 @@ public class MCRLanguageDetectorURIResolver implements URIResolver {
      *   <li>{@code full} - detects language by Unicode script first, falls back to word and ending heuristics</li>
      *   <li>{@code character} - detects language by Unicode script only, returns empty result for Latin scripts</li>
      * </ul>
+     * <p>The {@code {text}} value must be URL-encoded.
      * <p>Example request:
      * <pre>
-     *   detectLanguage:This is an english sentence
-     *   detectLanguage:full:This is an english sentence
-     *   detectLanguage:character:&lt;arabic char&gt;
+     *   detectLanguage:full:This%20is%20an%20english%20sentence
+     *   detectLanguage:character:%D9%87%D8%B0%D8%A7%20%D9%86%D8%B5%20%D8%B9%D8%B1%D8%A8%D9%8A
      * </pre>
      * <p>Example response:
      * <pre>{@code
@@ -65,7 +68,7 @@ public class MCRLanguageDetectorURIResolver implements URIResolver {
         }
 
         String method = split[1];
-        String text = split[2];
+        String text = URLDecoder.decode(split[2], StandardCharsets.UTF_8);
 
         String language = switch (method) {
             case "character" -> MCRLanguageDetector.detectLanguageByCharacter(text);
