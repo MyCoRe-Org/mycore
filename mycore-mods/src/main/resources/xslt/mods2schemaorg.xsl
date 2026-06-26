@@ -24,9 +24,6 @@
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   exclude-result-prefixes="#all">
 
-  <xsl:param name="WebApplicationBaseURL" />
-  <xsl:param name="MCR.Module-iview2.SupportedContentTypes" />
-
   <!--
 
   Define a transformer
@@ -42,7 +39,11 @@
 
   -->
 
+  <xsl:include href="resource:xslt/default-parameters.xsl" />
+  <xsl:include href="xslInclude:functions" />
   <xsl:include href="xslInclude:schemaorg" />
+
+  <xsl:param name="MCR.Module-iview2.SupportedContentTypes" />
 
   <xsl:template match="/">
     <xsl:element name="script">

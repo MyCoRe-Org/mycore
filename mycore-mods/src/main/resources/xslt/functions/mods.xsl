@@ -3,6 +3,7 @@
   xmlns:fn="http://www.w3.org/2005/xpath-functions"
   xmlns:mcrmods="http://www.mycore.de/xslt/mods"
   xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+  xmlns:mods="http://www.loc.gov/mods/v3"
   xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -89,6 +90,12 @@
   <xsl:function name="mcrmods:to-category" as="element()?">
     <xsl:param name="node" as="element()" />
     <xsl:sequence select="mcrmods:to-mycoreclass($node, 'single')/categories/category" />
+  </xsl:function>
+
+  <xsl:function name="mcrmods:pages-to-extent" as="element(mods:extent)?">
+    <xsl:param name="input" as="xs:string" />
+
+    <xsl:sequence select="document('modsExtent:' || fn:encode-for-uri($input))/*" />
   </xsl:function>
   
   <xsl:function name="mcrmods:is-supported" as="xs:boolean">
