@@ -31,11 +31,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.Properties;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.config.MCRProperties;
+import org.mycore.restapi.v1.utils.MCRRestVueI18nUtils;
 import org.mycore.services.i18n.MCRTranslation;
 
 import com.google.gson.stream.JsonWriter;
@@ -62,9 +65,15 @@ import jakarta.ws.rs.core.UriInfo;
 @Path("/messages")
 public class MCRRestAPIMessages {
 
+    private static final Logger LOGGER = LogManager.getLogger();
+
+    public static final String INDENT = "  ";
+
     public static final String FORMAT_JSON = "json";
 
     public static final String FORMAT_XML = "xml";
+
+    public static final String FORMAT_VUE_I18N = "vue-i18n";
 
     public static final String FORMAT_PROPERTY = "property";
 
@@ -86,19 +95,31 @@ public class MCRRestAPIMessages {
      * 
      */
     @GET
-    @Produces({ TEXT_XML_UTF_8, APPLICATION_JSON_UTF_8, TEXT_PLAIN_ISO_8859_1})
+    @Produces({ TEXT_XML_UTF_8, APPLICATION_JSON_UTF_8, TEXT_PLAIN_ISO_8859_1 })
     public Response listMessages(@Context UriInfo info, @Context HttpServletRequest request,
         @QueryParam("lang") @DefaultValue("de") String lang,
         @QueryParam("format") @DefaultValue("property") String format,
         @QueryParam("filter") @DefaultValue("") String filter) {
-        Locale locale = Locale.forLanguageTag(lang);
-        String[] check = filter.split(";");
 
-        Properties data = new MCRProperties();
-        for (String prefix : check) {
-            data.putAll(MCRTranslation.translatePrefixToLocale(prefix, locale));
-        }
         try {
+            if (FORMAT_VUE_I18N.equals(format)) {
+                StringWriter sw = new StringWriter();
+                JsonWriter writer = new JsonWriter(sw);
+                writer.setIndent(INDENT);
+                MCRRestVueI18nUtils.createVueI18nJson(writer, lang, filter);
+                writer.close();
+                return Response.ok(sw.toString()).type(APPLICATION_JSON_UTF_8)
+                    .build();
+            }
+
+            Locale locale = Locale.forLanguageTag(lang);
+            String[] check = filter.split(";");
+
+            Properties data = new MCRProperties();
+            for (String prefix : check) {
+                data.putAll(MCRTranslation.translatePrefixToLocale(prefix, locale));
+            }
+
             if (FORMAT_PROPERTY.equals(format)) {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 data.store(baos, "MyCoRe Messages (charset='ISO-8859-1')");
@@ -114,7 +135,7 @@ public class MCRRestAPIMessages {
                 StringWriter sw = new StringWriter();
 
                 JsonWriter writer = new JsonWriter(sw);
-                writer.setIndent("    ");
+                writer.setIndent(INDENT);
                 writer.beginObject();
                 writer.name("messages");
                 writer.beginObject();
@@ -130,7 +151,7 @@ public class MCRRestAPIMessages {
                     .build();
             }
         } catch (IOException e) {
-            //toDo
+            LOGGER.warn("Could not create message output", e);
         }
         return Response.status(Response.Status.BAD_REQUEST).build();
     }
@@ -172,7 +193,7 @@ public class MCRRestAPIMessages {
             if (FORMAT_JSON.equals(format)) {
                 StringWriter sw = new StringWriter();
                 JsonWriter writer = new JsonWriter(sw);
-                writer.setIndent("    ");
+                writer.setIndent(INDENT);
                 writer.beginObject();
                 writer.name(key);
                 writer.value(result);
@@ -183,7 +204,7 @@ public class MCRRestAPIMessages {
             //text only
             return Response.ok(result).type(TEXT_PLAIN_UTF_8).build();
         } catch (IOException e) {
-            //toDo
+            LOGGER.warn("Could not create message output", e);
         }
         return Response.status(Status.BAD_REQUEST).build();
     }
