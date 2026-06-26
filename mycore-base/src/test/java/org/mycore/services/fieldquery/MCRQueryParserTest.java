@@ -141,4 +141,26 @@ public class MCRQueryParserTest extends MCRTestCase {
             queryStringParsed.toString());
     }
 
+    /**
+     * Test method for a lone single quote in a "contains" condition. A standalone single quote (or "-'") must not
+     * raise a {@link StringIndexOutOfBoundsException} and must not swallow the remaining query terms, but simply be
+     * ignored as noise.
+     */
+
+    @Test
+    public final void testQueryWithLoneSingleQuote() {
+        Element c = new Element("condition");
+        c.setAttribute("field", "title");
+        c.setAttribute("operator", "contains");
+
+        String expected = "(title contains \"this\") AND (title contains \"is\") AND (title contains \"a\") "
+            + "AND (title contains \"test\")";
+
+        c.setAttribute("value", "this ' is a test");
+        assertEquals("Returned value is not", expected, queryParser.parse(c).toString());
+
+        c.setAttribute("value", "this -' is a test");
+        assertEquals("Returned value is not", expected, queryParser.parse(c).toString());
+    }
+
 }

@@ -214,20 +214,22 @@ public class MCRQueryParser extends MCRBooleanClauseParser<Void> {
                 }
             } else if (value.startsWith("'")) {
                 // begin of phrase
-                if (value.endsWith("'")) {
+                if (value.length() > 1 && value.endsWith("'")) {
                     // one-word phrase
                     values.add(value.substring(1, value.length() - 1));
-                } else {
+                } else if (value.length() > 1) {
                     phrase = new StringBuilder(value);
                 }
+                // else: lone single quote, ignore it
             } else if (value.startsWith("-'")) {
                 // begin of NOT phrase
-                if (value.endsWith("'")) {
+                if (value.length() > 2 && value.endsWith("'")) {
                     // one-word phrase
                     values.add("-" + value.substring(2, value.length() - 1));
-                } else {
+                } else if (value.length() > 2) {
                     phrase = new StringBuilder(value);
                 }
+                // else: lone "-'", ignore it
             } else {
                 values.add(value);
             }
