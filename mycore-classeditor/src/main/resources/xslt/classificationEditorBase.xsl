@@ -43,7 +43,7 @@
           language: "<xsl:value-of select='$CurrentLang' />",
           editable: true,
           debug: "<xsl:value-of select='$classeditor.debug' />" === "true",
-          solrEnabled: "<xsl:value-of select="mcrproperty:one('MCR.Category.DAO')" />" === "org.mycore.solr.classification.MCRSolrCategoryDAO"
+          solrEnabled: "<xsl:value-of select="mcrproperty:get('MCR.Category.DAO')" />" === "org.mycore.solr.classification.MCRSolrCategoryDAO"
         },
         classId: "<xsl:value-of select='$classeditor.class' />",
         categoryId: "<xsl:value-of select='$classeditor.categ' />"
