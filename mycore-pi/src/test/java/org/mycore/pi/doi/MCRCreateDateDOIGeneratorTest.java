@@ -16,67 +16,52 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.pi;
+package org.mycore.pi.doi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mycore.pi.MCRGenericPIGenerator.DEFAULT_DATE_FORMAT;
 
-import java.util.List;
-import java.util.Map;
-
-import org.jdom2.Element;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
+import org.mycore.common.date.MCRDateFormatter;
+import org.mycore.common.date.MCRFLDateScrambler;
 import org.mycore.common.date.MCRMockDateFormatter;
-import org.mycore.common.date.MCRSimpleDateFormatter;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.pi.doi.MCRDigitalObjectIdentifier;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
-import org.mycore.pi.urn.MCRDNBURN;
 import org.mycore.test.MCRJPAExtension;
-import org.mycore.test.MCRMetadataExtension;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
-@ExtendWith(MCRJPAExtension.class)
-@ExtendWith(MCRMetadataExtension.class)
+@ExtendWith({ MCRJPAExtension.class })
 @MCRTestConfiguration(properties = {
-    @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true")
+    @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true"),
 })
-public class MCRGenericPIGeneratorTest {
+public class MCRCreateDateDOIGeneratorTest {
+
+    public static final String PREFIX = "10.1234";
 
     @Test
-    public void testGenerate() throws MCRPersistentIdentifierException {
+    public void generate() throws MCRPersistentIdentifierException {
 
         MCRObject object = new MCRObject();
         object.setSchema("http://www.w3.org/2001/XMLSchema");
         object.setId(MCRObjectID.getInstance("my_test_00000123"));
 
-        Element testElement = new Element("test1");
-        testElement.setAttribute("class", "MCRMetaXML");
-        testElement.addContent(new Element("test2").setText("result1"));
-        testElement.addContent(new Element("test3").setText("result2"));
-
-        Element metadata = new Element("metadata");
-        metadata.addContent(testElement);
-
-        object.getMetadata().setFromDOM(metadata);
-
         MCRMockDateFormatter formatter = new MCRMockDateFormatter();
-        MCRGenericPIGenerator generator = new MCRGenericPIGenerator(
-            "urn:nbn:de:gbv:xyz:$CurrentDate-$1-$2-$ObjectType-$ObjectProject-$ObjectNumber-$Count-",
-            formatter, Map.of(), Map.of("my", "MY"), Map.of("test", "TEST"), 3, MCRDNBURN.TYPE,
-            List.of("/mycoreobject/metadata/test1/test2/text()", "/mycoreobject/metadata/test1/test3/text()"));
+        MCRCreateDateDOIGenerator generator = new MCRCreateDateDOIGenerator(new MCRDOIParser(), formatter, PREFIX, 3);
+        String doi = generator.generate(object, "").asString();
 
-        String pi = generator.generate(object, "").asString();
+        assertTrue(doi.startsWith(PREFIX));
+        assertEquals('/', doi.charAt(PREFIX.length()));
 
-        assertEquals("urn:nbn:de:gbv:xyz:" + formatter.lastFormattedDate() + "-result1-result2-TEST-MY-00000123-000-",
-            pi.substring(0, pi.length() - 1));
+        String value = doi.substring(PREFIX.length() + 1);
+
+        assertTrue(value.startsWith(formatter.lastFormattedDate() + "-"));
+        assertTrue(value.endsWith("-000"));
 
     }
 
@@ -87,12 +72,8 @@ public class MCRGenericPIGeneratorTest {
         object.setSchema("http://www.w3.org/2001/XMLSchema");
         object.setId(MCRObjectID.getInstance("my_test_00000123"));
 
-        MCRSimpleDateFormatter formatter = new MCRSimpleDateFormatter(DEFAULT_DATE_FORMAT);
-        MCRGenericPIGenerator generator = new MCRGenericPIGenerator(
-            "10.1234/$ObjectBase::$ObjectType-$Count",
-            formatter, Map.of("my_test", "XYZ"), Map.of(), Map.of(), -1, MCRDigitalObjectIdentifier.TYPE,
-            List.of());
-
+        MCRDateFormatter formatter = new MCRFLDateScrambler();
+        MCRCreateDateDOIGenerator generator = new MCRCreateDateDOIGenerator(new MCRDOIParser(), formatter, PREFIX, -1);
         String doi1 = generator.generate(object, "").asString();
         String doi2 = generator.generate(object, "").asString();
         String doi3 = generator.generate(object, "").asString();
@@ -100,10 +81,6 @@ public class MCRGenericPIGeneratorTest {
         assertNotEquals(doi1, doi2);
         assertNotEquals(doi2, doi3);
         assertNotEquals(doi3, doi1);
-
-        assertTrue(doi1.startsWith("10.1234/XYZ::test-"));
-        assertTrue(doi2.startsWith("10.1234/XYZ::test-"));
-        assertTrue(doi3.startsWith("10.1234/XYZ::test-"));
 
         assertTrue(doi1.endsWith("-0"));
         assertTrue(doi2.endsWith("-1"));

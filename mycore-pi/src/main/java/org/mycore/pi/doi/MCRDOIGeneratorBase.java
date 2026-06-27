@@ -18,28 +18,27 @@
 
 package org.mycore.pi.doi;
 
-import java.util.Optional;
+import java.util.Objects;
 
-import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.pi.MCRPIGenerator;
+import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
-/**
- * Just for testing. Provides the doi in the doi property.
- */
-public class MCRStaticDOIGenerator extends MCRPIGenerator<MCRDigitalObjectIdentifier> {
+public abstract class MCRDOIGeneratorBase extends MCRPIGenerator<MCRDigitalObjectIdentifier> {
 
-    public MCRStaticDOIGenerator() {
-        super();
-        checkPropertyExists("doi");
+    private final MCRDOIParser parser;
+
+    public MCRDOIGeneratorBase(MCRDOIParser parser) {
+        this.parser = Objects.requireNonNull(parser, "Parser must not be null");
     }
 
     @Override
-    public MCRDigitalObjectIdentifier generate(MCRBase mcrBase, String additional) {
-        final String doi = getProperties().get("doi");
-        final Optional<MCRDigitalObjectIdentifier> generatedDOI = new MCRDOIParser().parse(doi);
-        return generatedDOI
-            .orElseThrow(() -> new MCRConfigurationException("The property " + doi + " is not a valid doi!"));
+    public final MCRDigitalObjectIdentifier generate(MCRBase base, String additional)
+        throws MCRPersistentIdentifierException {
+        return parser.parse(buildDOI(base, additional)).get();
     }
+
+    protected abstract String buildDOI(MCRBase base, String additional)
+        throws MCRPersistentIdentifierException;
 
 }
