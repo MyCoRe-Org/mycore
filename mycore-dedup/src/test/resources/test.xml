@@ -1,0 +1,23 @@
+<mycoreobject xmlns:xlink="http://www.w3.org/1999/xlink"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="datamodel-mods.xsd"
+              ID="mods_00000001">
+    <metadata>
+        <def.modsContainer class="MCRMetaXML" heritable="false" notinherit="true">
+            <modsContainer inherited="0">
+                <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+                    <mods:titleInfo>
+                        <mods:title>This is a short title</mods:title>
+                    </mods:titleInfo>
+                    <mods:name type="personal">
+                        <mods:namePart type="family">Doe</mods:namePart>
+                    </mods:name>
+                    <mods:name type="personal">
+                        <mods:namePart type="family">Miller</mods:namePart>
+                    </mods:name>
+                    <mods:identifier type="doi">978-1-56619-909-4</mods:identifier>
+                </mods:mods>
+            </modsContainer>
+        </def.modsContainer>
+    </metadata>
+</mycoreobject>
