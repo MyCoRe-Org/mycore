@@ -18,70 +18,14 @@
 
 package org.mycore.pi.urn;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Predicate;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.mycore.pi.MCRPIManager;
-import org.mycore.pi.MCRPIRegistrationInfo;
-
 /**
- * A Generator which helps to generate a URN with a counter inside.
+ * @deprecated Use {@link MCRCountingDNBURNGeneratorBase} instead.
  */
-public abstract class MCRCountingDNBURNGenerator extends MCRDNBURNGenerator {
+@Deprecated(forRemoval = true)
+public abstract class MCRCountingDNBURNGenerator extends MCRCountingDNBURNGeneratorBase {
 
-    private static final Map<String, AtomicInteger> PATTERN_COUNT_MAP = new HashMap<>();
-
-    MCRCountingDNBURNGenerator() {
-        super();
+    MCRCountingDNBURNGenerator(String namespace) {
+        super(namespace, "");
     }
 
-    protected AtomicInteger readCountFromDatabase(String countPattern) {
-        Pattern regExpPattern = Pattern.compile(countPattern);
-        Predicate<String> matching = regExpPattern.asPredicate();
-
-        List<MCRPIRegistrationInfo> list = MCRPIManager.getInstance()
-            .getList(MCRDNBURN.TYPE, -1, -1);
-
-        // extract the number of the PI
-        Optional<Integer> highestNumber = list.stream()
-            .map(MCRPIRegistrationInfo::getIdentifier)
-            .filter(matching)
-            .map(pi -> {
-                // extract the number of the PI
-                Matcher matcher = regExpPattern.matcher(pi);
-                if (matcher.find() && matcher.groupCount() == 1) {
-                    String group = matcher.group(1);
-                    return Integer.parseInt(group, 10);
-                } else {
-                    return null;
-                }
-            }).filter(Objects::nonNull)
-            .min(Comparator.reverseOrder())
-            .map(n -> n + 1);
-        return new AtomicInteger(highestNumber.orElse(0));
-    }
-
-    /**
-     * Gets the count for a specific pattern and increase the internal counter. If there is no internal counter it will
-     * look into the Database and detect the highest count with the pattern.
-     *
-     * @param pattern a reg exp pattern which will be used to detect the highest count. The first group is the count.
-     *                e.G. [0-9]+-mods-2017-([0-9][0-9][0-9][0-9])-[0-9] will match 31-mods-2017-0003-3 and the returned
-     *                count will be 4 (3+1).
-     * @return the next count
-     */
-    public final synchronized int getCount(String pattern) {
-        AtomicInteger count = PATTERN_COUNT_MAP
-            .computeIfAbsent(pattern, this::readCountFromDatabase);
-
-        return count.getAndIncrement();
-    }
 }

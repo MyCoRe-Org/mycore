@@ -19,12 +19,10 @@
 package org.mycore.pi.purl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mycore.pi.MCRPIService.GENERATOR_CONFIG_PREFIX;
 
 import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
@@ -33,40 +31,34 @@ import org.mycore.test.MyCoReTest;
 @MyCoReTest
 @MCRTestConfiguration(properties = {
     @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true"),
-    @MCRTestProperty(key = GENERATOR_CONFIG_PREFIX + MCRIDPURLGeneratorTest.GENERATOR_1 + ".Class",
-        classNameOf = MCRIDPURLGenerator.class),
-    @MCRTestProperty(key = GENERATOR_CONFIG_PREFIX + MCRIDPURLGeneratorTest.GENERATOR_1 + ".BaseURLTemplate",
-        string = MCRIDPURLGeneratorTest.TEST_BASE_1),
-    @MCRTestProperty(key = GENERATOR_CONFIG_PREFIX + MCRIDPURLGeneratorTest.GENERATOR_2 + ".Class",
-        classNameOf = MCRIDPURLGenerator.class),
-    @MCRTestProperty(key = GENERATOR_CONFIG_PREFIX + MCRIDPURLGeneratorTest.GENERATOR_2 + ".BaseURLTemplate",
-        string = MCRIDPURLGeneratorTest.TEST_BASE_2)
 })
 public class MCRIDPURLGeneratorTest {
 
-    public static final String TEST_BASE_1 = "http://purl.myurl.de/$ID";
-
-    public static final String TEST_BASE_2 = "http://purl.myurl.de/$ID/$ID/$ID";
-
-    public static final String GENERATOR_1 = "IDPURLGenerator";
-
-    public static final String GENERATOR_2 = GENERATOR_1 + "2";
-
     @Test
     public void generate() throws MCRPersistentIdentifierException {
-        MCRObjectID testID = MCRObjectID.getInstance("my_test_00000001");
-        MCRObject mcrObject = new MCRObject();
-        mcrObject.setId(testID);
 
-        MCRIDPURLGenerator generator1 = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRIDPURLGenerator.class, GENERATOR_CONFIG_PREFIX + GENERATOR_1);
-        assertEquals("http://purl.myurl.de/my_test_00000001",
-                generator1.generate(mcrObject, "").asString(), "");
+        MCRObject object = new MCRObject();
+        object.setSchema("http://www.w3.org/2001/XMLSchema");
+        object.setId(MCRObjectID.getInstance("my_test_00000123"));
 
-        MCRIDPURLGenerator generator2 = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRIDPURLGenerator.class, GENERATOR_CONFIG_PREFIX + GENERATOR_2);
-        assertEquals("http://purl.myurl.de/my_test_00000001/my_test_00000001/my_test_00000001",
-                generator2.generate(mcrObject, "").asString(), "");
+        MCRIDPURLGenerator generator = new MCRIDPURLGenerator("https://purl.example.com/$ID");
+        String purl = generator.generate(object, "").asString();
+
+        assertEquals("https://purl.example.com/my_test_00000123", purl, "");
+
+    }
+
+    @Test
+    public void generateWithMultipleReplacements() throws MCRPersistentIdentifierException {
+
+        MCRObject object = new MCRObject();
+        object.setSchema("http://www.w3.org/2001/XMLSchema");
+        object.setId(MCRObjectID.getInstance("my_test_00000123"));
+
+        MCRIDPURLGenerator generator = new MCRIDPURLGenerator("https://purl.example.com/$ID/$ID/XYZ");
+        String purl = generator.generate(object, "").asString();
+
+        assertEquals("https://purl.example.com/my_test_00000123/my_test_00000123/XYZ", purl, "");
 
     }
 

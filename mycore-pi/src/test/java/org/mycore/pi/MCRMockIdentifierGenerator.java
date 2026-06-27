@@ -18,21 +18,15 @@
 
 package org.mycore.pi;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import org.mycore.datamodel.metadata.MCRBase;
 
 public class MCRMockIdentifierGenerator extends MCRPIGenerator<MCRMockIdentifier> {
 
-    public static final String TEST_PROPERTY = "mockProperty";
-
-    public static final String TEST_PROPERTY_VALUE = "mockPropertyValue";
-
     @Override
-    public MCRMockIdentifier generate(MCRBase mcrBase, String additional) {
-        assertEquals(TEST_PROPERTY_VALUE, getProperties().get(TEST_PROPERTY), "Test properties should be set!");
-
-        return (MCRMockIdentifier) new MCRMockIdentifierParser()
-            .parse(MCRMockIdentifier.MOCK_SCHEME + mcrBase.getId() + ":" + additional).get();
+    public MCRMockIdentifier generate(MCRBase base, String additional) {
+        return new MCRMockIdentifierParser()
+            .parse(MCRMockIdentifier.MOCK_SCHEME + base.getId() + ":" + additional)
+            .get();
     }
+
 }
