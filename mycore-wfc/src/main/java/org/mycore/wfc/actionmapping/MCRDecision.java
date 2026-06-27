@@ -18,6 +18,7 @@
 
 package org.mycore.wfc.actionmapping;
 
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.parsers.bool.MCRCondition;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
@@ -28,11 +29,13 @@ import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * @author Thomas Scheffler (yagee)
- *
  */
 @XmlRootElement(name = "when")
 @XmlAccessorType(XmlAccessType.NONE)
 public class MCRDecision {
+
+    @XmlAttribute(name = "login-detour")
+    private boolean ensureLogin;
 
     @XmlAttribute
     private String url;
@@ -40,6 +43,14 @@ public class MCRDecision {
     @XmlAttribute
     @XmlJavaTypeAdapter(MCRWorkflowRuleAdapter.class)
     private MCRCondition<?> condition;
+
+    public boolean isEnsureLogin() {
+        return ensureLogin;
+    }
+
+    public void setEnsureLogin(boolean ensureLogin) {
+        this.ensureLogin = ensureLogin;
+    }
 
     /**
      * @return the url
@@ -67,6 +78,14 @@ public class MCRDecision {
      */
     public void setCondition(MCRCondition<?> condition) {
         this.condition = condition;
+    }
+
+    public String getActualUrl() {
+        if (ensureLogin) {
+            return MCRFrontendUtil.getLoginURL(url);
+        } else {
+            return url;
+        }
     }
 
 }
