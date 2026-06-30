@@ -73,6 +73,8 @@ public class MCRRestAPIMessages {
 
     public static final String FORMAT_XML = "xml";
 
+    //"MCRApiDraft" - the vue-i18n output is experimental.
+    //It might change or be removed in the future
     public static final String FORMAT_VUE_I18N = "vue-i18n";
 
     public static final String FORMAT_PROPERTY = "property";
