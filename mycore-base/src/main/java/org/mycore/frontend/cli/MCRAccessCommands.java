@@ -36,6 +36,9 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.access.MCRRuleAccessInterface;
+import org.mycore.access.mcrimpl.MCRAccessStore;
+import org.mycore.access.mcrimpl.MCRRuleMapping;
+import org.mycore.access.mcrimpl.MCRRuleStore;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.xsl.uriresolver.MCRURIResolver;
@@ -152,6 +155,42 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         MCRRuleAccessInterface accessImpl = MCRAccessManager.requireRulesInterface();
         for (String permission : accessImpl.getPermissions()) {
             accessImpl.removeRule(permission);
+        }
+    }
+
+    /**
+     * delete all ACL rule mappings and rules
+     */
+    @MCRCommand(syntax = "delete all acl rules and mappings",
+        help = "Remove all rule mappings and rules from the Access Control System.",
+        order = 35)
+    public static void deleteAllAclRulesAndMappings() {
+        deleteAllAclMappings();
+        MCRRuleStore ruleStore = MCRRuleStore.obtainInstance();
+        for (String id : ruleStore.retrieveAllIDs()) {
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("deleting rul {}", id);
+            }
+            ruleStore.deleteRule(id);
+        }
+    }
+
+    /**
+     * delete all ACL rule mappings
+     */
+    @MCRCommand(syntax = "delete all acl mappings",
+        help = "Remove all rule mappings from the Access Control System.",
+        order = 35)
+    public static void deleteAllAclMappings() {
+        MCRAccessStore store = MCRAccessStore.obtainInstance();
+        for (String id : store.getDistinctStringIDs()) {
+            for (String pool : store.getPoolsForObject(id)) {
+                MCRRuleMapping rule = store.getAccessDefinition(pool, id);
+                if (LOGGER.isInfoEnabled()) {
+                    LOGGER.info("deleting rule mapping {} / {} / {}", id, pool, rule.getRuleId());
+                }
+                store.deleteAccessDefinition(rule);
+            }
         }
     }
 
