@@ -91,7 +91,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
     private static final long CHECK_PERIOD = MCRConfiguration2.getLong("MCR.LayoutService.LastModifiedCheckPeriod")
         .orElse(60_000L);
 
-    protected static final Class<? extends TransformerFactory> DEFAULT_FACTORY_CLASS = MCRConfiguration2
+    public static final Class<? extends TransformerFactory> DEFAULT_FACTORY_CLASS = MCRConfiguration2
         .<TransformerFactory>getClass("MCR.LayoutService.TransformerFactoryClass")
         .orElseGet(TransformerFactory.newInstance()::getClass);
 
