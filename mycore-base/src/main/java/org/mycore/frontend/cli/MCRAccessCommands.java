@@ -36,6 +36,8 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.access.MCRRuleAccessInterface;
+import org.mycore.access.mcrimpl.MCRAccessStore;
+import org.mycore.access.mcrimpl.MCRRuleMapping;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.xsl.uriresolver.MCRURIResolver;
@@ -152,6 +154,29 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         MCRRuleAccessInterface accessImpl = MCRAccessManager.requireRulesInterface();
         for (String permission : accessImpl.getPermissions()) {
             accessImpl.removeRule(permission);
+        }
+    }
+
+    /**
+     * delete all permissions including those that were created with
+     * {@link #permissionUpdateForID(String, String, String)} and
+     * {@link #permissionFileUpdateForID(String, String, String)}
+     */
+    @MCRCommand(syntax = "delete all permissions including those that were created with update permission",
+            help = "Remove all permission entries from the Access Control System.",
+            order = 35)
+    public static void deleteAllPermissionsIncludingThoseThatWereCreatedWithUpdatePermissions() {
+        MCRAccessStore store = MCRAccessStore.obtainInstance();
+        Collection<String> ids = store.getDistinctStringIDs();
+        for (String id : ids) {
+            Collection<String> pools = store.getPoolsForObject(id);
+            for (String pool : pools) {
+                MCRRuleMapping rule = store.getAccessDefinition(pool, id);
+                if(LOGGER.isInfoEnabled()) {
+                    LOGGER.info("deleting {} / {} / {}", id, pool, rule.getRuleId());
+                }
+                store.deleteAccessDefinition(rule);
+            }
         }
     }
 
