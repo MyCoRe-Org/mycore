@@ -19,7 +19,6 @@
 package org.mycore.frontend.xeditor.transformer;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.Arrays;
 import java.util.List;
 
@@ -28,7 +27,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
+import org.mycore.common.content.MCRStringContent;
+import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.services.i18n.MCRTranslation;
 
 /**
@@ -43,8 +43,6 @@ public class MCROutputTransformerHelper extends MCRTransformerHelperBase {
     private static final String ATTR_VALUE = "value";
     private static final String ATTR_I18N = "i18n";
     private static final String ATTR_ESCAPE_XML = "escape-xml";
-
-    private SAXBuilder saxBuilder = new SAXBuilder();
 
     @Override
     List<String> getSupportedMethods() {
@@ -61,7 +59,9 @@ public class MCROutputTransformerHelper extends MCRTransformerHelperBase {
             call.getReturnElement().setText(output);
         } else {
             try {
-                Element eText = saxBuilder.build(new StringReader("<text>" + output + "</text>")).getRootElement();
+                Element eText = MCRXMLParserFactory.getNonValidatingParser()
+                    .parseXML(new MCRStringContent("<text>" + output + "</text>"))
+                    .getRootElement();
                 call.getReturnElement().setContent(eText.cloneContent());
             } catch (JDOMException | IOException e) {
                 LOGGER.warn(
