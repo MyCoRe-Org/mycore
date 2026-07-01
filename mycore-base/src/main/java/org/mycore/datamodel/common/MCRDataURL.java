@@ -222,7 +222,7 @@ public class MCRDataURL implements Serializable {
             .orElseGet(() -> Optional.of(nodeList).filter(nl -> nl.getLength() == 1).map(nl -> nl.item(0))
                 .orElseThrow(() -> new IllegalArgumentException("Nodelist must have an single root element.")));
 
-        final TransformerFactory transformerFactory = MCRXSLTransformer.getDefaultTransformerFactory();
+        final TransformerFactory transformerFactory = MCRXSLTransformer.createDefaultTransformerFactory();
         final Transformer transformer = transformerFactory.newTransformer();
 
         MCRDataURLEncoding enc = encoding != null ? MCRDataURLEncoding.fromValue(encoding) : null;

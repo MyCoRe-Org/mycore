@@ -199,7 +199,7 @@ public class MCRCommandUtils {
 
         try {
             if (element != null) {
-                TransformerFactory transformerFactory = MCRXSLTransformer.getDefaultTransformerFactory();
+                TransformerFactory transformerFactory = MCRXSLTransformer.createDefaultTransformerFactory();
                 transformerFactory.setURIResolver(MCRURIResolver.obtainInstance());
                 transformer = transformerFactory.newTransformer(new JDOMSource(element));
                 cache.put(style, transformer);

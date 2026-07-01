@@ -74,7 +74,7 @@ public class MCRLayoutService {
     public void sendXML(HttpServletRequest req, HttpServletResponse res, MCRContent xml) throws IOException {
         res.setContentType("text/xml; charset=UTF-8");
         try {
-            Transformer transformer = MCRXSLTransformer.getDefaultTransformerFactory().newTransformer();
+            Transformer transformer = MCRXSLTransformer.createDefaultTransformerFactory().newTransformer();
             transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
             transformer.setOutputProperty(OutputKeys.INDENT, "no");
             StreamResult result = new StreamResult(res.getOutputStream());

@@ -165,7 +165,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
      *
      * @return a new transformer factory
      */
-    public static TransformerFactory getDefaultTransformerFactory() {
+    public static TransformerFactory createDefaultTransformerFactory() {
         return TransformerFactory.newInstance(DEFAULT_FACTORY_CLASS.getName(), MCRClassTools.getClassLoader());
     }
 

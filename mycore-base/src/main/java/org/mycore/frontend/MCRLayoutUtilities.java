@@ -399,7 +399,7 @@ public class MCRLayoutUtilities {
         if (LOGGER.isDebugEnabled()) {
             try {
                 String encoding = "UTF-8";
-                TransformerFactory tf = MCRXSLTransformer.getDefaultTransformerFactory();
+                TransformerFactory tf = MCRXSLTransformer.createDefaultTransformerFactory();
                 Transformer transformer = tf.newTransformer();
                 transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
                 transformer.setOutputProperty(OutputKeys.METHOD, "xml");
