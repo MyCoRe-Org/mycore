@@ -59,7 +59,6 @@ import org.jdom2.transform.JDOMResult;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.access.MCRAccessException;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
-import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRStreamUtils;
@@ -987,8 +986,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         MCRObjectID mcrId = MCRObjectID.getInstance(objectId);
         Document document = MCRXMLMetadataManager.obtainInstance().retrieveXML(mcrId);
         // do XSL transform
-        TransformerFactory transformerFactory = TransformerFactory
-            .newInstance(MCRXSLTransformer.DEFAULT_FACTORY_CLASS.getName(), MCRClassTools.getClassLoader());
+        TransformerFactory transformerFactory = MCRXSLTransformer.createDefaultTransformerFactory();
         transformerFactory.setErrorListener(new MCRErrorListener());
         transformerFactory.setURIResolver(MCRURIResolver.obtainInstance());
         XMLReader xmlReader = MCRXMLParserFactory.getNonValidatingParser().getXMLReader();

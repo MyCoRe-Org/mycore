@@ -159,6 +159,16 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         return instance;
     }
 
+    /**
+     * Creates a new {@link TransformerFactory} instance of the configured default implementation
+     * (see <code>MCR.LayoutService.TransformerFactoryClass</code>).
+     *
+     * @return a new transformer factory
+     */
+    public static TransformerFactory createDefaultTransformerFactory() {
+        return TransformerFactory.newInstance(DEFAULT_FACTORY_CLASS.getName(), MCRClassTools.getClassLoader());
+    }
+
     @Override
     public void init(String id) {
         super.init(id);
