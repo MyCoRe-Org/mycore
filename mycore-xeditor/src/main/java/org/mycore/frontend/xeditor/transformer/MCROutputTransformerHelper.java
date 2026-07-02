@@ -18,10 +18,17 @@
 
 package org.mycore.frontend.xeditor.transformer;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.mycore.common.content.MCRStringContent;
+import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.services.i18n.MCRTranslation;
 
 /**
@@ -31,8 +38,11 @@ import org.mycore.services.i18n.MCRTranslation;
  */
 public class MCROutputTransformerHelper extends MCRTransformerHelperBase {
 
+    private static final Logger LOGGER = LogManager.getLogger();
+
     private static final String ATTR_VALUE = "value";
     private static final String ATTR_I18N = "i18n";
+    private static final String ATTR_ESCAPE_XML = "escape-xml";
 
     @Override
     List<String> getSupportedMethods() {
@@ -43,8 +53,23 @@ public class MCROutputTransformerHelper extends MCRTransformerHelperBase {
     void handle(MCRTransformerHelperCall call) {
         String value = call.getAttributeValueOrDefault(ATTR_VALUE, null);
         String i18n = call.getAttributeValueOrDefault(ATTR_I18N, null);
+        boolean escapeXML = "true".equalsIgnoreCase(call.getAttributeValueOrDefault(ATTR_ESCAPE_XML, "true"));
         String output = output(value, i18n);
-        call.getReturnElement().setText(output);
+        if (escapeXML) {
+            call.getReturnElement().setText(output);
+        } else {
+            try {
+                Element eText = MCRXMLParserFactory.getNonValidatingParser()
+                    .parseXML(new MCRStringContent("<text>" + output + "</text>"))
+                    .getRootElement();
+                call.getReturnElement().setContent(eText.cloneContent());
+            } catch (JDOMException | IOException e) {
+                LOGGER.warn(
+                    "Could not transform value='{}', i18n='{}'to XML (text representation will be used instead): {}",
+                    value, i18n, output);
+                call.getReturnElement().setText(output);
+            }
+        }
     }
 
     private String output(String attrValue, String attrI18N) {

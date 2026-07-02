@@ -91,7 +91,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
     private static final long CHECK_PERIOD = MCRConfiguration2.getLong("MCR.LayoutService.LastModifiedCheckPeriod")
         .orElse(60_000L);
 
-    protected static final Class<? extends TransformerFactory> DEFAULT_FACTORY_CLASS = MCRConfiguration2
+    public static final Class<? extends TransformerFactory> DEFAULT_FACTORY_CLASS = MCRConfiguration2
         .<TransformerFactory>getClass("MCR.LayoutService.TransformerFactoryClass")
         .orElseGet(TransformerFactory.newInstance()::getClass);
 
@@ -157,6 +157,16 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
             INSTANCE_CACHE.put(key, instance);
         }
         return instance;
+    }
+
+    /**
+     * Creates a new {@link TransformerFactory} instance of the configured default implementation
+     * (see <code>MCR.LayoutService.TransformerFactoryClass</code>).
+     *
+     * @return a new transformer factory
+     */
+    public static TransformerFactory createDefaultTransformerFactory() {
+        return TransformerFactory.newInstance(DEFAULT_FACTORY_CLASS.getName(), MCRClassTools.getClassLoader());
     }
 
     @Override

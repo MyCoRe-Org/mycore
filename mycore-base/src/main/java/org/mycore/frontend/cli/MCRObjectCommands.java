@@ -69,6 +69,7 @@ import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
+import org.mycore.common.content.transformer.MCRXSLTransformer;
 import org.mycore.common.xml.MCREntityResolver;
 import org.mycore.common.xml.MCRLayoutTransformerFactory;
 import org.mycore.common.xml.MCRXMLHelper;
@@ -969,7 +970,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         MCRObjectID mcrId = MCRObjectID.getInstance(objectId);
         Document document = MCRXMLMetadataManager.obtainInstance().retrieveXML(mcrId);
         // do XSL transform
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        TransformerFactory transformerFactory = MCRXSLTransformer.createDefaultTransformerFactory();
         transformerFactory.setErrorListener(new MCRErrorListener());
         transformerFactory.setURIResolver(MCRURIResolver.obtainInstance());
         XMLReader xmlReader = MCRXMLParserFactory.getNonValidatingParser().getXMLReader();

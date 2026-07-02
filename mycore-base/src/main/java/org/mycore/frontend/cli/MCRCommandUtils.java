@@ -39,6 +39,7 @@ import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRUsageException;
+import org.mycore.common.content.transformer.MCRXSLTransformer;
 import org.mycore.common.xsl.MCRXSLResourceHelper;
 import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
@@ -198,7 +199,7 @@ public class MCRCommandUtils {
 
         try {
             if (element != null) {
-                TransformerFactory transformerFactory = TransformerFactory.newInstance();
+                TransformerFactory transformerFactory = MCRXSLTransformer.createDefaultTransformerFactory();
                 transformerFactory.setURIResolver(MCRURIResolver.obtainInstance());
                 transformer = transformerFactory.newTransformer(new JDOMSource(element));
                 cache.put(style, transformer);
