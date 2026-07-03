@@ -43,6 +43,7 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.access.MCRMissingPermissionException;
 import org.mycore.access.MCRMissingPrivilegeException;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRExpandedObjectCache;
 import org.mycore.common.MCRExpandedObjectManager;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration2;
@@ -132,6 +133,7 @@ public final class MCRMetadataManager {
 
         createDataInIFS(mcrDerivate, derivateId, objectId, objectBackup);
 
+        MCRExpandedObjectCache.getInstance().clear(mcrDerivate.getOwnerID());
     }
 
     private static MCRObjectID assignNewIdIfNecessary(MCRDerivate mcrDerivate) {
@@ -694,6 +696,7 @@ public final class MCRMetadataManager {
 
         updateIFS(fileSourceDirectory, derivateId);
 
+        MCRExpandedObjectCache.getInstance().clear(mcrDerivate.getOwnerID());
     }
 
     private static Path handleFileSourceDirectory(MCRDerivate mcrDerivate) {
