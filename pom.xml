@@ -27,7 +27,7 @@
     <version>57</version>
   </parent>
   <artifactId>mycore</artifactId>
-  <version>2023.06.5</version>
+  <version>2023.06.6-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>MyCoRe</name>
   <description xml:space="preserve">
