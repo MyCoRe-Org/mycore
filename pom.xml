@@ -110,7 +110,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <plugin>
           <groupId>org.mycore.plugins</groupId>
           <artifactId>datamodel-plugin</artifactId>
-          <version>0.10-SNAPSHOT</version>
+          <version>0.10</version>
         </plugin>
         <plugin>
           <groupId>com.github.eirslett</groupId>
