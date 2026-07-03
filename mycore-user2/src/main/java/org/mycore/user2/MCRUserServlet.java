@@ -451,7 +451,9 @@ public class MCRUserServlet extends MCRServlet {
      */
     private void listUsers(HttpServletRequest req, HttpServletResponse res) throws Exception {
         MCRUser currentUser = MCRUserManager.getCurrentUser();
-        List<MCRUser> ownUsers = MCRUserManager.listUsers(currentUser);
+        // listUsers() requires a persisted user entity; transient users have none yet
+        List<MCRUser> ownUsers =
+            currentUser instanceof MCRTransientUser ? List.of() : MCRUserManager.listUsers(currentUser);
         boolean hasAdminPermission = MCRAccessManager.checkPermission(MCRUser2Constants.USER_ADMIN_PERMISSION);
         boolean allowed = hasAdminPermission
             || MCRAccessManager.checkPermission(MCRUser2Constants.USER_CREATE_PERMISSION) || !ownUsers.isEmpty();
