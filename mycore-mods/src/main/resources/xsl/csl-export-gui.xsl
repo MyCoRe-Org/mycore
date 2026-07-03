@@ -65,7 +65,7 @@
         </script>
         <script src="{$WebApplicationBaseURL}js/csl-export.js"/>
         <div class="input-group mb-3 flex-wrap" data-export="{$type}">
-            <select name="format" class="form-control">
+            <select name="format" class="form-select">
                 <option value="">
                     <xsl:value-of select="i18n:translate('component.mods.csl.export.format')"/>
                 </option>
@@ -86,7 +86,7 @@
             </select>
             <select name="style">
                 <xsl:attribute name="class">
-                    <xsl:text>form-control</xsl:text>
+                    <xsl:text>form-select</xsl:text>
                     <xsl:if test="$type = 'basket'">
                         <xsl:text> d-none</xsl:text>
                     </xsl:if>
