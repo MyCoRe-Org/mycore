@@ -67,6 +67,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRURLContent;
+import org.mycore.common.content.transformer.MCRXSLTransformer;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.resource.MCRResourceHelper;
 import org.w3c.dom.Attr;
@@ -398,7 +399,7 @@ public class MCRLayoutUtilities {
         if (LOGGER.isDebugEnabled()) {
             try {
                 String encoding = "UTF-8";
-                TransformerFactory tf = TransformerFactory.newInstance();
+                TransformerFactory tf = MCRXSLTransformer.createDefaultTransformerFactory();
                 Transformer transformer = tf.newTransformer();
                 transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
                 transformer.setOutputProperty(OutputKeys.METHOD, "xml");

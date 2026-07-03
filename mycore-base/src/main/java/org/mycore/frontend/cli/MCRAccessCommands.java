@@ -447,9 +447,9 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      * @param id
      *            String the id of the object the rule is assigned to
      */
-    @MCRCommand(syntax = "delete all permissions for id {1}",
+    @MCRCommand(syntax = "delete all permissions for id {0}",
         help = "The command delete all access rules for a given id",
-        order = 120)
+        order = 35)
     public static void permissionDeleteAllForID(String id) {
         MCRRuleAccessInterface accessImpl = MCRAccessManager.requireRulesInterface();
         accessImpl.removeAllRules(id);
@@ -480,7 +480,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
 
     @MCRCommand(syntax = "delete all permissions for selected",
         help = "The command delete all access rules for a query selected set of object ids",
-        order = 140)
+        order = 35)
     public static void permissionDeleteAllForSelected() {
         MCRRuleAccessInterface accessImpl = MCRAccessManager.requireRulesInterface();
         for (String id : MCRBasicCommands.getSelectedValues()) {

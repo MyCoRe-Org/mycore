@@ -27,7 +27,6 @@ import java.util.Objects;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.logging.log4j.LogManager;
@@ -40,6 +39,7 @@ import org.mycore.common.config.annotation.MCRFactory;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRParameterizedTransformer;
+import org.mycore.common.content.transformer.MCRXSLTransformer;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.xml.sax.SAXException;
 
@@ -74,7 +74,7 @@ public class MCRLayoutService {
     public void sendXML(HttpServletRequest req, HttpServletResponse res, MCRContent xml) throws IOException {
         res.setContentType("text/xml; charset=UTF-8");
         try {
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            Transformer transformer = MCRXSLTransformer.createDefaultTransformerFactory().newTransformer();
             transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
             transformer.setOutputProperty(OutputKeys.INDENT, "no");
             StreamResult result = new StreamResult(res.getOutputStream());
