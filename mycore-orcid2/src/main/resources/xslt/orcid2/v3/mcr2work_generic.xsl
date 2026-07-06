@@ -64,7 +64,7 @@
     </common:subtitle>
   </xsl:template>
 
-  <xsl:template match="mods:mods/mods:titleInfo[@type='translated'][1]">
+  <xsl:template match="mods:mods/mods:titleInfo[@type='translated'][@xml:lang][1]">
     <common:translated-title>
       <xsl:apply-templates select="@xml:lang" />
       <xsl:apply-templates select="mods:nonSort" />
