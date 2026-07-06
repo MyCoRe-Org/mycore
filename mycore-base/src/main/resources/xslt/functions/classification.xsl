@@ -47,14 +47,14 @@
       <xsl:when test="$class[@classid and @categid]">
         <xsl:sequence select="mcrclass:label($lang, document(concat('classification:metadata:0:children:',$class/@classid,':',$class/@categid))//category)" />
       </xsl:when>
-      <xsl:when test="string-length($lang) > 0 and $class/label[lang($lang)]">
-        <xsl:sequence select="$class/label[lang($lang)]" />
+      <xsl:when test="string-length($lang) > 0 and $class/label[@xml:lang = $lang]">
+        <xsl:sequence select="$class/label[@xml:lang = $lang]" />
       </xsl:when>
-      <xsl:when test="$class/label[lang($CurrentLang)]">
-        <xsl:sequence select="$class/label[lang($CurrentLang)]" />
+      <xsl:when test="$class/label[@xml:lang = $CurrentLang]">
+        <xsl:sequence select="$class/label[@xml:lang = $CurrentLang]" />
       </xsl:when>
-      <xsl:when test="$class/label[lang($DefaultLang)]">
-        <xsl:sequence select="$class/label[lang($DefaultLang)]" />
+      <xsl:when test="$class/label[@xml:lang = $DefaultLang]">
+        <xsl:sequence select="$class/label[@xml:lang = $DefaultLang]" />
       </xsl:when>
       <xsl:otherwise>
         <xsl:sequence select="$class/label[1]" />
