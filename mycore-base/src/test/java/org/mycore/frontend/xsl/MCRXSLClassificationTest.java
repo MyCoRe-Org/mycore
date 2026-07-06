@@ -45,7 +45,7 @@ public class MCRXSLClassificationTest extends MCRJPATestCase {
         // existing classification: return category with respective labels
         assertEquals(1, result.getChildren("category").size());
         assertEquals("junit_1", result.getChild("category").getAttributeValue("ID"));
-        assertEquals(3, result.getChild("category").getChildren("label").size());
+        assertEquals(4, result.getChild("category").getChildren("label").size());
         assertEquals("de",
             result.getChild("category").getChildren("label").get(0).getAttributeValue("lang", Namespace.XML_NAMESPACE));
         assertEquals("junit_1 (de)",
