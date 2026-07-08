@@ -28,6 +28,7 @@ export class ObjectsContentHandler extends BaseContentHandler {
     const expanded = options?.expanded ?? false;
     const response = await fetch(`${this.mcrApplicationBaseURL}api/v2/objects/${path}?expanded=${expanded}`, {
       method: "GET",
+      cache: "no-store",
       headers: {
         "Authorization": authorizationHeader
       },
@@ -115,6 +116,7 @@ export class ObjectsContentHandler extends BaseContentHandler {
     console.log("unlock " + objectId);
     const response = await fetch(`${this.mcrApplicationBaseURL}api/v2/objects/${objectId}/lock`, {
       method: "DELETE",
+      keepalive: true,
       headers: {
         "Authorization": authorizationHeader
       }
