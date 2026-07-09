@@ -28,6 +28,8 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -408,17 +410,16 @@ public class MCRLayoutUtilities {
             Node emptyTextNode = emptyNodes.item(i);
             emptyTextNode.getParentNode().removeChild(emptyTextNode);
         }
-        NodeList userNameNodes = (NodeList) xpath.evaluate("//@href[contains(.,'{CurrentUser}')]", personalNavi,
-            XPathConstants.NODESET);
-        for (int i = 0; i < userNameNodes.getLength(); i++) {
-            Attr href = (Attr) userNameNodes.item(i);
-            String userID = MCRSessionMgr.getCurrentSession().getUserInformation().getUserID();
-            try {
-                href.setValue(href.getValue().replace("{CurrentUser}", MCRXMLFunctions.encodeURIPath(userID)));
-            } catch (URISyntaxException e) {
-                throw new MCRException("Unexpected exception while encoding user name: " + userID, e);
-            }
+        String userID = MCRSessionMgr.getCurrentSession().getUserInformation().getUserID();
+        try {
+            replaceHrefPlaceholder(xpath, personalNavi, "CurrentUser", MCRXMLFunctions.encodeURIPath(userID));
+        } catch (URISyntaxException e) {
+            throw new MCRException("Unexpected exception while encoding user name: " + userID, e);
         }
+        replaceHrefPlaceholder(xpath, personalNavi, "WebApplicationBaseURL", MCRFrontendUtil.getBaseURL());
+        replaceHrefPlaceholder(xpath, personalNavi, "WebApplicationBaseURLEncoded",
+            URLEncoder.encode(MCRFrontendUtil.getBaseURL(), StandardCharsets.UTF_8));
+
         personalNavi.normalizeDocument();
         if (LOGGER.isDebugEnabled()) {
             try {
@@ -440,6 +441,19 @@ public class MCRLayoutUtilities {
 
         }
         return personalNavi;
+    }
+
+    private static void replaceHrefPlaceholder(XPath xpath, Node root, String placeholder, String replacement) {
+        try {
+            NodeList nodes = (NodeList) xpath.evaluate("//@href[contains(.,'{" + placeholder + "}')]", root,
+                XPathConstants.NODESET);
+            for (int i = 0; i < nodes.getLength(); i++) {
+                Attr href = (Attr) nodes.item(i);
+                href.setValue(href.getValue().replace("{" + placeholder + "}", replacement));
+            }
+        } catch (XPathExpressionException e) {
+            throw new MCRException("Failed to replace placeholder {" + placeholder + "}", e);
+        }
     }
 
     public static long getDuration(long startTime) {
