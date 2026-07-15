@@ -50,6 +50,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 
 /**
  * This class provides methods to reload a SOLR schema using the
@@ -244,21 +245,25 @@ public class MCRSolrSchemaReloader {
              *            "name":"alto_words",
              *            "type":"alto_word_coordinates",
              *            "multiValued":true}}],
-             *       "msg":"error processing commands, errors: 
-             *                [{errorMessages=[Field 'alto_words': Field type 'alto_word_coordinates' not found.\n], 
+             *       "msg":"error processing commands, errors:
+             *                [{errorMessages=[Field 'alto_words': Field type 'alto_word_coordinates' not found.\n],
              *                add-field={name=alto_words, type=alto_word_coordinates, multiValued=true}}], ",
-             *       "code":400}} 
+             *       "code":400}}
              */
             JsonElement json = JsonParser.parseString(response);
             if (json.isJsonObject() && json.getAsJsonObject().has("error")) {
-                String msg = json.getAsJsonObject().get("error").getAsJsonObject().get("msg").getAsString();
-                LOGGER.error(() -> "SOLR config " + commandPrefix + " " + msg + "\n" + response);
+                if (json.getAsJsonObject().get("error").getAsJsonObject().has("msg")) {
+                    String msg = json.getAsJsonObject().get("error").getAsJsonObject().get("msg").getAsString();
+                    LOGGER.error(() -> "SOLR config " + commandPrefix + " " + msg + "\n" + response);
+                } else {
+                    LOGGER.error(() -> "SOLR config " + commandPrefix + " error:\n" + response);
+                }
             } else {
                 LOGGER.debug(() -> "SOLR config " + commandPrefix + " command was successful \n" + response);
             }
         } catch (SolrServerException e) {
             LOGGER.error(() -> "SOLR config " + commandPrefix + " error: " + e.getMessage() + "\n" + command, e);
-        } catch (Exception e) {
+        } catch (IOException | JsonSyntaxException e) {
             LOGGER.error(() -> "Could not execute the following Solr config command:\n" + command, e);
         }
     }
