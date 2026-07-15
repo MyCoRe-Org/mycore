@@ -224,6 +224,7 @@ public class MCRSolrSchemaReloader {
         MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(request,
             MCRSolrAuthenticationLevel.ADMIN);
         String commandPrefix = command.keySet().stream().findFirst().orElse("unknown command");
+        String logMsgPrefix = "SOLR config " + commandPrefix;
 
         try (InputStream is = MCRSolrSearchUtils.streamRequest(index.getClient(), request, "json")) {
             String response = new String(is.readAllBytes(), StandardCharsets.UTF_8);
@@ -251,18 +252,21 @@ public class MCRSolrSchemaReloader {
              *       "code":400}}
              */
             JsonElement json = JsonParser.parseString(response);
+
             if (json.isJsonObject() && json.getAsJsonObject().has("error")) {
                 if (json.getAsJsonObject().get("error").getAsJsonObject().has("msg")) {
                     String msg = json.getAsJsonObject().get("error").getAsJsonObject().get("msg").getAsString();
-                    LOGGER.error(() -> "SOLR config " + commandPrefix + " " + msg + "\n" + response);
+                    LOGGER.error(() -> logMsgPrefix + " " + msg + "\n" + response);
                 } else {
-                    LOGGER.error(() -> "SOLR config " + commandPrefix + " error:\n" + response);
+                    LOGGER.error(() -> logMsgPrefix + " error:\n" + response);
                 }
             } else {
-                LOGGER.debug(() -> "SOLR config " + commandPrefix + " command was successful \n" + response);
+                LOGGER.debug(() -> {
+                    return logMsgPrefix + " command was successful \n" + response;
+                });
             }
         } catch (SolrServerException e) {
-            LOGGER.error(() -> "SOLR config " + commandPrefix + " error: " + e.getMessage() + "\n" + command, e);
+            LOGGER.error(() -> logMsgPrefix + " error: " + e.getMessage() + "\n" + command, e);
         } catch (IOException | JsonSyntaxException e) {
             LOGGER.error(() -> "Could not execute the following Solr config command:\n" + command, e);
         }
