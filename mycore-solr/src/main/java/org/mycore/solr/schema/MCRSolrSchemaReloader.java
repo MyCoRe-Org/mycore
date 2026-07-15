@@ -252,7 +252,6 @@ public class MCRSolrSchemaReloader {
              *       "code":400}}
              */
             JsonElement json = JsonParser.parseString(response);
-
             if (json.isJsonObject() && json.getAsJsonObject().has("error")) {
                 if (json.getAsJsonObject().get("error").getAsJsonObject().has("msg")) {
                     String msg = json.getAsJsonObject().get("error").getAsJsonObject().get("msg").getAsString();
@@ -261,9 +260,7 @@ public class MCRSolrSchemaReloader {
                     LOGGER.error(() -> logMsgPrefix + " error:\n" + response);
                 }
             } else {
-                LOGGER.debug(() -> {
-                    return logMsgPrefix + " command was successful \n" + response;
-                });
+                LOGGER.debug(() -> logMsgPrefix + " command was successful \n" + response);
             }
         } catch (SolrServerException e) {
             LOGGER.error(() -> logMsgPrefix + " error: " + e.getMessage() + "\n" + command, e);
