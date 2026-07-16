@@ -26,6 +26,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
+import java.util.regex.Pattern;
+
 import org.apache.solr.common.SolrInputDocument;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
@@ -45,11 +47,15 @@ import org.mycore.solr.index.file.MCRSolrFileIndexAccumulator;
  * @author shermann (Silvio Hermann)
  * */
 public class MCRMetsFileIndexAccumulator implements MCRSolrFileIndexAccumulator {
+    private static final Pattern FILENAME_PATTERN =
+        Pattern.compile(MCRConfiguration2.getString("MCR.Solr.Mets.Filename.Pattern").get());
 
     @Override
     public void accumulate(SolrInputDocument solrInputDocument, Path path, BasicFileAttributes basicFileAttributes)
         throws IOException {
-        if (!MCRConfiguration2.getString("MCR.Mets.Filename").get().equals(path.getFileName().toString())) {
+
+        if (!MCRConfiguration2.getString("MCR.Mets.Filename").get().equals(path.getFileName().toString())
+            && !FILENAME_PATTERN.matcher(path.getFileName().toString()).matches()) {
             return;
         }
 
