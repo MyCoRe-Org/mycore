@@ -26,6 +26,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -125,7 +126,7 @@ public class MCRSolrRemoteTikaAccumulator implements MCRSolrFileIndexAccumulator
             client.extractText(is, (jsonReader -> processJsonResponse(document, filePath, attributes, jsonReader)));
         } catch (Exception e) {
             hasError = true;
-            errorMessage = e.getMessage();
+            errorMessage = Objects.requireNonNullElse(e.getMessage(), e.getClass().getSimpleName());
         } finally {
             LOGGER.debug("Extracted text from {} using Tika in {}ms", () -> filePath,
                 () -> System.currentTimeMillis() - start);
