@@ -24,9 +24,15 @@ import static org.mycore.common.config.MCRRuntimeComponentDetector.ComponentOrde
 import java.io.IOException;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.jar.JarFile;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -82,6 +88,18 @@ public class MCRStartupHandler {
             LOGGER.info("Library order: {}", () -> servletContext.getAttribute(ORDERED_LIBS));
         }
 
+        if (MCRConfiguration2.getBoolean("MCR.Startup.CheckClassProperties").orElse(false)) {
+            SortedSet<PropertyClassStatus> propertyClassStatuses = checkClassProperties();
+            if (!propertyClassStatuses.isEmpty()) {
+                MCRTableMessage<PropertyClassStatus> propertyTable = new MCRTableMessage<>(
+                    new MCRTableMessage.Column<>("Property", PropertyClassStatus::property),
+                    new MCRTableMessage.Column<>("Class", PropertyClassStatus::className),
+                    new MCRTableMessage.Column<>("Status", PropertyClassStatus::status));
+                propertyClassStatuses.forEach(propertyTable::add);
+                LOGGER.warn(() -> propertyTable.logMessage("Configured Classes report:"));
+            }
+        }
+
         MCRTableMessage<AutoExecutable> executableTable = new MCRTableMessage<>(
             new MCRTableMessage.Column<>("Name", AutoExecutable::getName),
             new MCRTableMessage.Column<>("Priority", AutoExecutable::getPriority),
@@ -96,6 +114,34 @@ public class MCRStartupHandler {
         LOGGER.info(() -> executableTable.logMessage("Detected auto executables:"));
         executables.forEach(autoExecutable -> startExecutable(servletContext, autoExecutable));
 
+    }
+
+    private static SortedSet<PropertyClassStatus> checkClassProperties() {
+        Pattern classPattern = Pattern.compile(MCRConfiguration2.getString("MCR.Startup.CheckClassRegEx").orElse("^$"));
+        return MCRConfiguration2.getPropertiesMap()
+            .entrySet()
+            .stream()
+            .filter(entry -> isClassProperty(entry.getKey(), entry.getValue(), classPattern))
+            .flatMap(entry -> MCRConfiguration2.splitValue(entry.getValue())
+                .map(value -> new PropertyClassStatus(entry.getKey(), value, null)))
+            .filter(pcs -> !pcs.className.isBlank())
+            .map(pcs -> {
+                try {
+                    Class<?> aClass = Class.forName(pcs.className(), false, MCRClassTools.getClassLoader());
+                    if (aClass.getAnnotation(Deprecated.class) != null) {
+                        return new PropertyClassStatus(pcs.property(), pcs.className(), ClassStatus.DEPRECATED);
+                    }
+                } catch (ClassNotFoundException | LinkageError e) {
+                    return new PropertyClassStatus(pcs.property(), pcs.className(), ClassStatus.NOT_FOUND);
+                }
+                return null;
+            })
+            .filter(Objects::nonNull)
+            .collect(Collectors.toCollection(TreeSet::new));
+    }
+
+    private static boolean isClassProperty(String key, String value, Pattern classPattern) {
+        return key.endsWith(".Class") || classPattern.matcher(value).find();
     }
 
     private static String toType(MCRComponent component) {
@@ -167,5 +213,34 @@ public class MCRStartupHandler {
             return Integer.compare(other.getPriority(), getPriority());
         }
 
+    }
+
+    private enum ClassStatus {
+        NOT_FOUND("not found"), DEPRECATED("deprecated");
+
+        private final String tableValue;
+
+        ClassStatus(String tableValue) {
+            this.tableValue = tableValue;
+        }
+
+        @Override
+        public String toString() {
+            return tableValue;
+        }
+    }
+
+    private record PropertyClassStatus(String property, String className, ClassStatus status)
+        implements Comparable<PropertyClassStatus> {
+
+        private static final Comparator<PropertyClassStatus> COMPARATOR =
+            Comparator.comparing(PropertyClassStatus::status)
+                .thenComparing(PropertyClassStatus::property)
+                .thenComparing(PropertyClassStatus::className);
+
+        @Override
+        public int compareTo(PropertyClassStatus other) {
+            return COMPARATOR.compare(this, other);
+        }
     }
 }
