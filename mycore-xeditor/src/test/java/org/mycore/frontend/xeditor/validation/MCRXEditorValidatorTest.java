@@ -376,6 +376,12 @@ public class MCRXEditorValidatorTest extends MCRTestCase {
         assertFalse(session.getValidator().isValid());
         checkResult(session, "/document/title", MCRValidationResults.MARKER_ERROR);
 
+        session = buildSession("document[title='Foo']");
+        session.getVariables().put("expectedTitle", new Element("expectedTitle").setText("Foo"));
+        addRule(session, "/document/title", "test", "text()=$expectedTitle", "relevant-if", "true()");
+        assertTrue(session.getValidator().isValid());
+        checkResult(session, "/document/title", MCRValidationResults.MARKER_SUCCESS);
+
     }
 
     @Test
