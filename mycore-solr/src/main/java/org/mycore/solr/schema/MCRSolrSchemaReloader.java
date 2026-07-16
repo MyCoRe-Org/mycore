@@ -50,6 +50,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 
 /**
  * This class provides methods to reload a SOLR schema using the
@@ -223,14 +224,47 @@ public class MCRSolrSchemaReloader {
         MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(request,
             MCRSolrAuthenticationLevel.ADMIN);
         String commandPrefix = command.keySet().stream().findFirst().orElse("unknown command");
+        String logMsgPrefix = "SOLR config " + commandPrefix;
 
         try (InputStream is = MCRSolrSearchUtils.streamRequest(index.getClient(), request, "json")) {
             String response = new String(is.readAllBytes(), StandardCharsets.UTF_8);
-            LOGGER.debug(() -> "SOLR config " + commandPrefix + " command was successful \n" + response);
+            /* Sample success response:
+             * {"responseHeader":{
+             *    "status":0,
+             *    "QTime":40}
+             * Sample error response:
+             *  { "responseHeader":{
+             *      "status":400,
+             *       "QTime":0},
+             *    "error":{
+             *       "metadata":[
+             *         "error-class","org.apache.solr.api.ApiBag$ExceptionWithErrObject",
+             *         "root-error-class","org.apache.solr.api.ApiBag$ExceptionWithErrObject"],
+             *       "details":[{
+             *          "errorMessages":["Field 'alto_words': Field type 'alto_word_coordinates' not found.\n"],
+             *          "add-field":{
+             *            "name":"alto_words",
+             *            "type":"alto_word_coordinates",
+             *            "multiValued":true}}],
+             *       "msg":"error processing commands, errors:
+             *                [{errorMessages=[Field 'alto_words': Field type 'alto_word_coordinates' not found.\n],
+             *                add-field={name=alto_words, type=alto_word_coordinates, multiValued=true}}], ",
+             *       "code":400}}
+             */
+            JsonElement json = JsonParser.parseString(response);
+            if (json.isJsonObject() && json.getAsJsonObject().has("error")) {
+                if (json.getAsJsonObject().get("error").getAsJsonObject().has("msg")) {
+                    String msg = json.getAsJsonObject().get("error").getAsJsonObject().get("msg").getAsString();
+                    LOGGER.error(() -> logMsgPrefix + " " + msg + "\n" + response);
+                } else {
+                    LOGGER.error(() -> logMsgPrefix + " error:\n" + response);
+                }
+            } else {
+                LOGGER.debug(() -> logMsgPrefix + " command was successful \n" + response);
+            }
         } catch (SolrServerException e) {
-            LOGGER
-                .error(() -> "SOLR config " + commandPrefix + " error: " + e.getMessage() + "\n" + command, e);
-        } catch (IOException e) {
+            LOGGER.error(() -> logMsgPrefix + " error: " + e.getMessage() + "\n" + command, e);
+        } catch (IOException | JsonSyntaxException e) {
             LOGGER.error(() -> "Could not execute the following Solr config command:\n" + command, e);
         }
     }
