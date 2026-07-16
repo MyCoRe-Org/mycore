@@ -103,7 +103,9 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
         SolrInputDocument doc = MCRSolrPathDocumentFactory.obtainInstance().getDocument(file, attrs);
         for (SolrInputField field : doc) {
             String name = "literal." + field.getName();
-            if (field.getValueCount() > 1) {
+            if (field.getValueCount() == 0) {
+                params.set(name, (String) null);
+            } else if (field.getValueCount() > 1) {
                 String[] values = getValues(field.getValues());
                 params.set(name, values);
             } else {
