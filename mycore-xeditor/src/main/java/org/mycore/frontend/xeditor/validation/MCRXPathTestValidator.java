@@ -61,11 +61,11 @@ public class MCRXPathTestValidator extends MCRValidator {
             }
 
             MCRBinding nodeBinding = new MCRBinding(i + 1, binding);
+            MCRXPathEvaluator evaluator = nodeBinding.getXPathEvaluator();
             if (!isRelevant(nodeBinding)) {
                 continue;
             }
 
-            MCRXPathEvaluator evaluator = nodeBinding.getXPathEvaluator();
             boolean result = evaluator.test(xPathExpression);
             nodeBinding.detach();
 
