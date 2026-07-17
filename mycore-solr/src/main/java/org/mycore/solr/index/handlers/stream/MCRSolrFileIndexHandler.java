@@ -107,7 +107,7 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
                 String[] values = getValues(field.getValues());
                 params.set(name, values);
             } else {
-                params.set(name, field.getValue().toString());
+                params.set(name, field.getValue() == null ? null : field.getValue().toString());
             }
         }
         return params;
