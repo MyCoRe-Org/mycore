@@ -206,9 +206,11 @@ public final class MCRMetadataManager {
 
         setDerivateMetadata(mcrDerivate);
 
-        fireEvent(mcrDerivate, null, MCREvent.EventType.CREATE);
-
         createDataInIFS(mcrDerivate, derivateId, objectId, objectBackup);
+        
+        handleFileSourceDirectory(mcrDerivate);
+        
+        fireEvent(mcrDerivate, null, MCREvent.EventType.CREATE);
 
         addLinkToMetadata(mcrDerivate, objectId, objectBackup);
     }
