@@ -43,7 +43,7 @@ public class MCRTikaHttpClient {
 
     private final String url;
 
-    // default endpoint for Tika v2 and v3
+    // default endpoint for Tika v2 and v3 / for v4 use 'tika/json/text'
     private String extractTextEndpoint = "tika/text";
 
     public MCRTikaHttpClient(String url) {
@@ -52,7 +52,8 @@ public class MCRTikaHttpClient {
 
     public MCRTikaHttpClient(String url, String extractTextEndpoint) {
         this(url);
-        this.extractTextEndpoint = extractTextEndpoint;
+        this.extractTextEndpoint = extractTextEndpoint.startsWith("/")
+            ? extractTextEndpoint.replaceFirst("^\\/+", "") : extractTextEndpoint;
     }
 
     public <T extends Throwable> void extractText(InputStream is, ThrowingConsumer<TreeNode, T> responseConsumer)
