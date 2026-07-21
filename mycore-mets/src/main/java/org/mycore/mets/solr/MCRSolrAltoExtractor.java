@@ -60,7 +60,7 @@ public class MCRSolrAltoExtractor implements MCRSolrFileIndexAccumulator {
         }
     }
 
-    private void extract(Element root, SolrInputDocument document) {
+    public void extract(Element root, SolrInputDocument document) {
         StringBuilder altoContent = new StringBuilder();
         String exp = "alto:Layout/alto:Page/alto:PrintSpace//alto:String";
         Namespace namespace = root.getNamespace();
