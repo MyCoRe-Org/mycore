@@ -36,6 +36,7 @@ import org.mycore.common.MCRUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRURLContent;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.MCRLayoutUtilities;
 import org.mycore.resource.MCRResourceHelper;
 import org.xml.sax.SAXException;
@@ -85,7 +86,7 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
                 String contextPath = job.getRequest().getContextPath();
                 String encodedURL = URLEncoder.encode(contextPath + webpageID, StandardCharsets.UTF_8);
                 StringBuilder redirectTarget = new StringBuilder();
-                redirectTarget.append(contextPath).append("/servlets/MCRLoginServlet");
+                redirectTarget.append(MCRFrontendUtil.getLoginURL());
                 redirectTarget.append("?url=").append(encodedURL);
                 if (!REDIRECT_GUESTS_XSL_STATUS_MESSAGE.isEmpty() && !REDIRECT_GUESTS_XSL_STATUS_STYLE.isEmpty()) {
                     redirectTarget.append("&XSL.Status.Message=").append(REDIRECT_GUESTS_XSL_STATUS_MESSAGE);

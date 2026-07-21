@@ -112,14 +112,15 @@ public class MCRParameterCollector {
             setFromSession(session);
         }
 
+        String requestUrl = getCompleteURL(request);
         if (!MCRSessionMgr.isLocked()) {
             MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
             setFromSession(mcrSession);
-            setUnmodifyableParameters(mcrSession, request);
+            setUnmodifiableParameters(mcrSession, request, requestUrl);
         }
         setFromRequestParameters(request);
         setFromRequestAttributes(request);
-        setFromRequestHeader(request);
+        setFromRequestHeader(request, requestUrl);
 
         debugSessionParameters();
     }
@@ -149,7 +150,7 @@ public class MCRParameterCollector {
         setFromConfiguration();
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         setFromSession(mcrSession);
-        setUnmodifyableParameters(mcrSession, null);
+        setUnmodifiableParameters(mcrSession, null, null);
         debugSessionParameters();
     }
 
@@ -272,11 +273,17 @@ public class MCRParameterCollector {
      * the user ID and the URL of the web application.
      *
      */
-    private void setUnmodifyableParameters(MCRSession session, HttpServletRequest request) {
+    private void setUnmodifiableParameters(MCRSession session, HttpServletRequest request, String requestUrl) {
         parameters.put("CurrentUser", session.getUserInformation().getUserID());
         parameters.put("CurrentLang", session.getCurrentLanguage());
         parameters.put("WebApplicationBaseURL", MCRFrontendUtil.getBaseURL());
         parameters.put("ServletsBaseURL", MCRServlet.getServletBaseURL());
+        parameters.put("LoginURL", MCRFrontendUtil.getLoginURL());
+        if (requestUrl != null) {
+            parameters.put("LoginDetourURL", MCRFrontendUtil.getLoginURL(requestUrl));
+        } else {
+            parameters.put("LoginDetourURL", MCRFrontendUtil.getLoginURL());
+        }
         String defaultLang = MCRConfiguration2.getString("MCR.Metadata.DefaultLang").orElse(MCRConstants.DEFAULT_LANG);
         parameters.put("DefaultLang", defaultLang);
 
@@ -292,8 +299,8 @@ public class MCRParameterCollector {
     }
 
     /** Sets the request and referer URL */
-    private void setFromRequestHeader(HttpServletRequest request) {
-        parameters.put("RequestURL", getCompleteURL(request));
+    private void setFromRequestHeader(HttpServletRequest request, String requestUrl) {
+        parameters.put("RequestURL", requestUrl);
         String referer = request.getHeader(HEADER_REFERER);
         String userAgent = request.getHeader(HEADER_USER_AGENT);
         parameters.put("Referer", referer != null ? referer : "");
