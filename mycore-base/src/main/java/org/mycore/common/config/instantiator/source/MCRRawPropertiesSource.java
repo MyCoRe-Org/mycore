@@ -18,8 +18,6 @@
 
 package org.mycore.common.config.instantiator.source;
 
-import static org.mycore.common.config.instantiator.MCRInstantiatorUtils.emptyRawException;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -27,6 +25,7 @@ import java.util.Set;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRRawProperties;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
+import org.mycore.common.config.instantiator.MCRInstantiatorUtils;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
 /**
@@ -98,7 +97,7 @@ final class MCRRawPropertiesSource implements MCRSource {
                 property = configuration.name().canonical() + "." + annotation.namePattern();
                 description = "raw property map";
             }
-            throw emptyRawException(property, target, description);
+            throw MCRInstantiatorUtils.emptyRawException(property, target, description);
         }
 
         return filteredProperties;
