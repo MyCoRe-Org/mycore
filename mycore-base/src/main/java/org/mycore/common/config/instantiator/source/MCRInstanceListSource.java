@@ -130,12 +130,12 @@ final class MCRInstanceListSource extends MCRSourceBase<List<Object>> {
     }
 
     @Override
-    protected MCRConfigurationException missingException(MCRSourceContext context) {
+    protected MCRConfigurationException missingResultException(MCRSourceContext context) {
         return context.emptyException();
     }
 
     @Override
-    protected List<Object> nullResultReplacement() {
+    protected List<Object> missingResultReplacement() {
         return new ArrayList<>();
     }
 

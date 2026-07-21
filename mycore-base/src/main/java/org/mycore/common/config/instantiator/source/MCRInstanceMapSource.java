@@ -128,12 +128,12 @@ final class MCRInstanceMapSource extends MCRSourceBase<Map<String, Object>> {
     }
 
     @Override
-    protected MCRConfigurationException missingException(MCRSourceContext context) {
+    protected MCRConfigurationException missingResultException(MCRSourceContext context) {
         return context.emptyException();
     }
 
     @Override
-    protected Map<String, Object> nullResultReplacement() {
+    protected Map<String, Object> missingResultReplacement() {
         return new HashMap<>();
     }
 

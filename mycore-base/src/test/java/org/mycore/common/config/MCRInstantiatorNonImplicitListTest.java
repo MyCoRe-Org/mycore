@@ -77,49 +77,28 @@ import org.mycore.test.MyCoReTest;
  *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">set empty</td>
- *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;"><code>[]</code></td>
- *     <td style="border: 1px solid;">Exception</td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">not set</td>
+ *     <td style="border: 1px solid;">not set / empty</td>
  *     <td style="border: 1px solid;">none or impl. enabled</td>
- *     <td style="border: 1px solid;">not set</td>
+ *     <td style="border: 1px solid;">not set / <code>1.a=</code></td>
  *     <td style="border: 1px solid;"><code>[]</code></td>
  *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">none or impl. enabled</td>
- *     <td style="border: 1px solid;"><code>1.a=</code></td>
- *     <td style="border: 1px solid;"><code>[]</code></td>
- *     <td style="border: 1px solid;">Exception</td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">not set</td>
+ *     <td style="border: 1px solid;">not set / empty</td>
  *     <td style="border: 1px solid;">none or impl. enabled</td>
  *     <td style="border: 1px solid;"><code>1.a=Value</code></td>
  *     <td style="border: 1px solid;"><code>[]</code></td>
  *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">not set</td>
+ *     <td style="border: 1px solid;">not set / empty</td>
  *     <td style="border: 1px solid;">expl. enabled</td>
- *     <td style="border: 1px solid;">not set</td>
+ *     <td style="border: 1px solid;">not set / <code>1.a=</code></td>
  *     <td style="border: 1px solid;"><code>[]</code></td>
  *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">expl. enabled</td>
- *     <td style="border: 1px solid;"><code>1.a=</code></td>
- *     <td style="border: 1px solid;"><code>[]</code></td>
- *     <td style="border: 1px solid;">Exception</td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">not set</td>
+ *     <td style="border: 1px solid;">not set / empty</td>
  *     <td style="border: 1px solid;">expl. enabled</td>
  *     <td style="border: 1px solid;"><code>Value</code></td>
  *     <td style="border: 1px solid;"><code>[]</code></td>
@@ -128,16 +107,9 @@ import org.mycore.test.MyCoReTest;
  *   <tr>
  *     <td style="border: 1px solid;">set</td>
  *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;">not set</td>
+ *     <td style="border: 1px solid;">not set / <code>1.a=</code></td>
  *     <td style="border: 1px solid;"><code>[_]</code></td>
  *     <td style="border: 1px solid;"><code>[_]</code></td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">set</td>
- *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;"><code>1.a=</code></td>
- *     <td style="border: 1px solid;"><code>[()]</code></td>
- *     <td style="border: 1px solid;"><code>[()]</code></td>
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;">set</td>
@@ -281,8 +253,7 @@ public class MCRInstantiatorNonImplicitListTest {
                 assertNotNull(nested);
 
                 switch (valueProperty) {
-                    case NOT_SET -> assertNull(nested.value);
-                    case SET_EMPTY -> assertEquals("", nested.value);
+                    case NOT_SET, SET_EMPTY -> assertNull(nested.value);
                     case SET_NON_EMPTY -> assertEquals("Value", nested.value);
                 }
 

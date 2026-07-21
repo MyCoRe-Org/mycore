@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
@@ -105,8 +104,6 @@ final class MCRPropertyListSource extends MCRSourceBase<List<String>> {
     protected List<String> getResult(MCRSourceContext context, MCRInstanceConfiguration<?> configuration,
         Map<String, String> properties, String prefix) {
 
-        AtomicBoolean hasRelevantProperty = new AtomicBoolean(false);
-
         Map<String, String> listProperties = new HashMap<>();
         String keyPrefix = prefix.isEmpty() ? prefix : prefix + ".";
         int keyPrefixLength = keyPrefix.length();
@@ -115,7 +112,6 @@ final class MCRPropertyListSource extends MCRSourceBase<List<String>> {
                 int index = key.indexOf('.', keyPrefixLength);
                 if (index == -1) {
                     if (!value.isEmpty()) {
-                        hasRelevantProperty.set(true);
                         listProperties.put(key.substring(keyPrefixLength), value);
                     }
                 }
@@ -140,17 +136,16 @@ final class MCRPropertyListSource extends MCRSourceBase<List<String>> {
         List<String> shortFormList = List.of();
         String shortFormProperty = properties.get(prefix);
         if (shortFormProperty != null) {
-            hasRelevantProperty.set(true);
             shortFormList = parseShortFormList(shortFormProperty);
         }
 
         int totalSize = headPropertyList.size() + shortFormList.size() + tailPropertyList.size();
-        List<String> fullPropertyList = new ArrayList<>(totalSize);
-        fullPropertyList.addAll(headPropertyList);
-        fullPropertyList.addAll(shortFormList);
-        fullPropertyList.addAll(tailPropertyList);
+        List<String> propertyList = new ArrayList<>(totalSize);
+        propertyList.addAll(headPropertyList);
+        propertyList.addAll(shortFormList);
+        propertyList.addAll(tailPropertyList);
 
-        return hasRelevantProperty.get() ? fullPropertyList : null;
+        return propertyList;
 
     }
 
@@ -164,12 +159,12 @@ final class MCRPropertyListSource extends MCRSourceBase<List<String>> {
     }
 
     @Override
-    protected MCRConfigurationException missingException(MCRSourceContext context) {
+    protected MCRConfigurationException missingResultException(MCRSourceContext context) {
         return context.emptyException();
     }
 
     @Override
-    protected List<String> nullResultReplacement() {
+    protected List<String> missingResultReplacement() {
         return new ArrayList<>();
     }
 

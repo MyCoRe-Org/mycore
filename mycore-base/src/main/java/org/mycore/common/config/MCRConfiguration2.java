@@ -256,7 +256,7 @@ public class MCRConfiguration2 {
         try {
             return ((MCRInstanceConfiguration<S>) CONFIGURATIONS.get(
                 new ConfigurationKey(superClass.getName(), name),
-                () -> MCRInstanceConfiguration.ofName(superClass, name, Options.IMPLICIT))).copy();
+                () -> MCRInstanceConfiguration.ofName(superClass, name, Options.IMPLICIT)));
         } catch (ExecutionException | UncheckedExecutionException e) {
             Throwables.throwIfUnchecked(e.getCause());
             throw new MCRException("Failed to create instance configuration for " + name, e.getCause());

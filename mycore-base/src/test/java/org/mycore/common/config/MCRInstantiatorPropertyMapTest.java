@@ -59,46 +59,32 @@ import org.mycore.test.MyCoReTest;
  *     <th style="border: 1px solid;">Expected Required Result</th>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">not set</td>
+ *     <td style="border: 1px solid;">not set / <code>A=</code></td>
  *     <td style="border: 1px solid;">no</td>
  *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;"><code>{}</code></td>
  *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">not set</td>
+ *     <td style="border: 1px solid;">not set / <code>A=</code></td>
  *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;">not set</td>
+ *     <td style="border: 1px solid;">not set / <code>X=</code></td>
  *     <td style="border: 1px solid;"><code>{}</code></td>
  *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;"><code>X=</code></td>
- *     <td style="border: 1px solid;"><code>{}</code></td>
- *     <td style="border: 1px solid;">Exception</td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">not set</td>
+ *     <td style="border: 1px solid;">not set / <code>A=</code></td>
  *     <td style="border: 1px solid;">yes</td>
  *     <td style="border: 1px solid;"><code>X=Y:y,Z:z</code></td>
  *     <td style="border: 1px solid;"><code>{Y=y, Z=z}</code></td>
  *     <td style="border: 1px solid;"><code>{Y=y, Z=z}</code></td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">not set</td>
+ *     <td style="border: 1px solid;">not set / <code>A=</code></td>
  *     <td style="border: 1px solid;">yes</td>
  *     <td style="border: 1px solid;"><code>X.Y=y</code>, <code>X.Z=z</code></td>
  *     <td style="border: 1px solid;"><code>{Y=y, Z=z}</code></td>
  *     <td style="border: 1px solid;"><code>{Y=y, Z=z}</code></td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;"><code>A=</code></td>
- *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;"><code>{}</code></td>
- *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;"><code>A=B:b,C:c</code></td>
@@ -258,16 +244,10 @@ public class MCRInstantiatorPropertyMapTest {
             exception = e;
         }
 
-        boolean missingDefaultConfiguration = required && valueProperty.notSet()
-            && defaultValue && (defaultProperty.notSetOrSetEmpty());
+        boolean missingDefault = required && !valueProperty.set() && defaultValue && !defaultProperty.set();
+        boolean emptyResultExpected = !valueProperty.set() && (!defaultValue || !defaultProperty.set());
 
-        // all the indications a nested property should not be created (or creation should be suppressed)
-        boolean shouldNotCreateProperty = false;
-        shouldNotCreateProperty |= valueProperty.notSet() && !defaultValue;
-        shouldNotCreateProperty |= valueProperty.notSet() && defaultValue && (defaultProperty.notSetOrSetEmpty());
-        shouldNotCreateProperty |= valueProperty.setEmpty();
-
-        if (missingDefaultConfiguration) {
+        if (missingDefault) {
 
             assertNull(instance);
             assertNotNull(exception);
@@ -276,7 +256,7 @@ public class MCRInstantiatorPropertyMapTest {
                 + " for target field 'map' in configured class " + configuredClass.getName()
                 + " is empty", exception.getMessage());
 
-        } else if (required && shouldNotCreateProperty) {
+        } else if (required && emptyResultExpected) {
 
             assertNull(instance);
             assertNotNull(exception);
@@ -293,7 +273,7 @@ public class MCRInstantiatorPropertyMapTest {
             Map<String, String> list = instance.map();
             assertNotNull(list);
 
-            if (shouldNotCreateProperty) {
+            if (emptyResultExpected) {
 
                 assertTrue(list.isEmpty());
 
@@ -303,10 +283,10 @@ public class MCRInstantiatorPropertyMapTest {
                 String value = list.get("nonEmpty");
                 assertNotNull(value);
 
-                if (valueProperty.notSet()) {
-                    assertEquals("DefaultValue", value);
-                } else {
+                if (valueProperty.set()) {
                     assertEquals("Value", value);
+                } else {
+                    assertEquals("DefaultValue", value);
                 }
 
             }
@@ -330,12 +310,8 @@ public class MCRInstantiatorPropertyMapTest {
 
         SET_LONG_FORM;
 
-        public boolean notSet() {
-            return this == NOT_SET;
-        }
-
-        public boolean setEmpty() {
-            return this == SET_EMPTY;
+        public boolean set() {
+            return this == SET_SHORT_FORM || this == SET_LONG_FORM;
         }
 
     }
@@ -350,8 +326,8 @@ public class MCRInstantiatorPropertyMapTest {
 
         SET_LONG_FORM;
 
-        public boolean notSetOrSetEmpty() {
-            return this == NOT_SET || this == SET_EMPTY;
+        public boolean set() {
+            return this == SET_SHORT_FORM || this == SET_LONG_FORM;
         }
 
     }
