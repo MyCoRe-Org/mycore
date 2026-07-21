@@ -26,6 +26,7 @@ import org.mycore.common.config.annotation.MCRProperty;
 
 import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.databind.node.ValueNode;
 
 /**
@@ -104,11 +105,11 @@ public class MCRSimpleTikaMapper implements MCRTikaMapper {
                     sb.append(getValueNodeAsString(vn));
                 }
             });
-            document.addField(simplifiedKey, sb.toString());
+            mapValueNode(document, new TextNode(sb.toString()), simplifiedKey);
         }
     }
 
-    private void mapValueNode(SolrInputDocument document, ValueNode vn, String simplifiedKey) {
+    protected void mapValueNode(SolrInputDocument document, ValueNode vn, String simplifiedKey) {
         String value = getValueNodeAsString(vn);
         if (value == null || value.isEmpty()) {
             return;

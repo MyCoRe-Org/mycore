@@ -43,15 +43,23 @@ public class MCRTikaHttpClient {
 
     private final String url;
 
+    // default endpoint for Tika v2 and v3 / for v4 use 'tika/json/text'
+    private String extractTextEndpoint = "tika/text";
+
     public MCRTikaHttpClient(String url) {
         this.url = url.endsWith("/") ? url : url + "/";
+    }
 
+    public MCRTikaHttpClient(String url, String extractTextEndpoint) {
+        this(url);
+        this.extractTextEndpoint = extractTextEndpoint.startsWith("/")
+            ? extractTextEndpoint.replaceFirst("^\\/+", "") : extractTextEndpoint;
     }
 
     public <T extends Throwable> void extractText(InputStream is, ThrowingConsumer<TreeNode, T> responseConsumer)
         throws IOException, T {
         HttpRequest httpPut = MCRSolrUtils.getRequestBuilder()
-            .uri(URI.create(url + "tika/text"))
+            .uri(URI.create(url + extractTextEndpoint))
             .setHeader("Accept", "application/json")
             .PUT(HttpRequest.BodyPublishers.ofInputStream(() -> is))
             .build();
