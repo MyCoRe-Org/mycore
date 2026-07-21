@@ -43,8 +43,7 @@ import org.mycore.common.config.instantiator.target.MCRTarget;
  * Common abstraction for components of a class (i.e., a {@link Field} or a {@link Method}) that can,
  * in principle, be used for injection. It provides an abstraction for obtaining a value based on present annotations.
  */
-public sealed interface MCRSource permits MCRInstanceListSource, MCRInstanceMapSource, MCRInstanceSource,
-    MCRPostConstructionSource, MCRPropertyListSource, MCRPropertyMapSource, MCRPropertySource, MCRRawPropertiesSource {
+public interface MCRSource {
 
     Type type();
 
