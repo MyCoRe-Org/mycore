@@ -21,7 +21,6 @@ package org.mycore.common.config.instantiator.source;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import org.mycore.common.config.MCRConfiguration2;
@@ -104,12 +103,9 @@ final class MCRPropertyMapSource extends MCRSourceBase<Map<String, String>> {
     protected Map<String, String> getResult(MCRSourceContext context, MCRInstanceConfiguration<?> configuration,
         Map<String, String> properties, String prefix) {
 
-        AtomicBoolean hasRelevantProperty = new AtomicBoolean(false);
-
         Map<String, String> shortFormMap = Map.of();
         String shortFormProperty = properties.get(prefix);
         if (shortFormProperty != null) {
-            hasRelevantProperty.set(true);
             shortFormMap = parseShortFormMap(shortFormProperty);
         }
 
@@ -121,7 +117,6 @@ final class MCRPropertyMapSource extends MCRSourceBase<Map<String, String>> {
                 int index = key.indexOf('.', keyPrefixLength);
                 if (index == -1) {
                     if (!value.isEmpty()) {
-                        hasRelevantProperty.set(true);
                         mapProperties.put(key.substring(keyPrefixLength), value);
                     }
                 }
@@ -137,7 +132,7 @@ final class MCRPropertyMapSource extends MCRSourceBase<Map<String, String>> {
             }
         }
 
-        return hasRelevantProperty.get() ? propertyMap : null;
+        return propertyMap;
 
     }
 
@@ -155,12 +150,12 @@ final class MCRPropertyMapSource extends MCRSourceBase<Map<String, String>> {
     }
 
     @Override
-    protected MCRConfigurationException missingException(MCRSourceContext context) {
+    protected MCRConfigurationException missingResultException(MCRSourceContext context) {
         return context.emptyException();
     }
 
     @Override
-    protected Map<String, String> nullResultReplacement() {
+    protected Map<String, String> missingResultReplacement() {
         return new HashMap<>();
     }
 

@@ -111,12 +111,12 @@ final class MCRInstanceSource extends MCRSourceBase<Object> {
     }
 
     @Override
-    protected MCRConfigurationException missingException(MCRSourceContext context) {
+    protected MCRConfigurationException missingResultException(MCRSourceContext context) {
         return context.missingException();
     }
 
     @Override
-    protected Object nullResultReplacement() {
+    protected Object missingResultReplacement() {
         return null;
     }
 
