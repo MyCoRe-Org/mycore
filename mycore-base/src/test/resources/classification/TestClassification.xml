@@ -6,6 +6,7 @@
             <label xml:lang="de" text="junit_1 (de)"/>
             <label xml:lang="en" text="junit_1 (en)"/>
             <label xml:lang="x-xxx" text="abc"/>
+            <label xml:lang="x-xxx-abc" text="def"/>
         </category>
         <category ID="junit_2">
             <label xml:lang="en" text="junit_2 (en)"/>
