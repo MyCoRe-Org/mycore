@@ -18,27 +18,35 @@
 
 package org.mycore.pi.urn;
 
-import java.util.UUID;
+import java.util.function.Supplier;
 
-import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRProperty;
 
 /**
- * Builds a new, unique NISS using Java implementation of the UUID
- * specification. java.util.UUID creates 'only' version 4 UUIDs.
- * Version 4 UUIDs are generated from a large random number and do
- * not include the MAC address.
- * <p>
- * UUID = 8*HEX "-" 4*HEX "-" 4*HEX "-" 4*HEX "-" 12*HEX
- * Example One: 067e6162-3b6f-4ae2-a171-2470b63dff00
- * Example Two: 54947df8-0e9e-4471-a2f9-9af509fb5889
- *
- * @author Kathleen Neumann (kkrebs)
- * @author Sebastian Hofmann
+ * @deprecated Use {@link MCRUUIDDNBURNGenerator} instead.
  */
-public class MCRUUIDURNGenerator extends MCRDNBURNGenerator {
+@Deprecated(forRemoval = true)
+@MCRConfigurationProxy(proxyClass = MCRUUIDURNGenerator.Factory.class)
+public class MCRUUIDURNGenerator extends MCRUUIDDNBURNGenerator {
 
-    @Override
-    protected String buildNISS(MCRObjectID mcrID, String additional) {
-        return UUID.randomUUID().toString();
+    public MCRUUIDURNGenerator(String namespace, String delimiter) {
+        super(namespace, delimiter);
     }
+
+    public static class Factory implements Supplier<MCRUUIDURNGenerator> {
+
+        @MCRProperty(name = NAMESPACE_KEY)
+        public String namespace;
+
+        @MCRProperty(name = DELIMITER_KEY, required = false)
+        public String delimiter = "";
+
+        @Override
+        public MCRUUIDURNGenerator get() {
+            return new MCRUUIDURNGenerator(namespace, delimiter);
+        }
+
+    }
+
 }
