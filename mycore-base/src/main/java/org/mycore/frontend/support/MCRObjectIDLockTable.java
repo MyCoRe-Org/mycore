@@ -71,8 +71,12 @@ public final class MCRObjectIDLockTable implements MCRSessionListener {
      */
     public void clearTable(MCRSession session) {
         String sessionId = session.getID();
+        String userId = session.getUserInformation().getUserID();
         List<MCRObjectID> toRemoveList = lockMap.entrySet().stream()
-            .filter(entry -> entry.getValue().id.equals(sessionId))
+            .filter(entry -> {
+                MCRObjectLock objectLock = entry.getValue();
+                return objectLock.id.equals(sessionId) || objectLock.createdBy.equals(userId);
+            })
             .map(ConcurrentMap.Entry::getKey)
             .toList();
         for (MCRObjectID objectId : toRemoveList) {
@@ -190,9 +194,11 @@ public final class MCRObjectIDLockTable implements MCRSessionListener {
      * @return {@code true} if the object is locked and the lock's ID matches the current session ID.
      */
     public static boolean isLockedByCurrentSession(MCRObjectID objectId) {
-        String sessionId = MCRSessionMgr.getCurrentSession().getID();
+        MCRSession session = MCRSessionMgr.getCurrentSession();
+        String sessionId = session.getID();
+        String userId = session.getUserInformation().getUserID();
         MCRObjectLock objectLock = getInstance().lockMap.get(objectId);
-        return objectLock != null && sessionId.equals(objectLock.id);
+        return objectLock != null && (sessionId.equals(objectLock.id) || userId.equals(objectLock.createdBy));
     }
 
     /**

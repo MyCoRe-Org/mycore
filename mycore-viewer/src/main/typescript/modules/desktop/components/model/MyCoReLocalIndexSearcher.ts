@@ -60,7 +60,7 @@ export class MyCoReLocalIndexSearcher extends MyCoReViewerSearcher {
   private clearDoubleResults(searchResults) {
     let contextExists = {};
     return searchResults.filter((el) => {
-      let key = (Utils.hash(el.context.text() + el.matchWords.join("")));
+      let key = (Utils.hash(el.context.textContent + el.matchWords.join("")));
       if (key in contextExists) {
         return false;
       } else {

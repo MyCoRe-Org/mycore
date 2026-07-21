@@ -141,6 +141,7 @@ export class ObjectsContentHandler extends BaseContentHandler {
     console.log("unlock " + objectId);
     const response = await fetch(`${this.mcrApplicationBaseURL}api/v2/objects/${objectId}/lock`, {
       method: "DELETE",
+      keepalive: true,
       headers: {
         "Authorization": authorizationHeader
       },
