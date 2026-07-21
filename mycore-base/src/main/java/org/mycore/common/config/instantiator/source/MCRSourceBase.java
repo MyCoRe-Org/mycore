@@ -56,16 +56,16 @@ abstract class MCRSourceBase<Result> implements MCRSource {
         }
 
         String defaultName = defaultName();
-        if (result == null && !defaultName.isEmpty()) {
+        if (isMissingResult(result) && !defaultName.isEmpty()) {
             context = new MCRSourceContext(target, defaultName, "default " + description());
             result = getResult(context, configuration, configuration.fullProperties(), defaultName);
         }
 
-        if ((result == null || isMissingResult(result)) && required()) {
-            throw missingException(context);
+        if (isMissingResult(result) && required()) {
+            throw missingResultException(context);
         }
 
-        return result == null ? nullResultReplacement() : result;
+        return isMissingResult(result) ? missingResultReplacement() : result;
 
     }
 
@@ -86,9 +86,9 @@ abstract class MCRSourceBase<Result> implements MCRSource {
 
     protected abstract boolean isMissingResult(Result result);
 
-    protected abstract MCRConfigurationException missingException(MCRSourceContext context);
+    protected abstract MCRConfigurationException missingResultException(MCRSourceContext context);
 
-    protected abstract Result nullResultReplacement();
+    protected abstract Result missingResultReplacement();
 
     protected final Object createInstance(MCRSourceContext context, MCRInstanceConfiguration<?> configuration,
         MCRSentinel sentinel) {
@@ -120,7 +120,7 @@ abstract class MCRSourceBase<Result> implements MCRSource {
 
         if (sentinel != null) {
             boolean sentinelValue = sentinel.defaultValue();
-            String configuredSentinelValue = properties.remove(prefix + sentinel.name());
+            String configuredSentinelValue = properties.get(prefix + sentinel.name());
             if (configuredSentinelValue != null) {
                 sentinelValue = Boolean.parseBoolean(configuredSentinelValue);
             }
