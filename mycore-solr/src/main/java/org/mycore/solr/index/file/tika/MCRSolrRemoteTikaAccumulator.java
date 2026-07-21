@@ -63,6 +63,8 @@ public class MCRSolrRemoteTikaAccumulator implements MCRSolrFileIndexAccumulator
 
     public static final String TIKA_MAPPER_MAX_FILE_SIZE = SOLR_CONFIG_PREFIX + "Tika.MaxFileSize";
 
+    public static final String TIKA_EXTRACT_TEXT_ENDPOINT_PROPERTY = SOLR_CONFIG_PREFIX + "Tika.ExtractTextEndpoint";
+
     private static final Logger LOGGER = LogManager.getLogger();
 
     private final Set<MCRTikaHttpClient> tikaClients;
@@ -88,7 +90,8 @@ public class MCRSolrRemoteTikaAccumulator implements MCRSolrFileIndexAccumulator
             () -> MCRConfiguration2.createConfigurationException(TIKA_MAPPER_MAX_FILE_SIZE));
 
         this.tikaClients = MCRConfiguration2.splitValue(serverList.orElse(""))
-            .map(MCRTikaHttpClient::new)
+            .map(baseUrl -> new MCRTikaHttpClient(baseUrl.trim(),
+                MCRConfiguration2.getString(TIKA_EXTRACT_TEXT_ENDPOINT_PROPERTY).orElseThrow().trim()))
             .collect(Collectors.toSet());
         enabled = !tikaClients.isEmpty();
     }
