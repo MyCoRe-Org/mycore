@@ -741,6 +741,12 @@
   },
   {
     "add-field": {
+      "name": "tika_metadata",
+      "type": "strings"
+    }
+  },
+  {
+    "add-field": {
       "name": "tika_has_error",
       "type": "boolean"
     }
