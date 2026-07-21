@@ -206,9 +206,11 @@ public final class MCRMetadataManager {
 
         setDerivateMetadata(mcrDerivate);
 
+        Path sourcePath = removeSourcePathFromInternals(mcrDerivate);
+
         fireEvent(mcrDerivate, null, MCREvent.EventType.CREATE);
 
-        createDataInIFS(mcrDerivate, derivateId, objectId, objectBackup);
+        createDataInIFS(mcrDerivate, derivateId, objectId, objectBackup, sourcePath);
 
         addLinkToMetadata(mcrDerivate, objectId, objectBackup);
     }
@@ -270,9 +272,9 @@ public final class MCRMetadataManager {
     }
 
     private static void createDataInIFS(MCRDerivate mcrDerivate, MCRObjectID derivateId, MCRObjectID objectId,
-        byte[] objectBackup) throws MCRPersistenceException {
+        byte[] objectBackup, Path sourcePath) throws MCRPersistenceException {
         try {
-            processDerivate(mcrDerivate, derivateId, objectBackup);
+            processDerivate(mcrDerivate, derivateId, objectBackup, sourcePath);
         } catch (Exception e) {
             restore(mcrDerivate, objectId, objectBackup);
             throw new MCRPersistenceException("Error during data creation in IFS.", e);
@@ -294,11 +296,11 @@ public final class MCRMetadataManager {
     }
 
     private static void processDerivate(MCRDerivate mcrDerivate, MCRObjectID objectId,
-        byte[] objectBackup) {
+        byte[] objectBackup, final Path sourcePath) {
         MCRObjectID derivateId = mcrDerivate.getId();
         if (mcrDerivate.getDerivate().getInternals() != null) {
             MCRPath rootPath = MCRPath.getPath(derivateId.toString(), "/");
-            if (mcrDerivate.getDerivate().getInternals().getSourcePath() == null) {
+            if (sourcePath == null) {
                 try {
                     rootPath.getFileSystem().createRoot(rootPath.getOwner());
                 } catch (IOException ioExc) {
@@ -306,14 +308,12 @@ public final class MCRMetadataManager {
                         "Cannot create root of '" + rootPath.getOwner() + "'.", ioExc);
                 }
             } else {
-                final String sourcepath = mcrDerivate.getDerivate().getInternals().getSourcePath();
-                final Path f = Paths.get(sourcepath);
-                if (Files.exists(f)) {
+                if (Files.exists(sourcePath)) {
                     try {
                         if (LOGGER.isDebugEnabled()) {
                             LOGGER.debug("Starting File-Import");
                         }
-                        importDerivate(derivateId.toString(), f);
+                        importDerivate(derivateId.toString(), sourcePath);
                     } catch (final Exception e) {
                         if (Files.exists(rootPath)) {
                             deleteDerivate(derivateId.toString());
@@ -322,7 +322,7 @@ public final class MCRMetadataManager {
                         throw new MCRPersistenceException("Can't add derivate to the IFS", e);
                     }
                 } else {
-                    LOGGER.warn("Empty derivate, the File or Directory -->{}<--  was not found.", sourcepath);
+                    LOGGER.warn("Empty derivate, the File or Directory -->{}<--  was not found.", sourcePath);
                 }
             }
         }
@@ -853,7 +853,7 @@ public final class MCRMetadataManager {
 
         checkUpdatePermission(derivateId);
 
-        Path fileSourceDirectory = handleFileSourceDirectory(mcrDerivate);
+        Path fileSourceDirectory = removeSourcePathFromInternals(mcrDerivate);
 
         MCRDerivate old = retrieveMCRDerivate(derivateId);
 
@@ -866,7 +866,7 @@ public final class MCRMetadataManager {
         addLinkToMetadata(mcrDerivate);
     }
 
-    private static Path handleFileSourceDirectory(MCRDerivate mcrDerivate) {
+    private static Path removeSourcePathFromInternals(MCRDerivate mcrDerivate) {
         MCRMetaIFS internals = mcrDerivate.getDerivate().getInternals();
         if (internals != null && internals.getSourcePath() != null) {
             Path fileSourceDirectory = Paths.get(internals.getSourcePath());
