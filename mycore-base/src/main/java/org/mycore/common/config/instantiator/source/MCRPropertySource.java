@@ -18,14 +18,10 @@
 
 package org.mycore.common.config.instantiator.source;
 
-import static org.mycore.common.config.instantiator.MCRInstantiatorUtils.emptyNameException;
-import static org.mycore.common.config.instantiator.MCRInstantiatorUtils.missingException;
-
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.config.annotation.MCRSentinel;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
@@ -34,9 +30,7 @@ import org.mycore.common.config.instantiator.target.MCRTarget;
 /**
  * A {@link MCRPropertySource} is a {@link MCRSource} that interprets a {@link MCRProperty}.
  */
-final class MCRPropertySource implements MCRSource {
-
-    private static final Logger LOGGER = LogManager.getLogger();
+final class MCRPropertySource extends MCRSourceBase<String> {
 
     private final MCRProperty annotation;
 
@@ -73,69 +67,60 @@ final class MCRPropertySource implements MCRSource {
     }
 
     @Override
-    public String get(MCRInstanceConfiguration<?> configuration, MCRTarget target) {
-
-        String name = annotation.name();
-        if (name.isEmpty()) {
-            throw emptyNameException(target);
-        }
-
-        Map<String, String> fullProperties = configuration.fullProperties();
-
-        String property;
-        String description;
-        String propertyValue;
-        if (annotation.absolute()) {
-            property = annotation.name();
-            description = "absolute property";
-            propertyValue = getPropertyValue(property, annotation.name(), fullProperties, description);
-        } else {
-            property = configuration.name().canonical() + "." + annotation.name();
-            description = "property";
-            propertyValue = getPropertyValue(property, annotation.name(), configuration.properties(), description);
-        }
-
-        String defaultName = annotation.defaultName();
-        if (propertyValue == null && !defaultName.isEmpty()) {
-
-            property = defaultName;
-            description = "default property";
-            propertyValue = getPropertyValue(defaultName, defaultName, fullProperties, description);
-
-            if (propertyValue == null) {
-                throw missingException(property, target, description);
-            }
-
-        }
-
-        if (propertyValue == null && annotation.required()) {
-            throw missingException(property, target, description);
-        }
-
-        return propertyValue;
-
+    protected String description() {
+        return "property";
     }
 
-    private String getPropertyValue(String property, String prefix,
-        Map<String, String> properties, String description) {
+    @Override
+    protected String name() {
+        return annotation.name();
+    }
 
-        if (sentinel != null) {
-            boolean sentinelValue = sentinel.defaultValue();
-            String configuredSentinelValue = properties.get(prefix + "." + sentinel.name());
-            if (configuredSentinelValue != null) {
-                sentinelValue = Boolean.parseBoolean(configuredSentinelValue);
-            }
-            if (sentinelValue == sentinel.rejectionValue()) {
-                if (LOGGER.isInfoEnabled()) {
-                    LOGGER.info("[SENTINEL] Ignoring {} {} and all sub-properties", description, property);
-                }
-                return null;
-            }
+    @Override
+    protected boolean allowsEmptyName() {
+        return false;
+    }
 
+    @Override
+    protected boolean absolute() {
+        return annotation.absolute();
+    }
+
+    @Override
+    protected boolean required() {
+        return annotation.required();
+    }
+
+    @Override
+    protected String defaultName() {
+        return annotation.defaultName();
+    }
+
+    @Override
+    protected String getResult(MCRSourceContext context, MCRInstanceConfiguration<?> configuration,
+        Map<String, String> properties, String prefix) {
+
+        if (rejectedBySentinel(sentinel, context, properties, prefix + ".")) {
+            return null;
         }
 
         return properties.get(prefix);
 
+    }
+
+    @Override
+    protected boolean isMissingResult(String result) {
+        return result == null;
+    }
+
+    @Override
+    protected MCRConfigurationException missingException(MCRSourceContext context) {
+        return context.missingException();
+    }
+
+    @Override
+    protected String nullResultReplacement() {
+        return null;
     }
 
 }
