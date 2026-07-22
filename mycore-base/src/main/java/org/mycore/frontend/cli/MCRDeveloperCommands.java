@@ -110,7 +110,7 @@ public class MCRDeveloperCommands {
         help = "Show configuration property with key {0}",
         order = 40)
     public static void showProperty(String key) {
-        String value = MCRConfiguration2.getPropertiesMap().get(key);
+        String value = MCRConfiguration2.getAllPropertiesMap().get(key);
         if (value == null) {
             LOGGER.info("Found no value for key {}", key);
         } else {
@@ -123,7 +123,7 @@ public class MCRDeveloperCommands {
         help = "Show configuration properties starting with key prefix {0}",
         order = 50)
     public static void showProperties(String keyPrefix) {
-        Map<String, String> values = MCRConfiguration2.getSubPropertiesMap(keyPrefix);
+        Map<String, String> values = MCRConfiguration2.getSubpropertiesMap(keyPrefix);
         if (values.isEmpty()) {
             LOGGER.info("Found no values for key prefix {}", keyPrefix);
         } else {
@@ -136,7 +136,7 @@ public class MCRDeveloperCommands {
         help = "Show all configuration properties",
         order = 60)
     public static void showAllProperties() {
-        Map<String, String> values = MCRConfiguration2.getPropertiesMap();
+        Map<String, String> values = MCRConfiguration2.getAllPropertiesMap();
         if (values.isEmpty()) {
             LOGGER.info("Found no values");
         } else {

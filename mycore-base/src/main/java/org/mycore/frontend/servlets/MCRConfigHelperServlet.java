@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.config.MCRConfigurationException;
 
 import com.google.gson.Gson;
@@ -99,7 +100,7 @@ public class MCRConfigHelperServlet extends HttpServlet {
         for (String property : properties.split(",")) {
             if (property.endsWith("*")) {
                 String prefix = property.substring(0, property.length() - 1);
-                MCRConfiguration2.getSubPropertiesMap(prefix)
+                MCRConfigurationBase.getSubpropertiesMap(prefix)
                     .forEach((key, value) -> propertiesMap.put(prefix + key, value));
             } else {
                 MCRConfiguration2.getString(property).ifPresent((p) -> propertiesMap.put(property, p));
