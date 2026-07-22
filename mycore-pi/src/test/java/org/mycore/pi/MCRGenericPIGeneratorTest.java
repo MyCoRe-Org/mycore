@@ -19,19 +19,26 @@
 package org.mycore.pi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mycore.pi.MCRGenericPIGenerator.DEFAULT_DATE_FORMAT;
+import static org.mycore.pi.MCRGenericPIGenerator.DEFAULT_DATE_LOCALE;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Locale;
+import java.util.List;
+import java.util.Map;
 
 import org.jdom2.Element;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
+import org.mycore.common.date.MCRMockDateFormatter;
+import org.mycore.common.date.MCRSimpleDateFormatter;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.pi.doi.MCRDigitalObjectIdentifier;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
+import org.mycore.pi.urn.MCRDNBURN;
 import org.mycore.test.MCRJPAExtension;
 import org.mycore.test.MCRMetadataExtension;
 import org.mycore.test.MyCoReTest;
@@ -44,33 +51,73 @@ import org.mycore.test.MyCoReTest;
 })
 public class MCRGenericPIGeneratorTest {
 
-    public static final int CURRENT_YEAR = Calendar.getInstance().get(Calendar.YEAR);
-
     @Test
     public void testGenerate() throws MCRPersistentIdentifierException {
-        final MCRGenericPIGenerator generator = new MCRGenericPIGenerator(
-            "urn:nbn:de:gbv:$CurrentDate-$1-$2-$ObjectType-$ObjectProject-$ObjectNumber-$Count-",
-            new SimpleDateFormat("yyyy", Locale.ROOT), null, null, 3,
-            "dnbUrn", "/mycoreobject/metadata/test1/test2/text()", "/mycoreobject/metadata/test1/test3/text()");
 
-        //generator.init(MCRPIService.GENERATOR_CONFIG_PREFIX + "test1");
+        MCRObject object = new MCRObject();
+        object.setSchema("http://www.w3.org/2001/XMLSchema");
+        object.setId(MCRObjectID.getInstance("my_test_00000123"));
 
-        MCRObjectID testID = MCRObjectID.getInstance("my_test_00000001");
-        MCRObject mcrObject = new MCRObject();
-        mcrObject.setSchema("test");
-        mcrObject.setId(testID);
-        final Element metadata = new Element("metadata");
-        final Element testElement = new Element("test1");
-        metadata.addContent(testElement);
+        Element testElement = new Element("test1");
         testElement.setAttribute("class", "MCRMetaXML");
         testElement.addContent(new Element("test2").setText("result1"));
         testElement.addContent(new Element("test3").setText("result2"));
-        mcrObject.getMetadata().setFromDOM(metadata);
 
-        final String pi1 = generator.generate(mcrObject, "").asString();
-        final String pi2 = generator.generate(mcrObject, "").asString();
-        assertEquals("urn:nbn:de:gbv:" + CURRENT_YEAR + "-result1-result2-test-my-00000001-000-", pi1.substring(0, pi1.length() - 1));
-        assertEquals("urn:nbn:de:gbv:" + CURRENT_YEAR + "-result1-result2-test-my-00000001-001-", pi2.substring(0, pi2.length() - 1));
+        Element metadata = new Element("metadata");
+        metadata.addContent(testElement);
+
+        object.getMetadata().setFromDOM(metadata);
+
+        MCRMockDateFormatter formatter = new MCRMockDateFormatter();
+        MCRGenericPIGenerator generator = new MCRGenericPIGenerator(
+            "urn:nbn:de:gbv:xyz:$CurrentDate-$1-$2-$ObjectType-$ObjectProject-$ObjectNumber-$Count-",
+            formatter,
+            Map.of("my", "MY"),
+            Map.of("test", "TEST"),
+            3,
+            MCRDNBURN.TYPE,
+            List.of("/mycoreobject/metadata/test1/test2/text()", "/mycoreobject/metadata/test1/test3/text()"));
+
+        String pi = generator.generate(object, "").asString();
+
+        assertEquals("urn:nbn:de:gbv:xyz:" + formatter.lastFormattedDate() + "-result1-result2-TEST-MY-00000123-000-",
+            pi.substring(0, pi.length() - 1));
+
+    }
+
+    @Test
+    public void generateMultiple() throws MCRPersistentIdentifierException {
+
+        MCRObject object = new MCRObject();
+        object.setSchema("http://www.w3.org/2001/XMLSchema");
+        object.setId(MCRObjectID.getInstance("my_test_00000123"));
+
+        MCRSimpleDateFormatter formatter = new MCRSimpleDateFormatter(DEFAULT_DATE_FORMAT, DEFAULT_DATE_LOCALE);
+        MCRGenericPIGenerator generator = new MCRGenericPIGenerator(
+            "10.1234/$ObjectType-$Count",
+            formatter,
+            Map.of(),
+            Map.of(),
+            -1,
+            MCRDigitalObjectIdentifier.TYPE,
+            List.of());
+
+        String doi1 = generator.generate(object, "").asString();
+        String doi2 = generator.generate(object, "").asString();
+        String doi3 = generator.generate(object, "").asString();
+
+        assertNotEquals(doi1, doi2);
+        assertNotEquals(doi2, doi3);
+        assertNotEquals(doi3, doi1);
+
+        assertTrue(doi1.startsWith("10.1234/test-"));
+        assertTrue(doi2.startsWith("10.1234/test-"));
+        assertTrue(doi3.startsWith("10.1234/test-"));
+
+        assertTrue(doi1.endsWith("-0"));
+        assertTrue(doi2.endsWith("-1"));
+        assertTrue(doi3.endsWith("-2"));
+
     }
 
 }

@@ -18,29 +18,57 @@
 
 package org.mycore.pi.doi;
 
-import java.util.Optional;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.function.Supplier;
 
-import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.pi.MCRPIGenerator;
-import org.mycore.pi.MCRPersistentIdentifier;
 
-public class MCRUUIDDOIGenerator extends MCRPIGenerator<MCRDigitalObjectIdentifier> {
+/**
+ * {@link MCRUUIDDOIGenerator} is a {@link MCRPIGenerator} for {@link MCRDigitalObjectIdentifier} identifiers
+ * that generates identifiers using a given prefix and a {@link UUID} as the suffix.
+ * <p>
+ * The following configuration options are available:
+ * <ul>
+ * <li> The property suffix {@link MCRUUIDDOIGenerator#PREFIX_KEY} can be used to
+ * specify the prefix.
+ * </ul>
+ * Example:
+ * <pre><code>
+ * [...].Class=org.mycore.pi.doi.MCRUUIDDOIGenerator
+ * [...].Prefix=10.1234
+ * </code></pre>
+ */
+@MCRConfigurationProxy(proxyClass = MCRUUIDDOIGenerator.Factory.class)
+public class MCRUUIDDOIGenerator extends MCRDOIGeneratorBase {
 
-    private final MCRDOIParser mcrdoiParser;
+    public static final String PREFIX_KEY = "Prefix";
 
-    private String prefix = MCRConfiguration2.getStringOrThrow("MCR.DOI.Prefix");
+    private final String prefix;
 
-    public MCRUUIDDOIGenerator() {
-        super();
-        mcrdoiParser = new MCRDOIParser();
+    public MCRUUIDDOIGenerator(MCRDOIParser parser, String prefix) {
+        super(parser);
+        this.prefix = Objects.requireNonNull(prefix, "Prefix must not be null");
     }
 
     @Override
-    public MCRDigitalObjectIdentifier generate(MCRBase mcrObject, String additional) {
-        Optional<MCRDigitalObjectIdentifier> parse = mcrdoiParser.parse(prefix + "/" + UUID.randomUUID());
-        MCRPersistentIdentifier doi = parse.get();
-        return (MCRDigitalObjectIdentifier) doi;
+    protected String buildDOI(MCRBase base, String additional) {
+        return prefix + "/" + UUID.randomUUID();
     }
+
+    public static class Factory implements Supplier<MCRUUIDDOIGenerator> {
+
+        @MCRProperty(name = PREFIX_KEY, defaultName = "MCR.DOI.Prefix")
+        public String prefix;
+
+        @Override
+        public MCRUUIDDOIGenerator get() {
+            return new MCRUUIDDOIGenerator(new MCRDOIParser(), prefix);
+        }
+
+    }
+
 }

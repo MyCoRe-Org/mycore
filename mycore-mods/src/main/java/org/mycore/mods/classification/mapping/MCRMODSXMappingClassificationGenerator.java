@@ -57,9 +57,9 @@ import org.mycore.mods.MCRMODSWrapper;
  * <li> The property suffix {@link MCRXMappingClassificationGeneratorBase#EVALUATOR_KEY} can be used to
  * specify the evaluator used to obtain category IDs from.
  * <li> For the evaluator, the property suffix {@link MCRSentinel#DEFAULT_KEY} can be used to
- *  exclude the evaluator from the configuration and use a default {@link MCRSimpleXMappingEvaluator} instead.
+ * exclude the evaluator from the configuration and use a default {@link MCRSimpleXMappingEvaluator} instead.
  * <li> The property suffix {@link MCRXMappingClassificationGeneratorBase#ON_MISSING_MAPPED_CATEGORY_KEY} can be used to
- * specify the behaviour, when a mapped classification value is missing.
+ * specify the behavior, when a mapped classification value is missing.
  * </ul>
  * Example:
  * <pre><code>

@@ -16,17 +16,23 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.pi;
+package org.mycore.common.date;
 
-import org.mycore.datamodel.metadata.MCRBase;
+import java.time.Instant;
+import java.util.Date;
 
-public class MCRMockIdentifierGenerator implements MCRPIGenerator<MCRMockIdentifier> {
+/**
+ * {@link MCRInstantFormatterBase} is a base implementation of {@link MCRDateFormatter} that
+ * formats {@link Instant} objects.
+ */
+public non-sealed abstract class MCRInstantFormatterBase implements MCRDateFormatter {
 
     @Override
-    public MCRMockIdentifier generate(MCRBase base, String additional) {
-        return new MCRMockIdentifierParser()
-            .parse(MCRMockIdentifier.MOCK_SCHEME + base.getId() + ":" + additional)
-            .get();
+    public final String format(Date date) {
+        return format(date.toInstant());
     }
+
+    @Override
+    public abstract String format(Instant instant);
 
 }

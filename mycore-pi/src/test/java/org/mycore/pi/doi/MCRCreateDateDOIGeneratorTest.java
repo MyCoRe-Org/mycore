@@ -19,24 +19,28 @@
 package org.mycore.pi.doi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Map;
-
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
+import org.mycore.common.date.MCRDateFormatter;
+import org.mycore.common.date.MCRFLDateScrambler;
+import org.mycore.common.date.MCRMockDateFormatter;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
+import org.mycore.test.MCRJPAExtension;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
+@ExtendWith({ MCRJPAExtension.class })
 @MCRTestConfiguration(properties = {
     @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true"),
 })
-public class MCRMapObjectIDDOIGeneratorTest {
+public class MCRCreateDateDOIGeneratorTest {
 
     public static final String PREFIX = "10.1234";
 
@@ -47,8 +51,8 @@ public class MCRMapObjectIDDOIGeneratorTest {
         object.setSchema("http://www.w3.org/2001/XMLSchema");
         object.setId(MCRObjectID.getInstance("my_test_00000123"));
 
-        Map<String, String> prefixMap = Map.of("my_test", PREFIX);
-        MCRMapObjectIDDOIGenerator generator = new MCRMapObjectIDDOIGenerator(new MCRDOIParser(), prefixMap);
+        MCRMockDateFormatter formatter = new MCRMockDateFormatter();
+        MCRCreateDateDOIGenerator generator = new MCRCreateDateDOIGenerator(new MCRDOIParser(), formatter, PREFIX, 3);
         String doi = generator.generate(object, "").asString();
 
         assertTrue(doi.startsWith(PREFIX));
@@ -56,41 +60,32 @@ public class MCRMapObjectIDDOIGeneratorTest {
 
         String value = doi.substring(PREFIX.length() + 1);
 
-        assertEquals("123", value);
+        assertTrue(value.startsWith(formatter.lastFormattedDate() + "-"));
+        assertTrue(value.endsWith("-000"));
 
     }
 
     @Test
-    public void generateWithInfix() throws MCRPersistentIdentifierException {
+    public void generateMultiple() throws MCRPersistentIdentifierException {
 
         MCRObject object = new MCRObject();
         object.setSchema("http://www.w3.org/2001/XMLSchema");
         object.setId(MCRObjectID.getInstance("my_test_00000123"));
 
-        Map<String, String> prefixMap = Map.of("my_test", PREFIX + "/xyz-");
-        MCRMapObjectIDDOIGenerator generator = new MCRMapObjectIDDOIGenerator(new MCRDOIParser(), prefixMap);
-        String doi = generator.generate(object, "").asString();
+        MCRDateFormatter formatter = new MCRFLDateScrambler();
+        MCRCreateDateDOIGenerator generator = new MCRCreateDateDOIGenerator(new MCRDOIParser(), formatter, PREFIX, -1);
+        String doi1 = generator.generate(object, "").asString();
+        String doi2 = generator.generate(object, "").asString();
+        String doi3 = generator.generate(object, "").asString();
 
-        assertTrue(doi.startsWith(PREFIX));
-        assertEquals('/', doi.charAt(PREFIX.length()));
+        assertNotEquals(doi1, doi2);
+        assertNotEquals(doi2, doi3);
+        assertNotEquals(doi3, doi1);
 
-        String value = doi.substring(PREFIX.length() + 1);
+        assertTrue(doi1.endsWith("-0"));
+        assertTrue(doi2.endsWith("-1"));
+        assertTrue(doi3.endsWith("-2"));
 
-        assertEquals("xyz-123", value);
-
-    }
-
-    @Test
-    public void missingMapping() {
-
-        MCRObject object = new MCRObject();
-        object.setSchema("http://www.w3.org/2001/XMLSchema");
-        object.setId(MCRObjectID.getInstance("my_test_00000123"));
-
-        Map<String, String> prefixMap = Map.of();
-        MCRMapObjectIDDOIGenerator generator = new MCRMapObjectIDDOIGenerator(new MCRDOIParser(), prefixMap);
-
-        assertThrows(MCRPersistentIdentifierException.class, () -> generator.generate(object, ""));
     }
 
 }
