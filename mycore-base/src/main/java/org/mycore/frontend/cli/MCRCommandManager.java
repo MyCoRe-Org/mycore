@@ -83,7 +83,7 @@ public class MCRCommandManager {
     /** Read internal and/or external commands */
     protected void initConfiguredCommands(String type) {
         String prefix = "MCR.CLI.Classes." + type;
-        Stream<Map.Entry<String, String>> propsWithPrefix = MCRConfiguration2.getPropertiesMap()
+        Stream<Map.Entry<String, String>> propsWithPrefix = MCRConfiguration2.getRawPropertiesMap()
             .entrySet()
             .stream()
             .filter(e -> e.getKey().startsWith(prefix));

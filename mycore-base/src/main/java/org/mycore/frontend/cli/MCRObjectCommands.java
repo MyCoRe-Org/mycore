@@ -977,7 +977,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         xmlReader.setEntityResolver(MCREntityResolver.getInstance());
         SAXSource styleSource = new SAXSource(xmlReader, style.getInputSource());
         Transformer transformer = transformerFactory.newTransformer(styleSource);
-        for (Entry<String, String> property : MCRConfiguration2.getPropertiesMap().entrySet()) {
+        for (Entry<String, String> property : MCRConfiguration2.getRawPropertiesMap().entrySet()) {
             transformer.setParameter(property.getKey(), property.getValue());
         }
         transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");

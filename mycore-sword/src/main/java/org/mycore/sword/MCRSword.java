@@ -57,7 +57,7 @@ public class MCRSword {
         workspaceCollectionTable = new ConcurrentHashMap<>();
         LOGGER.info("--- INITIALIZE SWORD SERVER ---");
         final int lengthOfPropertyPrefix = MCRSwordConstants.MCR_SWORD_COLLECTION_PREFIX.length();
-        MCRConfiguration2.getPropertiesMap()
+        MCRConfiguration2.getRawPropertiesMap()
             .keySet()
             .stream()
             .filter(prop -> prop.startsWith(MCRSwordConstants.MCR_SWORD_COLLECTION_PREFIX))

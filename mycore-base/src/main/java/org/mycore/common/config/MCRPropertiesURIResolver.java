@@ -105,7 +105,7 @@ public class MCRPropertiesURIResolver implements URIResolver {
         final Element entryElement = new Element("entry");
 
         entryElement.setAttribute("key", key);
-        String value = MCRConfiguration2.getPropertiesMap().get(key);
+        String value = MCRConfiguration2.getRawPropertiesMap().get(key);
         if (value != null) {
             entryElement.setText(value);
         }
