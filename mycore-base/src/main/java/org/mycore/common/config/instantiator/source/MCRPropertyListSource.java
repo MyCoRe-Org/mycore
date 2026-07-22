@@ -18,19 +18,14 @@
 
 package org.mycore.common.config.instantiator.source;
 
-import static org.mycore.common.config.instantiator.MCRInstantiatorUtils.emptyException;
-import static org.mycore.common.config.instantiator.MCRInstantiatorUtils.orderedKeys;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRPropertyList;
 import org.mycore.common.config.annotation.MCRSentinel;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
@@ -39,9 +34,7 @@ import org.mycore.common.config.instantiator.target.MCRTarget;
 /**
  * A {@link MCRPropertyListSource} is a {@link MCRSource} that interprets a {@link MCRPropertyList}.
  */
-final class MCRPropertyListSource implements MCRSource {
-
-    private static final Logger LOGGER = LogManager.getLogger();
+final class MCRPropertyListSource extends MCRSourceBase<List<String>> {
 
     private final MCRPropertyList annotation;
 
@@ -78,121 +71,101 @@ final class MCRPropertyListSource implements MCRSource {
     }
 
     @Override
-    public List<String> get(MCRInstanceConfiguration<?> configuration, MCRTarget target) {
-
-        Map<String, String> fullProperties = configuration.fullProperties();
-
-        String property;
-        String description;
-        List<String> propertyList;
-        if (annotation.absolute()) {
-            property = annotation.name();
-            description = "absolute property list";
-            Map<String, String> properties = fullProperties;
-            propertyList = getPropertyList(property, annotation.name(), ".", target, properties, description);
-        } else {
-            if (annotation.name().isEmpty()) {
-                property = configuration.name().canonical();
-                description = "property list";
-                Map<String, String> properties = configuration.properties();
-                propertyList = getPropertyList(property, "", "", target, properties, description);
-            } else {
-                property = configuration.name().canonical() + "." + annotation.name();
-                description = "property list";
-                Map<String, String> properties = configuration.properties();
-                propertyList = getPropertyList(property, annotation.name(), ".", target, properties, description);
-            }
-        }
-
-        String defaultName = annotation.defaultName();
-        if (propertyList == null && !defaultName.isEmpty()) {
-
-            property = defaultName;
-            description = "default property list";
-            propertyList = getPropertyList(defaultName, defaultName, ".", target, fullProperties, description);
-
-            if (propertyList == null || (propertyList.isEmpty() && annotation.required())) {
-                throw emptyException(property, target, description);
-            }
-
-        }
-
-        if ((propertyList == null || propertyList.isEmpty()) && annotation.required()) {
-            throw emptyException(property, target, description);
-        }
-
-        return propertyList == null ? new ArrayList<>() : propertyList;
-
+    protected String description() {
+        return "property list";
     }
 
-    private List<String> getPropertyList(String property, String prefix, String delimiter,
-        MCRTarget target, Map<String, String> properties, String description) {
+    @Override
+    protected String name() {
+        return annotation.name();
+    }
 
-        AtomicBoolean hasRelevantProperty = new AtomicBoolean(false);
+    @Override
+    protected boolean allowsEmptyName() {
+        return true;
+    }
 
-        Map<String, String> rawPropertyMap = new HashMap<>();
-        String keyPrefix = prefix + delimiter;
+    @Override
+    protected boolean absolute() {
+        return annotation.absolute();
+    }
+
+    @Override
+    protected boolean required() {
+        return annotation.required();
+    }
+
+    @Override
+    protected String defaultName() {
+        return annotation.defaultName();
+    }
+
+    @Override
+    protected List<String> getResult(MCRSourceContext context, MCRInstanceConfiguration<?> configuration,
+        Map<String, String> properties, String prefix) {
+
+        Map<String, String> listProperties = new HashMap<>();
+        String keyPrefix = prefix.isEmpty() ? prefix : prefix + ".";
         int keyPrefixLength = keyPrefix.length();
         properties.forEach((key, value) -> {
             if (key.startsWith(keyPrefix) && !key.isEmpty()) {
                 int index = key.indexOf('.', keyPrefixLength);
                 if (index == -1) {
                     if (!value.isEmpty()) {
-                        hasRelevantProperty.set(true);
-                        rawPropertyMap.put(key.substring(keyPrefixLength), value);
+                        listProperties.put(key.substring(keyPrefixLength), value);
                     }
                 }
             }
         });
 
         List<String> headPropertyList = new ArrayList<>(0);
-        List<String> tailPropertyList = new ArrayList<>(rawPropertyMap.size());
+        List<String> tailPropertyList = new ArrayList<>(listProperties.size());
 
-        List<String> keyList = orderedKeys(property, target, rawPropertyMap, description);
+        List<String> keyList = context.orderedKeys(listProperties);
         for (String key : keyList) {
-            String value = rawPropertyMap.get(key);
-            if (sentinel != null) {
-                boolean sentinelValue = sentinel.defaultValue();
-                String configuredSentinelValue = properties.get(keyPrefix + key + "." + sentinel.name());
-                if (configuredSentinelValue != null) {
-                    sentinelValue = Boolean.parseBoolean(configuredSentinelValue);
-                }
-                if (sentinelValue == sentinel.rejectionValue()) {
-                    if (LOGGER.isInfoEnabled()) {
-                        LOGGER.info("[SENTINEL] Ignoring {} element {}.{} and all sub-properties",
-                            description, property, key);
-                    }
-                    continue;
+            MCRSourceContext nestedContext = context.nested(key, "property list element");
+            if (!rejectedBySentinel(sentinel, nestedContext, properties, keyPrefix + key + ".")) {
+                if (key.charAt(0) == '-') {
+                    headPropertyList.add(listProperties.get(key));
+                } else {
+                    tailPropertyList.add(listProperties.get(key));
                 }
             }
-
-            if (key.charAt(0) == '-') {
-                headPropertyList.add(value);
-            } else {
-                tailPropertyList.add(value);
-            }
-
         }
 
         List<String> shortFormList = List.of();
         String shortFormProperty = properties.get(prefix);
         if (shortFormProperty != null) {
-            hasRelevantProperty.set(true);
             shortFormList = parseShortFormList(shortFormProperty);
         }
 
         int totalSize = headPropertyList.size() + shortFormList.size() + tailPropertyList.size();
-        List<String> fullPropertyList = new ArrayList<>(totalSize);
-        fullPropertyList.addAll(headPropertyList);
-        fullPropertyList.addAll(shortFormList);
-        fullPropertyList.addAll(tailPropertyList);
+        List<String> propertyList = new ArrayList<>(totalSize);
+        propertyList.addAll(headPropertyList);
+        propertyList.addAll(shortFormList);
+        propertyList.addAll(tailPropertyList);
 
-        return hasRelevantProperty.get() ? fullPropertyList : null;
+        return propertyList;
 
     }
 
     private List<String> parseShortFormList(String value) {
         return MCRConfiguration2.splitValue(value).toList();
+    }
+
+    @Override
+    protected boolean isMissingResult(List<String> result) {
+        return result.isEmpty();
+    }
+
+    @Override
+    protected MCRConfigurationException missingResultException(MCRSourceContext context) {
+        return context.emptyException();
+    }
+
+    @Override
+    protected List<String> missingResultReplacement() {
+        return new ArrayList<>();
     }
 
 }

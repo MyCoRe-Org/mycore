@@ -18,17 +18,13 @@
 
 package org.mycore.common.config.instantiator.source;
 
-import static org.mycore.common.config.instantiator.MCRInstantiatorUtils.emptyException;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRPropertyMap;
 import org.mycore.common.config.annotation.MCRSentinel;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
@@ -37,9 +33,7 @@ import org.mycore.common.config.instantiator.target.MCRTarget;
 /**
  * A {@link MCRPropertyMapSource} is a {@link MCRSource} that interprets a {@link MCRPropertyMap}.
  */
-final class MCRPropertyMapSource implements MCRSource {
-
-    private static final Logger LOGGER = LogManager.getLogger();
+final class MCRPropertyMapSource extends MCRSourceBase<Map<String, String>> {
 
     private final MCRPropertyMap annotation;
 
@@ -76,75 +70,54 @@ final class MCRPropertyMapSource implements MCRSource {
     }
 
     @Override
-    public Map<String, String> get(MCRInstanceConfiguration<?> configuration, MCRTarget target) {
-
-        Map<String, String> fullProperties = configuration.fullProperties();
-
-        String property;
-        String description;
-        Map<String, String> propertyMap;
-        if (annotation.absolute()) {
-            property = annotation.name();
-            description = "absolute property map";
-            Map<String, String> properties = fullProperties;
-            propertyMap = getPropertyMap(property, annotation.name(), ".", properties, description);
-        } else {
-            if (annotation.name().isEmpty()) {
-                property = configuration.name().canonical();
-                description = "property map";
-                Map<String, String> properties = configuration.properties();
-                propertyMap = getPropertyMap(property, "", "", properties, description);
-            } else {
-                property = configuration.name().canonical() + "." + annotation.name();
-                description = "property map";
-                Map<String, String> properties = configuration.properties();
-                propertyMap = getPropertyMap(property, annotation.name(), ".", properties, description);
-            }
-        }
-
-        String defaultName = annotation.defaultName();
-        if (propertyMap == null && !defaultName.isEmpty()) {
-
-            property = defaultName;
-            description = "default property map";
-            propertyMap = getPropertyMap(defaultName, defaultName, ".", fullProperties, description);
-
-            if (propertyMap == null || (propertyMap.isEmpty() && annotation.required())) {
-                throw emptyException(property, target, description);
-            }
-
-        }
-
-        if ((propertyMap == null || propertyMap.isEmpty()) && annotation.required()) {
-            throw emptyException(property, target, description);
-        }
-
-        return propertyMap == null ? new HashMap<>() : propertyMap;
-
+    protected String description() {
+        return "property map";
     }
 
-    private Map<String, String> getPropertyMap(String property, String prefix, String delimiter,
-        Map<String, String> properties, String description) {
+    @Override
+    protected String name() {
+        return annotation.name();
+    }
 
-        AtomicBoolean hasRelevantProperty = new AtomicBoolean(false);
+    @Override
+    protected boolean allowsEmptyName() {
+        return true;
+    }
+
+    @Override
+    protected boolean absolute() {
+        return annotation.absolute();
+    }
+
+    @Override
+    protected boolean required() {
+        return annotation.required();
+    }
+
+    @Override
+    protected String defaultName() {
+        return annotation.defaultName();
+    }
+
+    @Override
+    protected Map<String, String> getResult(MCRSourceContext context, MCRInstanceConfiguration<?> configuration,
+        Map<String, String> properties, String prefix) {
 
         Map<String, String> shortFormMap = Map.of();
         String shortFormProperty = properties.get(prefix);
         if (shortFormProperty != null) {
-            hasRelevantProperty.set(true);
             shortFormMap = parseShortFormMap(shortFormProperty);
         }
 
-        Map<String, String> rawPropertyMap = new HashMap<>(shortFormMap);
-        String keyPrefix = prefix + delimiter;
+        Map<String, String> mapProperties = new HashMap<>(shortFormMap);
+        String keyPrefix = prefix.isEmpty() ? prefix : prefix + ".";
         int keyPrefixLength = keyPrefix.length();
         properties.forEach((key, value) -> {
             if (key.startsWith(keyPrefix) && !key.isEmpty()) {
                 int index = key.indexOf('.', keyPrefixLength);
                 if (index == -1) {
                     if (!value.isEmpty()) {
-                        hasRelevantProperty.set(true);
-                        rawPropertyMap.put(key.substring(keyPrefixLength), value);
+                        mapProperties.put(key.substring(keyPrefixLength), value);
                     }
                 }
             }
@@ -152,28 +125,14 @@ final class MCRPropertyMapSource implements MCRSource {
 
         Map<String, String> propertyMap = new HashMap<>();
 
-        for (String key : rawPropertyMap.keySet()) {
-            String value = rawPropertyMap.get(key);
-            if (sentinel != null) {
-                boolean sentinelValue = sentinel.defaultValue();
-                String configuredSentinelValue = properties.get(keyPrefix + key + "." + sentinel.name());
-                if (configuredSentinelValue != null) {
-                    sentinelValue = Boolean.parseBoolean(configuredSentinelValue);
-                }
-                if (sentinelValue == sentinel.rejectionValue()) {
-                    if (LOGGER.isInfoEnabled()) {
-                        LOGGER.info("[SENTINEL] Ignoring {} entry {}.{} and all sub-properties",
-                            description, property, key);
-                    }
-                    continue;
-                }
+        for (String key : mapProperties.keySet()) {
+            MCRSourceContext nestedContext = context.nested(key, "property map entry");
+            if (!rejectedBySentinel(sentinel, nestedContext, properties, keyPrefix + key + ".")) {
+                propertyMap.put(key, mapProperties.get(key));
             }
-
-            propertyMap.put(key, value);
-
         }
 
-        return hasRelevantProperty.get() ? propertyMap : null;
+        return propertyMap;
 
     }
 
@@ -183,6 +142,21 @@ final class MCRPropertyMapSource implements MCRSource {
             .filter(parts -> parts.length != 1)
             .filter(parts -> !parts[1].isBlank())
             .collect(Collectors.toMap(parts -> parts[0].trim(), parts -> parts[1].trim()));
+    }
+
+    @Override
+    protected boolean isMissingResult(Map<String, String> result) {
+        return result.isEmpty();
+    }
+
+    @Override
+    protected MCRConfigurationException missingResultException(MCRSourceContext context) {
+        return context.emptyException();
+    }
+
+    @Override
+    protected Map<String, String> missingResultReplacement() {
+        return new HashMap<>();
     }
 
 }

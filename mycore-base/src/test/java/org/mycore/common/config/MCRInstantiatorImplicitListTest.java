@@ -77,49 +77,28 @@ import org.mycore.test.MyCoReTest;
  *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">set empty</td>
- *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;">-</td>
+ *     <td style="border: 1px solid;">not set / empty</td>
+ *     <td style="border: 1px solid;">none or impl. enabled</td>
+ *     <td style="border: 1px solid;">not set / <code>1.a=</code></td>
  *     <td style="border: 1px solid;"><code>[]</code></td>
  *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">none or impl. enabled</td>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;"><code>[]</code></td>
- *     <td style="border: 1px solid;">Exception</td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">none or impl. enabled</td>
- *     <td style="border: 1px solid;"><code>1.a=</code></td>
- *     <td style="border: 1px solid;"><code>[()]</code></td>
- *     <td style="border: 1px solid;"><code>[()]</code></td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">not set</td>
+ *     <td style="border: 1px solid;">not set / empty</td>
  *     <td style="border: 1px solid;">none or impl. enabled</td>
  *     <td style="border: 1px solid;"><code>1.a=Value</code></td>
  *     <td style="border: 1px solid;"><code>[(Value)]</code></td>
  *     <td style="border: 1px solid;"><code>[(Value)]</code></td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">not set</td>
+ *     <td style="border: 1px solid;">not set / empty</td>
  *     <td style="border: 1px solid;">expl. enabled</td>
- *     <td style="border: 1px solid;">not set</td>
+ *     <td style="border: 1px solid;">not set / <code>1.a=</code></td>
  *     <td style="border: 1px solid;"><code>[_]</code></td>
  *     <td style="border: 1px solid;"><code>[_]</code></td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">expl. enabled</td>
- *     <td style="border: 1px solid;"><code>1.a=</code></td>
- *     <td style="border: 1px solid;"><code>[()]</code></td>
- *     <td style="border: 1px solid;"><code>[()]</code></td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">not set</td>
+ *     <td style="border: 1px solid;">not set / empty</td>
  *     <td style="border: 1px solid;">expl. enabled</td>
  *     <td style="border: 1px solid;"><code>1.a=Value</code></td>
  *     <td style="border: 1px solid;"><code>[(Value)]</code></td>
@@ -128,16 +107,9 @@ import org.mycore.test.MyCoReTest;
  *   <tr>
  *     <td style="border: 1px solid;">set</td>
  *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;">not set</td>
+ *     <td style="border: 1px solid;">not set / <code>1.a=</code></td>
  *     <td style="border: 1px solid;"><code>[_]</code></td>
  *     <td style="border: 1px solid;"><code>[_]</code></td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">set</td>
- *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;"><code>1.a=</code></td>
- *     <td style="border: 1px solid;"><code>[()]</code></td>
- *     <td style="border: 1px solid;"><code>[()]</code></td>
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;">set</td>
@@ -231,7 +203,7 @@ public class MCRInstantiatorImplicitListTest {
 
         // log all relevant configuration entries
         LOGGER.info("CONFIGURATION PROPERTIES");
-        Map<String, String> propertiesMap = MCRConfiguration2.getPropertiesMap();
+        Map<String, String> propertiesMap = MCRConfiguration2.getRawProperties();
         LOGGER.info("{}={}", CONFIGURED_CLASS_PROPERTY, get(propertiesMap, CONFIGURED_CLASS_PROPERTY));
         LOGGER.info("{}={}", NESTED_CLASS_PROPERTY, get(propertiesMap, NESTED_CLASS_PROPERTY));
         LOGGER.info("{}={}", NESTED_SENTINEL_PROPERTY, get(propertiesMap, NESTED_SENTINEL_PROPERTY));
@@ -248,14 +220,13 @@ public class MCRInstantiatorImplicitListTest {
 
         // all the indications a nested class should be instantiated (implicitly)
         boolean shouldInstantiateNestedClass = false;
-        shouldInstantiateNestedClass |= classProperty != ClassProperty.NOT_SET;
-        shouldInstantiateNestedClass |= valueProperty != ValueProperty.NOT_SET;
+        shouldInstantiateNestedClass |= classProperty.set();
+        shouldInstantiateNestedClass |= valueProperty.set();
         shouldInstantiateNestedClass |= sentinel == Sentinel.EXPLICITLY_ENABLED;
 
         // all the indications a nested class should not be instantiated (or instantiation should be suppressed)
         boolean shouldNotInstantiateNestedClass = false;
         shouldNotInstantiateNestedClass |= !shouldInstantiateNestedClass;
-        shouldNotInstantiateNestedClass |= classProperty == ClassProperty.SET_EMPTY;
         shouldNotInstantiateNestedClass |= sentinel == Sentinel.IMPLICITLY_DISABLED;
         shouldNotInstantiateNestedClass |= sentinel == Sentinel.EXPLICITLY_DISABLED;
 
@@ -287,8 +258,7 @@ public class MCRInstantiatorImplicitListTest {
                 assertNotNull(nested);
 
                 switch (valueProperty) {
-                    case NOT_SET -> assertNull(nested.value);
-                    case SET_EMPTY -> assertEquals("", nested.value);
+                    case NOT_SET, SET_EMPTY -> assertNull(nested.value);
                     case SET_NON_EMPTY -> assertEquals("Value", nested.value);
                 }
 
@@ -309,7 +279,11 @@ public class MCRInstantiatorImplicitListTest {
 
         SET_EMPTY,
 
-        SET_NON_EMPTY
+        SET_NON_EMPTY;
+
+        public boolean set() {
+            return this == SET_NON_EMPTY;
+        }
 
     }
 
@@ -333,7 +307,11 @@ public class MCRInstantiatorImplicitListTest {
 
         SET_EMPTY,
 
-        SET_NON_EMPTY
+        SET_NON_EMPTY;
+
+        public boolean set() {
+            return this == SET_NON_EMPTY;
+        }
 
     }
 
