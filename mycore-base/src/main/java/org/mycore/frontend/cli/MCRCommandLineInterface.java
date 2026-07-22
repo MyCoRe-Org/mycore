@@ -211,7 +211,7 @@ public class MCRCommandLineInterface {
      * @return expanded command
      */
     public static String expandCommand(final String command) {
-        StringSubstitutor strSubstitutor = new StringSubstitutor(MCRConfiguration2.getPropertiesMap());
+        StringSubstitutor strSubstitutor = new StringSubstitutor(MCRConfiguration2.getRawProperties());
         String expandedCommand = strSubstitutor.replace(command);
         if (!expandedCommand.equals(command)) {
             output(command + " --> " + expandedCommand);

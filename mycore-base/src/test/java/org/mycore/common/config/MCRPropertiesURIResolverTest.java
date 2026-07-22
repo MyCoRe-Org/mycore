@@ -32,7 +32,7 @@ public class MCRPropertiesURIResolverTest {
         MCRConfiguration2.set("Sample.basedir", "/home/user/base");
         MCRConfiguration2.set("Sample.subdir", "%Sample.basedir%/subdir");
         MCRConfiguration2.set("Sample.file", "%Sample.subdir%/file.txt");
-        MCRPropertiesResolver resolver = new MCRPropertiesResolver(MCRConfiguration2.getPropertiesMap());
+        MCRPropertiesResolver resolver = new MCRPropertiesResolver(MCRConfiguration2.getRawProperties());
         assertEquals("/home/user/base", resolver.resolve("%Sample.basedir%"));
         assertEquals("/home/user/base/subdir", resolver.resolve("%Sample.subdir%"));
         assertEquals("/home/user/base/subdir/file.txt", resolver.resolve("%Sample.file%"));
@@ -43,7 +43,7 @@ public class MCRPropertiesURIResolverTest {
         MCRConfiguration2.set("Sample.basedir", "/home/user/base");
         MCRConfiguration2.set("Sample.subdir", "%Sample.basedir%/subdir");
         MCRConfiguration2.set("Sample.file", "%Sample.subdir%/file.txt");
-        Map<String, String> p = MCRConfiguration2.getPropertiesMap();
+        Map<String, String> p = MCRConfiguration2.getRawProperties();
         MCRPropertiesResolver resolver = new MCRPropertiesResolver(p);
         Map<String, String> resolvedProperties = resolver.resolveAll(p);
         assertEquals("/home/user/base/subdir", resolvedProperties.get("Sample.subdir"));
@@ -55,7 +55,7 @@ public class MCRPropertiesURIResolverTest {
         MCRConfiguration2.set("a", "%a%,hallo");
         MCRConfiguration2.set("b", "hallo,%b%,welt");
         MCRConfiguration2.set("c", "%b%,%a%");
-        Map<String, String> p = MCRConfiguration2.getPropertiesMap();
+        Map<String, String> p = MCRConfiguration2.getRawProperties();
         MCRPropertiesResolver resolver = new MCRPropertiesResolver(p);
         assertEquals("hallo", resolver.resolve("%a%"));
         assertEquals("hallo,welt", resolver.resolve("%b%"));

@@ -231,7 +231,7 @@ public class MCRInstantiatorNonImplicitListTest {
 
         // log all relevant configuration entries
         LOGGER.info("CONFIGURATION PROPERTIES");
-        Map<String, String> propertiesMap = MCRConfiguration2.getPropertiesMap();
+        Map<String, String> propertiesMap = MCRConfiguration2.getRawProperties();
         LOGGER.info("{}={}", CONFIGURED_CLASS_PROPERTY, get(propertiesMap, CONFIGURED_CLASS_PROPERTY));
         LOGGER.info("{}={}", NESTED_CLASS_PROPERTY, get(propertiesMap, NESTED_CLASS_PROPERTY));
         LOGGER.info("{}={}", NESTED_SENTINEL_PROPERTY, get(propertiesMap, NESTED_SENTINEL_PROPERTY));

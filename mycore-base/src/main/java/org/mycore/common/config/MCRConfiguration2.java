@@ -25,6 +25,7 @@ import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -107,10 +108,39 @@ public class MCRConfiguration2 {
         .softValues()
         .build();
 
+    private static final AtomicReference<Map<String, String>> PROPERTIES = new AtomicReference<>(null);
+
     static Map<SingletonKey, Object> instanceHolder = new MCRConcurrentHashMap<>();
 
+    /**
+     * @deprecated Use {@link #getRawProperties()} instead.
+     */
+    @Deprecated
     public static Map<String, String> getPropertiesMap() {
+        return getRawProperties();
+    }
+
+    /**
+     * Returns all configuration properties, including properties with empty values, i.e.
+     * properties that are not recognized by, for example, {@link #getString(String)}.
+     */
+    public static Map<String, String> getRawProperties() {
         return Collections.unmodifiableMap(MCRConfigurationBase.getResolvedProperties().getAsMap());
+    }
+
+    /**
+     * Returns all configuration properties, excluding properties with empty values, i.e.
+     * only properties that are recognized by, for example, {@link #getString(String)}.
+     */
+    public static Map<String, String> getAllProperties() {
+        return PROPERTIES.updateAndGet(existingValue -> {
+            if (existingValue != null) {
+                return existingValue;
+            }
+            return getRawProperties().entrySet().stream()
+                .filter(entry -> !entry.getValue().isBlank())
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().trim()));
+        });
     }
 
     /**
@@ -135,7 +165,7 @@ public class MCRConfiguration2 {
      * @return a map of the properties as stated above
      */
     public static Map<String, String> getSubPropertiesMap(String propertyPrefix) {
-        return getPropertiesMap()
+        return getRawProperties()
             .entrySet()
             .stream()
             .filter(e -> e.getKey().startsWith(propertyPrefix))
@@ -494,6 +524,7 @@ public class MCRConfiguration2 {
     }
 
     static void clearCaches() {
+        PROPERTIES.set(null);
         CONFIGURATIONS.invalidateAll();
     }
 

@@ -56,7 +56,7 @@ public class MCRPIConfigurationChecker implements MCRStartupHandler.AutoExecutab
         LOGGER.info("Check persistent identifier configuration!");
         final List<String> deprecatedPropertyList = DEPRECATED_PROPERTY_PREFIXES
             .stream()
-            .flatMap(propPrefix -> MCRConfiguration2.getPropertiesMap()
+            .flatMap(propPrefix -> MCRConfiguration2.getRawProperties()
                 .entrySet()
                 .stream()
                 .filter(p -> p.getKey().startsWith(propPrefix))

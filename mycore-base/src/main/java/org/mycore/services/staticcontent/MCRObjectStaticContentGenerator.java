@@ -97,7 +97,7 @@ public class MCRObjectStaticContentGenerator {
     }
 
     public static List<String> getContentGenerators() {
-        return MCRConfiguration2.getPropertiesMap()
+        return MCRConfiguration2.getRawProperties()
             .keySet()
             .stream()
             .filter(k -> k.startsWith(CONFIG_ID_PREFIX))
