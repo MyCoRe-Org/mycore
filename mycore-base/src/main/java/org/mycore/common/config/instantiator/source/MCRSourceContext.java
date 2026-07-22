@@ -121,8 +121,22 @@ public final class MCRSourceContext {
 
     private String exceptionMessage(String exceptionMessage) {
         return MCRInstantiatorUtils.capitalize(description()) + ", configured in " + property()
-            + " (and its sub-properties)," + " for target " + target.type().name().toLowerCase(Locale.ROOT) + " '"
-            + target.name() + "' in configured class " + target.declaringClass().getName() + " " + exceptionMessage;
+            + " (and its sub-properties)," + " for target " + targetTypeName(target) + " '"
+            + target.name() + "' in configured class " + targetClassName(target) + " " + exceptionMessage;
+    }
+
+    public String missingValueMessage(MCRTarget target) {
+        return MCRInstantiatorUtils.capitalize(description()) + " for target " + targetTypeName(target) + " '"
+            + target.name() + "' in configured class " + targetClassName(target) + " references missing configuration "
+            + property() + " (or sub-properties thereof),";
+    }
+
+    private static String targetTypeName(MCRTarget target) {
+        return target.type().name().toLowerCase(Locale.ROOT);
+    }
+
+    private static String targetClassName(MCRTarget target) {
+        return target.declaringClass().getName();
     }
 
 }

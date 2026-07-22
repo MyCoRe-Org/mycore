@@ -55,13 +55,16 @@ abstract sealed class MCRSourceBase<Result> implements MCRSource permits MCRInst
             context = new MCRSourceContext(target, configuration.name().canonical() + "." + name, description());
             result = getResult(context, configuration, configuration.properties(), name);
         }
+        if (logger.isDebugEnabled() && isMissingResult(result)) {
+            logger.debug(context.missingValueMessage(target));
+        }
 
         String defaultName = defaultName();
         if (result == null && !defaultName.isEmpty()) {
             context = new MCRSourceContext(target, defaultName, "default " + description());
             result = getResult(context, configuration, configuration.fullProperties(), defaultName);
-            if (result == null || (isMissingResult(result) && required())) {
-                throw missingException(context);
+            if (logger.isDebugEnabled() && isMissingResult(result)) {
+                logger.debug(context.missingValueMessage(target));
             }
         }
 
