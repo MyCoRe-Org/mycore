@@ -65,7 +65,12 @@ final class MCRPostConstructionSource implements MCRSource {
         return switch (annotation.value()) {
             case ACTUAL -> configuration.name().actual();
             case CANONICAL -> configuration.name().canonical();
+            case TAILING_NAME -> lastComponent(configuration.name().canonical());
         };
+    }
+
+    private String lastComponent(String name) {
+        return name.substring(name.lastIndexOf('.') + 1);
     }
 
 }

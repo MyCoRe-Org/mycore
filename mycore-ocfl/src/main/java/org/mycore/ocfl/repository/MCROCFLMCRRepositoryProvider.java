@@ -28,6 +28,8 @@ import io.ocfl.core.extension.OcflExtensionConfig;
 import io.ocfl.core.extension.OcflExtensionRegistry;
 import jakarta.inject.Singleton;
 
+import static org.mycore.common.config.annotation.MCRPostConstruction.Value.TAILING_NAME;
+
 /**
  * Repository Provider for the MyCoRe-Storage-Layout
  * @author Tobias Lenhardt [Hammer1279]
@@ -36,10 +38,10 @@ import jakarta.inject.Singleton;
 public class MCROCFLMCRRepositoryProvider extends MCROCFLLocalRepositoryProvider {
 
     @Override
-    @MCRPostConstruction
-    public void init(String prop) throws IOException {
+    @MCRPostConstruction(TAILING_NAME)
+    public void init(String id) throws IOException {
         OcflExtensionRegistry.register(MCRStorageLayoutExtension.EXTENSION_NAME, MCRStorageLayoutExtension.class);
-        super.init(prop);
+        super.init(id);
     }
 
     @Override

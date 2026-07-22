@@ -45,6 +45,8 @@ import org.mycore.common.content.transformer.MCRContentTransformerFactory;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
+import static org.mycore.common.config.annotation.MCRPostConstruction.Value.TAILING_NAME;
+
 @MCRConfigurationProxy(proxyClass = MCRObjectStaticContentGenerator.Factory.class)
 public class MCRObjectStaticContentGenerator {
 
@@ -191,9 +193,9 @@ public class MCRObjectStaticContentGenerator {
 
         private String configId;
 
-        @MCRPostConstruction
-        public void setConfigId(String property) {
-            this.configId = property.substring(property.lastIndexOf('.') + 1 );
+        @MCRPostConstruction(TAILING_NAME)
+        public void setConfigId(String configId) {
+            this.configId = configId;
         }
 
         @Override

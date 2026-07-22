@@ -41,6 +41,8 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.transfer.s3.S3TransferManager;
 
+import static org.mycore.common.config.annotation.MCRPostConstruction.Value.TAILING_NAME;
+
 /**
  * Provides an implementation of {@link MCROCFLRepositoryProvider} for managing OCFL repositories on AWS S3-compatible
  * storage.
@@ -115,12 +117,11 @@ public class MCROCFLS3RepositoryProvider implements MCROCFLRepositoryProvider {
      *   <li>Registers a shutdown handler to clean up resources on application close.</li>
      * </ul>
      *
-     * @param prop the property key used to identify this repository configuration.
+     * @param id the repository ID.
      * @throws IOException if an error occurs during initialization.
      */
-    @MCRPostConstruction
-    public void init(String prop) throws IOException {
-        String id = prop.substring(REPOSITORY_PROPERTY_PREFIX.length());
+    @MCRPostConstruction(TAILING_NAME)
+    public void init(String id) throws IOException {
 
         Files.createDirectories(workDir);
 

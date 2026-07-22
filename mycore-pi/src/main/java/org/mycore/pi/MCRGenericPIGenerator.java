@@ -55,6 +55,8 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
+import static org.mycore.common.config.annotation.MCRPostConstruction.Value.TAILING_NAME;
+
 /**
  *
  * MCR.PI.Generator.myGenerator.Class=org.mycore.pi.urn.MCRGenericPIGenerator
@@ -147,7 +149,7 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
     }
 
     @Override
-    @MCRPostConstruction
+    @MCRPostConstruction(TAILING_NAME)
     public void init(String property) {
         super.init(property);
         final Map<String, String> properties = getProperties();

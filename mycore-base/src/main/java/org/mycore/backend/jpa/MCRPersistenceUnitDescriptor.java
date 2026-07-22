@@ -40,6 +40,8 @@ import jakarta.persistence.PersistenceUnitTransactionType;
 import jakarta.persistence.SharedCacheMode;
 import jakarta.persistence.ValidationMode;
 
+import static org.mycore.common.config.annotation.MCRPostConstruction.Value.TAILING_NAME;
+
 public class MCRPersistenceUnitDescriptor implements PersistenceUnitDescriptor {
 
     public static final String MCR_PERSISTENCE_PROPERTIES_PREFIX = "Properties.";
@@ -58,10 +60,9 @@ public class MCRPersistenceUnitDescriptor implements PersistenceUnitDescriptor {
 
     private String name;
 
-    @MCRPostConstruction
-    public void initializeName(String property) {
-        this.name = property.substring(MCRPersistenceProvider.JPA_PERSISTENCE_UNIT_PROPERTY_NAME.length())
-            .split("\\.")[0];
+    @MCRPostConstruction(TAILING_NAME)
+    public void initializeName(String name) {
+        this.name = name;
         LOGGER.info("Initialized persistence unit {}", this.name);
     }
 

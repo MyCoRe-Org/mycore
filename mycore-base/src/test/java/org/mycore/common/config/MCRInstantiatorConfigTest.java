@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mycore.common.config.MCRConfiguration2.set;
+import static org.mycore.common.config.annotation.MCRPostConstruction.Value.ACTUAL;
 import static org.mycore.common.config.instantiator.MCRInstanceConfiguration.ofName;
 
 import java.util.ArrayList;
@@ -489,7 +490,7 @@ public class MCRInstantiatorConfigTest {
             return orderedMethodValues;
         }
 
-        @MCRPostConstruction(MCRPostConstruction.Value.ACTUAL)
+        @MCRPostConstruction(ACTUAL)
         public void callPostConstruction(String property) throws MCRConfigurationException {
             postConstructionProperty = property;
         }
