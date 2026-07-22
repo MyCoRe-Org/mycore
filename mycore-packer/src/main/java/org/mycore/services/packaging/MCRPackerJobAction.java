@@ -87,7 +87,7 @@ public class MCRPackerJobAction extends MCRJobAction {
 
     public static Map<String, String> getConfiguration(String packerId) {
         String packerConfigPrefix = MCRPacker.PACKER_CONFIGURATION_PREFIX + packerId + ".";
-        return MCRConfiguration2.getPropertiesMap()
+        return MCRConfiguration2.getRawProperties()
             .entrySet()
             .stream()
             .filter(p -> p.getKey().startsWith(packerConfigPrefix))

@@ -31,7 +31,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 
 /**
- * Represents an extract of properties (typically {@link MCRConfiguration2#getPropertiesMap()}) used to
+ * Represents an extract of properties (typically {@link MCRConfiguration2#getRawProperties()}) used to
  * instantiate an object. Provides methods to extract nested configurations.
  * <p>
  * Generally speaking, a configuration has a {@link MCRInstanceConfiguration#name()} that represents the
@@ -85,11 +85,11 @@ public final class MCRInstanceConfiguration<S> {
     /**
      * Shorthand for {@link MCRInstanceConfiguration#ofClass(Class, Class, String, Map)} that
      * uses {@link MCRClassTools#forName(String)} to resolve the value class and
-     * uses {@link MCRConfiguration2#getPropertiesMap()} as the properties.
+     * uses {@link MCRConfiguration2#getRawProperties()} as the properties.
      */
     public static <S> MCRInstanceConfiguration<S> ofClassName(Class<S> superClass, String className,
         String prefix) {
-        return ofClassName(superClass, className, prefix, MCRConfiguration2.getPropertiesMap());
+        return ofClassName(superClass, className, prefix, MCRConfiguration2.getRawProperties());
     }
 
     /**
@@ -108,11 +108,11 @@ public final class MCRInstanceConfiguration<S> {
 
     /**
      * Shorthand for {@link MCRInstanceConfiguration#ofClass(Class, Class, String, Map)} that
-     * uses {@link MCRConfiguration2#getPropertiesMap()} as the properties.
+     * uses {@link MCRConfiguration2#getRawProperties()} as the properties.
      */
     public static <S> MCRInstanceConfiguration<S> ofClass(Class<S> superClass, Class<? extends S> valueClass,
         String prefix) {
-        return ofClass(superClass, valueClass, prefix, MCRConfiguration2.getPropertiesMap());
+        return ofClass(superClass, valueClass, prefix, MCRConfiguration2.getRawProperties());
     }
 
     /**
@@ -143,11 +143,11 @@ public final class MCRInstanceConfiguration<S> {
     /**
      * Shorthand for {@link MCRInstanceConfiguration#ofName(Class, MCRInstanceName, Map, Set)} that
      * creates the name with {@link MCRInstanceName#of(String)} and
-     * uses {@link MCRConfiguration2#getPropertiesMap()} as the properties and
+     * uses {@link MCRConfiguration2#getRawProperties()} as the properties and
      * uses {@link Options#NONE} as the options.
      */
     public static <T> MCRInstanceConfiguration<T> ofName(Class<T> superClass, String name) {
-        return ofName(superClass, MCRInstanceName.of(name), MCRConfiguration2.getPropertiesMap(), Options.NONE);
+        return ofName(superClass, MCRInstanceName.of(name), MCRConfiguration2.getRawProperties(), Options.NONE);
     }
 
     /**
@@ -163,11 +163,11 @@ public final class MCRInstanceConfiguration<S> {
     /**
      * Shorthand for {@link MCRInstanceConfiguration#ofName(Class, MCRInstanceName, Map, Set)} that
      * creates the name with {@link MCRInstanceName#of(String)} and
-     * uses {@link MCRConfiguration2#getPropertiesMap()} as the properties.
+     * uses {@link MCRConfiguration2#getRawProperties()} as the properties.
      */
     public static <T> MCRInstanceConfiguration<T> ofName(Class<T> superClass, String name,
         Set<Option> options) {
-        return ofName(superClass, MCRInstanceName.of(name), MCRConfiguration2.getPropertiesMap(), options);
+        return ofName(superClass, MCRInstanceName.of(name), MCRConfiguration2.getRawProperties(), options);
     }
 
     /**
