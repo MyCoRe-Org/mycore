@@ -69,7 +69,7 @@ import org.mycore.test.MyCoReTest;
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;">yes</td>
  *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">Exception</td>
+ *     <td style="border: 1px solid;"><code>[]</code></td>
  *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
@@ -255,14 +255,13 @@ public class MCRInstantiatorPropertyListTest {
             exception = e;
         }
 
-        boolean missingDefaultConfiguration = false;
-        missingDefaultConfiguration |= valueProperty.notSet() && defaultValue && defaultProperty.notSet();
-        missingDefaultConfiguration |= required && valueProperty.notSet() && defaultValue && defaultProperty.setEmpty();
+        boolean missingDefaultConfiguration = required && valueProperty.notSet()
+            && defaultValue && defaultProperty.notSetOrSetEmpty();
 
         // all the indications a nested property should not be created (or creation should be suppressed)
         boolean shouldNotCreateProperty = false;
         shouldNotCreateProperty |= valueProperty.notSet() && !defaultValue;
-        shouldNotCreateProperty |= valueProperty.notSet() && defaultValue && defaultProperty.setEmpty();
+        shouldNotCreateProperty |= valueProperty.notSet() && defaultValue && defaultProperty.notSetOrSetEmpty();
         shouldNotCreateProperty |= valueProperty.setEmpty();
 
         if (missingDefaultConfiguration) {
@@ -348,12 +347,8 @@ public class MCRInstantiatorPropertyListTest {
 
         SET_LONG_FORM;
 
-        public boolean notSet() {
-            return this == NOT_SET;
-        }
-
-        public boolean setEmpty() {
-            return this == SET_EMPTY;
+        public boolean notSetOrSetEmpty() {
+            return this == NOT_SET || this == SET_EMPTY;
         }
 
     }

@@ -66,7 +66,7 @@ import org.mycore.test.MyCoReTest;
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;">yes</td>
  *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">Exception</td>
+ *     <td style="border: 1px solid;"><code>null</code></td>
  *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
@@ -193,10 +193,12 @@ public class MCRInstantiatorPropertyTest {
             exception = e;
         }
 
-        boolean missingDefaultConfiguration = valueProperty.notSet() && defaultValue && defaultProperty.notSet();
+        boolean missingDefaultConfiguration = required && valueProperty.notSet()
+            && defaultValue && defaultProperty.notSet();
 
         // all the indications a nested property should not be created (or creation should be suppressed)
-        boolean shouldNotCreateProperty = valueProperty.notSet() && !defaultValue;
+        boolean shouldNotCreateProperty = valueProperty.notSet() &&
+            (!defaultValue || (!required && defaultProperty.notSet()));
 
         if (missingDefaultConfiguration) {
 
