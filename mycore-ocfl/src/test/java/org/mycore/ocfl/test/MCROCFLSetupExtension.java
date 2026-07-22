@@ -124,7 +124,7 @@ public class MCROCFLSetupExtension implements BeforeEachCallback, AfterEachCallb
                 + repositoryProvider.getClass().getSimpleName());
         }
         repositoryProviderMock.setRemote(remote);
-        repositoryProviderMock.init(MCROCFLRepositoryProvider.REPOSITORY_PROPERTY_PREFIX + repositoryId);
+        repositoryProviderMock.init(repositoryId);
 
         LOGGER.info("OCFL repository root: {}", repositoryProviderMock.getRepositoryRoot());
         LOGGER.info("OCFL repository working directory: {}", repositoryProviderMock.getWorkDir());

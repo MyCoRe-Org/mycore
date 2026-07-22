@@ -18,6 +18,7 @@
 package org.mycore.pi;
 
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
+import static org.mycore.common.config.annotation.MCRPostConstruction.Value.TAILING_NAME;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -226,9 +227,9 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
             });
     }
 
-    @MCRPostConstruction
-    public void init(String prop) {
-        registrationServiceID = prop.substring(MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX.length());
+    @MCRPostConstruction(TAILING_NAME)
+    public void init(String registrationServiceID) {
+        this.registrationServiceID = registrationServiceID;
     }
 
     public final String getServiceID() {

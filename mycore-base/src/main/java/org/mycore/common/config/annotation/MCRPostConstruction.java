@@ -54,7 +54,9 @@ public @interface MCRPostConstruction {
 
         ACTUAL,
 
-        CANONICAL
+        CANONICAL,
+
+        TAILING_NAME
 
     }
 

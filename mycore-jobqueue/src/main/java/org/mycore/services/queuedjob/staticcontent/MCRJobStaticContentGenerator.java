@@ -40,6 +40,8 @@ import org.mycore.services.queuedjob.MCRJobQueueManager;
 import org.mycore.services.queuedjob.MCRJobStatus;
 import org.mycore.services.staticcontent.MCRObjectStaticContentGenerator;
 
+import static org.mycore.common.config.annotation.MCRPostConstruction.Value.TAILING_NAME;
+
 @MCRConfigurationProxy(proxyClass = MCRJobStaticContentGenerator.Factory.class)
 public class MCRJobStaticContentGenerator extends MCRObjectStaticContentGenerator {
 
@@ -88,9 +90,9 @@ public class MCRJobStaticContentGenerator extends MCRObjectStaticContentGenerato
 
         private String configId;
 
-        @MCRPostConstruction
-        public void setConfigId(String property) {
-            this.configId = property.substring(property.lastIndexOf('.') + 1 );
+        @MCRPostConstruction(TAILING_NAME)
+        public void setConfigId(String configId) {
+            this.configId = configId;
         }
 
         @Override

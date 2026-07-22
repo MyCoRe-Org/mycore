@@ -18,6 +18,7 @@
 
 package org.mycore.pi;
 
+import static org.mycore.common.config.annotation.MCRPostConstruction.Value.TAILING_NAME;
 import static org.mycore.pi.MCRPIService.GENERATOR_CONFIG_PREFIX;
 
 import java.util.Map;
@@ -38,9 +39,9 @@ public abstract class MCRPIGenerator<T extends MCRPersistentIdentifier> {
         return properties;
     }
 
-    @MCRPostConstruction
-    public void init(String property) {
-        generatorID = property.substring(GENERATOR_CONFIG_PREFIX.length());
+    @MCRPostConstruction(TAILING_NAME)
+    public void init(String generatorID) {
+        this.generatorID = generatorID;
     }
 
     @MCRRawProperties(namePattern = "*", required = false)
