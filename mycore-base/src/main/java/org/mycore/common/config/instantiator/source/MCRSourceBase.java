@@ -61,9 +61,6 @@ abstract class MCRSourceBase<Result> implements MCRSource {
         if (result == null && !defaultName.isEmpty()) {
             context = new MCRSourceContext(target, defaultName, "default " + description());
             result = getResult(context, configuration, configuration.fullProperties(), defaultName);
-            if (result == null || (isMissingResult(result) && required())) {
-                throw missingException(context);
-            }
         }
 
         if ((result == null || isMissingResult(result)) && required()) {
