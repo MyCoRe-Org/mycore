@@ -437,7 +437,7 @@ public class MCRParameterCollector {
 
             PROPERTIES_CHANGE_LISTENER_ID.set(uuid);
 
-            MCRConfiguration2.getPropertiesMap().forEach((key, value) -> {
+            MCRConfiguration2.getRawPropertiesMap().forEach((key, value) -> {
                 safeProperties.put(xmlSafe(key), value);
             });
 

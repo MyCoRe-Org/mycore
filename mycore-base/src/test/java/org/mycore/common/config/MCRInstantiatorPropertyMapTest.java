@@ -240,7 +240,7 @@ public class MCRInstantiatorPropertyMapTest {
 
         // log all relevant configuration entries
         LOGGER.info("CONFIGURATION PROPERTIES");
-        Map<String, String> propertiesMap = MCRConfiguration2.getPropertiesMap();
+        Map<String, String> propertiesMap = MCRConfiguration2.getRawPropertiesMap();
         LOGGER.info("{}={}", CONFIGURED_CLASS_PROPERTY, get(propertiesMap, CONFIGURED_CLASS_PROPERTY));
         LOGGER.info("{}={}", MAP_PROPERTY, get(propertiesMap, MAP_PROPERTY));
         LOGGER.info("{}={}", MAP_PROPERTY_NON_EMPTY, get(propertiesMap, MAP_PROPERTY_NON_EMPTY));

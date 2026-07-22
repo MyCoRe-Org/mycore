@@ -48,7 +48,7 @@ public class MCRClassificationAndSetMapper {
      */
     public static String mapClassificationToSet(String prefix, String classid) {
         String propPrefix = prefix + PROP_SETS_PREFIX;
-        return MCRConfiguration2.getPropertiesMap()
+        return MCRConfiguration2.getRawPropertiesMap()
             .entrySet()
             .stream()
             .filter(p -> p.getKey().startsWith(propPrefix))
@@ -61,7 +61,7 @@ public class MCRClassificationAndSetMapper {
     }
 
     private static String getSetNameFromDeprecatedProperty(String prefix, String classid) {
-        return MCRConfiguration2.getPropertiesMap()
+        return MCRConfiguration2.getRawPropertiesMap()
             .entrySet()
             .stream()
             .filter(p -> p.getKey().startsWith(prefix + PROP_SUFFIX))
