@@ -24,6 +24,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.mycore.common.config.annotation.MCRPostConstruction;
+import org.mycore.common.config.annotation.MCRPostConstruction.Value;
 import org.mycore.common.config.annotation.MCRProperty;
 
 import io.ocfl.core.extension.OcflExtensionConfig;
@@ -59,14 +60,13 @@ public abstract class MCROCFLLocalRepositoryProvider implements MCROCFLRepositor
      * Initializes the OCFL repository by setting up the working and repository root directories
      * and configuring the repository builder.
      *
-     * @param prop the repository configuration property key, used to determine the repository ID.
+     * @param id the repository ID.
      * @throws IOException if an I/O error occurs while creating the necessary directories.
      */
-    @MCRPostConstruction
-    public void init(String prop) throws IOException {
+    @MCRPostConstruction(Value.TRAILING_NAME)
+    public void init(String id) throws IOException {
         Files.createDirectories(workDir);
         Files.createDirectories(repositoryRoot);
-        String id = prop.substring(REPOSITORY_PROPERTY_PREFIX.length());
         repository = buildRepository(id);
     }
 

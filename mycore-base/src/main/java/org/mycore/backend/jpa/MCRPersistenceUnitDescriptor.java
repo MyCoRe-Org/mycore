@@ -31,6 +31,7 @@ import org.hibernate.bytecode.spi.ClassTransformer;
 import org.hibernate.jpa.boot.spi.PersistenceUnitDescriptor;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.config.annotation.MCRPostConstruction;
+import org.mycore.common.config.annotation.MCRPostConstruction.Value;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.config.annotation.MCRPropertyList;
 import org.mycore.common.config.annotation.MCRRawProperties;
@@ -57,10 +58,9 @@ public class MCRPersistenceUnitDescriptor implements PersistenceUnitDescriptor {
 
     private String name;
 
-    @MCRPostConstruction
-    public void initializeName(String property) {
-        this.name = property.substring(MCRPersistenceProvider.JPA_PERSISTENCE_UNIT_PROPERTY_NAME.length())
-            .split("\\.")[0];
+    @MCRPostConstruction(Value.TRAILING_NAME)
+    public void initializeName(String name) {
+        this.name = name;
         LOGGER.info("Initialized persistence unit {}", this.name);
     }
 

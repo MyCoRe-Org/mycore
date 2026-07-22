@@ -47,6 +47,7 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRPostConstruction;
+import org.mycore.common.config.annotation.MCRPostConstruction.Value;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.config.annotation.MCRRawProperties;
 import org.mycore.datamodel.metadata.MCRBase;
@@ -226,9 +227,9 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
             });
     }
 
-    @MCRPostConstruction
-    public void init(String prop) {
-        registrationServiceID = prop.substring(MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX.length());
+    @MCRPostConstruction(Value.TRAILING_NAME)
+    public void init(String registrationServiceID) {
+        this.registrationServiceID = registrationServiceID;
     }
 
     public final String getServiceID() {
