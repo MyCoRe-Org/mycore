@@ -29,7 +29,6 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.config.MCRConfigurationException;
 
 /**
  * Represents an extract of properties (typically {@link MCRConfiguration2#getAllProperties()}) used to
@@ -214,12 +213,7 @@ public final class MCRInstanceConfiguration<S> {
             if (className.isBlank()) {
                 return null;
             }
-            try {
-                return MCRClassTools.forName(className);
-            } catch (ClassNotFoundException e) {
-                throw new MCRConfigurationException("Missing class (" + className + ")" +
-                    " configured in: " + name.actual(), e);
-            }
+            return MCRInstantiatorUtils.getClass(name.actual(), className);
         }
 
         if (options.contains(Option.IMPLICIT) && Modifier.isFinal(superClass.getModifiers())) {

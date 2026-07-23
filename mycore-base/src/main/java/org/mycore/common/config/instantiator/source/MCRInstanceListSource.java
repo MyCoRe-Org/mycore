@@ -32,7 +32,7 @@ import org.mycore.common.config.instantiator.target.MCRTarget;
 /**
  * A {@link MCRInstanceListSource} is a {@link MCRSource} that interprets a {@link MCRInstanceList}.
  */
-final class MCRInstanceListSource extends MCRSourceBase<List<Object>> {
+final class MCRInstanceListSource extends MCRInstanceSourceBase<List<Object>> {
 
     private final MCRInstanceList annotation;
 
