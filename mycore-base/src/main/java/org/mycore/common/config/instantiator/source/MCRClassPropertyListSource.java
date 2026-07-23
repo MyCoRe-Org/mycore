@@ -21,18 +21,18 @@ package org.mycore.common.config.instantiator.source;
 import java.util.List;
 import java.util.Set;
 
-import org.mycore.common.config.annotation.MCRPropertyList;
+import org.mycore.common.config.annotation.MCRClassPropertyList;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
 /**
- * A {@link MCRPropertyListSource} is a {@link MCRSource} that interprets a {@link MCRPropertyList}.
+ * A {@link MCRClassPropertyListSource} is a {@link MCRSource} that interprets a {@link MCRClassPropertyList}.
  */
-final class MCRPropertyListSource extends MCRValueListSourceBase<String> {
+final class MCRClassPropertyListSource extends MCRValueListSourceBase<Class<?>> {
 
-    private final MCRPropertyList annotation;
+    private final MCRClassPropertyList annotation;
 
-    MCRPropertyListSource(MCRPropertyList annotation, MCRAnnotationProvider annotationProvider) {
-        super(annotationProvider, new MCRPropertyExtractor());
+    MCRClassPropertyListSource(MCRClassPropertyList annotation, MCRAnnotationProvider annotationProvider) {
+        super(annotationProvider, new MCRClassPropertyExtractor(annotation.valueClass()));
         this.annotation = annotation;
     }
 
@@ -42,8 +42,8 @@ final class MCRPropertyListSource extends MCRValueListSourceBase<String> {
     }
 
     @Override
-    public Class<MCRPropertyList> annotationClass() {
-        return MCRPropertyList.class;
+    public Class<MCRClassPropertyList> annotationClass() {
+        return MCRClassPropertyList.class;
     }
 
     @Override
@@ -63,7 +63,7 @@ final class MCRPropertyListSource extends MCRValueListSourceBase<String> {
 
     @Override
     protected String description() {
-        return "property list";
+        return "class list";
     }
 
     @Override
