@@ -18,32 +18,31 @@
 
 package org.mycore.common.config.instantiator.source;
 
-import java.util.List;
 import java.util.Set;
 
-import org.mycore.common.config.annotation.MCRPropertyList;
+import org.mycore.common.config.annotation.MCRClassProperty;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
 /**
- * A {@link MCRPropertyListSource} is a {@link MCRSource} that interprets a {@link MCRPropertyList}.
+ * A {@link MCRClassPropertySource} is a {@link MCRSource} that interprets a {@link MCRClassProperty}.
  */
-final class MCRPropertyListSource extends MCRValueListSourceBase<String> {
+final class MCRClassPropertySource extends MCRValueSourceBase<Class<?>> {
 
-    private final MCRPropertyList annotation;
+    private final MCRClassProperty annotation;
 
-    MCRPropertyListSource(MCRPropertyList annotation, MCRAnnotationProvider annotationProvider) {
-        super(annotationProvider, new MCRPropertyExtractor());
+    MCRClassPropertySource(MCRClassProperty annotation, MCRAnnotationProvider annotationProvider) {
+        super(annotationProvider, new MCRClassPropertyExtractor(annotation.valueClass()));
         this.annotation = annotation;
     }
 
     @Override
     public Type type() {
-        return Type.PROPERTY_LIST;
+        return Type.PROPERTY;
     }
 
     @Override
-    public Class<MCRPropertyList> annotationClass() {
-        return MCRPropertyList.class;
+    public Class<MCRClassProperty> annotationClass() {
+        return MCRClassProperty.class;
     }
 
     @Override
@@ -58,12 +57,12 @@ final class MCRPropertyListSource extends MCRValueListSourceBase<String> {
 
     @Override
     public Class<?> valueClass() {
-        return List.class;
+        return Class.class;
     }
 
     @Override
     protected String description() {
-        return "property list";
+        return "class";
     }
 
     @Override
@@ -73,7 +72,7 @@ final class MCRPropertyListSource extends MCRValueListSourceBase<String> {
 
     @Override
     protected boolean allowsEmptyName() {
-        return true;
+        return false;
     }
 
     @Override
