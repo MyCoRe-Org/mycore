@@ -18,31 +18,22 @@
 
 package org.mycore.common.config.instantiator.source;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRPropertyList;
-import org.mycore.common.config.annotation.MCRSentinel;
-import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
 /**
  * A {@link MCRPropertyListSource} is a {@link MCRSource} that interprets a {@link MCRPropertyList}.
  */
-final class MCRPropertyListSource extends MCRSourceBase<List<String>> {
+final class MCRPropertyListSource extends MCRValueListSourceBase<String> {
 
     private final MCRPropertyList annotation;
 
-    private final MCRSentinel sentinel;
-
     MCRPropertyListSource(MCRPropertyList annotation, MCRAnnotationProvider annotationProvider) {
+        super(annotationProvider, new MCRPropertyExtractor());
         this.annotation = annotation;
-        this.sentinel = annotationProvider.get(MCRSentinel.class);
     }
 
     @Override
@@ -98,74 +89,6 @@ final class MCRPropertyListSource extends MCRSourceBase<List<String>> {
     @Override
     protected String defaultName() {
         return annotation.defaultName();
-    }
-
-    @Override
-    protected List<String> getResult(MCRSourceContext context, MCRInstanceConfiguration<?> configuration,
-        Map<String, String> properties, String prefix) {
-
-        Map<String, String> listProperties = new HashMap<>();
-        String keyPrefix = prefix.isEmpty() ? prefix : prefix + ".";
-        int keyPrefixLength = keyPrefix.length();
-        properties.forEach((key, value) -> {
-            if (key.startsWith(keyPrefix) && !key.isEmpty()) {
-                int index = key.indexOf('.', keyPrefixLength);
-                if (index == -1) {
-                    if (!value.isEmpty()) {
-                        listProperties.put(key.substring(keyPrefixLength), value);
-                    }
-                }
-            }
-        });
-
-        List<String> headPropertyList = new ArrayList<>(0);
-        List<String> tailPropertyList = new ArrayList<>(listProperties.size());
-
-        List<String> keyList = context.orderedKeys(listProperties);
-        for (String key : keyList) {
-            MCRSourceContext nestedContext = context.nested(key, "property list element");
-            if (!rejectedBySentinel(sentinel, nestedContext, properties, keyPrefix + key + ".")) {
-                if (key.charAt(0) == '-') {
-                    headPropertyList.add(listProperties.get(key));
-                } else {
-                    tailPropertyList.add(listProperties.get(key));
-                }
-            }
-        }
-
-        List<String> shortFormList = List.of();
-        String shortFormProperty = properties.get(prefix);
-        if (shortFormProperty != null) {
-            shortFormList = parseShortFormList(shortFormProperty);
-        }
-
-        int totalSize = headPropertyList.size() + shortFormList.size() + tailPropertyList.size();
-        List<String> propertyList = new ArrayList<>(totalSize);
-        propertyList.addAll(headPropertyList);
-        propertyList.addAll(shortFormList);
-        propertyList.addAll(tailPropertyList);
-
-        return propertyList;
-
-    }
-
-    private List<String> parseShortFormList(String value) {
-        return MCRConfiguration2.splitValue(value).toList();
-    }
-
-    @Override
-    protected boolean isMissingResult(List<String> result) {
-        return result.isEmpty();
-    }
-
-    @Override
-    protected MCRConfigurationException missingResultException(MCRSourceContext context) {
-        return context.emptyException();
-    }
-
-    @Override
-    protected List<String> missingResultReplacement() {
-        return new ArrayList<>();
     }
 
 }

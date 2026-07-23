@@ -18,37 +18,31 @@
 
 package org.mycore.common.config.instantiator.source;
 
-import java.util.Map;
 import java.util.Set;
 
-import org.mycore.common.config.MCRConfigurationException;
-import org.mycore.common.config.annotation.MCRInstance;
-import org.mycore.common.config.annotation.MCRSentinel;
-import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
+import org.mycore.common.config.annotation.MCRClassProperty;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
 /**
- * A {@link MCRInstanceSource} is a {@link MCRSource} that interprets a {@link MCRInstance}.
+ * A {@link MCRClassPropertySource} is a {@link MCRSource} that interprets a {@link MCRClassProperty}.
  */
-final class MCRInstanceSource extends MCRInstanceSourceBase<Object> {
+final class MCRClassPropertySource extends MCRValueSourceBase<Class<?>> {
 
-    private final MCRInstance annotation;
+    private final MCRClassProperty annotation;
 
-    private final MCRSentinel sentinel;
-
-    MCRInstanceSource(MCRInstance annotation, MCRAnnotationProvider annotationProvider) {
+    MCRClassPropertySource(MCRClassProperty annotation, MCRAnnotationProvider annotationProvider) {
+        super(annotationProvider, new MCRClassPropertyExtractor(annotation.valueClass()));
         this.annotation = annotation;
-        this.sentinel = annotationProvider.get(MCRSentinel.class);
     }
 
     @Override
     public Type type() {
-        return Type.INSTANCE;
+        return Type.PROPERTY;
     }
 
     @Override
-    public Class<MCRInstance> annotationClass() {
-        return MCRInstance.class;
+    public Class<MCRClassProperty> annotationClass() {
+        return MCRClassProperty.class;
     }
 
     @Override
@@ -63,12 +57,12 @@ final class MCRInstanceSource extends MCRInstanceSourceBase<Object> {
 
     @Override
     public Class<?> valueClass() {
-        return annotation.valueClass();
+        return Class.class;
     }
 
     @Override
     protected String description() {
-        return "instance";
+        return "class";
     }
 
     @Override
@@ -83,7 +77,7 @@ final class MCRInstanceSource extends MCRInstanceSourceBase<Object> {
 
     @Override
     protected boolean absolute() {
-        return false;
+        return annotation.absolute();
     }
 
     @Override
@@ -93,31 +87,7 @@ final class MCRInstanceSource extends MCRInstanceSourceBase<Object> {
 
     @Override
     protected String defaultName() {
-        return "";
-    }
-
-    @Override
-    protected Object getResult(MCRSourceContext context, MCRInstanceConfiguration<?> configuration,
-        Map<String, String> properties, String prefix) {
-
-        MCRInstanceConfiguration<?> nestedConfiguration = configuration.nested(annotation.valueClass(), name());
-        return createInstance(context, nestedConfiguration, sentinel);
-
-    }
-
-    @Override
-    protected boolean isMissingResult(Object result) {
-        return result == null;
-    }
-
-    @Override
-    protected MCRConfigurationException missingResultException(MCRSourceContext context) {
-        return context.missingException();
-    }
-
-    @Override
-    protected Object missingResultReplacement() {
-        return null;
+        return annotation.defaultName();
     }
 
 }

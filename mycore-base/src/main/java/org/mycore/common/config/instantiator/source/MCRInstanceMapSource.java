@@ -31,7 +31,7 @@ import org.mycore.common.config.instantiator.target.MCRTarget;
 /**
  * A {@link MCRInstanceMapSource} is a {@link MCRSource} that interprets a {@link MCRInstanceMap}.
  */
-final class MCRInstanceMapSource extends MCRSourceBase<Map<String, Object>> {
+final class MCRInstanceMapSource extends MCRInstanceSourceBase<Map<String, Object>> {
 
     private final MCRInstanceMap annotation;
 
