@@ -26,14 +26,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
-import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.common.config.annotation.MCRClassProperty;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstanceMap;
-import org.mycore.common.config.annotation.MCRPostConstruction;
-import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.restapi.MCRApiDraftFilter;
 import org.mycore.restapi.MCRContentNegotiationViaExtensionFilter;
@@ -146,38 +143,15 @@ public class MCRRestV2App extends MCRJerseyRestApp {
 
         public static final class Factory implements Supplier<Binding> {
 
-            @MCRProperty(name = "From")
-            public String implementationClass;
+            @MCRClassProperty(name = "From")
+            public Class<?> implementationClass;
 
-            @MCRProperty(name = "To")
-            public String apiClass;
-
-            private String property;
-
-            @MCRPostConstruction
-            public void init(String property) {
-                this.property = property;
-            }
+            @MCRClassProperty(name = "To")
+            public Class<?> apiClass;
 
             @Override
             public Binding get() {
-                Class<?> implementationClass = toClass(this.implementationClass, "From");
-                Class<?> apiClass = toClass(this.apiClass, "To");
-                if (!apiClass.isAssignableFrom(implementationClass)) {
-                    throw new IllegalArgumentException("Implementation " + this.implementationClass + " configured in "
-                        + property + ".From does not implement/extend " + this.apiClass + " configured in "
-                        + property + ".To");
-                }
                 return new Binding(implementationClass, apiClass);
-            }
-
-            private Class<?> toClass(String className, String key) {
-                try {
-                    return MCRClassTools.forName(className);
-                } catch (ClassNotFoundException e) {
-                    throw new MCRConfigurationException("Cannot load class " + className + "configured in "
-                        + property + "." + key, e);
-                }
             }
 
         }

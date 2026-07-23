@@ -29,7 +29,7 @@ import org.mycore.common.config.instantiator.MCRInstantiatorUtils;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
 abstract sealed class MCRSourceBase<Result> implements MCRSource permits MCRInstanceListSource, MCRInstanceMapSource,
-    MCRInstanceSource, MCRPropertyListSource, MCRPropertyMapSource, MCRPropertySource {
+    MCRInstanceSource, MCRValueListSourceBase, MCRValueMapSourceBase, MCRValueSourceBase {
 
     protected final Logger logger = LogManager.getLogger(getClass());
 
@@ -115,7 +115,7 @@ abstract sealed class MCRSourceBase<Result> implements MCRSource permits MCRInst
         Object instance = configuration.instantiate();
 
         if (!configuration.valueClass().isAssignableFrom(instance.getClass())) {
-            throw context.incompatibilityException(configuration.valueClass(), instance);
+            throw context.incompatibilityException(configuration.valueClass(), instance.getClass());
         }
 
         return instance;

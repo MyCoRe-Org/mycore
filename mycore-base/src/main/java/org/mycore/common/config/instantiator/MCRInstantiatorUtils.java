@@ -86,8 +86,8 @@ public final class MCRInstantiatorUtils {
 
     public static MCRConfigurationException emptyRawException(String property, MCRTarget target,
         String description) {
-        return new MCRConfigurationException(capitalize(description) + ", configured in " + property + "," +
-            " for target " + targetTypeName(target) + " '" + target.name() + "' in configured class "
+        return new MCRConfigurationException(capitalize(description) + ", configured in " + property + ","
+            + " for target " + targetTypeName(target) + " '" + target.name() + "' in configured class "
             + target.declaringClass().getName()
             + " is empty");
     }
