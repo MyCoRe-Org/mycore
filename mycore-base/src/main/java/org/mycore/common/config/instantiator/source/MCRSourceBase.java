@@ -28,8 +28,8 @@ import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.common.config.instantiator.MCRInstantiatorUtils;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
-abstract sealed class MCRSourceBase<Result> implements MCRSource permits MCRInstanceListSource, MCRInstanceMapSource,
-    MCRInstanceSource, MCRPropertyListSource, MCRPropertyMapSource, MCRPropertySource {
+abstract sealed class MCRSourceBase<Result> implements MCRSource permits MCRInstanceSourceBase, MCRValueListSourceBase, 
+        MCRValueMapSourceBase, MCRValueSourceBase {
 
     protected final Logger logger = LogManager.getLogger(getClass());
 
@@ -96,31 +96,6 @@ abstract sealed class MCRSourceBase<Result> implements MCRSource permits MCRInst
     protected abstract MCRConfigurationException missingResultException(MCRSourceContext context);
 
     protected abstract Result missingResultReplacement();
-
-    protected final Object createInstance(MCRSourceContext context, MCRInstanceConfiguration<?> configuration,
-        MCRSentinel sentinel) {
-
-        if (rejectedBySentinel(sentinel, context, configuration.properties(), "")) {
-            return null;
-        }
-
-        if (!configuration.instantiatable()) {
-            if (logger.isInfoEnabled()) {
-                logger.info("[CLEAN-UP] Ignoring {} {} and all sub-properties (no or empty class name)",
-                    context.description(), context.property());
-            }
-            return null;
-        }
-
-        Object instance = configuration.instantiate();
-
-        if (!configuration.valueClass().isAssignableFrom(instance.getClass())) {
-            throw context.incompatibilityException(configuration.valueClass(), instance);
-        }
-
-        return instance;
-
-    }
 
     protected final boolean rejectedBySentinel(MCRSentinel sentinel, MCRSourceContext context,
         Map<String, String> properties, String prefix) {
