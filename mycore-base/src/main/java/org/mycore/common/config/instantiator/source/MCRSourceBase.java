@@ -18,7 +18,10 @@
 
 package org.mycore.common.config.instantiator.source;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,6 +31,18 @@ import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.common.config.instantiator.MCRInstantiatorUtils;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
+/**
+ * A {@link MCRSourceBase} is a base implementation of {@link MCRSource} that
+ * handles basic aspects for obtaining a value for annotation based injection from properties, i.e.
+ * <ul>
+ *   <li>whether annotation name are allowed</li>
+ *   <li>whether the annotation name is absolute or not,</li>
+ *   <li>whether falling back to a default value is necessary, if no value is configured</li>
+ *   <li>whether an exception is thrown id no value and no default value is configured.</li>
+ * </ul>
+ *
+ * @param <Result> the type of injected value.
+ */
 abstract class MCRSourceBase<Result> implements MCRSource {
 
     protected final Logger logger = LogManager.getLogger(getClass());
@@ -37,30 +52,34 @@ abstract class MCRSourceBase<Result> implements MCRSource {
     public final Result get(MCRInstanceConfiguration<?> configuration, MCRTarget target) {
 
         String name = name();
-        if (name.isEmpty() && !allowsEmptyName()) {
-            throw MCRInstantiatorUtils.emptyNameException(target);
-        }
+        Map<String, String> fullProperties = configuration.fullProperties();
 
         MCRSourceContext context;
         Result result;
 
-        if (absolute()) {
+        if (supportsAbsoluteName()) {
+            if (name.isEmpty()) {
+                throw MCRInstantiatorUtils.emptyNameException(target);
+            }
             context = new MCRSourceContext(target, name, "absolute " + description());
-            result = getResult(context, configuration, configuration.fullProperties(), name);
+            result = getResult(context, reduceProperties(fullProperties, name), fullProperties);
         } else {
+            if (name.isEmpty() && !supportsEmptyName()) {
+                throw MCRInstantiatorUtils.emptyNameException(target);
+            }
             if (name.isEmpty()) {
                 context = new MCRSourceContext(target, configuration.name().canonical(), description());
-                result = getResult(context, configuration, configuration.properties(), "");
+                result = getResult(context, configuration.properties(), fullProperties);
             } else {
                 context = new MCRSourceContext(target, configuration.name().canonical() + "." + name, description());
-                result = getResult(context, configuration, configuration.properties(), name);
+                result = getResult(context, reduceProperties(configuration.properties(), name), fullProperties);
             }
         }
 
         String defaultName = defaultName();
         if (isMissingResult(result) && !defaultName.isEmpty()) {
             context = new MCRSourceContext(target, defaultName, "default " + description());
-            result = getResult(context, configuration, configuration.fullProperties(), defaultName);
+            result = getResult(context, reduceProperties(fullProperties, defaultName), fullProperties);
         }
 
         if (isMissingResult(result) && required()) {
@@ -71,20 +90,56 @@ abstract class MCRSourceBase<Result> implements MCRSource {
 
     }
 
+    protected static Map<String, String> reduceProperties(Map<String, String> properties, String prefix) {
+
+        final String prefixWithDelimiter = prefix + '.';
+        final int prefixWithDelimiterLength = prefixWithDelimiter.length();
+
+        Map<String, String> reducedProperties = new HashMap<>();
+        for (Map.Entry<String, String> entry : properties.entrySet()) {
+            String key = entry.getKey();
+            if (!key.startsWith(prefixWithDelimiter)) {
+                continue;
+            }
+            String reducedKey = key.substring(prefixWithDelimiterLength);
+            reducedProperties.put(reducedKey, entry.getValue());
+        }
+        String directProperty = properties.get(prefix);
+        if (directProperty != null) {
+            reducedProperties.put("", directProperty);
+        }
+        return reducedProperties;
+    }
+
+    protected static Set<String> nextNestedKeys(Map<String, String> properties) {
+        Set<String> keys = new HashSet<>();
+        properties.keySet().forEach((key) -> {
+            if (!key.isEmpty()) {
+                int index = key.indexOf('.');
+                if (index == -1) {
+                    keys.add(key);
+                } else {
+                    keys.add(key.substring(0, index));
+                }
+            }
+        });
+        return keys;
+    }
+
     protected abstract String description();
 
     protected abstract String name();
 
-    protected abstract boolean allowsEmptyName();
-
-    protected abstract boolean absolute();
-
-    protected abstract boolean required();
-
     protected abstract String defaultName();
 
-    protected abstract Result getResult(MCRSourceContext context, MCRInstanceConfiguration<?> configuration,
-        Map<String, String> properties, String prefix);
+    protected abstract boolean supportsEmptyName();
+
+    protected abstract boolean supportsAbsoluteName();
+
+    protected abstract Result getResult(MCRSourceContext context, Map<String, String> properties,
+        Map<String, String> fullProperties);
+
+    protected abstract boolean required();
 
     protected abstract boolean isMissingResult(Result result);
 
@@ -93,18 +148,19 @@ abstract class MCRSourceBase<Result> implements MCRSource {
     protected abstract Result missingResultReplacement();
 
     protected final boolean rejectedBySentinel(MCRSentinel sentinel, MCRSourceContext context,
-        Map<String, String> properties, String prefix) {
+        Map<String, String> properties) {
 
         if (sentinel != null) {
             boolean sentinelValue = sentinel.defaultValue();
-            String configuredSentinelValue = properties.get(prefix + sentinel.name());
+            String configuredSentinelValue = properties.get(sentinel.name());
             if (configuredSentinelValue != null) {
                 sentinelValue = Boolean.parseBoolean(configuredSentinelValue);
             }
             if (sentinelValue == sentinel.rejectionValue()) {
                 if (logger.isInfoEnabled()) {
-                    logger.info("[SENTINEL] Ignoring {} {} and all sub-properties",
-                        context.description(), context.property());
+                    logger.info("[SENTINEL] Ignoring {}, configured in {} (and sub-properties thereof), " +
+                        "because {}.{} has value {}", context.description(), context.property(),
+                        context.property(), sentinel.name(), sentinel.rejectionValue());
                 }
                 return true;
             }

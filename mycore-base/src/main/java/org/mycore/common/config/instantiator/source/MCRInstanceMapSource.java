@@ -18,28 +18,22 @@
 
 package org.mycore.common.config.instantiator.source;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRInstanceMap;
-import org.mycore.common.config.annotation.MCRSentinel;
-import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
 /**
  * A {@link MCRInstanceMapSource} is a {@link MCRSource} that interprets a {@link MCRInstanceMap}.
  */
-final class MCRInstanceMapSource extends MCRInstanceSourceBase<Map<String, Object>> {
+final class MCRInstanceMapSource extends MCRValueMapSourceBase<Object> {
 
     private final MCRInstanceMap annotation;
 
-    private final MCRSentinel sentinel;
-
     MCRInstanceMapSource(MCRInstanceMap annotation, MCRAnnotationProvider annotationProvider) {
+        super(annotationProvider, new MCRInstanceExtractor(annotation.valueClass()));
         this.annotation = annotation;
-        this.sentinel = annotationProvider.get(MCRSentinel.class);
     }
 
     @Override
@@ -78,63 +72,28 @@ final class MCRInstanceMapSource extends MCRInstanceSourceBase<Map<String, Objec
     }
 
     @Override
-    protected boolean allowsEmptyName() {
+    protected String defaultName() {
+        return "";
+    }
+
+    @Override
+    protected boolean supportsEmptyName() {
         return true;
     }
 
     @Override
-    protected boolean absolute() {
+    protected boolean supportsAbsoluteName() {
+        return false;
+    }
+
+    @Override
+    protected boolean supportsShortForm() {
         return false;
     }
 
     @Override
     protected boolean required() {
         return annotation.required();
-    }
-
-    @Override
-    protected String defaultName() {
-        return "";
-    }
-
-    @Override
-    protected Map<String, Object> getResult(MCRSourceContext context, MCRInstanceConfiguration<?> configuration,
-        Map<String, String> properties, String prefix) {
-
-        Map<String, ? extends MCRInstanceConfiguration<?>> nestedConfigurationMap =
-            configuration.nestedMap(annotation.valueClass(), annotation.name());
-
-        Map<String, Object> instanceMap = new HashMap<>();
-
-        for (String key : nestedConfigurationMap.keySet()) {
-
-            MCRSourceContext nestedContext = context.nested(key, "instance map entry");
-            MCRInstanceConfiguration<?> nestedConfiguration = nestedConfigurationMap.get(key);
-            Object instance = createInstance(nestedContext, nestedConfiguration, sentinel);
-
-            if (instance != null) {
-                instanceMap.put(key, instance);
-            }
-
-        }
-
-        return instanceMap;
-
-    }
-
-    @Override
-    protected boolean isMissingResult(Map<String, Object> result) {
-        return result.isEmpty();
-    }
-
-    @Override
-    protected MCRConfigurationException missingResultException(MCRSourceContext context) {
-        return context.emptyException();
-    }
-
-    @Override
-    protected Map<String, Object> missingResultReplacement() {
-        return new HashMap<>();
     }
 
 }

@@ -29,27 +29,27 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
-import org.mycore.common.config.annotation.MCRClassProperty;
-import org.mycore.common.config.annotation.MCRClassPropertyList;
-import org.mycore.common.config.annotation.MCRClassPropertyMap;
+import org.mycore.common.config.annotation.MCRInstance;
+import org.mycore.common.config.annotation.MCRInstanceList;
+import org.mycore.common.config.annotation.MCRInstanceMap;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
-public class MCRInstantiatorClassPropertyBasicTest {
+public class MCRInstantiatorInstanceBasicTest {
 
     @Test
     @MCRTestConfiguration(
         properties = {
             @MCRTestProperty(key = "Foo.Class", classNameOf = TestClass.class),
-            @MCRTestProperty(key = "Foo.Value", classNameOf = FooValue.class),
+            @MCRTestProperty(key = "Foo.Value.Class", classNameOf = FooValue.class),
         })
-    public void classValue() {
+    public void instanceValue() {
 
         TestClass instance = ofName(TestClass.class, "Foo").instantiate();
 
         assertNotNull(instance);
-        assertEquals(FooValue.class, instance.value);
+        assertEquals(FooValue.class, instance.value.getClass());
 
     }
 
@@ -57,14 +57,14 @@ public class MCRInstantiatorClassPropertyBasicTest {
     @MCRTestConfiguration(
         properties = {
             @MCRTestProperty(key = "Foo.Class", classNameOf = TestClass.class),
-            @MCRTestProperty(key = "Foo.Value", classNameOf = IncompatibleValue.class),
+            @MCRTestProperty(key = "Foo.Value.Class", classNameOf = IncompatibleValue.class),
         })
-    public void incompatibleClassValue() {
+    public void incompatibleInstanceValue() {
 
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
             () -> MCRInstanceConfiguration.ofName(TestClass.class, "Foo").instantiate());
 
-        assertEquals("Class, configured in Foo.Value (and sub-properties thereof),"
+        assertEquals("Instance, configured in Foo.Value (and sub-properties thereof),"
             + " for target field 'value' in configured class " + TestClass.class.getName()
             + " has a class (" + IncompatibleValue.class.getName() + ") that is incompatible"
             + " with the annotated class (" + Value.class.getName() + ")", exception.getMessage());
@@ -75,18 +75,18 @@ public class MCRInstantiatorClassPropertyBasicTest {
     @MCRTestConfiguration(
         properties = {
             @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithMap.class),
-            @MCRTestProperty(key = "Foo.Values.foo", classNameOf = FooValue.class),
+            @MCRTestProperty(key = "Foo.Values.foo.Class", classNameOf = FooValue.class),
             @MCRTestProperty(key = "Foo.Values.foo.Extra", string = "FOO"),
-            @MCRTestProperty(key = "Foo.Values.bar", classNameOf = BarValue.class),
+            @MCRTestProperty(key = "Foo.Values.bar.Class", classNameOf = BarValue.class),
             @MCRTestProperty(key = "Foo.Values.bar.Extra", string = "BAR"),
         })
-    public void classValueMap() {
+    public void instanceValueMap() {
 
         TestClassWithMap instance = ofName(TestClassWithMap.class, "Foo").instantiate();
 
         assertNotNull(instance);
-        assertEquals(FooValue.class, instance.values.get("foo"));
-        assertEquals(BarValue.class, instance.values.get("bar"));
+        assertEquals(FooValue.class, instance.values.get("foo").getClass());
+        assertEquals(BarValue.class, instance.values.get("bar").getClass());
 
     }
 
@@ -94,39 +94,39 @@ public class MCRInstantiatorClassPropertyBasicTest {
     @MCRTestConfiguration(
         properties = {
             @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithList.class),
-            @MCRTestProperty(key = "Foo.Values.10", classNameOf = FooValue.class),
+            @MCRTestProperty(key = "Foo.Values.10.Class", classNameOf = FooValue.class),
             @MCRTestProperty(key = "Foo.Values.10.Extra", string = "FOO"),
-            @MCRTestProperty(key = "Foo.Values.20", classNameOf = BarValue.class),
+            @MCRTestProperty(key = "Foo.Values.20.Class", classNameOf = BarValue.class),
             @MCRTestProperty(key = "Foo.Values.20.Extra", string = "BAR"),
         })
-    public void classValueList() {
+    public void instanceValueList() {
 
         TestClassWithList instance = ofName(TestClassWithList.class, "Foo").instantiate();
 
         assertNotNull(instance);
-        assertEquals(FooValue.class, instance.values.getFirst());
-        assertEquals(BarValue.class, instance.values.getLast());
+        assertEquals(FooValue.class, instance.values.getFirst().getClass());
+        assertEquals(BarValue.class, instance.values.getLast().getClass());
 
     }
 
     public static class TestClass {
 
-        @MCRClassProperty(name = "Value", valueClass = Value.class)
-        public Class<? extends Value> value;
+        @MCRInstance(name = "Value", valueClass = Value.class)
+        public Value value;
 
     }
 
     public static class TestClassWithMap {
 
-        @MCRClassPropertyMap(name = "Values", valueClass = Value.class)
-        public Map<String, Class<? extends Value>> values;
+        @MCRInstanceMap(name = "Values", valueClass = Value.class)
+        public Map<String, Value> values;
 
     }
 
     public static class TestClassWithList {
 
-        @MCRClassPropertyList(name = "Values", valueClass = Value.class)
-        public List<Class<? extends Value>> values;
+        @MCRInstanceList(name = "Values", valueClass = Value.class)
+        public List<Value> values;
 
     }
 

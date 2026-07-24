@@ -18,27 +18,21 @@
 
 package org.mycore.common.config.instantiator.source;
 
-import java.util.Map;
 import java.util.Set;
 
-import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRInstance;
-import org.mycore.common.config.annotation.MCRSentinel;
-import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
 /**
  * A {@link MCRInstanceSource} is a {@link MCRSource} that interprets a {@link MCRInstance}.
  */
-final class MCRInstanceSource extends MCRInstanceSourceBase<Object> {
+final class MCRInstanceSource extends MCRValueSourceBase<Object> {
 
     private final MCRInstance annotation;
 
-    private final MCRSentinel sentinel;
-
     MCRInstanceSource(MCRInstance annotation, MCRAnnotationProvider annotationProvider) {
+        super(annotationProvider, new MCRInstanceExtractor(annotation.valueClass()));
         this.annotation = annotation;
-        this.sentinel = annotationProvider.get(MCRSentinel.class);
     }
 
     @Override
@@ -77,47 +71,23 @@ final class MCRInstanceSource extends MCRInstanceSourceBase<Object> {
     }
 
     @Override
-    protected boolean allowsEmptyName() {
+    protected String defaultName() {
+        return "";
+    }
+
+    @Override
+    protected boolean supportsEmptyName() {
         return false;
     }
 
     @Override
-    protected boolean absolute() {
+    protected boolean supportsAbsoluteName() {
         return false;
     }
 
     @Override
     protected boolean required() {
         return annotation.required();
-    }
-
-    @Override
-    protected String defaultName() {
-        return "";
-    }
-
-    @Override
-    protected Object getResult(MCRSourceContext context, MCRInstanceConfiguration<?> configuration,
-        Map<String, String> properties, String prefix) {
-
-        MCRInstanceConfiguration<?> nestedConfiguration = configuration.nested(annotation.valueClass(), name());
-        return createInstance(context, nestedConfiguration, sentinel);
-
-    }
-
-    @Override
-    protected boolean isMissingResult(Object result) {
-        return result == null;
-    }
-
-    @Override
-    protected MCRConfigurationException missingResultException(MCRSourceContext context) {
-        return context.missingException();
-    }
-
-    @Override
-    protected Object missingResultReplacement() {
-        return null;
     }
 
 }
