@@ -252,7 +252,7 @@ public class MCRInstantiatorClassPropertyMapTest {
             assertNull(instance);
             assertNotNull(exception);
 
-            assertEquals("Default class map, configured in MCR.Map (and its sub-properties),"
+            assertEquals("Default class map, configured in MCR.Map (and sub-properties thereof),"
                 + " for target field 'map' in configured class " + configuredClass.getName()
                 + " is empty", exception.getMessage());
 
@@ -261,7 +261,7 @@ public class MCRInstantiatorClassPropertyMapTest {
             assertNull(instance);
             assertNotNull(exception);
 
-            assertEquals("Class map, configured in Foo.Map (and its sub-properties),"
+            assertEquals("Class map, configured in Foo.Map (and sub-properties thereof),"
                 + " for target field 'map' in configured class " + configuredClass.getName()
                 + " is empty", exception.getMessage());
 
