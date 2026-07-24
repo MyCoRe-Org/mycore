@@ -18,33 +18,21 @@
 
 package org.mycore.common.config.instantiator.source;
 
-import static org.mycore.common.config.instantiator.MCRInstantiatorUtils.createInstance;
-import static org.mycore.common.config.instantiator.MCRInstantiatorUtils.emptyNameException;
-import static org.mycore.common.config.instantiator.MCRInstantiatorUtils.missingException;
-import static org.mycore.common.config.instantiator.MCRInstantiatorUtils.property;
-
 import java.util.Set;
 
 import org.mycore.common.config.annotation.MCRInstance;
-import org.mycore.common.config.annotation.MCRSentinel;
-import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
 /**
  * A {@link MCRInstanceSource} is a {@link MCRSource} that interprets a {@link MCRInstance}.
  */
-@SuppressWarnings({ "PMD.MCR.Singleton.ClassModifiers", "PMD.MCR.Singleton.PrivateConstructor",
-    "PMD.MCR.Singleton.NonPrivateConstructors", "PMD.MCR.Singleton.MethodModifiers",
-    "PMD.MCR.Singleton.MethodReturnType", "PMD.SingletonClassReturningNewInstance" })
-final class MCRInstanceSource implements MCRSource {
+final class MCRInstanceSource extends MCRValueSourceBase<Object> {
 
     private final MCRInstance annotation;
 
-    private final MCRSentinel sentinel;
-
     MCRInstanceSource(MCRInstance annotation, MCRAnnotationProvider annotationProvider) {
+        super(annotationProvider, new MCRInstanceExtractor(annotation.valueClass()));
         this.annotation = annotation;
-        this.sentinel = annotationProvider.get(MCRSentinel.class);
     }
 
     @Override
@@ -73,22 +61,33 @@ final class MCRInstanceSource implements MCRSource {
     }
 
     @Override
-    public Object get(MCRInstanceConfiguration<?> configuration, MCRTarget target) {
+    protected String description() {
+        return "instance";
+    }
 
-        String name = annotation.name();
-        if (name.isEmpty()) {
-            throw emptyNameException(target);
-        }
+    @Override
+    protected String name() {
+        return annotation.name();
+    }
 
-        MCRInstanceConfiguration<?> nestedConfiguration = configuration.nested(annotation.valueClass(), name);
-        Object instance = createInstance(target, nestedConfiguration, sentinel, "instance");
+    @Override
+    protected String defaultName() {
+        return "";
+    }
 
-        if (instance == null && annotation.required()) {
-            throw missingException(property(configuration, annotation.name()), target, "instance");
-        }
+    @Override
+    protected boolean supportsEmptyName() {
+        return false;
+    }
 
-        return instance;
+    @Override
+    protected boolean supportsAbsoluteName() {
+        return false;
+    }
 
+    @Override
+    protected boolean required() {
+        return annotation.required();
     }
 
 }

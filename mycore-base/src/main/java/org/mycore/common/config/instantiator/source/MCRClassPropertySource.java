@@ -18,32 +18,31 @@
 
 package org.mycore.common.config.instantiator.source;
 
-import java.util.Map;
 import java.util.Set;
 
-import org.mycore.common.config.annotation.MCRPropertyMap;
+import org.mycore.common.config.annotation.MCRClassProperty;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
 /**
- * A {@link MCRPropertyMapSource} is a {@link MCRSource} that interprets a {@link MCRPropertyMap}.
+ * A {@link MCRClassPropertySource} is a {@link MCRSource} that interprets a {@link MCRClassProperty}.
  */
-final class MCRPropertyMapSource extends MCRValueMapSourceBase<String> {
+final class MCRClassPropertySource extends MCRValueSourceBase<Class<?>> {
 
-    private final MCRPropertyMap annotation;
+    private final MCRClassProperty annotation;
 
-    MCRPropertyMapSource(MCRPropertyMap annotation, MCRAnnotationProvider annotationProvider) {
-        super(annotationProvider, new MCRPropertyExtractor());
+    MCRClassPropertySource(MCRClassProperty annotation, MCRAnnotationProvider annotationProvider) {
+        super(annotationProvider, new MCRClassPropertyExtractor(annotation.valueClass()));
         this.annotation = annotation;
     }
 
     @Override
     public Type type() {
-        return Type.PROPERTY_MAP;
+        return Type.PROPERTY;
     }
 
     @Override
-    public Class<MCRPropertyMap> annotationClass() {
-        return MCRPropertyMap.class;
+    public Class<MCRClassProperty> annotationClass() {
+        return MCRClassProperty.class;
     }
 
     @Override
@@ -58,12 +57,12 @@ final class MCRPropertyMapSource extends MCRValueMapSourceBase<String> {
 
     @Override
     public Class<?> valueClass() {
-        return Map.class;
+        return Class.class;
     }
 
     @Override
     protected String description() {
-        return "property map";
+        return "class";
     }
 
     @Override
@@ -78,17 +77,12 @@ final class MCRPropertyMapSource extends MCRValueMapSourceBase<String> {
 
     @Override
     protected boolean supportsEmptyName() {
-        return true;
+        return false;
     }
 
     @Override
     protected boolean supportsAbsoluteName() {
         return annotation.absolute();
-    }
-
-    @Override
-    protected boolean supportsShortForm() {
-        return true;
     }
 
     @Override

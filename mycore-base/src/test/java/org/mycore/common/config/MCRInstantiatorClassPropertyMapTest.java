@@ -35,7 +35,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
-import org.mycore.common.config.annotation.MCRPropertyMap;
+import org.mycore.common.config.annotation.MCRClassPropertyMap;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.test.MyCoReTest;
 
@@ -103,7 +103,7 @@ import org.mycore.test.MyCoReTest;
  * </table>
  */
 @MyCoReTest
-public class MCRInstantiatorPropertyMapTest {
+public class MCRInstantiatorClassPropertyMapTest {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -190,13 +190,13 @@ public class MCRInstantiatorPropertyMapTest {
                 MCRConfiguration2.set(MAP_PROPERTY_EMPTY, (String) null);
             }
             case SET_SHORT_FORM -> {
-                MCRConfiguration2.set(MAP_PROPERTY, "nonEmpty:Value,empty:");
+                MCRConfiguration2.set(MAP_PROPERTY, "nonEmpty:" + Value.class.getName() + ",empty:");
                 MCRConfiguration2.set(MAP_PROPERTY_NON_EMPTY, (String) null);
                 MCRConfiguration2.set(MAP_PROPERTY_EMPTY, (String) null);
             }
             case SET_LONG_FORM -> {
                 MCRConfiguration2.set(MAP_PROPERTY, (String) null);
-                MCRConfiguration2.set(MAP_PROPERTY_NON_EMPTY, "Value");
+                MCRConfiguration2.set(MAP_PROPERTY_NON_EMPTY, Value.class.getName());
             }
         }
 
@@ -214,13 +214,13 @@ public class MCRInstantiatorPropertyMapTest {
                 MCRConfiguration2.set(DEFAULT_MAP_PROPERTY_EMPTY, (String) null);
             }
             case SET_SHORT_FORM -> {
-                MCRConfiguration2.set(DEFAULT_MAP_PROPERTY, "nonEmpty:DefaultValue,empty:");
+                MCRConfiguration2.set(DEFAULT_MAP_PROPERTY, "nonEmpty:" + DefaultValue.class.getName() + ",empty:");
                 MCRConfiguration2.set(DEFAULT_MAP_PROPERTY_NON_EMPTY, (String) null);
                 MCRConfiguration2.set(DEFAULT_MAP_PROPERTY_EMPTY, (String) null);
             }
             case SET_LONG_FORM -> {
                 MCRConfiguration2.set(DEFAULT_MAP_PROPERTY, (String) null);
-                MCRConfiguration2.set(DEFAULT_MAP_PROPERTY_NON_EMPTY, "DefaultValue");
+                MCRConfiguration2.set(DEFAULT_MAP_PROPERTY_NON_EMPTY, DefaultValue.class.getName());
             }
         }
 
@@ -252,7 +252,7 @@ public class MCRInstantiatorPropertyMapTest {
             assertNull(instance);
             assertNotNull(exception);
 
-            assertEquals("Default property map, configured in MCR.Map (and sub-properties thereof),"
+            assertEquals("Default class map, configured in MCR.Map (and sub-properties thereof),"
                 + " for target field 'map' in configured class " + configuredClass.getName()
                 + " is empty", exception.getMessage());
 
@@ -261,7 +261,7 @@ public class MCRInstantiatorPropertyMapTest {
             assertNull(instance);
             assertNotNull(exception);
 
-            assertEquals("Property map, configured in Foo.Map (and sub-properties thereof),"
+            assertEquals("Class map, configured in Foo.Map (and sub-properties thereof),"
                 + " for target field 'map' in configured class " + configuredClass.getName()
                 + " is empty", exception.getMessage());
 
@@ -270,7 +270,7 @@ public class MCRInstantiatorPropertyMapTest {
             assertNull(exception);
             assertNotNull(instance);
 
-            Map<String, String> list = instance.map();
+            Map<String, Class<?>> list = instance.map();
             assertNotNull(list);
 
             if (emptyResultExpected) {
@@ -280,13 +280,13 @@ public class MCRInstantiatorPropertyMapTest {
             } else {
 
                 assertEquals(1, list.size());
-                String value = list.get("nonEmpty");
+                Class<?> value = list.get("nonEmpty");
                 assertNotNull(value);
 
                 if (valueProperty.set()) {
-                    assertEquals("Value", value);
+                    assertEquals(Value.class, value);
                 } else {
-                    assertEquals("DefaultValue", value);
+                    assertEquals(DefaultValue.class, value);
                 }
 
             }
@@ -334,17 +334,17 @@ public class MCRInstantiatorPropertyMapTest {
 
     public interface Configurable {
 
-        Map<String, String> map();
+        Map<String, Class<?>> map();
 
     }
 
     public static class NotRequiredDefaultNotSet implements Configurable {
 
-        @MCRPropertyMap(name = "Map", required = false)
-        public Map<String, String> map;
+        @MCRClassPropertyMap(name = "Map", required = false)
+        public Map<String, Class<?>> map;
 
         @Override
-        public Map<String, String> map() {
+        public Map<String, Class<?>> map() {
             return map;
         }
 
@@ -352,11 +352,11 @@ public class MCRInstantiatorPropertyMapTest {
 
     public static class NotRequiredDefaultSet implements Configurable {
 
-        @MCRPropertyMap(name = "Map", required = false, defaultName = "MCR.Map")
-        public Map<String, String> map;
+        @MCRClassPropertyMap(name = "Map", required = false, defaultName = "MCR.Map")
+        public Map<String, Class<?>> map;
 
         @Override
-        public Map<String, String> map() {
+        public Map<String, Class<?>> map() {
             return map;
         }
 
@@ -364,11 +364,11 @@ public class MCRInstantiatorPropertyMapTest {
 
     public static class RequiredDefaultNotSet implements Configurable {
 
-        @MCRPropertyMap(name = "Map")
-        public Map<String, String> map;
+        @MCRClassPropertyMap(name = "Map")
+        public Map<String, Class<?>> map;
 
         @Override
-        public Map<String, String> map() {
+        public Map<String, Class<?>> map() {
             return map;
         }
 
@@ -376,13 +376,21 @@ public class MCRInstantiatorPropertyMapTest {
 
     public static class RequiredDefaultSet implements Configurable {
 
-        @MCRPropertyMap(name = "Map", defaultName = "MCR.Map")
-        public Map<String, String> map;
+        @MCRClassPropertyMap(name = "Map", defaultName = "MCR.Map")
+        public Map<String, Class<?>> map;
 
         @Override
-        public Map<String, String> map() {
+        public Map<String, Class<?>> map() {
             return map;
         }
+
+    }
+
+    public static final class Value {
+
+    }
+
+    public static final class DefaultValue {
 
     }
 

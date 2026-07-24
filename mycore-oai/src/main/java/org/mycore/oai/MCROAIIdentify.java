@@ -94,7 +94,7 @@ public class MCROAIIdentify extends SimpleIdentify {
 
     private Collection<String> getDescriptionURIs() {
         String descriptionConfig = getConfigPrefix() + "DescriptionURI";
-        return MCRConfiguration2.getPropertiesMap()
+        return MCRConfiguration2.getRawProperties()
             .entrySet()
             .stream()
             .filter(p -> p.getKey().startsWith(descriptionConfig))
@@ -104,7 +104,7 @@ public class MCROAIIdentify extends SimpleIdentify {
 
     public FriendsDescription getFriendsDescription() {
         FriendsDescription desc = new FriendsDescription();
-        MCRConfiguration2.getPropertiesMap()
+        MCRConfiguration2.getRawProperties()
             .entrySet()
             .stream()
             .filter(p -> p.getKey().startsWith(this.configPrefix + "Friends."))

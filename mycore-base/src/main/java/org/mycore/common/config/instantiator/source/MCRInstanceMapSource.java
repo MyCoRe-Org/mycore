@@ -18,31 +18,22 @@
 
 package org.mycore.common.config.instantiator.source;
 
-import static org.mycore.common.config.instantiator.MCRInstantiatorUtils.createInstance;
-import static org.mycore.common.config.instantiator.MCRInstantiatorUtils.emptyException;
-import static org.mycore.common.config.instantiator.MCRInstantiatorUtils.property;
-
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import org.mycore.common.config.annotation.MCRInstanceMap;
-import org.mycore.common.config.annotation.MCRSentinel;
-import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
 /**
  * A {@link MCRInstanceMapSource} is a {@link MCRSource} that interprets a {@link MCRInstanceMap}.
  */
-final class MCRInstanceMapSource implements MCRSource {
+final class MCRInstanceMapSource extends MCRValueMapSourceBase<Object> {
 
     private final MCRInstanceMap annotation;
 
-    private final MCRSentinel sentinel;
-
     MCRInstanceMapSource(MCRInstanceMap annotation, MCRAnnotationProvider annotationProvider) {
+        super(annotationProvider, new MCRInstanceExtractor(annotation.valueClass()));
         this.annotation = annotation;
-        this.sentinel = annotationProvider.get(MCRSentinel.class);
     }
 
     @Override
@@ -71,26 +62,38 @@ final class MCRInstanceMapSource implements MCRSource {
     }
 
     @Override
-    public Map<String, Object> get(MCRInstanceConfiguration<?> configuration, MCRTarget target) {
+    protected String description() {
+        return "instance map";
+    }
 
-        Map<String, ? extends MCRInstanceConfiguration<?>> nestedConfigurationMap =
-            configuration.nestedMap(annotation.valueClass(), annotation.name());
+    @Override
+    protected String name() {
+        return annotation.name();
+    }
 
-        Map<String, Object> instanceMap = new HashMap<>();
-        for (String key : nestedConfigurationMap.keySet()) {
-            MCRInstanceConfiguration<?> nestedConfiguration = nestedConfigurationMap.get(key);
-            Object instance = createInstance(target, nestedConfiguration, sentinel, "instance map entry");
-            if (instance != null) {
-                instanceMap.put(key, instance);
-            }
-        }
+    @Override
+    protected String defaultName() {
+        return "";
+    }
 
-        if (instanceMap.isEmpty() && annotation.required()) {
-            throw emptyException(property(configuration, annotation.name()), target, "instance map");
-        }
+    @Override
+    protected boolean supportsEmptyName() {
+        return true;
+    }
 
-        return instanceMap;
+    @Override
+    protected boolean supportsAbsoluteName() {
+        return false;
+    }
 
+    @Override
+    protected boolean supportsShortForm() {
+        return false;
+    }
+
+    @Override
+    protected boolean required() {
+        return annotation.required();
     }
 
 }

@@ -19,6 +19,7 @@
 package org.mycore.common.config.instantiator;
 
 import java.lang.reflect.Modifier;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -28,10 +29,9 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.config.MCRConfigurationException;
 
 /**
- * Represents an extract of properties (typically {@link MCRConfiguration2#getPropertiesMap()}) used to
+ * Represents an extract of properties (typically {@link MCRConfiguration2#getAllProperties()}) used to
  * instantiate an object. Provides methods to extract nested configurations.
  * <p>
  * Generally speaking, a configuration has a {@link MCRInstanceConfiguration#name()} that represents the
@@ -66,12 +66,12 @@ public final class MCRInstanceConfiguration<S> {
 
     private MCRInstanceConfiguration(Class<S> superClass, Class<? extends S> valueClass, MCRInstanceName name,
         Map<String, String> properties, Map<String, String> fullProperties) {
+        properties.remove(CLASS_KEY);
         this.superClass = superClass;
         this.valueClass = valueClass;
         this.name = name;
-        this.properties = properties;
+        this.properties = Collections.unmodifiableMap(properties);
         this.fullProperties = fullProperties;
-        properties.remove(CLASS_KEY);
     }
 
     public boolean instantiatable() {
@@ -85,11 +85,11 @@ public final class MCRInstanceConfiguration<S> {
     /**
      * Shorthand for {@link MCRInstanceConfiguration#ofClass(Class, Class, String, Map)} that
      * uses {@link MCRClassTools#forName(String)} to resolve the value class and
-     * uses {@link MCRConfiguration2#getPropertiesMap()} as the properties.
+     * uses {@link MCRConfiguration2#getAllProperties()} as the properties.
      */
     public static <S> MCRInstanceConfiguration<S> ofClassName(Class<S> superClass, String className,
         String prefix) {
-        return ofClassName(superClass, className, prefix, MCRConfiguration2.getPropertiesMap());
+        return ofClassName(superClass, className, prefix, MCRConfiguration2.getAllProperties());
     }
 
     /**
@@ -108,11 +108,11 @@ public final class MCRInstanceConfiguration<S> {
 
     /**
      * Shorthand for {@link MCRInstanceConfiguration#ofClass(Class, Class, String, Map)} that
-     * uses {@link MCRConfiguration2#getPropertiesMap()} as the properties.
+     * uses {@link MCRConfiguration2#getAllProperties()} as the properties.
      */
     public static <S> MCRInstanceConfiguration<S> ofClass(Class<S> superClass, Class<? extends S> valueClass,
         String prefix) {
-        return ofClass(superClass, valueClass, prefix, MCRConfiguration2.getPropertiesMap());
+        return ofClass(superClass, valueClass, prefix, MCRConfiguration2.getAllProperties());
     }
 
     /**
@@ -143,11 +143,11 @@ public final class MCRInstanceConfiguration<S> {
     /**
      * Shorthand for {@link MCRInstanceConfiguration#ofName(Class, MCRInstanceName, Map, Set)} that
      * creates the name with {@link MCRInstanceName#of(String)} and
-     * uses {@link MCRConfiguration2#getPropertiesMap()} as the properties and
+     * uses {@link MCRConfiguration2#getAllProperties()} as the properties and
      * uses {@link Options#NONE} as the options.
      */
     public static <T> MCRInstanceConfiguration<T> ofName(Class<T> superClass, String name) {
-        return ofName(superClass, MCRInstanceName.of(name), MCRConfiguration2.getPropertiesMap(), Options.NONE);
+        return ofName(superClass, MCRInstanceName.of(name), MCRConfiguration2.getAllProperties(), Options.NONE);
     }
 
     /**
@@ -163,11 +163,11 @@ public final class MCRInstanceConfiguration<S> {
     /**
      * Shorthand for {@link MCRInstanceConfiguration#ofName(Class, MCRInstanceName, Map, Set)} that
      * creates the name with {@link MCRInstanceName#of(String)} and
-     * uses {@link MCRConfiguration2#getPropertiesMap()} as the properties.
+     * uses {@link MCRConfiguration2#getAllProperties()} as the properties.
      */
     public static <T> MCRInstanceConfiguration<T> ofName(Class<T> superClass, String name,
         Set<Option> options) {
-        return ofName(superClass, MCRInstanceName.of(name), MCRConfiguration2.getPropertiesMap(), options);
+        return ofName(superClass, MCRInstanceName.of(name), MCRConfiguration2.getAllProperties(), options);
     }
 
     /**
@@ -213,12 +213,7 @@ public final class MCRInstanceConfiguration<S> {
             if (className.isBlank()) {
                 return null;
             }
-            try {
-                return MCRClassTools.forName(className);
-            } catch (ClassNotFoundException e) {
-                throw new MCRConfigurationException("Missing class (" + className + ")" +
-                    " configured in: " + name.actual(), e);
-            }
+            return MCRInstantiatorUtils.getClass(name.actual(), className);
         }
 
         if (options.contains(Option.IMPLICIT) && Modifier.isFinal(superClass.getModifiers())) {
@@ -272,163 +267,6 @@ public final class MCRInstanceConfiguration<S> {
         return fullProperties;
     }
 
-    /**
-     * Returns the configuration for a nested instance.
-     * <p>
-     * Example: Given an {@link MCRInstanceConfiguration}
-     * representing the {@link MCRInstanceName} <code>Some.Instance.Name</code>, properties
-     * <ul>
-     *     <li><code>Foo.Class=some.nested.ClassName</code></li>
-     *     <li><code>Foo.Key1=Value1</code></li>
-     *     <li><code>Foo.Key2=Value2</code></li>
-     *     <li><code>Bar=UnrelatedValue</code></li>
-     * </ul>
-     * and a <em>prefix</em> of <code>Foo</code>, this will return a an {@link MCRInstanceConfiguration}
-     * representing the {@link MCRInstanceConfiguration#name()} <code>Some.Instance.Name.Foo</code>,
-     * {@link MCRInstanceConfiguration#valueClass()} <code>some.nested.ClassName</code>
-     * and properties
-     * <ul>
-     *     <li><code>Key1=Value1</code></li>
-     *     <li><code>Key2=Value2</code></li>
-     * </ul>
-     *
-     * @param prefix the prefix
-     * @return the nested configuration
-     */
-    public <N> MCRInstanceConfiguration<N> nested(Class<N> superClass, String prefix) {
-        MCRInstanceName nestedName = name.nested(prefix);
-        Map<String, String> reducedProperties = reduceProperties(prefix, properties);
-        Class<? extends N> valueClass = resolveValueClass(superClass, nestedName, reducedProperties, Options.IMPLICIT);
-        return new MCRInstanceConfiguration<>(superClass, valueClass, nestedName, reducedProperties, fullProperties);
-    }
-
-    /**
-     * Returns a {@link Map} of configurations for nested instances, mapped by the first name segment.
-     * <p>
-     * Example: Given an {@link MCRInstanceConfiguration}
-     * representing the {@link MCRInstanceName} <code>Some.Instance.Name</code>, properties
-     * <ul>
-     *     <li><code>A.Class=some.nested.ClassNameA</code></li>
-     *     <li><code>A.Key1=ValueA1</code></li>
-     *     <li><code>A.Key2=ValueA2</code></li>
-     *     <li><code>B.Class=some.nested.ClassNameB</code></li>
-     *     <li><code>B.Key1=ValueB1</code></li>
-     *     <li><code>B.Key2=ValueB2</code></li>
-     * </ul>
-     * this will return a map containing
-     * <ol>
-     *     <li>
-     *         an entry with key <code>A</code> mapping to an {@link MCRInstanceConfiguration}
-     *         representing the {@link MCRInstanceConfiguration#name()} <code>Some.Instance.Name.A</code>,
-     *         {@link MCRInstanceConfiguration#valueClass()} <code>some.nested.ClassNameA</code>
-     *         and {@link MCRInstanceConfiguration#properties()}
-     *        <ul>
-     *            <li><code>Key1=ValueA1</code></li>
-     *            <li><code>Key2=ValueA2</code></li>
-     *        </ul>
-     *        and {@link MCRInstanceConfiguration#fullProperties()} that are equal to the full properties of this
-     *        configuration (i.e. the full properties used to create the top level configuration).
-     *     </li>
-     *     <li>
-     *         an entry with key <code>B</code> mapping to an {@link MCRInstanceConfiguration}
-     *         representing the {@link MCRInstanceConfiguration#name()} <code>Some.Instance.Name.B</code>,
-     *         {@link MCRInstanceConfiguration#valueClass()} <code>some.nested.ClassNameB</code>
-     *         and {@link MCRInstanceConfiguration#properties()}
-     *        <ul>
-     *            <li><code>Key1=ValueB1</code></li>
-     *            <li><code>Key2=ValueB2</code></li>
-     *        </ul>
-     *        and {@link MCRInstanceConfiguration#fullProperties()} that are equal to the full properties of this
-     *        configuration (i.e. the full properties used to create the top level configuration).
-     *     </li>
-     * </ol>
-     * <p>
-     *
-     * @return the nested configuration map
-     */
-    public <N> Map<String, MCRInstanceConfiguration<N>> nestedMap(Class<N> superClass) {
-        Map<String, MCRInstanceConfiguration<N>> nestedConfigurationMap = new HashMap<>();
-        for (Map.Entry<String, String> entry : properties().entrySet()) {
-            String key = entry.getKey();
-            int index = key.indexOf('.');
-            String nestedConfigurationKey = -1 == index ? key : key.substring(0, index);
-            if (!nestedConfigurationMap.containsKey(nestedConfigurationKey)) {
-                String nestedConfigurationSuffix = nestedConfigurationKey;
-                nestedConfigurationMap.put(nestedConfigurationKey,
-                    nested(superClass, nestedConfigurationSuffix));
-            }
-        }
-        return nestedConfigurationMap;
-    }
-
-    /**
-     * Returns a {@link Map} of configurations for nested instances with a common prefix, mapped by the
-     * name segment following that common prefix.
-     * <p>
-     * Example: Given an {@link MCRInstanceConfiguration}
-     * representing the {@link MCRInstanceName} <code>Some.Instance.Name</code>, properties
-     * <ul>
-     *     <li><code>Foo.A.Class=come.nested.ClassNameA</code></li>
-     *     <li><code>Foo.A.Key1=ValueA1</code></li>
-     *     <li><code>Foo.A.Key2=ValueA2</code></li>
-     *     <li><code>Foo.B.Class=some.nested.ClassNameB</code></li>
-     *     <li><code>Foo.B.Key1=ValueB1</code></li>
-     *     <li><code>Foo.B.Key2=ValueB2</code></li>
-     *     <li><code>Bar=UnrelatedValue</code></li>
-     * </ul>
-     * and a <em>commonPrefix</em> of <code>Foo</code>, this will return a map containing
-     * <ol>
-     *     <li>
-     *         an entry with key <code>A</code> mapping to an {@link MCRInstanceConfiguration}
-     *         representing the {@link MCRInstanceConfiguration#name()} <code>Some.Instance.Name.Foo.A</code>,
-     *         {@link MCRInstanceConfiguration#valueClass()} <code>some.nested.ClassNameA</code>
-     *         and {@link MCRInstanceConfiguration#properties()}
-     *        <ul>
-     *            <li><code>Key1=ValueA1</code></li>
-     *            <li><code>Key2=ValueA2</code></li>
-     *        </ul>
-     *        and {@link MCRInstanceConfiguration#fullProperties()} that are equal to the full properties of this
-     *        configuration (i.e. the full properties used to create the top level configuration).
-     *     </li>
-     *     <li>
-     *         an entry with key <code>B</code> mapping to an {@link MCRInstanceConfiguration}
-     *         representing the {@link MCRInstanceConfiguration#name()} <code>Some.Instance.Name.Foo.B</code>,
-     *         {@link MCRInstanceConfiguration#valueClass()} <code>some.nested.ClassNameB</code>
-     *         and {@link MCRInstanceConfiguration#properties()}
-     *        <ul>
-     *            <li><code>Key1=ValueB1</code></li>
-     *            <li><code>Key2=ValueB2</code></li>
-     *        </ul>
-     *        and {@link MCRInstanceConfiguration#fullProperties()} that are equal to the full properties of this
-     *        configuration (i.e. the full properties used to create the top level configuration).
-     *     </li>
-     * </ol>
-     *
-     * @param prefix the common prefix
-     * @return the nested configuration map
-     */
-    public <N> Map<String, MCRInstanceConfiguration<N>> nestedMap(Class<N> superClass, String prefix) {
-        if (prefix.isEmpty()) {
-            return nestedMap(superClass);
-        }
-        String suffixWithDelimiter = prefix + ".";
-        Map<String, MCRInstanceConfiguration<N>> nestedConfigurationMap = new HashMap<>();
-        for (Map.Entry<String, String> entry : properties().entrySet()) {
-            String key = entry.getKey();
-            if (key.startsWith(suffixWithDelimiter)) {
-                String remainingKey = key.substring(suffixWithDelimiter.length());
-                int index = remainingKey.indexOf('.');
-                String nestedConfigurationKey = -1 == index ? remainingKey : remainingKey.substring(0, index);
-                if (!nestedConfigurationMap.containsKey(nestedConfigurationKey)) {
-                    String nestedConfigurationSuffix = suffixWithDelimiter + nestedConfigurationKey;
-                    nestedConfigurationMap.put(nestedConfigurationKey,
-                        nested(superClass, nestedConfigurationSuffix));
-                }
-            }
-        }
-        return nestedConfigurationMap;
-    }
-
     public MCRInstanceConfiguration<S> copy() {
         return new MCRInstanceConfiguration<>(superClass, valueClass, name, new HashMap<>(properties), fullProperties);
     }
@@ -441,6 +279,12 @@ public final class MCRInstanceConfiguration<S> {
             "name=" + name + ", " +
             "properties=" + properties + ", " +
             "#fullProperties=" + fullProperties.size() + "}";
+    }
+
+    public static <N> MCRInstanceConfiguration<N> ofComponents(Class<N> superClass, MCRInstanceName name,
+        Map<String, String> properties, Map<String, String> fullProperties) {
+        Class<? extends N> valueClass = resolveValueClass(superClass, name, properties, Options.IMPLICIT);
+        return new MCRInstanceConfiguration<>(superClass, valueClass, name, properties, fullProperties);
     }
 
     public enum Option {

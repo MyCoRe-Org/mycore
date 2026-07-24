@@ -77,49 +77,28 @@ import org.mycore.test.MyCoReTest;
  *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">set empty</td>
- *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;"><code>{}</code></td>
- *     <td style="border: 1px solid;">Exception</td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">not set</td>
+ *     <td style="border: 1px solid;">not set / empty</td>
  *     <td style="border: 1px solid;">none or impl. enabled</td>
- *     <td style="border: 1px solid;">not set</td>
+ *     <td style="border: 1px solid;">not set / <code>A.a=</code></td>
  *     <td style="border: 1px solid;"><code>{}</code></td>
  *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">none or impl. enabled</td>
- *     <td style="border: 1px solid;"><code>A.a=</code></td>
- *     <td style="border: 1px solid;"><code>{}</code></td>
- *     <td style="border: 1px solid;">Exception</td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">not set</td>
+ *     <td style="border: 1px solid;">not set / empty</td>
  *     <td style="border: 1px solid;">none or impl. enabled</td>
  *     <td style="border: 1px solid;"><code>A.a=Value</code></td>
  *     <td style="border: 1px solid;"><code>{}</code></td>
  *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">not set</td>
+ *     <td style="border: 1px solid;">not set / empty</td>
  *     <td style="border: 1px solid;">expl. enabled</td>
- *     <td style="border: 1px solid;">not set</td>
+ *     <td style="border: 1px solid;">not set / <code>A.a=</code></td>
  *     <td style="border: 1px solid;"><code>{}</code></td>
  *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">expl. enabled</td>
- *     <td style="border: 1px solid;"><code>A.a=</code></td>
- *     <td style="border: 1px solid;"><code>{}</code></td>
- *     <td style="border: 1px solid;">Exception</td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">not set</td>
+ *     <td style="border: 1px solid;">not set / empty</td>
  *     <td style="border: 1px solid;">expl. enabled</td>
  *     <td style="border: 1px solid;"><code>A=Value</code></td>
  *     <td style="border: 1px solid;"><code>{}</code></td>
@@ -128,16 +107,9 @@ import org.mycore.test.MyCoReTest;
  *   <tr>
  *     <td style="border: 1px solid;">set</td>
  *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;">not set</td>
+ *     <td style="border: 1px solid;">not set / <code>A.a=</code></td>
  *     <td style="border: 1px solid;"><code>{A=_}</code></td>
  *     <td style="border: 1px solid;"><code>{A=_}</code></td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">set</td>
- *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;"><code>A.a=</code></td>
- *     <td style="border: 1px solid;"><code>{A=()}</code></td>
- *     <td style="border: 1px solid;"><code>{A=()}</code></td>
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;">set</td>
@@ -231,7 +203,7 @@ public class MCRInstantiatorNonImplicitMapTest {
 
         // log all relevant configuration entries
         LOGGER.info("CONFIGURATION PROPERTIES");
-        Map<String, String> propertiesMap = MCRConfiguration2.getPropertiesMap();
+        Map<String, String> propertiesMap = MCRConfiguration2.getRawProperties();
         LOGGER.info("{}={}", CONFIGURED_CLASS_PROPERTY, get(propertiesMap, CONFIGURED_CLASS_PROPERTY));
         LOGGER.info("{}={}", NESTED_CLASS_PROPERTY, get(propertiesMap, NESTED_CLASS_PROPERTY));
         LOGGER.info("{}={}", NESTED_SENTINEL_PROPERTY, get(propertiesMap, NESTED_SENTINEL_PROPERTY));
@@ -258,7 +230,7 @@ public class MCRInstantiatorNonImplicitMapTest {
             assertNull(instance);
             assertNotNull(exception);
 
-            assertEquals("Instance map, configured in Foo.Nested (and its sub-properties)," +
+            assertEquals("Instance map, configured in Foo.Nested (and sub-properties thereof)," +
                 " for target field 'nestedMap' in configured class " + configuredClass.getName()
                 + " is empty", exception.getMessage());
 
@@ -281,8 +253,7 @@ public class MCRInstantiatorNonImplicitMapTest {
                 assertNotNull(nested);
 
                 switch (valueProperty) {
-                    case NOT_SET -> assertNull(nested.value);
-                    case SET_EMPTY -> assertEquals("", nested.value);
+                    case NOT_SET, SET_EMPTY -> assertNull(nested.value);
                     case SET_NON_EMPTY -> assertEquals("Value", nested.value);
                 }
 

@@ -18,33 +18,22 @@
 
 package org.mycore.common.config.instantiator.source;
 
-import static org.mycore.common.config.instantiator.MCRInstantiatorUtils.createInstance;
-import static org.mycore.common.config.instantiator.MCRInstantiatorUtils.emptyException;
-import static org.mycore.common.config.instantiator.MCRInstantiatorUtils.orderedKeys;
-import static org.mycore.common.config.instantiator.MCRInstantiatorUtils.property;
-
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.mycore.common.config.annotation.MCRInstanceList;
-import org.mycore.common.config.annotation.MCRSentinel;
-import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
 /**
  * A {@link MCRInstanceListSource} is a {@link MCRSource} that interprets a {@link MCRInstanceList}.
  */
-final class MCRInstanceListSource implements MCRSource {
+final class MCRInstanceListSource extends MCRValueListSourceBase<Object> {
 
     private final MCRInstanceList annotation;
 
-    private final MCRSentinel sentinel;
-
     MCRInstanceListSource(MCRInstanceList annotation, MCRAnnotationProvider annotationProvider) {
+        super(annotationProvider, new MCRInstanceExtractor(annotation.valueClass()));
         this.annotation = annotation;
-        this.sentinel = annotationProvider.get(MCRSentinel.class);
     }
 
     @Override
@@ -73,29 +62,38 @@ final class MCRInstanceListSource implements MCRSource {
     }
 
     @Override
-    public List<Object> get(MCRInstanceConfiguration<?> configuration, MCRTarget target) {
+    protected String description() {
+        return "instance list";
+    }
 
-        Map<String, ? extends MCRInstanceConfiguration<?>> nestedConfigurationMap =
-            configuration.nestedMap(annotation.valueClass(), annotation.name());
+    @Override
+    protected String name() {
+        return annotation.name();
+    }
 
-        List<String> keyList = orderedKeys(property(configuration, annotation.name()), target,
-            nestedConfigurationMap, "instance list");
+    @Override
+    protected String defaultName() {
+        return "";
+    }
 
-        List<Object> instanceList = new ArrayList<>(nestedConfigurationMap.size());
-        for (String key : keyList) {
-            MCRInstanceConfiguration<?> nestedConfiguration = nestedConfigurationMap.get(key);
-            Object instance = createInstance(target, nestedConfiguration, sentinel, "instance list element");
-            if (instance != null) {
-                instanceList.add(instance);
-            }
-        }
+    @Override
+    protected boolean supportsEmptyName() {
+        return true;
+    }
 
-        if (instanceList.isEmpty() && annotation.required()) {
-            throw emptyException(property(configuration, annotation.name()), target, "instance list");
-        }
+    @Override
+    protected boolean supportsAbsoluteName() {
+        return false;
+    }
 
-        return instanceList;
+    @Override
+    protected boolean supportsShortForm() {
+        return false;
+    }
 
+    @Override
+    protected boolean required() {
+        return annotation.required();
     }
 
 }

@@ -21,18 +21,18 @@ package org.mycore.common.config.instantiator.source;
 import java.util.Map;
 import java.util.Set;
 
-import org.mycore.common.config.annotation.MCRPropertyMap;
+import org.mycore.common.config.annotation.MCRClassPropertyMap;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
 /**
- * A {@link MCRPropertyMapSource} is a {@link MCRSource} that interprets a {@link MCRPropertyMap}.
+ * A {@link MCRClassPropertyMapSource} is a {@link MCRSource} that interprets a {@link MCRClassPropertyMap}.
  */
-final class MCRPropertyMapSource extends MCRValueMapSourceBase<String> {
+final class MCRClassPropertyMapSource extends MCRValueMapSourceBase<Class<?>> {
 
-    private final MCRPropertyMap annotation;
+    private final MCRClassPropertyMap annotation;
 
-    MCRPropertyMapSource(MCRPropertyMap annotation, MCRAnnotationProvider annotationProvider) {
-        super(annotationProvider, new MCRPropertyExtractor());
+    MCRClassPropertyMapSource(MCRClassPropertyMap annotation, MCRAnnotationProvider annotationProvider) {
+        super(annotationProvider, new MCRClassPropertyExtractor(annotation.valueClass()));
         this.annotation = annotation;
     }
 
@@ -42,8 +42,8 @@ final class MCRPropertyMapSource extends MCRValueMapSourceBase<String> {
     }
 
     @Override
-    public Class<MCRPropertyMap> annotationClass() {
-        return MCRPropertyMap.class;
+    public Class<MCRClassPropertyMap> annotationClass() {
+        return MCRClassPropertyMap.class;
     }
 
     @Override
@@ -63,7 +63,7 @@ final class MCRPropertyMapSource extends MCRValueMapSourceBase<String> {
 
     @Override
     protected String description() {
-        return "property map";
+        return "class map";
     }
 
     @Override
