@@ -18,16 +18,12 @@
 
 package org.mycore.common.config.instantiator.source;
 
-import static org.mycore.common.config.instantiator.MCRInstantiatorUtils.createInstance;
-import static org.mycore.common.config.instantiator.MCRInstantiatorUtils.emptyException;
-import static org.mycore.common.config.instantiator.MCRInstantiatorUtils.orderedKeys;
-import static org.mycore.common.config.instantiator.MCRInstantiatorUtils.property;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRInstanceList;
 import org.mycore.common.config.annotation.MCRSentinel;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
@@ -36,7 +32,7 @@ import org.mycore.common.config.instantiator.target.MCRTarget;
 /**
  * A {@link MCRInstanceListSource} is a {@link MCRSource} that interprets a {@link MCRInstanceList}.
  */
-final class MCRInstanceListSource implements MCRSource {
+final class MCRInstanceListSource extends MCRInstanceSourceBase<List<Object>> {
 
     private final MCRInstanceList annotation;
 
@@ -73,29 +69,74 @@ final class MCRInstanceListSource implements MCRSource {
     }
 
     @Override
-    public List<Object> get(MCRInstanceConfiguration<?> configuration, MCRTarget target) {
+    protected String description() {
+        return "instance list";
+    }
+
+    @Override
+    protected String name() {
+        return annotation.name();
+    }
+
+    @Override
+    protected boolean allowsEmptyName() {
+        return true;
+    }
+
+    @Override
+    protected boolean absolute() {
+        return false;
+    }
+
+    @Override
+    protected boolean required() {
+        return annotation.required();
+    }
+
+    @Override
+    protected String defaultName() {
+        return "";
+    }
+
+    @Override
+    protected List<Object> getResult(MCRSourceContext context, MCRInstanceConfiguration<?> configuration,
+        Map<String, String> properties, String prefix) {
 
         Map<String, ? extends MCRInstanceConfiguration<?>> nestedConfigurationMap =
             configuration.nestedMap(annotation.valueClass(), annotation.name());
 
-        List<String> keyList = orderedKeys(property(configuration, annotation.name()), target,
-            nestedConfigurationMap, "instance list");
-
         List<Object> instanceList = new ArrayList<>(nestedConfigurationMap.size());
+
+        List<String> keyList = context.orderedKeys(nestedConfigurationMap);
         for (String key : keyList) {
+
+            MCRSourceContext nestedContext = context.nested(key, "instance list element");
             MCRInstanceConfiguration<?> nestedConfiguration = nestedConfigurationMap.get(key);
-            Object instance = createInstance(target, nestedConfiguration, sentinel, "instance list element");
+            Object instance = createInstance(nestedContext, nestedConfiguration, sentinel);
+
             if (instance != null) {
                 instanceList.add(instance);
             }
-        }
 
-        if (instanceList.isEmpty() && annotation.required()) {
-            throw emptyException(property(configuration, annotation.name()), target, "instance list");
         }
 
         return instanceList;
 
+    }
+
+    @Override
+    protected boolean isMissingResult(List<Object> result) {
+        return result.isEmpty();
+    }
+
+    @Override
+    protected MCRConfigurationException missingResultException(MCRSourceContext context) {
+        return context.emptyException();
+    }
+
+    @Override
+    protected List<Object> missingResultReplacement() {
+        return new ArrayList<>();
     }
 
 }

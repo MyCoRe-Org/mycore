@@ -69,13 +69,6 @@ import org.mycore.test.MyCoReTest;
  *     <th style="border: 1px solid;">Expected Required Result</th>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">none or impl. enabled</td>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;"><code>null</code></td>
- *     <td style="border: 1px solid;">Exception</td>
- *   </tr>
- *   <tr>
  *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;">impl. or expl. disabled</td>
  *     <td style="border: 1px solid;">-</td>
@@ -83,60 +76,39 @@ import org.mycore.test.MyCoReTest;
  *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">set empty</td>
- *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;"><code>null</code></td>
- *     <td style="border: 1px solid;">Exception</td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">not set</td>
+ *     <td style="border: 1px solid;">not set / empty</td>
  *     <td style="border: 1px solid;">none or impl. enabled</td>
- *     <td style="border: 1px solid;"><code>a=</code></td>
+ *     <td style="border: 1px solid;">not set / <code>a=</code></td>
  *     <td style="border: 1px solid;"><code>null</code></td>
  *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">not set</td>
+ *     <td style="border: 1px solid;">not set / empty</td>
  *     <td style="border: 1px solid;">none or impl. enabled</td>
  *     <td style="border: 1px solid;"><code>a=Value</code></td>
  *     <td style="border: 1px solid;"><code>null</code></td>
  *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">not set</td>
+ *     <td style="border: 1px solid;">not set / empty</td>
  *     <td style="border: 1px solid;">expl. enabled</td>
- *     <td style="border: 1px solid;">not set</td>
+ *     <td style="border: 1px solid;">not set / <code>a=</code></td>
  *     <td style="border: 1px solid;"><code>null</code></td>
  *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">not set</td>
+ *     <td style="border: 1px solid;">not set / empty</td>
  *     <td style="border: 1px solid;">expl. enabled</td>
- *     <td style="border: 1px solid;"><code>a=</code></td>
- *     <td style="border: 1px solid;"><code>null</code></td>
- *     <td style="border: 1px solid;">Exception</td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">expl. enabled</td>
- *     <td style="border: 1px solid;"><code>Value</code></td>
+ *     <td style="border: 1px solid;"><code>a=Value</code></td>
  *     <td style="border: 1px solid;"><code>null</code></td>
  *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;">set</td>
  *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;">not set</td>
+ *     <td style="border: 1px solid;">not set / <code>a=</code></td>
  *     <td style="border: 1px solid;"><code>_</code></td>
  *     <td style="border: 1px solid;"><code>_</code></td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">set</td>
- *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;"><code>a=</code></td>
- *     <td style="border: 1px solid;"><code>()</code></td>
- *     <td style="border: 1px solid;"><code>()</code></td>
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;">set</td>
@@ -230,7 +202,7 @@ public class MCRInstantiatorNonImplicitTest {
 
         // log all relevant configuration entries
         LOGGER.info("CONFIGURATION PROPERTIES");
-        Map<String, String> propertiesMap = MCRConfiguration2.getPropertiesMap();
+        Map<String, String> propertiesMap = MCRConfiguration2.getRawProperties();
         LOGGER.info("{}={}", CONFIGURED_CLASS_PROPERTY, get(propertiesMap, CONFIGURED_CLASS_PROPERTY));
         LOGGER.info("{}={}", NESTED_CLASS_PROPERTY, get(propertiesMap, NESTED_CLASS_PROPERTY));
         LOGGER.info("{}={}", NESTED_SENTINEL_PROPERTY, get(propertiesMap, NESTED_SENTINEL_PROPERTY));
@@ -277,8 +249,7 @@ public class MCRInstantiatorNonImplicitTest {
                 assertNotNull(nested);
 
                 switch (valueProperty) {
-                    case NOT_SET -> assertNull(nested.value);
-                    case SET_EMPTY -> assertEquals("", nested.value);
+                    case NOT_SET, SET_EMPTY -> assertNull(nested.value);
                     case SET_NON_EMPTY -> assertEquals("Value", nested.value);
                 }
 

@@ -19,6 +19,7 @@
 package org.mycore.common.config.instantiator;
 
 import java.lang.reflect.Modifier;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -28,10 +29,9 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.config.MCRConfigurationException;
 
 /**
- * Represents an extract of properties (typically {@link MCRConfiguration2#getPropertiesMap()}) used to
+ * Represents an extract of properties (typically {@link MCRConfiguration2#getAllProperties()}) used to
  * instantiate an object. Provides methods to extract nested configurations.
  * <p>
  * Generally speaking, a configuration has a {@link MCRInstanceConfiguration#name()} that represents the
@@ -66,12 +66,12 @@ public final class MCRInstanceConfiguration<S> {
 
     private MCRInstanceConfiguration(Class<S> superClass, Class<? extends S> valueClass, MCRInstanceName name,
         Map<String, String> properties, Map<String, String> fullProperties) {
+        properties.remove(CLASS_KEY);
         this.superClass = superClass;
         this.valueClass = valueClass;
         this.name = name;
-        this.properties = properties;
+        this.properties = Collections.unmodifiableMap(properties);
         this.fullProperties = fullProperties;
-        properties.remove(CLASS_KEY);
     }
 
     public boolean instantiatable() {
@@ -85,11 +85,11 @@ public final class MCRInstanceConfiguration<S> {
     /**
      * Shorthand for {@link MCRInstanceConfiguration#ofClass(Class, Class, String, Map)} that
      * uses {@link MCRClassTools#forName(String)} to resolve the value class and
-     * uses {@link MCRConfiguration2#getPropertiesMap()} as the properties.
+     * uses {@link MCRConfiguration2#getAllProperties()} as the properties.
      */
     public static <S> MCRInstanceConfiguration<S> ofClassName(Class<S> superClass, String className,
         String prefix) {
-        return ofClassName(superClass, className, prefix, MCRConfiguration2.getPropertiesMap());
+        return ofClassName(superClass, className, prefix, MCRConfiguration2.getAllProperties());
     }
 
     /**
@@ -108,11 +108,11 @@ public final class MCRInstanceConfiguration<S> {
 
     /**
      * Shorthand for {@link MCRInstanceConfiguration#ofClass(Class, Class, String, Map)} that
-     * uses {@link MCRConfiguration2#getPropertiesMap()} as the properties.
+     * uses {@link MCRConfiguration2#getAllProperties()} as the properties.
      */
     public static <S> MCRInstanceConfiguration<S> ofClass(Class<S> superClass, Class<? extends S> valueClass,
         String prefix) {
-        return ofClass(superClass, valueClass, prefix, MCRConfiguration2.getPropertiesMap());
+        return ofClass(superClass, valueClass, prefix, MCRConfiguration2.getAllProperties());
     }
 
     /**
@@ -143,11 +143,11 @@ public final class MCRInstanceConfiguration<S> {
     /**
      * Shorthand for {@link MCRInstanceConfiguration#ofName(Class, MCRInstanceName, Map, Set)} that
      * creates the name with {@link MCRInstanceName#of(String)} and
-     * uses {@link MCRConfiguration2#getPropertiesMap()} as the properties and
+     * uses {@link MCRConfiguration2#getAllProperties()} as the properties and
      * uses {@link Options#NONE} as the options.
      */
     public static <T> MCRInstanceConfiguration<T> ofName(Class<T> superClass, String name) {
-        return ofName(superClass, MCRInstanceName.of(name), MCRConfiguration2.getPropertiesMap(), Options.NONE);
+        return ofName(superClass, MCRInstanceName.of(name), MCRConfiguration2.getAllProperties(), Options.NONE);
     }
 
     /**
@@ -163,11 +163,11 @@ public final class MCRInstanceConfiguration<S> {
     /**
      * Shorthand for {@link MCRInstanceConfiguration#ofName(Class, MCRInstanceName, Map, Set)} that
      * creates the name with {@link MCRInstanceName#of(String)} and
-     * uses {@link MCRConfiguration2#getPropertiesMap()} as the properties.
+     * uses {@link MCRConfiguration2#getAllProperties()} as the properties.
      */
     public static <T> MCRInstanceConfiguration<T> ofName(Class<T> superClass, String name,
         Set<Option> options) {
-        return ofName(superClass, MCRInstanceName.of(name), MCRConfiguration2.getPropertiesMap(), options);
+        return ofName(superClass, MCRInstanceName.of(name), MCRConfiguration2.getAllProperties(), options);
     }
 
     /**
@@ -213,12 +213,7 @@ public final class MCRInstanceConfiguration<S> {
             if (className.isBlank()) {
                 return null;
             }
-            try {
-                return MCRClassTools.forName(className);
-            } catch (ClassNotFoundException e) {
-                throw new MCRConfigurationException("Missing class (" + className + ")" +
-                    " configured in: " + name.actual(), e);
-            }
+            return MCRInstantiatorUtils.getClass(name.actual(), className);
         }
 
         if (options.contains(Option.IMPLICIT) && Modifier.isFinal(superClass.getModifiers())) {

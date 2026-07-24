@@ -28,6 +28,9 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import org.mycore.common.config.annotation.MCRClassProperty;
+import org.mycore.common.config.annotation.MCRClassPropertyList;
+import org.mycore.common.config.annotation.MCRClassPropertyMap;
 import org.mycore.common.config.annotation.MCRInstance;
 import org.mycore.common.config.annotation.MCRInstanceList;
 import org.mycore.common.config.annotation.MCRInstanceMap;
@@ -43,8 +46,7 @@ import org.mycore.common.config.instantiator.target.MCRTarget;
  * Common abstraction for components of a class (i.e., a {@link Field} or a {@link Method}) that can,
  * in principle, be used for injection. It provides an abstraction for obtaining a value based on present annotations.
  */
-public sealed interface MCRSource permits MCRInstanceListSource, MCRInstanceMapSource, MCRInstanceSource,
-    MCRPostConstructionSource, MCRPropertyListSource, MCRPropertyMapSource, MCRPropertySource, MCRRawPropertiesSource {
+public interface MCRSource {
 
     Type type();
 
@@ -71,6 +73,18 @@ public sealed interface MCRSource permits MCRInstanceListSource, MCRInstanceMapS
         PROPERTY_LIST(
             Group.VALUE_INJECTION,
             new Mapper<>(MCRPropertyList.class, MCRPropertyListSource::new)),
+
+        CLASS_PROPERTY(
+            Group.VALUE_INJECTION,
+            new Mapper<>(MCRClassProperty.class, MCRClassPropertySource::new)),
+
+        CLASS_PROPERTY_MAP(
+            Group.VALUE_INJECTION,
+            new Mapper<>(MCRClassPropertyMap.class, MCRClassPropertyMapSource::new)),
+
+        CLASS_PROPERTY_LIST(
+            Group.VALUE_INJECTION,
+            new Mapper<>(MCRClassPropertyList.class, MCRClassPropertyListSource::new)),
 
         RAW_PROPERTIES(
             Group.VALUE_INJECTION,

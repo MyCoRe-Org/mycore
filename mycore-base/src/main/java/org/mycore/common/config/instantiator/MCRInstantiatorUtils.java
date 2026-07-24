@@ -19,20 +19,12 @@
 package org.mycore.common.config.instantiator;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.config.MCRConfigurationException;
-import org.mycore.common.config.annotation.MCRSentinel;
 import org.mycore.common.config.instantiator.source.MCRSource;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
@@ -41,8 +33,6 @@ import org.mycore.common.config.instantiator.target.MCRTarget;
  */
 @SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public final class MCRInstantiatorUtils {
-
-    private static final Logger LOGGER = LogManager.getLogger();
 
     private MCRInstantiatorUtils() {
     }
@@ -54,43 +44,6 @@ public final class MCRInstantiatorUtils {
         } catch (ClassNotFoundException e) {
             throw new MCRConfigurationException("Missing class (" + className + ") configured in: " + property, e);
         }
-    }
-
-    public static Object createInstance(MCRTarget target, MCRInstanceConfiguration<?> configuration,
-        MCRSentinel sentinel, String description) {
-
-        String property = configuration.name().canonical();
-
-        if (sentinel != null) {
-            boolean sentinelValue = sentinel.defaultValue();
-            String configuredSentinelValue = configuration.properties().remove(sentinel.name());
-            if (configuredSentinelValue != null) {
-                sentinelValue = Boolean.parseBoolean(configuredSentinelValue);
-            }
-            if (sentinelValue == sentinel.rejectionValue()) {
-                if (LOGGER.isInfoEnabled()) {
-                    LOGGER.info("[SENTINEL] Ignoring {} {} and all sub-properties", description, property);
-                }
-                return null;
-            }
-        }
-
-        if (!configuration.instantiatable()) {
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("[CLEAN-UP] Ignoring {} {} and all sub-properties (no or empty class name)",
-                    description, property);
-            }
-            return null;
-        }
-
-        Object instance = configuration.instantiate();
-
-        if (!configuration.valueClass().isAssignableFrom(instance.getClass())) {
-            throw incompatibilityException(property, target, configuration.valueClass(), instance);
-        }
-
-        return instance;
-
     }
 
     public static String methodNames(List<Method> methods) {
@@ -113,14 +66,6 @@ public final class MCRInstantiatorUtils {
         return source.annotationClass().getName();
     }
 
-    public static String property(MCRInstanceConfiguration<?> configuration, String annotationName) {
-        if (Objects.equals("", annotationName)) {
-            return configuration.name().canonical();
-        } else {
-            return configuration.name().canonical() + "." + annotationName;
-        }
-    }
-
     public static MCRConfigurationException emptyNameException(MCRTarget target) {
         return new MCRConfigurationException("The name for target " + targetTypeName(target) + " '" + target.name()
             + "' in configured class " + target.declaringClass().getName() + " must not be empty");
@@ -128,17 +73,9 @@ public final class MCRInstantiatorUtils {
 
     public static MCRConfigurationException incompatibilityException(String property, Class<?> instanceClass,
         Class<?> superClass) {
-        return new MCRConfigurationException("Instance of class " + instanceClass.getName()
-            + ", configured in " + property + ", is incompatible with" +
-            " intended super class " + superClass.getName());
-    }
-
-    public static MCRConfigurationException incompatibilityException(String property, MCRTarget target,
-        Class<?> annotationValueClass, Object instance) {
-        return new MCRConfigurationException("Instance of class " + instance.getClass().getName()
-            + "', configured in " + property + ", is incompatible with annotated value class "
-            + annotationValueClass.getName() + " for target " + targetTypeName(target)
-            + " '" + target.name() + "' in configured class " + target.declaringClass().getName());
+        return new MCRConfigurationException("Instance, configured in " + property + ", has a class ("
+            + instanceClass.getName() + ") that is incompatible with the intended super class ("
+            + superClass.getName() + ")");
     }
 
     public static MCRConfigurationException missingException(String property, Class<?> superClass) {
@@ -147,73 +84,16 @@ public final class MCRInstantiatorUtils {
             + " and therefore cannot be used implicitly)");
     }
 
-    public static MCRConfigurationException missingException(String property, MCRTarget target,
-        String description) {
-        return new MCRConfigurationException(
-            capitalize(description) + ", configured in " + property + " (and its sub-properties)," +
-                " for target " + targetTypeName(target) + " '" + target.name() + "' in configured class "
-                + target.declaringClass().getName()
-                + " is missing");
-    }
-
-    public static MCRConfigurationException emptyException(String property, MCRTarget target, String description) {
-        return new MCRConfigurationException(
-            capitalize(description) + ", configured in " + property + " (and its sub-properties)," +
-                " for target " + targetTypeName(target) + " '" + target.name() + "' in configured class "
-                + target.declaringClass().getName()
-                + " is empty");
-    }
-
     public static MCRConfigurationException emptyRawException(String property, MCRTarget target,
         String description) {
-        return new MCRConfigurationException(
-            capitalize(description) + ", configured in " + property + "," +
-                " for target " + targetTypeName(target) + " '" + target.name() + "' in configured class "
-                + target.declaringClass().getName()
-                + " is empty");
-    }
-
-    public static MCRConfigurationException nonIntegerKeyException(String property, MCRTarget target,
-        String key, String description, NumberFormatException exception) {
-        return new MCRConfigurationException(
-            capitalize(description) + ", configured in " + property + " (and its sub-properties)," +
-                " for target " + targetTypeName(target) + " '" + target.name() + "' in configured class "
-                + target.declaringClass().getName() + " has element with non-integer key " + key,
-            exception);
+        return new MCRConfigurationException(capitalize(description) + ", configured in " + property + ","
+            + " for target " + targetTypeName(target) + " '" + target.name() + "' in configured class "
+            + target.declaringClass().getName()
+            + " is empty");
     }
 
     public static String capitalize(String description) {
         return description.substring(0, 1).toUpperCase(Locale.ROOT) + description.substring(1);
-    }
-
-    public static MCRConfigurationException inconsistentKeysException(String property, MCRTarget target,
-        String key1, String key2, String description) {
-        return new MCRConfigurationException(
-            capitalize(description) + ", configured in " + property + " (and its sub-properties),"
-                + " for target " + targetTypeName(target) + " '" + target.name() + "' in configured class "
-                + target.declaringClass().getName() + " has element with inconsistent integer keys "
-                + key1 + " and " + key2);
-    }
-
-    @SuppressWarnings("PMD.PreserveStackTrace")
-    public static List<String> orderedKeys(String property, MCRTarget target, Map<String, ?> map,
-        String description) {
-
-        SortedMap<Integer, String> keyMap = new TreeMap<>();
-        for (String key : map.keySet()) {
-            try {
-                Integer integerValue = Integer.parseInt(key);
-                String alreadyMappedKey = keyMap.put(integerValue, key);
-                if (alreadyMappedKey != null && !alreadyMappedKey.equals(key)) {
-                    throw inconsistentKeysException(property, target, key, alreadyMappedKey, description);
-                }
-            } catch (NumberFormatException e) {
-                throw nonIntegerKeyException(property, target, key, description, e);
-            }
-        }
-
-        return new ArrayList<>(keyMap.values());
-
     }
 
 }

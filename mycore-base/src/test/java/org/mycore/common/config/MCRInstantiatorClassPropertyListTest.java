@@ -35,7 +35,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
-import org.mycore.common.config.annotation.MCRPropertyList;
+import org.mycore.common.config.annotation.MCRClassPropertyList;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.test.MyCoReTest;
 
@@ -103,7 +103,7 @@ import org.mycore.test.MyCoReTest;
  * </table>
  */
 @MyCoReTest
-public class MCRInstantiatorPropertyListTest {
+public class MCRInstantiatorClassPropertyListTest {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -187,13 +187,13 @@ public class MCRInstantiatorPropertyListTest {
                 MCRConfiguration2.set(LIST_PROPERTY_2, (String) null);
             }
             case SET_SHORT_FORM -> {
-                MCRConfiguration2.set(LIST_PROPERTY, "Value,");
+                MCRConfiguration2.set(LIST_PROPERTY, Value.class.getName() + ",");
                 MCRConfiguration2.set(LIST_PROPERTY_1, (String) null);
                 MCRConfiguration2.set(LIST_PROPERTY_2, (String) null);
             }
             case SET_LONG_FORM -> {
                 MCRConfiguration2.set(LIST_PROPERTY, (String) null);
-                MCRConfiguration2.set(LIST_PROPERTY_1, "Value");
+                MCRConfiguration2.set(LIST_PROPERTY_1, Value.class.getName());
             }
         }
 
@@ -211,13 +211,13 @@ public class MCRInstantiatorPropertyListTest {
                 MCRConfiguration2.set(DEFAULT_LIST_PROPERTY_2, (String) null);
             }
             case SET_SHORT_FORM -> {
-                MCRConfiguration2.set(DEFAULT_LIST_PROPERTY, "DefaultValue,");
+                MCRConfiguration2.set(DEFAULT_LIST_PROPERTY, DefaultValue.class.getName() + ",");
                 MCRConfiguration2.set(DEFAULT_LIST_PROPERTY_1, (String) null);
                 MCRConfiguration2.set(DEFAULT_LIST_PROPERTY_2, (String) null);
             }
             case SET_LONG_FORM -> {
                 MCRConfiguration2.set(DEFAULT_LIST_PROPERTY, (String) null);
-                MCRConfiguration2.set(DEFAULT_LIST_PROPERTY_1, "DefaultValue");
+                MCRConfiguration2.set(DEFAULT_LIST_PROPERTY_1, DefaultValue.class.getName());
             }
         }
 
@@ -249,7 +249,7 @@ public class MCRInstantiatorPropertyListTest {
             assertNull(instance);
             assertNotNull(exception);
 
-            assertEquals("Default property list, configured in MCR.List (and its sub-properties),"
+            assertEquals("Default class list, configured in MCR.List (and its sub-properties),"
                 + " for target field 'list' in configured class " + configuredClass.getName()
                 + " is empty", exception.getMessage());
 
@@ -258,7 +258,7 @@ public class MCRInstantiatorPropertyListTest {
             assertNull(instance);
             assertNotNull(exception);
 
-            assertEquals("Property list, configured in Foo.List (and its sub-properties),"
+            assertEquals("Class list, configured in Foo.List (and its sub-properties),"
                 + " for target field 'list' in configured class " + configuredClass.getName()
                 + " is empty", exception.getMessage());
 
@@ -267,7 +267,7 @@ public class MCRInstantiatorPropertyListTest {
             assertNull(exception);
             assertNotNull(instance);
 
-            List<String> list = instance.list();
+            List<Class<?>> list = instance.list();
             assertNotNull(list);
 
             if (emptyResultExpected) {
@@ -277,13 +277,13 @@ public class MCRInstantiatorPropertyListTest {
             } else {
 
                 assertEquals(1, list.size());
-                String value = list.getFirst();
+                Class<?> value = list.getFirst();
                 assertNotNull(value);
 
                 if (valueProperty.set()) {
-                    assertEquals("Value", value);
+                    assertEquals(Value.class, value);
                 } else {
-                    assertEquals("DefaultValue", value);
+                    assertEquals(DefaultValue.class, value);
                 }
 
             }
@@ -331,17 +331,17 @@ public class MCRInstantiatorPropertyListTest {
 
     public interface Configurable {
 
-        List<String> list();
+        List<Class<?>> list();
 
     }
 
     public static class NotRequiredDefaultNotSet implements Configurable {
 
-        @MCRPropertyList(name = "List", required = false)
-        public List<String> list;
+        @MCRClassPropertyList(name = "List", required = false)
+        public List<Class<?>> list;
 
         @Override
-        public List<String> list() {
+        public List<Class<?>> list() {
             return list;
         }
 
@@ -349,11 +349,11 @@ public class MCRInstantiatorPropertyListTest {
 
     public static class NotRequiredDefaultSet implements Configurable {
 
-        @MCRPropertyList(name = "List", required = false, defaultName = "MCR.List")
-        public List<String> list;
+        @MCRClassPropertyList(name = "List", required = false, defaultName = "MCR.List")
+        public List<Class<?>> list;
 
         @Override
-        public List<String> list() {
+        public List<Class<?>> list() {
             return list;
         }
 
@@ -361,11 +361,11 @@ public class MCRInstantiatorPropertyListTest {
 
     public static class RequiredDefaultNotSet implements Configurable {
 
-        @MCRPropertyList(name = "List")
-        public List<String> list;
+        @MCRClassPropertyList(name = "List")
+        public List<Class<?>> list;
 
         @Override
-        public List<String> list() {
+        public List<Class<?>> list() {
             return list;
         }
 
@@ -373,13 +373,21 @@ public class MCRInstantiatorPropertyListTest {
 
     public static class RequiredDefaultSet implements Configurable {
 
-        @MCRPropertyList(name = "List", defaultName = "MCR.List")
-        public List<String> list;
+        @MCRClassPropertyList(name = "List", defaultName = "MCR.List")
+        public List<Class<?>> list;
 
         @Override
-        public List<String> list() {
+        public List<Class<?>> list() {
             return list;
         }
+
+    }
+
+    public static final class Value {
+
+    }
+
+    public static final class DefaultValue {
 
     }
 
