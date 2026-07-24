@@ -18,6 +18,8 @@
 
 package org.mycore.common.config.instantiator.source;
 
+import java.util.Map;
+
 /**
  * A {@link MCRValueExtractor} extracts a value (of a specific type) from a configured string value.
  *
@@ -25,6 +27,6 @@ package org.mycore.common.config.instantiator.source;
  */
 interface MCRValueExtractor<Value> {
 
-    Value toValue(MCRSourceContext context, String value);
+    Value toValue(MCRSourceContext context, Map<String, String> properties, Map<String, String> fullProperties);
 
 }
