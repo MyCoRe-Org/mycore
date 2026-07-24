@@ -95,7 +95,9 @@ public class MCRInstantiatorClassPropertyBasicTest {
         properties = {
             @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithMap.class),
             @MCRTestProperty(key = "Foo.Values.foo", classNameOf = FooValue.class),
+            @MCRTestProperty(key = "Foo.Values.foo.Extra", string = "FOO"),
             @MCRTestProperty(key = "Foo.Values.bar", classNameOf = BarValue.class),
+            @MCRTestProperty(key = "Foo.Values.bar.Extra", string = "BAR"),
         })
     public void classValueMap() {
 
@@ -149,7 +151,9 @@ public class MCRInstantiatorClassPropertyBasicTest {
         properties = {
             @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithList.class),
             @MCRTestProperty(key = "Foo.Values.10", classNameOf = FooValue.class),
+            @MCRTestProperty(key = "Foo.Values.10.Extra", string = "FOO"),
             @MCRTestProperty(key = "Foo.Values.20", classNameOf = BarValue.class),
+            @MCRTestProperty(key = "Foo.Values.20.Extra", string = "BAR"),
         })
     public void classValueList() {
 

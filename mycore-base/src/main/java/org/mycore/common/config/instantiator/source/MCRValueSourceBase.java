@@ -21,10 +21,17 @@ package org.mycore.common.config.instantiator.source;
 import java.util.Map;
 
 import org.mycore.common.config.MCRConfigurationException;
-import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 
+/**
+ * A {@link MCRValueSourceBase} is a base implementation of {@link MCRSource} that
+ * obtains a single value for annotation based injection from properties.
+ * It provides support for {@link MCRSentinel} and
+ * uses a {@link MCRValueExtractor} to obtain a single value from properties.
+ *
+ * @param <Value> the type of injected value.
+ */
 abstract sealed class MCRValueSourceBase<Value> extends MCRSourceBase<Value> permits MCRClassPropertySource,
-    MCRPropertySource {
+    MCRInstanceSource, MCRPropertySource {
 
     private final MCRValueExtractor<Value> extractor;
 
@@ -34,15 +41,14 @@ abstract sealed class MCRValueSourceBase<Value> extends MCRSourceBase<Value> per
     }
 
     @Override
-    protected final Value getResult(MCRSourceContext context, MCRInstanceConfiguration<?> configuration,
-        Map<String, String> properties, String prefix) {
+    protected final Value getResult(MCRSourceContext context, Map<String, String> properties,
+        Map<String, String> fullProperties) {
 
-        if (rejectedBySentinel(context, properties, prefix + ".")) {
+        if (rejectedBySentinel(context, properties)) {
             return null;
         }
 
-        String value = properties.get(prefix);
-        return value == null ? null : extractor.toValue(context, value);
+        return extractor.toValue(context, properties, fullProperties);
 
     }
 
