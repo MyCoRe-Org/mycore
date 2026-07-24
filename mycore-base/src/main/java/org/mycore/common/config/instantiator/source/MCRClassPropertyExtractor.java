@@ -18,23 +18,38 @@
 
 package org.mycore.common.config.instantiator.source;
 
+import java.util.Map;
+
 import org.mycore.common.MCRClassTools;
 
-class MCRClassPropertyExtractor implements MCRValueExtractor<Class<?>> {
+/**
+ * A {@link MCRClassPropertyExtractor} is a {@link MCRPropertyExtractor} that uses
+ * {@link MCRClassTools#forName(String)} to extract {@link Class} values.
+ */
+final class MCRClassPropertyExtractor implements MCRValueExtractor<Class<?>> {
 
-    private final Class<?> valueClass;
+    private final Class<?> superClass;
 
     MCRClassPropertyExtractor(Class<?> valueClass) {
-        this.valueClass = valueClass;
+        this.superClass = valueClass;
     }
 
     @Override
-    public Class<?> toValue(MCRSourceContext context, String value) {
-        Class<?> configuredClass = loadConfiguredClass(context, value);
-        if (!valueClass.isAssignableFrom(configuredClass)) {
-            throw context.incompatibilityException(valueClass, configuredClass);
+    public Class<?> toValue(MCRSourceContext context, Map<String, String> properties,
+        Map<String, String> fullProperties) {
+
+        String className = properties.get("");
+
+        if (className == null) {
+            return null;
+        }
+
+        Class<?> configuredClass = loadConfiguredClass(context, className);
+        if (!superClass.isAssignableFrom(configuredClass)) {
+            throw context.classIncompatibilityException(superClass, configuredClass);
         }
         return configuredClass;
+
     }
 
     private Class<?> loadConfiguredClass(MCRSourceContext context, String value) {
