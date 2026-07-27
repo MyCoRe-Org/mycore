@@ -18,9 +18,9 @@
 
 package org.mycore.common.config.instantiator.source;
 
-import java.util.Map;
-
 import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.common.config.instantiator.MCRProperTree;
+import org.mycore.common.config.annotation.MCRSentinel;
 
 /**
  * A {@link MCRValueSourceBase} is a base implementation of {@link MCRSource} that
@@ -41,8 +41,8 @@ abstract sealed class MCRValueSourceBase<Value> extends MCRSourceBase<Value> per
     }
 
     @Override
-    protected final Value getResult(MCRSourceContext context, Map<String, String> properties,
-        Map<String, String> fullProperties) {
+    protected final Value getResult(MCRSourceContext context, MCRProperTree properties,
+        MCRProperTree fullProperties) {
 
         if (rejectedBySentinel(context, properties)) {
             return null;

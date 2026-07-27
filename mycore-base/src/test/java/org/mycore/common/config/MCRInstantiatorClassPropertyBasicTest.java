@@ -21,7 +21,6 @@ package org.mycore.common.config;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mycore.common.config.instantiator.MCRInstanceConfiguration.ofName;
 
 import java.util.List;
 import java.util.Map;
@@ -48,7 +47,7 @@ public class MCRInstantiatorClassPropertyBasicTest {
         })
     public void classValue() {
 
-        TestClass instance = ofName(TestClass.class, "Foo").instantiate();
+        TestClass instance = ofName(TestClass.class);
 
         assertNotNull(instance);
         assertEquals(FooValue.class, instance.value);
@@ -64,7 +63,7 @@ public class MCRInstantiatorClassPropertyBasicTest {
     public void incompatibleClassValue() {
 
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
-            () -> MCRInstanceConfiguration.ofName(TestClass.class, "Foo").instantiate());
+            () -> ofName(TestClass.class));
 
         assertEquals("Class, configured in Foo.Value (and sub-properties thereof),"
             + " for target field 'value' in configured class " + TestClass.class.getName()
@@ -82,7 +81,7 @@ public class MCRInstantiatorClassPropertyBasicTest {
     public void missingClassValue() {
 
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
-            () -> MCRInstanceConfiguration.ofName(TestClass.class, "Foo").instantiate());
+            () -> ofName(TestClass.class));
 
         assertEquals("Class, configured in Foo.Value (and sub-properties thereof),"
             + " for target field 'value' in configured class " + TestClass.class.getName()
@@ -101,7 +100,7 @@ public class MCRInstantiatorClassPropertyBasicTest {
         })
     public void classValueMap() {
 
-        TestClassWithMap instance = ofName(TestClassWithMap.class, "Foo").instantiate();
+        TestClassWithMap instance = ofName(TestClassWithMap.class);
 
         assertNotNull(instance);
         assertEquals(FooValue.class, instance.values.get("foo"));
@@ -119,7 +118,7 @@ public class MCRInstantiatorClassPropertyBasicTest {
     public void incompatibleClassValueInMap() {
 
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
-            () -> MCRInstanceConfiguration.ofName(TestClass.class, "Foo").instantiate());
+            () -> ofName(TestClass.class));
 
         assertEquals("Class map entry, configured in Foo.Values.bar (and sub-properties thereof),"
             + " for target field 'values' in configured class " + TestClassWithMap.class.getName()
@@ -138,7 +137,7 @@ public class MCRInstantiatorClassPropertyBasicTest {
     public void missingClassValueInMap() {
 
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
-            () -> MCRInstanceConfiguration.ofName(TestClass.class, "Foo").instantiate());
+            () -> ofName(TestClass.class));
 
         assertEquals("Class map entry, configured in Foo.Values.bar (and sub-properties thereof),"
             + " for target field 'values' in configured class " + TestClassWithMap.class.getName()
@@ -157,7 +156,7 @@ public class MCRInstantiatorClassPropertyBasicTest {
         })
     public void classValueList() {
 
-        TestClassWithList instance = ofName(TestClassWithList.class, "Foo").instantiate();
+        TestClassWithList instance = ofName(TestClassWithList.class);
 
         assertNotNull(instance);
         assertEquals(FooValue.class, instance.values.getFirst());
@@ -175,7 +174,7 @@ public class MCRInstantiatorClassPropertyBasicTest {
     public void incompatibleClassValueInList() {
 
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
-            () -> MCRInstanceConfiguration.ofName(TestClass.class, "Foo").instantiate());
+            () -> ofName(TestClass.class));
 
         assertEquals("Class list element, configured in Foo.Values.20 (and sub-properties thereof),"
             + " for target field 'values' in configured class " + TestClassWithList.class.getName()
@@ -194,12 +193,17 @@ public class MCRInstantiatorClassPropertyBasicTest {
     public void missingClassValueInList() {
 
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
-            () -> MCRInstanceConfiguration.ofName(TestClass.class, "Foo").instantiate());
+            () -> ofName(TestClass.class));
 
         assertEquals("Class list element, configured in Foo.Values.20 (and sub-properties thereof),"
             + " for target field 'values' in configured class " + TestClassWithList.class.getName()
             + " has a class (" + MISSING_CLASS + ") that could not be loaded", exception.getMessage());
 
+    }
+
+    private <S> S ofName(Class<S> superClass) {
+        return MCRInstanceConfiguration.ofName(superClass, "Foo", MCRConfiguration2
+            .getAllPropertiesTree()).instantiate();
     }
 
     public static class TestClass {

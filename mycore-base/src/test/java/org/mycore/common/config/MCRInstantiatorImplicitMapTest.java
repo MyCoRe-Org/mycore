@@ -213,7 +213,8 @@ public class MCRInstantiatorImplicitMapTest {
         Configurable instance = null;
         MCRConfigurationException exception = null;
         try {
-            instance = MCRInstanceConfiguration.ofName(Configurable.class, "Foo").instantiate();
+            instance = MCRInstanceConfiguration.ofName(Configurable.class, "Foo",
+                MCRConfiguration2.getAllPropertiesTree()).instantiate();
         } catch (MCRConfigurationException e) {
             exception = e;
         }

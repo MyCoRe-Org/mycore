@@ -19,34 +19,37 @@
 package org.mycore.common.config;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import java.util.function.Supplier;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
-import org.mycore.common.config.annotation.MCRConfigurationProxy;
-import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.config.annotation.MCRRawProperties;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
-public class MCRInstantiatorProxyTest {
+public class MCRInstantiatorRawPropertiesBasicTest {
 
     @Test
     @MCRTestConfiguration(
         properties = {
             @MCRTestProperty(key = "Foo.Class", classNameOf = TestClass.class),
-            @MCRTestProperty(key = "Foo.Property1", string = "Value1"),
-            @MCRTestProperty(key = "Foo.Property2", string = "Value2")
+            @MCRTestProperty(key = "Foo.1", string = "1"),
+            @MCRTestProperty(key = "Foo.2", string = "2"),
+            @MCRTestProperty(key = "Foo.Values.1", string = "Value-1"),
+            @MCRTestProperty(key = "Foo.Values.2", string = "Value-2"),
+            @MCRTestProperty(key = "MCR.Values.1", string = "MCR-Value-1"),
+            @MCRTestProperty(key = "MCR.Values.2", string = "MCR-Value-2")
         })
     public void annotated() {
 
         TestClass instance = ofName(TestClass.class);
 
-        assertNotNull(instance);
-        assertEquals("Value1-Value2", instance.value());
+        assertEquals(Map.of("1", "1", "2", "2", "Values.1", "Value-1", "Values.2", "Value-2"), instance.values);
+        assertEquals(Map.of("1", "Value-1", "2", "Value-2"), instance.nestedValues);
+        assertEquals(Map.of("1", "MCR-Value-1", "2", "MCR-Value-2"), instance.absoluteValues);
 
     }
 
@@ -55,33 +58,16 @@ public class MCRInstantiatorProxyTest {
             .getAllPropertiesTree()).instantiate();
     }
 
-    @MCRConfigurationProxy(proxyClass = TestClass.Factory.class)
     public static class TestClass {
 
-        private final String value;
+        @MCRRawProperties(namePattern = "*")
+        public Map<String, String> values;
 
-        public TestClass(String value) {
-            this.value = value;
-        }
+        @MCRRawProperties(namePattern = "Values.*")
+        public Map<String, String> nestedValues;
 
-        public String value() {
-            return value;
-        }
-
-        public static class Factory implements Supplier<TestClass> {
-
-            @MCRProperty(name = "Property1")
-            public String value1;
-
-            @MCRProperty(name = "Property2")
-            public String value2;
-
-            @Override
-            public TestClass get() {
-                return new TestClass(value1 + "-" + value2);
-            }
-
-        }
+        @MCRRawProperties(namePattern = "MCR.Values.*", absolute = true)
+        public Map<String, String> absoluteValues;
 
     }
 
