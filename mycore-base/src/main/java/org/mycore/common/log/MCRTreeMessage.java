@@ -54,7 +54,11 @@ public final class MCRTreeMessage {
     }
 
     public void add(String key, MCRTreeMessage message) {
-        entries.add(new NestedEntry(key, message));
+        entries.add(new NestedEntry(key, null, message));
+    }
+
+    public void add(String key, String value, MCRTreeMessage message) {
+        entries.add(new NestedEntry(key, value, message));
     }
 
     public String logMessage(String introduction) {
@@ -140,16 +144,19 @@ public final class MCRTreeMessage {
 
         private final String key;
 
+        private final String value;
+
         private final MCRTreeMessage description;
 
-        private NestedEntry(String key, MCRTreeMessage description) {
+        private NestedEntry(String key, String value, MCRTreeMessage description) {
             this.key = Objects.requireNonNull(key);
+            this.value = value;
             this.description = Objects.requireNonNull(description);
         }
 
         @Override
         public void treeLines(List<Indent> prefix, List<String> lines) {
-            lines.add(prefixString(prefix) + key + ":");
+            lines.add(prefixString(prefix) + key + ":" + (value == null ? "" : " " + value));
             description.treeLines(prefix, lines);
         }
     }
