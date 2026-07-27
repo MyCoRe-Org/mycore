@@ -18,12 +18,11 @@
 
 package org.mycore.common.config.instantiator.source;
 
-import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.common.config.instantiator.MCRInstanceName;
+import org.mycore.common.config.instantiator.MCRProperTree;
 
 /**
  * A {@link MCRClassPropertyExtractor} is a {@link MCRPropertyExtractor} that uses
@@ -40,8 +39,7 @@ final class MCRInstanceExtractor implements MCRValueExtractor<Object> {
     }
 
     @Override
-    public Object toValue(MCRSourceContext context, Map<String, String> properties,
-        Map<String, String> fullProperties) {
+    public Object toValue(MCRSourceContext context, MCRProperTree properties, MCRProperTree fullProperties) {
 
         MCRInstanceConfiguration<?> configuration = MCRInstanceConfiguration.ofComponents(
             superClass, MCRInstanceName.of(context.property()), properties, fullProperties);

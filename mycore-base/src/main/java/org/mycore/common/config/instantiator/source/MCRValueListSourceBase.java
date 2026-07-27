@@ -20,11 +20,14 @@ package org.mycore.common.config.instantiator.source;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRSentinel;
+import org.mycore.common.config.instantiator.MCRProperTree;
 
 /**
  * A {@link MCRValueListSourceBase} is a base implementation of {@link MCRSource} that
@@ -47,19 +50,19 @@ abstract sealed class MCRValueListSourceBase<Value> extends MCRSourceBase<List<V
     }
 
     @Override
-    protected final List<Value> getResult(MCRSourceContext context, Map<String, String> properties,
-        Map<String, String> fullProperties) {
+    protected final List<Value> getResult(MCRSourceContext context, MCRProperTree properties,
+        MCRProperTree fullProperties) {
 
         List<Value> list = new ArrayList<>();
 
         int negativeKeyCount = 0;
         String elementDescription = context.description() + " element";
-        for (String key : context.orderedKeys(nextNestedKeys(properties))) {
+        for (String key : orderedKeys(context, properties.keys())) {
             if (key.charAt(0) == '-') {
                 negativeKeyCount++;
             }
             MCRSourceContext nestedContext = context.nested(key, elementDescription);
-            Map<String, String> nestesProperties = reduceProperties(properties, key);
+            MCRProperTree nestesProperties = properties.nested(key);
             if (!rejectedBySentinel(sentinel, nestedContext, nestesProperties)) {
                 Value value = extractor.toValue(nestedContext, nestesProperties, fullProperties);
                 if (value != null) {
@@ -68,11 +71,11 @@ abstract sealed class MCRValueListSourceBase<Value> extends MCRSourceBase<List<V
             }
         }
 
-        String shortFormProperty = properties.get("");
+        String shortFormProperty = properties.value();
         if (supportsShortForm() && shortFormProperty != null) {
             List<Value> shortFormList = new ArrayList<>();
             for (String shortFormValue : parseShortFormList(shortFormProperty)) {
-                Value value = extractor.toValue(context, Map.of("", shortFormValue), fullProperties);
+                Value value = extractor.toValue(context, MCRProperTree.of(shortFormValue), fullProperties);
                 if (value != null) {
                     shortFormList.add(value);
                 }
@@ -81,6 +84,25 @@ abstract sealed class MCRValueListSourceBase<Value> extends MCRSourceBase<List<V
         }
 
         return list;
+
+    }
+
+    public List<String> orderedKeys(MCRSourceContext context, Stream<String> keys) {
+
+        SortedMap<Integer, String> keyMap = new TreeMap<>();
+        keys.forEach(key -> {
+            try {
+                Integer integerValue = Integer.parseInt(key);
+                String alreadyMappedKey = keyMap.put(integerValue, key);
+                if (alreadyMappedKey != null && !alreadyMappedKey.equals(key)) {
+                    throw context.inconsistentIntegerKeysException(key, alreadyMappedKey);
+                }
+            } catch (NumberFormatException exception) {
+                throw context.nonIntegerKeyException(key, exception);
+            }
+        });
+
+        return new ArrayList<>(keyMap.values());
 
     }
 

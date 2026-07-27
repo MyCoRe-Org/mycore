@@ -18,7 +18,7 @@
 
 package org.mycore.common.config.instantiator.source;
 
-import java.util.Map;
+import org.mycore.common.config.instantiator.MCRProperTree;
 
 /**
  * A {@link MCRValueExtractor} obtains a value from properties.
@@ -27,6 +27,6 @@ import java.util.Map;
  */
 interface MCRValueExtractor<Value> {
 
-    Value toValue(MCRSourceContext context, Map<String, String> properties, Map<String, String> fullProperties);
+    Value toValue(MCRSourceContext context, MCRProperTree properties, MCRProperTree fullProperties);
 
 }
