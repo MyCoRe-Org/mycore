@@ -42,6 +42,7 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.MCRUserInformationResolver;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.instantiator.MCRProperTree;
 import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -121,13 +122,35 @@ public class MCRDeveloperCommands {
     @MCRCommand(
         syntax = "show properties {0}",
         help = "Show configuration properties starting with key prefix {0}",
-        order = 50)
+        order = 45)
     public static void showProperties(String keyPrefix) {
         Map<String, String> values = MCRConfiguration2.getSubpropertiesMap(keyPrefix);
         if (values.isEmpty()) {
             LOGGER.info("Found no values for key prefix {}", keyPrefix);
         } else {
             values.forEach((key, value) -> LOGGER.info("Found value for key {}: {}", keyPrefix + key, value));
+        }
+    }
+
+    @MCRCommand(
+        syntax = "show properties tree",
+        help = "Show configuration properties as tree",
+        order = 35)
+    public static void showPropertiesTree() {
+        MCRProperTree values = MCRConfiguration2.getAllPropertiesTree();
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info(values.toTreeMessage().logMessage("Properties tree"));
+        }
+    }
+
+    @MCRCommand(
+        syntax = "show properties tree {0}",
+        help = "Show configuration properties starting with key prefix {0} as tree",
+        order = 30)
+    public static void showPropertiesTree(String keyPrefix) {
+        MCRProperTree values = MCRConfiguration2.getAllPropertiesTree().deeplyNested(keyPrefix);
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info(values.toTreeMessage().logMessage("Properties tree"));
         }
     }
 
