@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRSentinel;
+import org.mycore.common.config.instantiator.MCRProperTree;
 
 /**
  * A {@link MCRValueMapSourceBase} is a base implementation of {@link MCRSource} that
@@ -47,15 +48,15 @@ abstract sealed class MCRValueMapSourceBase<Value> extends MCRSourceBase<Map<Str
     }
 
     @Override
-    protected final Map<String, Value> getResult(MCRSourceContext context, Map<String, String> properties,
-        Map<String, String> fullProperties) {
+    protected final Map<String, Value> getResult(MCRSourceContext context, MCRProperTree properties,
+        MCRProperTree fullProperties) {
 
         Map<String, Value> map = new HashMap<>();
 
-        String shortFormProperty = properties.get("");
+        String shortFormProperty = properties.value();
         if (supportsShortForm() && shortFormProperty != null) {
             parseShortFormMap(shortFormProperty).forEach((key, shortFormValue) -> {
-                Value value = extractor.toValue(context, Map.of("", shortFormValue), fullProperties);
+                Value value = extractor.toValue(context, MCRProperTree.of(shortFormValue), fullProperties);
                 if (value != null) {
                     map.put(key, value);
                 }
@@ -63,16 +64,16 @@ abstract sealed class MCRValueMapSourceBase<Value> extends MCRSourceBase<Map<Str
         }
 
         String entryDescription = context.description() + " entry";
-        for (String key : nextNestedKeys(properties)) {
+        properties.keys().forEach(key -> {
             MCRSourceContext nestedContext = context.nested(key, entryDescription);
-            Map<String, String> nestesProperties = reduceProperties(properties, key);
+            MCRProperTree nestesProperties = properties.nested(key);
             if (!rejectedBySentinel(sentinel, nestedContext, nestesProperties)) {
                 Value value = extractor.toValue(nestedContext, nestesProperties, fullProperties);
                 if (value != null) {
                     map.put(key, value);
                 }
             }
-        }
+        });
 
         return map;
 
