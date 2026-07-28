@@ -26,7 +26,7 @@ import java.nio.file.Path;
 
 import javax.xml.transform.Source;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
@@ -95,13 +95,13 @@ public class MCRURIResolverTest extends MCRTestCase {
         Source xslSource = MCRURIResolver.obtainInstance()
             .resolve("xslImport:xsl-import:functions/xsl-2.xsl", xslResourceUrl);
         Assert.assertNotNull(xslSource);
-        Assert.assertTrue(StringUtils.endsWith(xslSource.getSystemId(), "/xsl/functions/xsl-1.xsl"));
+        Assert.assertTrue(Strings.CS.endsWith(xslSource.getSystemId(), "/xsl/functions/xsl-1.xsl"));
 
         String xsltResourceUrl = MCRResourceHelper.getResourceUrl("/xslt/functions/xsl-2.xsl").toString();
         Source xsltSource = MCRURIResolver.obtainInstance()
             .resolve("xslImport:xsl-import:functions/xsl-2.xsl", xsltResourceUrl);
         Assert.assertNotNull(xsltSource);
-        Assert.assertTrue(StringUtils.endsWith(xsltSource.getSystemId(), "/xslt/functions/xsl-1.xsl"));
+        Assert.assertTrue(Strings.CS.endsWith(xsltSource.getSystemId(), "/xslt/functions/xsl-1.xsl"));
 
     }
 

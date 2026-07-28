@@ -32,7 +32,7 @@
   <properties>
     <enforcer.skip>true</enforcer.skip>
     <manifest.priority>54</manifest.priority>
-    <orcidModelVersion>3.0.12</orcidModelVersion>
+    <orcidModelVersion>3.3.8</orcidModelVersion>
   </properties>
   <build>
     <plugins>
@@ -174,10 +174,9 @@
       <artifactId>commons-io</artifactId>
     </dependency>
     <dependency>
-      <groupId>commons-lang</groupId>
       <!-- required by orcid model -->
-      <artifactId>commons-lang</artifactId>
-      <version>2.6</version>
+      <groupId>io.swagger.core.v3</groupId>
+      <artifactId>swagger-annotations-jakarta</artifactId>
     </dependency>
     <dependency>
       <groupId>jakarta.servlet</groupId>
@@ -250,6 +249,14 @@
         <exclusion>
           <groupId>javax.ws.rs</groupId>
           <artifactId>jsr311-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>io.swagger.core.v3</groupId>
+          <artifactId>swagger-annotations</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>io.swagger.core.v3</groupId>
+          <artifactId>swagger-jaxrs2</artifactId>
         </exclusion>
         <exclusion>
           <groupId>io.swagger</groupId>

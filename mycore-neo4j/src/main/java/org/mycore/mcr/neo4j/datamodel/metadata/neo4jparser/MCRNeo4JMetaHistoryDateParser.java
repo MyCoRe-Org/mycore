@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -46,7 +46,7 @@ public class MCRNeo4JMetaHistoryDateParser extends MCRNeo4JAbstractDataModelPars
         for (Element element : rootTag.getChildren()) {
             for (Element text : element.getChildren("text")) {
                 final String lang = text.getAttributeValue("lang", Namespace.XML_NAMESPACE);
-                final String content = StringUtils.replace(text.getTextTrim(), "'", "");
+                final String content = Strings.CS.replace(text.getTextTrim(), "'", "");
 
                 values.add(new Neo4JNode(lang, content));
             }
