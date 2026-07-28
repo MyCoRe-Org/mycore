@@ -28,7 +28,30 @@ import java.lang.annotation.Target;
  * This annotation is used to mark methods that should be called after the creation of the object.
  * <p>
  * The method may have a single parameter of type {@link String} for which, if present, the name of the
- * configuration property containing the class name of the configured instance will be passed.
+ * configuration property (which contains the class name of the configured instance) will be passed; either
+ * <ul>
+ *   <li>
+ *     the entire name, including the trailing <code>.Class</code> suffix (ACTUAL)
+ *   </li>
+ *   <li>
+ *     the entire name, except the trailing <code>.Class</code> suffix (CANONICAL, default)
+ *   </li>
+ *   <li>
+ *     just the last actual part of the name (the part before the trailing <code>.Class</code> suffix) (TRAILING_NAME).
+ *   </li>
+ * </ul>
+ * The last option is useful for instances that are listed in a map (for example via {@link MCRInstanceMap}),
+ * where the instance is interested in its map key.
+ * <p>
+ * Example:
+ * <pre><code>
+ * MCR.Foo.Bar.Widgets.fancy_widget.Class=foo.bar.widgets.FancyWidget
+ * </code></pre>
+ * <ul>
+ *   <li>ACTUAL: <code>MCR.Foo.Bar.Widgets.fancy_widget.Class</code></li>
+ *   <li>CANONICAL: <code>MCR.Foo.Bar.Widgets.fancy_widget</code></li>
+ *   <li>TRAILING_NAME: <code>fancy_widget</code></li>
+ * </ul>
  * <p>
  * The method needs to be public.
  *
@@ -52,9 +75,26 @@ public @interface MCRPostConstruction {
 
     enum Value {
 
+        /**
+         * Provides the entire name, including the trailing <code>.Class</code> suffix.
+         * <p>
+         * Example: <code>MCR.Foo.Bar.Widgets.fancy_widget.Class</code>
+         */
         ACTUAL,
 
-        CANONICAL
+        /**
+         * Provides the entire name, except the trailing <code>.Class</code> suffix.
+         * <p>
+         * Example: <code>MCR.Foo.Bar.Widgets.fancy_widget</code>
+         */
+        CANONICAL,
+
+        /**
+         * Provides just the last actual part of the name (the part before the trailing <code>.Class</code> suffix).
+         * <p>
+         * Example: <code>fancy_widget</code>
+         */
+        TRAILING_NAME
 
     }
 

@@ -37,6 +37,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRPostConstruction;
+import org.mycore.common.config.annotation.MCRPostConstruction.Value;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
@@ -191,9 +192,9 @@ public class MCRObjectStaticContentGenerator {
 
         private String configId;
 
-        @MCRPostConstruction
-        public void setConfigId(String property) {
-            this.configId = property.substring(property.lastIndexOf('.') + 1 );
+        @MCRPostConstruction(Value.TRAILING_NAME)
+        public void setConfigId(String configId) {
+            this.configId = configId;
         }
 
         @Override

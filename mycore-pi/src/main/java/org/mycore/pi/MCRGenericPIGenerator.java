@@ -50,6 +50,7 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRPostConstruction;
+import org.mycore.common.config.annotation.MCRPostConstruction.Value;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
@@ -147,9 +148,9 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
     }
 
     @Override
-    @MCRPostConstruction
-    public void init(String property) {
-        super.init(property);
+    @MCRPostConstruction(Value.TRAILING_NAME)
+    public void init(String generatorID) {
+        super.init(generatorID);
         final Map<String, String> properties = getProperties();
 
         setGeneralPattern(properties.get(PROPERTY_KEY_GENERAL_PATTERN));
