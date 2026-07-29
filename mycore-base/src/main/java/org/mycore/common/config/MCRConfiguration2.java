@@ -18,6 +18,9 @@
 
 package org.mycore.common.config;
 
+import static org.mycore.common.config.instantiator.MCRInstanceConfiguration.CLASS_SUFFIX;
+
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -30,6 +33,8 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration.Options;
@@ -39,8 +44,6 @@ import org.mycore.common.config.instantiator.MCRProperTree;
 import org.mycore.common.function.MCRTriConsumer;
 
 import jakarta.inject.Singleton;
-
-import static org.mycore.common.config.instantiator.MCRInstanceConfiguration.CLASS_SUFFIX;
 
 /**
  * Provides methods to manage and read all configuration properties from the MyCoRe configuration files.
@@ -91,6 +94,8 @@ import static org.mycore.common.config.instantiator.MCRInstanceConfiguration.CLA
 // because of intrusive test case org.mycore.common.config.MCRConfigurationTest.testSingletonMapGet
 @SuppressWarnings("PMD.MutableStaticState")
 public class MCRConfiguration2 {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final Map<UUID, EventListener> LISTENERS = new ConcurrentHashMap<>();
 
@@ -353,19 +358,8 @@ public class MCRConfiguration2 {
      * @return a list of properties which represent a configurable class
      */
     public static Stream<String> getInstantiatablePropertyKeys(String prefix) {
-        return getSubpropertiesMap(prefix).entrySet()
-            .stream()
-            .filter(entry -> {
-                String s = entry.getKey();
-                if (!s.endsWith(CLASS_SUFFIX)) {
-                    return false;
-                }
-                String key = s.substring(0, s.length() - CLASS_SUFFIX.length());
-                return !key.contains(".");
-            })
-            .map(Map.Entry::getKey)
-            .map(key -> key.substring(0, key.length() - CLASS_SUFFIX.length()))
-            .map(prefix::concat);
+        return getInstantiatableConfigurations(Object.class, prefix, configuration -> configuration.name().canonical())
+            .values().stream();
     }
 
     /**
@@ -373,10 +367,45 @@ public class MCRConfiguration2 {
      * @return a map where the key is a String describing the configurable instance value
      */
     public static <S> Map<String, Callable<S>> getInstances(Class<S> superClass, String prefix) {
-        return getInstantiatablePropertyKeys(prefix)
-            .collect(Collectors.toMap(
-                k -> MCRInstanceName.of(k).canonical().substring(prefix.length()),
-                v -> () -> getInstanceOf(superClass, v).orElse(null)));
+        return getInstantiatableConfigurations(superClass, prefix, configuration -> configuration::instantiate);
+    }
+
+    private static <S, V> Map<String, V> getInstantiatableConfigurations(Class<S> superClass,
+        String prefix, Function<MCRInstanceConfiguration<S>, V> configurationMapper) {
+
+        // prefix with removed trailing dot
+        String trimmedPrefix = prefix.endsWith(".") ? prefix.substring(0, prefix.length() - 1) : prefix;
+
+        // properties for root-level
+        MCRProperTree fullProperties = getAllPropertiesTree();
+
+        // name and properties for 'prefix'-level
+        MCRInstanceName name = MCRInstanceName.of(trimmedPrefix);
+        MCRProperTree properties = fullProperties.deeplyNested(trimmedPrefix);
+
+        Map<String, V> result = new HashMap<>();
+        properties.keys().forEach(key -> {
+
+            // name and properties for 'prefix'.'key'-level
+            MCRInstanceName nestedName = name.nested(key);
+            MCRProperTree nestedProperties = properties.nested(key);
+
+            // configuration for 'prefix'.'key'-level
+            MCRInstanceConfiguration<S> configuration = MCRInstanceConfiguration
+                .ofComponents(superClass, nestedName, nestedProperties, fullProperties);
+
+            // only consider instantiable configurations
+            if (configuration.instantiatable()) {
+                result.put(key, configurationMapper.apply(configuration));
+            } else if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Skipping {} for prefix {} and superclass {} because it is not instantiatable",
+                    key, trimmedPrefix, superClass.getName());
+            }
+
+        });
+
+        return result;
+
     }
 
     /**
