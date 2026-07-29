@@ -26,8 +26,10 @@ var RuleSelector = function() {
 
   function formatSelect(item) {
     var span = $("<span></span>")
-    span.text($(item.element).text());
-    span.attr("title", $(item.element).attr("title"));
+    span.text(item.text);
+    if (item.element) {
+      span.attr("title", $(item.element).attr("title"));
+    }
     return span;
   }
 
@@ -50,14 +52,14 @@ var RuleSelector = function() {
     },
     update: function() {
       var cla = this;
-      $(".acle2-access-rule:not(.select2-container)").each(function() {
-        var ruleID = $(this).select2("val");
+      $("select.acle2-access-rule").each(function() {
+        var ruleID = $(this).val();
         $(this).select2("destroy");
         cla.append(ruleID, $(this).parent());
         $(this).remove();
       });
       $("select.acle2-access-rule").each(function() {
-        $(this).siblings("div.acle2-access-rule").attr("title", $(this).children("option:selected").attr("title"));
+        $(this).siblings(".select2-container").attr("title", $(this).children("option:selected").attr("title"));
       });
     },
     append: function(ruleID, elem) {
@@ -69,11 +71,18 @@ var RuleSelector = function() {
       newSelector.val(ruleID);
       newSelector.appendTo(elem);
       newSelector.select2({
-        matcher: function(term, text, opt) {
-          return text.toUpperCase().indexOf(term.toUpperCase()) >= 0
-            || opt.attr("title").toUpperCase().indexOf(term.toUpperCase()) >= 0;
+        matcher: function(params, data) {
+          if ($.trim(params.term) === "") {
+            return data;
+          }
+          var title = data.element ? $(data.element).attr("title") || "" : "";
+          if (data.text.toUpperCase().indexOf(params.term.toUpperCase()) >= 0
+            || title.toUpperCase().indexOf(params.term.toUpperCase()) >= 0) {
+            return data;
+          }
+          return null;
         },
-        formatResult: formatSelect
+        templateResult: formatSelect
       });
     }
   };

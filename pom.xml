@@ -944,6 +944,11 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <version>0.10.2</version>
       </dependency>
       <dependency>
+        <groupId>at.yawk.lz4</groupId>
+        <artifactId>lz4-java</artifactId>
+        <version>1.11.1</version>
+      </dependency>
+      <dependency>
         <groupId>com.auth0</groupId>
         <artifactId>java-jwt</artifactId>
         <version>4.5.0</version>
@@ -1393,7 +1398,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.bouncycastle</groupId>
         <artifactId>bcprov-jdk18on</artifactId>
-        <version>1.80</version>
+        <version>1.84</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
@@ -1509,6 +1514,11 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <groupId>org.jsoup</groupId>
         <artifactId>jsoup</artifactId>
         <version>1.20.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mozilla</groupId>
+        <artifactId>rhino</artifactId>
+        <version>1.7.14.1</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
@@ -1814,6 +1824,10 @@ Applications based on MyCoRe use a common core, which provides the functionality
           <exclusion>
             <groupId>com.jcraft</groupId>
             <artifactId>jsch.agentproxy.svnkit-trilead-ssh2</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.lz4</groupId>
+            <artifactId>lz4-java</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
