@@ -88,3 +88,16 @@ Relevant files:
 - [`src/main/vue/webcli/vite.config.ts`](src/main/vue/webcli/vite.config.ts)
 - [`src/main/vue/webcli/playwright.config.ts`](src/main/vue/webcli/playwright.config.ts)
 - [`src/main/vue/webcli/tests/a11y/`](src/main/vue/webcli/tests/a11y/)
+
+The MCR-3794 performance probe uses a local HTTP/WebSocket stub that implements the
+Web CLI protocol and can stream either command-queue snapshots or log messages:
+
+```bash
+cd src/main/vue/webcli
+yarn test:performance
+```
+
+The probe reports DOM churn, elapsed time, peak JavaScript heap growth, and retained
+JavaScript heap growth after garbage collection for several workload sizes, including
+10,000 objects. Its Chromium measurements are intended for repeatable regression
+comparisons; the DOM-churn result is independent of the browser's garbage collector.

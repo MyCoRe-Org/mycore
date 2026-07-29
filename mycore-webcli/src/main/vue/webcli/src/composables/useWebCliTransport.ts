@@ -15,11 +15,17 @@ export interface WebCliTransportClient {
 }
 
 export interface UseWebCliTransportRuntime {
+  cancelAnimationFrameFn?: (handle: number) => void;
   clearIntervalFn?: (handle: number) => void;
   createTransport?: () => WebCliTransportClient;
   fetchImpl?: (input: string, init?: RequestInit) => Promise<unknown>;
   locationLike?: LocationLike;
+  requestAnimationFrameFn?: (callback: FrameRequestCallback) => number;
   setIntervalFn?: (handler: () => void, timeout: number) => number;
+}
+
+export interface BufferedLogEntry extends LogEntry {
+  renderId: number;
 }
 
 export function useWebCliTransport(
@@ -31,18 +37,23 @@ export function useWebCliTransport(
   const fetchImpl = runtime.fetchImpl ?? ((input: string, init?: RequestInit) => window.fetch(input, init));
   const setIntervalFn = runtime.setIntervalFn ?? window.setInterval.bind(window);
   const clearIntervalFn = runtime.clearIntervalFn ?? window.clearInterval.bind(window);
+  const requestAnimationFrameFn = runtime.requestAnimationFrameFn ?? window.requestAnimationFrame.bind(window);
+  const cancelAnimationFrameFn = runtime.cancelAnimationFrameFn ?? window.cancelAnimationFrame.bind(window);
   const transport = runtime.createTransport?.() ?? new WebCliTransport(locationLike);
   const commandGroups = ref<CommandGroup[]>([]);
   const currentCommand = ref('');
   const queue = ref<string[]>([]);
   const queueLength = ref(0);
-  const logs = ref<LogEntry[]>([]);
+  const logs = ref<BufferedLogEntry[]>([]);
   const refreshRunning = ref(true);
   const permissionError = ref('');
   const lastLogAnnouncement = ref('');
   const liveStatus = ref('WebCLI ready.');
   const remoteContinueIfOneFails = ref<boolean | null>(null);
   const keepAliveHandle = ref<number | null>(null);
+  let logFrameHandle: number | null = null;
+  let nextLogRenderId = 1;
+  let pendingLogs: BufferedLogEntry[] = [];
   let unsubscribeTransport: (() => void) | null = null;
 
   function resolveLogLimit(): number {
@@ -60,13 +71,40 @@ export function useWebCliTransport(
     }
   }
 
+  function flushLogs(): void {
+    logFrameHandle = null;
+    if (pendingLogs.length === 0) {
+      return;
+    }
+    const latestLog = pendingLogs.at(-1);
+    const nextLogs = [...logs.value, ...pendingLogs];
+    pendingLogs = [];
+    logs.value = nextLogs.slice(-resolveLogLimit());
+    if (latestLog) {
+      lastLogAnnouncement.value = `${latestLog.logLevel}: ${latestLog.message}`;
+    }
+  }
+
   function appendLog(entry: LogEntry): void {
-    logs.value = [...logs.value, entry];
-    trimLogs();
-    lastLogAnnouncement.value = `${entry.logLevel}: ${entry.message}`;
+    pendingLogs.push({
+      ...entry,
+      renderId: nextLogRenderId++,
+    });
+    const maxEntries = resolveLogLimit();
+    if (pendingLogs.length > maxEntries) {
+      pendingLogs = pendingLogs.slice(-maxEntries);
+    }
+    if (logFrameHandle === null) {
+      logFrameHandle = requestAnimationFrameFn(flushLogs);
+    }
   }
 
   function clearLogs(): void {
+    if (logFrameHandle !== null) {
+      cancelAnimationFrameFn(logFrameHandle);
+      logFrameHandle = null;
+    }
+    pendingLogs = [];
     logs.value = [];
     lastLogAnnouncement.value = 'Logs cleared.';
   }
@@ -134,6 +172,11 @@ export function useWebCliTransport(
   });
 
   onBeforeUnmount(() => {
+    if (logFrameHandle !== null) {
+      cancelAnimationFrameFn(logFrameHandle);
+    }
+    logFrameHandle = null;
+    pendingLogs = [];
     if (unsubscribeTransport) {
       unsubscribeTransport();
     }

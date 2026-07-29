@@ -25,7 +25,8 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -138,7 +139,9 @@ public class MCRWebCLIContainer {
      */
     public void addCommand(String cmd) {
         LOGGER.info("appending command: {}", cmd);
-        processCallable.commands.add(cmd);
+        synchronized (processCallable.commands) {
+            processCallable.commands.add(cmd);
+        }
         if (!isRunning()) {
             curFuture = EXECUTOR.submit(processCallable);
         }
@@ -225,7 +228,7 @@ public class MCRWebCLIContainer {
 
         private final ReentrantLock lock;
 
-        List<String> commands;
+        private final Deque<String> commands;
 
         Session webSocketSession;
 
@@ -241,12 +244,12 @@ public class MCRWebCLIContainer {
 
         private MCRLogEventProcessor logEventProcessor;
 
-        private final SubmissionPublisher<List<String>> cmdListPublisher;
+        private final SubmissionPublisher<Collection<String>> cmdListPublisher;
 
         private MCRCommandListProcessor cmdListProcessor;
 
         ProcessCallable(MCRSession session, Session webSocketSession, ReentrantLock lock) {
-            this.commands = new ArrayList<>();
+            this.commands = new ArrayDeque<>();
             this.session = session;
             this.lock = lock;
             this.stopLogs = false;
@@ -310,7 +313,9 @@ public class MCRWebCLIContainer {
         }
 
         public void clearCommandList() {
-            this.commands.clear();
+            synchronized (commands) {
+                commands.clear();
+            }
             cmdListPublisher.submit(commands);
             setCurrentCommand("");
         }
@@ -330,7 +335,7 @@ public class MCRWebCLIContainer {
                 // ignore comment
                 return true;
             }
-            LOGGER.info("Processing command:'{}' ({} left)", () -> command, commands::size);
+            LOGGER.info("Processing command:'{}' ({} left)", () -> command, this::getCommandCount);
             setCurrentCommand(command);
             long start = System.currentTimeMillis();
             MCRTransactionManager.beginTransactions();
@@ -378,7 +383,9 @@ public class MCRWebCLIContainer {
                     // Add commands to queue
                     if (!commandsReturned.isEmpty()) {
                         LOGGER.info("Queueing {} commands to process", commandsReturned::size);
-                        commands.addAll(0, commandsReturned);
+                        synchronized (commands) {
+                            commandsReturned.reversed().forEach(commands::addFirst);
+                        }
                         cmdListPublisher.submit(commands);
                     }
 
@@ -395,8 +402,9 @@ public class MCRWebCLIContainer {
             } else {
                 LOGGER.printf(Level.ERROR, "The following command failed: '%s'", lastCommand);
             }
-            if (!commands.isEmpty()) {
-                LOGGER.printf(Level.INFO, "There are %d other commands still unprocessed.", commands.size());
+            int commandCount = getCommandCount();
+            if (commandCount > 0) {
+                LOGGER.printf(Level.INFO, "There are %d other commands still unprocessed.", commandCount);
             }
             String unprocessedCommandsFile = MCRConfiguration2.getStringOrThrow("MCR.WebCLI.UnprocessedCommandsFile");
             File file = new File(unprocessedCommandsFile);
@@ -407,7 +415,7 @@ public class MCRWebCLIContainer {
                 if (lastCommand != null) {
                     pw.println(lastCommand);
                 }
-                for (String command : commands.toArray(String[]::new)) {
+                for (String command : getCommands()) {
                     pw.println(command);
                 }
                 if (failedQueue != null && !failedQueue.isEmpty()) {
@@ -438,8 +446,8 @@ public class MCRWebCLIContainer {
             int sessionTime = httpSession.map(HttpSession::getMaxInactiveInterval).orElse(-1);
             httpSession.ifPresent(s -> s.setMaxInactiveInterval(-1));
             try {
-                while (!commands.isEmpty()) {
-                    String command = commands.removeFirst();
+                String command = pollCommand();
+                while (command != null) {
                     cmdListPublisher.submit(commands);
                     if (!processCommand(command)) {
                         if (!continueIfOneFails) {
@@ -447,6 +455,7 @@ public class MCRWebCLIContainer {
                         }
                         failedQueue.add(command);
                     }
+                    command = pollCommand();
                 }
                 if (failedQueue.isEmpty()) {
                     setCurrentCommand("");
@@ -511,7 +520,27 @@ public class MCRWebCLIContainer {
 
         @Override
         public String toString() {
-            return this.commands.stream().findFirst().orElse("no active command");
+            synchronized (commands) {
+                return Optional.ofNullable(commands.peekFirst()).orElse("no active command");
+            }
+        }
+
+        private int getCommandCount() {
+            synchronized (commands) {
+                return commands.size();
+            }
+        }
+
+        private String[] getCommands() {
+            synchronized (commands) {
+                return commands.toArray(String[]::new);
+            }
+        }
+
+        private String pollCommand() {
+            synchronized (commands) {
+                return commands.pollFirst();
+            }
         }
 
         public void webSocketClosed() {
