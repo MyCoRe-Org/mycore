@@ -72,6 +72,11 @@ final class MCRPropertyListSource extends MCRValueListSourceBase<String> {
     }
 
     @Override
+    protected String defaultNamePrefix() {
+        return annotation.defaultNamePrefix();
+    }
+
+    @Override
     protected boolean supportsEmptyName() {
         return true;
     }

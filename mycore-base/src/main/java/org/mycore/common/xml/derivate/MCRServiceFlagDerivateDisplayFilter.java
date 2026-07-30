@@ -50,7 +50,7 @@ import org.mycore.datamodel.metadata.MCRDerivate;
 @MCRConfigurationProxy(proxyClass = MCRServiceFlagDerivateDisplayFilter.Factory.class)
 public class MCRServiceFlagDerivateDisplayFilter implements MCRDerivateDisplayFilter {
 
-    public static final String DEFAULT_KEY_PREFIX = MCRDerivateDisplayFilter.DEFAULT_KEY_PREFIX + "ServiceFlag.";
+    public static final String DEFAULT_KEY_PREFIX = "MCR.Default.Derivate.DisplayFilter.ServiceFlag";
 
     public static final String FLAG_TYPE_PREFIX_KEY = "FlagTypePrefix";
 
@@ -83,7 +83,7 @@ public class MCRServiceFlagDerivateDisplayFilter implements MCRDerivateDisplayFi
 
     public static class Factory implements Supplier<MCRServiceFlagDerivateDisplayFilter> {
 
-        @MCRProperty(name = FLAG_TYPE_PREFIX_KEY, defaultName = DEFAULT_KEY_PREFIX + FLAG_TYPE_PREFIX_KEY)
+        @MCRProperty(name = FLAG_TYPE_PREFIX_KEY, defaultNamePrefix = DEFAULT_KEY_PREFIX)
         public String flagTypePrefix;
 
         @Override
