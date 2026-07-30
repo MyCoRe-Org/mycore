@@ -20,8 +20,7 @@ package org.mycore.webcli.flow;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.AbstractCollection;
-import java.util.Iterator;
+import java.util.AbstractList;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Flow;
 import java.util.concurrent.TimeUnit;
@@ -41,7 +40,7 @@ public class MCRCommandListProcessorTest {
         processor.subscribe(new ResultSubscriber(result));
 
         try {
-            processor.onNext(new BoundedTraversalCollection(10_000, 100));
+            processor.onNext(new BoundedTraversalList(10_000, 100));
             JsonObject json = result.orTimeout(5, TimeUnit.SECONDS).join();
             JsonArray commands = json.getAsJsonArray("return");
 
@@ -54,36 +53,23 @@ public class MCRCommandListProcessorTest {
         }
     }
 
-    private static class BoundedTraversalCollection extends AbstractCollection<String> {
+    private static class BoundedTraversalList extends AbstractList<String> {
 
         private final int size;
 
         private final int traversalLimit;
 
-        BoundedTraversalCollection(int size, int traversalLimit) {
+        BoundedTraversalList(int size, int traversalLimit) {
             this.size = size;
             this.traversalLimit = traversalLimit;
         }
 
         @Override
-        public Iterator<String> iterator() {
-            return new Iterator<>() {
-
-                private int index;
-
-                @Override
-                public boolean hasNext() {
-                    return index < size;
-                }
-
-                @Override
-                public String next() {
-                    if (index >= traversalLimit) {
-                        throw new AssertionError("Processor traversed more commands than it serializes");
-                    }
-                    return "command " + index++;
-                }
-            };
+        public String get(int index) {
+            if (index >= traversalLimit) {
+                throw new AssertionError("Processor traversed more commands than it serializes");
+            }
+            return "command " + index;
         }
 
         @Override

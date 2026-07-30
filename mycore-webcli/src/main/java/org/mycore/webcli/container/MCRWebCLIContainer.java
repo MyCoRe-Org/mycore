@@ -25,12 +25,12 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
 import java.util.ArrayDeque;
-import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
+import java.util.SequencedCollection;
 import java.util.TreeMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -244,7 +244,7 @@ public class MCRWebCLIContainer {
 
         private MCRLogEventProcessor logEventProcessor;
 
-        private final SubmissionPublisher<Collection<String>> cmdListPublisher;
+        private final SubmissionPublisher<SequencedCollection<String>> cmdListPublisher;
 
         private MCRCommandListProcessor cmdListProcessor;
 

@@ -18,8 +18,8 @@
 
 package org.mycore.webcli.flow;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.SequencedCollection;
 import java.util.concurrent.Flow;
 import java.util.concurrent.SubmissionPublisher;
 
@@ -27,11 +27,8 @@ import org.mycore.common.MCRJSONUtils;
 
 import com.google.gson.JsonObject;
 
-record MCRCommandQueueUpdate(List<String> commands, int size) {
-}
-
 public class MCRCommandListProcessor extends SubmissionPublisher<JsonObject>
-    implements Flow.Processor<Collection<String>, JsonObject> {
+    implements Flow.Processor<SequencedCollection<String>, JsonObject> {
     private Flow.Subscription upstreamSubscription;
 
     @Override
@@ -41,7 +38,7 @@ public class MCRCommandListProcessor extends SubmissionPublisher<JsonObject>
     }
 
     @Override
-    public void onNext(Collection<String> item) {
+    public void onNext(SequencedCollection<String> item) {
         try {
             MCRCommandQueueUpdate update;
             synchronized (item) {
@@ -71,5 +68,8 @@ public class MCRCommandListProcessor extends SubmissionPublisher<JsonObject>
     public void close() {
         upstreamSubscription.cancel();
         super.close();
+    }
+
+    record MCRCommandQueueUpdate(List<String> commands, int size) {
     }
 }
