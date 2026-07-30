@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-class MCRCommandListProcessorTest {
+public class MCRCommandListProcessorTest {
 
     @Test
     void serializesAtMostOneHundredCommandsWhilePreservingQueueSize() {
