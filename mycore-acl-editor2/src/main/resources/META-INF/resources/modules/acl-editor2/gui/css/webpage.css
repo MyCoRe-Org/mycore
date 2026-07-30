@@ -152,6 +152,10 @@ select, textarea, input[type="text"] {
   width: 100%;
 }
 
+#acle2-access-table .select2-container {
+  width: 100% !important;
+}
+
 #acle2-access-table tr.odd {
   background-color: #F9F9F9;
 }
