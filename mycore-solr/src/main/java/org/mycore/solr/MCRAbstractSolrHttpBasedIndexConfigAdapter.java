@@ -30,6 +30,10 @@ import org.mycore.common.config.annotation.MCRProperty;
 
 public abstract class MCRAbstractSolrHttpBasedIndexConfigAdapter<T extends MCRSolrIndex> implements Supplier<T> {
 
+    public static final String DEFAULT_PROPERTY_PREFIX = "MCR.Solr.Default";
+
+    public static final String DEFAULT_CLIENT_PROPERTY_PREFIX = "MCR.Solr.Default.Client";
+
     private String indexTypes;
 
     private String idleTimeout;
@@ -61,8 +65,7 @@ public abstract class MCRAbstractSolrHttpBasedIndexConfigAdapter<T extends MCRSo
         return idleTimeout;
     }
 
-    @MCRProperty(name = "IdleTimeout", defaultName = MCRSolrDefaultPropertyConstants.CLIENT_IDLE_TIMEOUT,
-        required = false)
+    @MCRProperty(name = "IdleTimeout", defaultNamePrefix = DEFAULT_CLIENT_PROPERTY_PREFIX, required = false)
     public void setIdleTimeout(String idleTimeout) {
         this.idleTimeout = idleTimeout;
     }
@@ -71,8 +74,7 @@ public abstract class MCRAbstractSolrHttpBasedIndexConfigAdapter<T extends MCRSo
         return idleTimeoutUnit;
     }
 
-    @MCRProperty(name = "IdleTimeout.Unit", defaultName = MCRSolrDefaultPropertyConstants.CLIENT_IDLE_TIMEOUT_UNIT,
-        required = false)
+    @MCRProperty(name = "IdleTimeout.Unit", defaultNamePrefix = DEFAULT_CLIENT_PROPERTY_PREFIX, required = false)
     public void setIdleTimeoutUnit(String idleTimeoutUnit) {
         this.idleTimeoutUnit = idleTimeoutUnit;
     }
@@ -81,8 +83,7 @@ public abstract class MCRAbstractSolrHttpBasedIndexConfigAdapter<T extends MCRSo
         return connectionTimeout;
     }
 
-    @MCRProperty(name = "ConnectionTimeout", defaultName = MCRSolrDefaultPropertyConstants.CLIENT_CONNECTION_TIMEOUT,
-        required = false)
+    @MCRProperty(name = "ConnectionTimeout", defaultNamePrefix = DEFAULT_CLIENT_PROPERTY_PREFIX, required = false)
     public void setConnectionTimeout(String connectionTimeout) {
         this.connectionTimeout = connectionTimeout;
     }
@@ -91,9 +92,7 @@ public abstract class MCRAbstractSolrHttpBasedIndexConfigAdapter<T extends MCRSo
         return connectionTimeoutUnit;
     }
 
-    @MCRProperty(name = "ConnectionTimeout.Unit",
-        defaultName = MCRSolrDefaultPropertyConstants.CLIENT_CONNECTION_TIMEOUT_UNIT,
-        required = false)
+    @MCRProperty(name = "ConnectionTimeout.Unit", defaultNamePrefix = DEFAULT_CLIENT_PROPERTY_PREFIX, required = false)
     public void setConnectionTimeoutUnit(String connectionTimeoutUnit) {
         this.connectionTimeoutUnit = connectionTimeoutUnit;
     }
@@ -102,8 +101,7 @@ public abstract class MCRAbstractSolrHttpBasedIndexConfigAdapter<T extends MCRSo
         return requestTimeout;
     }
 
-    @MCRProperty(name = "RequestTimeout", defaultName = MCRSolrDefaultPropertyConstants.CLIENT_REQUEST_TIMEOUT,
-        required = false)
+    @MCRProperty(name = "RequestTimeout", defaultNamePrefix = DEFAULT_CLIENT_PROPERTY_PREFIX, required = false)
     public void setRequestTimeout(String requestTimeout) {
         this.requestTimeout = requestTimeout;
     }
@@ -112,9 +110,7 @@ public abstract class MCRAbstractSolrHttpBasedIndexConfigAdapter<T extends MCRSo
         return requestTimeoutUnit;
     }
 
-    @MCRProperty(name = "RequestTimeout.Unit",
-        defaultName = MCRSolrDefaultPropertyConstants.CLIENT_REQUEST_TIMEOUT_UNIT,
-        required = false)
+    @MCRProperty(name = "RequestTimeout.Unit", defaultNamePrefix = DEFAULT_CLIENT_PROPERTY_PREFIX, required = false)
     public void setRequestTimeoutUnit(String requestTimeoutUnit) {
         this.requestTimeoutUnit = requestTimeoutUnit;
     }
@@ -128,7 +124,7 @@ public abstract class MCRAbstractSolrHttpBasedIndexConfigAdapter<T extends MCRSo
         this.useHttp11 = useHttp11;
     }
 
-    @MCRProperty(name = "UseJettyHttpClient", defaultName = MCRSolrDefaultPropertyConstants.USE_JETTY_HTTP_CLIENT)
+    @MCRProperty(name = "UseJettyHttpClient", defaultNamePrefix = DEFAULT_PROPERTY_PREFIX)
     public void setUseJettyHttpClient(String useJettyHttpClient) {
         this.useJettyHttpClient = Boolean.parseBoolean(useJettyHttpClient);
     }

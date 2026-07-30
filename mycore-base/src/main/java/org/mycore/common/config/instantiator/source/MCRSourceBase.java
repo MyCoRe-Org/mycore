@@ -78,7 +78,7 @@ abstract sealed class MCRSourceBase<Result> implements MCRSource permits MCRValu
             logger.debug(context.missingValueMessage(target));
         }
 
-        String defaultName = defaultName();
+        String defaultName = getDefaultName(target);
         if (isMissingResult(result) && !defaultName.isEmpty()) {
             context = new MCRSourceContext(target, defaultName, "default " + description());
             result = getResult(context, fullProperties.deeplyNested(defaultName), fullProperties);
@@ -101,6 +101,8 @@ abstract sealed class MCRSourceBase<Result> implements MCRSource permits MCRValu
 
     protected abstract String defaultName();
 
+    protected abstract String defaultNamePrefix();
+
     protected abstract boolean supportsEmptyName();
 
     protected abstract boolean absoluteName();
@@ -115,6 +117,19 @@ abstract sealed class MCRSourceBase<Result> implements MCRSource permits MCRValu
     protected abstract MCRConfigurationException missingResultException(MCRSourceContext context);
 
     protected abstract Result missingResultReplacement();
+
+    private String getDefaultName(MCRTarget target) {
+        if (!defaultNamePrefix().isEmpty()) {
+            if (!defaultName().isEmpty()) {
+                return defaultNamePrefix() + "." + defaultName();
+            }
+            if (name().isEmpty()) {
+                throw MCRInstantiatorUtils.defaultNameConflictException(target);
+            }
+            return defaultNamePrefix() + "." + name();
+        }
+        return defaultName();
+    }
 
     protected final boolean rejectedBySentinel(MCRSourceContext context, MCRProperTree properties) {
 

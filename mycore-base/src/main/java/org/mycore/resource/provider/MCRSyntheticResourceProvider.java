@@ -61,6 +61,8 @@ import org.mycore.resource.locator.MCRSyntheticResourceLocator;
 @MCRConfigurationProxy(proxyClass = MCRSyntheticResourceProvider.Factory.class)
 public final class MCRSyntheticResourceProvider extends MCRLocatorResourceProvider {
 
+    public static final String DEFAULT_KEY_PREFIX = MCRResourceProviderBase.DEFAULT_KEY_PREFIX + ".Synthetic";
+
     public static final String SPECS_KEY = "Specs";
 
     private final List<MCRSyntheticResourceSpec> specs;
@@ -86,7 +88,7 @@ public final class MCRSyntheticResourceProvider extends MCRLocatorResourceProvid
 
     public static class Factory implements Supplier<MCRSyntheticResourceProvider> {
 
-        @MCRProperty(name = COVERAGE_KEY, defaultName = "MCR.Resource.Provider.Default.Synthetic.Coverage")
+        @MCRProperty(name = COVERAGE_KEY, defaultNamePrefix = DEFAULT_KEY_PREFIX)
         public String coverage;
 
         @MCRInstanceList(name = SPECS_KEY, valueClass = MCRSyntheticResourceSpec.class)

@@ -51,6 +51,8 @@ import org.mycore.common.hint.MCRHints;
 @MCRConfigurationProxy(proxyClass = MCRDeveloperOverrideResourceProvider.Factory.class)
 public final class MCRDeveloperOverrideResourceProvider extends MCRFileSystemResourceProviderBase {
 
+    public static final String DEFAULT_KEY_PREFIX = MCRResourceProviderBase.DEFAULT_KEY_PREFIX + ".DeveloperOverride";
+
     public static final String DEVELOPER_RESOURCE_OVERRIDE_PROPERTY = "MCR.Developer.Resource.Override";
 
     private final List<Path> paths;
@@ -73,7 +75,7 @@ public final class MCRDeveloperOverrideResourceProvider extends MCRFileSystemRes
 
     public static class Factory implements Supplier<MCRDeveloperOverrideResourceProvider> {
 
-        @MCRProperty(name = COVERAGE_KEY, defaultName = "MCR.Resource.Provider.Default.DeveloperOverride.Coverage")
+        @MCRProperty(name = COVERAGE_KEY, defaultNamePrefix = DEFAULT_KEY_PREFIX)
         public String coverage;
 
         @Override

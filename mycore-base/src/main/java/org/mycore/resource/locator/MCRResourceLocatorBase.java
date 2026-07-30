@@ -35,6 +35,8 @@ import org.mycore.resource.common.MCRResourceTracer;
  */
 public abstract class MCRResourceLocatorBase implements MCRResourceLocator {
 
+    public static final String DEFAULT_KEY_PREFIX = "MCR.Default.Resource.Locator";
+
     @Override
     public final Stream<URL> locate(MCRResourcePath path, MCRHints hints) {
         return locate(path, hints, new MCRNoOpResourceTracer());
