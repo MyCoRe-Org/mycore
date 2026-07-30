@@ -50,6 +50,37 @@ describe('WebCLI app command input', () => {
     expect(window.localStorage.getItem('commandHistory')).toBe(JSON.stringify(['process resource {0}']));
   });
 
+  it('selects a MessageFormat integer placeholder after choosing a command', async () => {
+    wrapper = await mountApp();
+    const transport = getCurrentTransport();
+    const command = 'cli test {0,number,integer} log lines';
+    const placeholder = '{0,number,integer}';
+
+    transport.emit({
+      type: 'commandList',
+      value: [
+        {
+          name: 'CLI Test Commands',
+          commands: [{ command, help: 'Generate numbered log lines.' }],
+        },
+      ],
+    });
+    await nextTick();
+
+    await wrapper.get('.webcli-command-menu .dropdown-toggle').trigger('click');
+    await nextTick();
+    const commandLink = wrapper.findAll('.dropdown-item').find(item => item.text() === command);
+    expect(commandLink).toBeTruthy();
+
+    await commandLink!.trigger('click');
+    await nextTick();
+    await nextTick();
+
+    const input = wrapper.get('#command-input input').element as HTMLInputElement;
+    expect(input.selectionStart).toBe(command.indexOf(placeholder));
+    expect(input.selectionEnd).toBe(command.indexOf(placeholder) + placeholder.length);
+  });
+
   it('focuses the input and places the caret at the end after selecting a command without placeholders', async () => {
     wrapper = await mountApp();
     const transport = getCurrentTransport();
@@ -409,30 +440,33 @@ describe('WebCLI app command input', () => {
   it('moves through placeholders with Tab and then lets focus continue normally', async () => {
     wrapper = await mountApp();
     const input = wrapper.get('#command-input input');
-    await input.setValue('command {0} and {1}');
+    const command = 'command {0,number,integer} and {1}';
+    const firstPlaceholder = '{0,number,integer}';
+    const secondPlaceholder = '{1}';
+    await input.setValue(command);
 
     const element = input.element as HTMLInputElement;
     element.selectionEnd = 0;
 
     const firstPreventDefault = vi.fn();
     await input.trigger('keydown', { key: 'Tab', preventDefault: firstPreventDefault });
-    expect(element.selectionStart).toBe(8);
-    expect(element.selectionEnd).toBe(11);
+    expect(element.selectionStart).toBe(command.indexOf(firstPlaceholder));
+    expect(element.selectionEnd).toBe(command.indexOf(firstPlaceholder) + firstPlaceholder.length);
     expect(firstPreventDefault).toHaveBeenCalledTimes(1);
 
-    element.selectionEnd = 11;
+    element.selectionEnd = command.indexOf(firstPlaceholder) + firstPlaceholder.length;
     const secondPreventDefault = vi.fn();
     await input.trigger('keydown', { key: 'Tab', preventDefault: secondPreventDefault });
-    expect(element.selectionStart).toBe(16);
-    expect(element.selectionEnd).toBe(19);
+    expect(element.selectionStart).toBe(command.indexOf(secondPlaceholder));
+    expect(element.selectionEnd).toBe(command.indexOf(secondPlaceholder) + secondPlaceholder.length);
     expect(secondPreventDefault).toHaveBeenCalledTimes(1);
 
-    element.selectionEnd = 19;
+    element.selectionEnd = command.indexOf(secondPlaceholder) + secondPlaceholder.length;
     const thirdPreventDefault = vi.fn();
     await input.trigger('keydown', { key: 'Tab', preventDefault: thirdPreventDefault });
     expect(thirdPreventDefault).not.toHaveBeenCalled();
-    expect(element.selectionStart).toBe(16);
-    expect(element.selectionEnd).toBe(19);
+    expect(element.selectionStart).toBe(command.indexOf(secondPlaceholder));
+    expect(element.selectionEnd).toBe(command.indexOf(secondPlaceholder) + secondPlaceholder.length);
   });
 
   it('uses semantic buttons and labels for the primary controls', async () => {
