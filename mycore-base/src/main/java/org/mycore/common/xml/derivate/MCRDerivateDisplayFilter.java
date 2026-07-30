@@ -28,8 +28,6 @@ import org.mycore.datamodel.metadata.MCRDerivate;
  */
 public interface MCRDerivateDisplayFilter {
 
-    String DEFAULT_KEY_PREFIX = "MCR.Default.Derivate.DisplayFilter.";
-
     /**
      * Returns, weather the given derivate should be included when displaying derivates for the given intent, or
      * <code>null</code> to indicate, that no opinion is expressed.

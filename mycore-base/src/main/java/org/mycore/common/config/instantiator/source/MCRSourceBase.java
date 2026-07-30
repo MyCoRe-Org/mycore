@@ -21,10 +21,10 @@ package org.mycore.common.config.instantiator.source;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfigurationException;
-import org.mycore.common.config.instantiator.MCRProperTree;
 import org.mycore.common.config.annotation.MCRSentinel;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.common.config.instantiator.MCRInstantiatorUtils;
+import org.mycore.common.config.instantiator.MCRProperTree;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
 /**
@@ -72,7 +72,7 @@ abstract sealed class MCRSourceBase<Result> implements MCRSource permits MCRValu
             logger.debug(context.missingValueMessage(target));
         }
 
-        String defaultName = defaultName();
+        String defaultName = getDefaultName(target);
         if (isMissingResult(result) && !defaultName.isEmpty()) {
             context = new MCRSourceContext(target, defaultName, "default " + description());
             result = getResult(context, fullProperties.deeplyNested(defaultName), fullProperties);
@@ -95,6 +95,8 @@ abstract sealed class MCRSourceBase<Result> implements MCRSource permits MCRValu
 
     protected abstract String defaultName();
 
+    protected abstract String defaultNamePrefix();
+
     protected abstract boolean supportsEmptyName();
 
     protected abstract boolean absoluteName();
@@ -109,6 +111,19 @@ abstract sealed class MCRSourceBase<Result> implements MCRSource permits MCRValu
     protected abstract MCRConfigurationException missingResultException(MCRSourceContext context);
 
     protected abstract Result missingResultReplacement();
+
+    private String getDefaultName(MCRTarget target) {
+        if (!defaultNamePrefix().isEmpty()) {
+            if (!defaultName().isEmpty()) {
+                return defaultNamePrefix() + "." + defaultName();
+            }
+            if (name().isEmpty()) {
+                throw MCRInstantiatorUtils.defaultNameConflictException(target);
+            }
+            return defaultNamePrefix() + "." + name();
+        }
+        return defaultName();
+    }
 
     protected final boolean rejectedBySentinel(MCRSentinel sentinel, MCRSourceContext context,
         MCRProperTree properties) {
