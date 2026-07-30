@@ -75,6 +75,8 @@ import jakarta.persistence.criteria.Root;
 @MCRConfigurationProxy(proxyClass = MCRSimpleJobSelector.Factory.class)
 public final class MCRSimpleJobSelector implements MCRJobSelector {
 
+    public static final String DEFAULT_KEY_PREFIX = "MCR.Default.Job.Selector.Simple";
+
     public static final String ACTIONS_KEY = "Actions";
 
     public static final String ACTION_MODE_KEY = "ActionMode";
@@ -154,19 +156,19 @@ public final class MCRSimpleJobSelector implements MCRJobSelector {
     public static class Factory implements Supplier<MCRSimpleJobSelector> {
 
         @MCRClassPropertyList(name = ACTIONS_KEY, valueClass = MCRJobAction.class,
-            defaultName = "MCR.QueuedJob.Selectors.Default.Actions")
+            defaultNamePrefix = DEFAULT_KEY_PREFIX)
         public List<Class<? extends MCRJobAction>> actions;
 
-        @MCRProperty(name = ACTION_MODE_KEY, defaultName = "MCR.QueuedJob.Selectors.Default.ActionMode")
+        @MCRProperty(name = ACTION_MODE_KEY, defaultNamePrefix = DEFAULT_KEY_PREFIX)
         public String actionMode;
 
-        @MCRPropertyList(name = STATUSES_KEY, defaultName = "MCR.QueuedJob.Selectors.Default.Statuses")
+        @MCRPropertyList(name = STATUSES_KEY, defaultNamePrefix = DEFAULT_KEY_PREFIX)
         public List<String> statuses;
 
-        @MCRProperty(name = STATUS_MODE_KEY, defaultName = "MCR.QueuedJob.Selectors.Default.StatusMode")
+        @MCRProperty(name = STATUS_MODE_KEY, defaultNamePrefix = DEFAULT_KEY_PREFIX)
         public String statusMode;
 
-        @MCRProperty(name = AGE_DAYS_KEY, defaultName = "MCR.QueuedJob.Selectors.Default.AgeDays")
+        @MCRProperty(name = AGE_DAYS_KEY, defaultNamePrefix = DEFAULT_KEY_PREFIX)
         public String ageDays;
 
         @Override

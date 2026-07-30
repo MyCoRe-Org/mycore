@@ -77,6 +77,11 @@ final class MCRInstanceListSource extends MCRValueListSourceBase<Object> {
     }
 
     @Override
+    protected String defaultNamePrefix() {
+        return "";
+    }
+
+    @Override
     protected boolean supportsEmptyName() {
         return true;
     }

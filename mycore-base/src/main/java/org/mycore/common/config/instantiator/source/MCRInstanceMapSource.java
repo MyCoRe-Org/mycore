@@ -77,6 +77,11 @@ final class MCRInstanceMapSource extends MCRValueMapSourceBase<Object> {
     }
 
     @Override
+    protected String defaultNamePrefix() {
+        return "";
+    }
+
+    @Override
     protected boolean supportsEmptyName() {
         return true;
     }

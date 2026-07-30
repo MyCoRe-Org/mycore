@@ -48,7 +48,6 @@ import org.mycore.solr.auth.MCRSolrAuthenticationManager;
  * @author Robert Stephan
  */
 public class MCRSolrIDMapper extends MCRDefaultIDMapper implements MCRIDMapper {
-
     private static final Logger LOGGER = LogManager.getLogger();
 
     private Set<String> objectSolrFields = Collections.emptySet();

@@ -61,9 +61,22 @@ public @interface MCRClassProperty {
 
     /**
      * @return The name for a default property that should be used as a fallback, if no value is configured.
-     * The default property must be absolute, e.g. <code>MCR.Foo.Bar</code>.
+     * The default name must be absolute, e.g. <code>MCR.Foo.Bar</code>.
+     * <p>
+     * If used together with {@link #defaultNamePrefix()}, the default name prefix and this value will be concatenated.
+     * The resulting default name must be absolute.
      */
     String defaultName() default "";
+
+    /**
+     * @return The name prefix, that, concatenated with {@link #name()} should be used as a fallback, if no value is
+     * configured. The resulting default name must be absolute, e.g. <code>MCR.Foo.Bar</code>.
+     * <p>
+     * If used together with {@link #defaultName()}, this value and the default name (instead of the name)
+     * will be concatenated. The resulting default name must be absolute.
+     */
+    String defaultNamePrefix() default "";
+
 
     /**
      * @return The order in which the annotated fields or methods are processed. The higher the value, the later the

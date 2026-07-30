@@ -76,6 +76,11 @@ final class MCRClassPropertySource extends MCRValueSourceBase<Class<?>> {
     }
 
     @Override
+    protected String defaultNamePrefix() {
+        return annotation.defaultNamePrefix();
+    }
+
+    @Override
     protected boolean supportsEmptyName() {
         return false;
     }

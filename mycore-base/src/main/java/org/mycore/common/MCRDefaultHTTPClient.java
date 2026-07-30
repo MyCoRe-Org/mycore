@@ -44,6 +44,8 @@ import org.mycore.services.http.MCRHttpUtils;
 
 public class MCRDefaultHTTPClient implements MCRHTTPClient {
 
+    public static final String DEFAULT_PROPERTY_PREFIX = "MCR.HTTPClient";
+
     private static final Logger LOGGER = LogManager.getLogger();
 
     @SuppressWarnings("PMD.SingularField")
@@ -78,17 +80,17 @@ public class MCRDefaultHTTPClient implements MCRHTTPClient {
         MCRShutdownHandler.getInstance().addCloseable(this::close);
     }
 
-    @MCRProperty(name = "MaxObjectSize", defaultName = "MCR.HTTPClient.MaxObjectSize")
+    @MCRProperty(name = "MaxObjectSize", defaultNamePrefix = DEFAULT_PROPERTY_PREFIX)
     public void setMaxObjectSize(String size) {
         this.maxObjectSize = Long.parseLong(size);
     }
 
-    @MCRProperty(name = "MaxCacheEntries", defaultName = "MCR.HTTPClient.MaxCacheEntries")
+    @MCRProperty(name = "MaxCacheEntries", defaultNamePrefix = DEFAULT_PROPERTY_PREFIX)
     public void setMaxCacheEntries(String size) {
         this.maxCacheEntries = Integer.parseInt(size);
     }
 
-    @MCRProperty(name = "RequestTimeout", defaultName = "MCR.HTTPClient.RequestTimeout")
+    @MCRProperty(name = "RequestTimeout", defaultNamePrefix = DEFAULT_PROPERTY_PREFIX)
     public void setRequestTimeout(String size) {
         this.requestTimeout = Integer.parseInt(size);
     }
