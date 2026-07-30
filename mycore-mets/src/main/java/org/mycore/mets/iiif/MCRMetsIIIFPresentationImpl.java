@@ -31,8 +31,6 @@ import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
-import org.mycore.common.config.annotation.MCRPostConstruction;
-import org.mycore.common.config.annotation.MCRPostConstruction.Value;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
@@ -127,7 +125,7 @@ public class MCRMetsIIIFPresentationImpl extends MCRIIIFPresentationImpl {
         return new MCRJDOMContent(document);
     }
 
-    public static class Factory implements Supplier<MCRMetsIIIFPresentationImpl> {
+    public static abstract class FactoryBase extends MCRIIIFPresentationImpl.FactoryBase {
 
         @MCRProperty(name = TRANSFORMER_PROPERTY)
         public String transformerId;
@@ -135,12 +133,9 @@ public class MCRMetsIIIFPresentationImpl extends MCRIIIFPresentationImpl {
         @MCRProperty(name = STORE_METS_ON_GENERATE_PROPERTY, defaultName = STORE_METS_ON_GENERATE_DEFAULT_PROPERTY)
         public String storeMetsOnGenerate;
 
-        public String implName;
+    }
 
-        @MCRPostConstruction(Value.TRAILING_NAME)
-        public void setImplName(String implName) {
-            this.implName = implName;
-        }
+    public static final class Factory extends FactoryBase implements Supplier<MCRMetsIIIFPresentationImpl> {
 
         @Override
         public MCRMetsIIIFPresentationImpl get() {

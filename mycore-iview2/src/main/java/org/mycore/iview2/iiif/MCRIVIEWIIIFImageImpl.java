@@ -43,8 +43,6 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.access.MCRMissingPermissionException;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstance;
-import org.mycore.common.config.annotation.MCRPostConstruction;
-import org.mycore.common.config.annotation.MCRPostConstruction.Value;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.config.annotation.MCRPropertyList;
 import org.mycore.iiif.image.MCRIIIFImageUtil;
@@ -367,7 +365,7 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
             MCRAccessManager.checkPermission(tileInfo.derivate(), MCRAccessManager.PERMISSION_READ);
     }
 
-    public static class Factory implements Supplier<MCRIVIEWIIIFImageImpl> {
+    public static abstract class FactoryBase extends MCRIIIFImageImpl.FactoryBase {
 
         @MCRInstance(name = TILE_FILE_PROVIDER_PROPERTY, valueClass = MCRTileFileProvider.class, required = false)
         public MCRTileFileProvider tileFileProvider;
@@ -381,21 +379,18 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
         @MCRProperty(name = IDENTIFIER_SEPARATOR_PROPERTY, defaultName = IDENTIFIER_SEPARATOR_DEFAULT_PROPERTY)
         public String identifierSeparator;
 
-        public String implName;
-
-        @MCRPostConstruction(Value.TRAILING_NAME)
-        public void setImplName(String implName) {
-            this.implName = implName;
+        public MCRTileFileProvider getTileFileProvider() {
+            return tileFileProvider != null ? tileFileProvider : new MCRDefaultTileFileProvider();
         }
+
+    }
+
+    public static final class Factory extends FactoryBase implements Supplier<MCRIVIEWIIIFImageImpl> {
 
         @Override
         public MCRIVIEWIIIFImageImpl get() {
             return new MCRIVIEWIIIFImageImpl(implName, getTileFileProvider(), transparentFormats,
                 Long.parseLong(maxImageSize), identifierSeparator);
-        }
-
-        private MCRTileFileProvider getTileFileProvider() {
-            return tileFileProvider != null ? tileFileProvider : new MCRDefaultTileFileProvider();
         }
 
     }

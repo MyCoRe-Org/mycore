@@ -22,6 +22,7 @@ import java.awt.image.BufferedImage;
 
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.iiif.image.model.MCRIIIFImageInformation;
 import org.mycore.iiif.image.model.MCRIIIFImageProfile;
 import org.mycore.iiif.image.model.MCRIIIFImageQuality;
@@ -69,5 +70,16 @@ public abstract class MCRIIIFImageImpl {
         throws MCRIIIFImageNotFoundException, MCRIIIFImageProvidingException, MCRAccessException;
 
     public abstract MCRIIIFImageProfile getProfile();
+
+    public static abstract class FactoryBase {
+
+        public String implName;
+
+        @MCRPostConstruction(MCRPostConstruction.Value.TRAILING_NAME)
+        public void setImplName(String implName) {
+            this.implName = implName;
+        }
+
+    }
 
 }

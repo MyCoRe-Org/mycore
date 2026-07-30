@@ -28,9 +28,6 @@ import java.util.function.Supplier;
 
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
-import org.mycore.common.config.annotation.MCRInstance;
-import org.mycore.common.config.annotation.MCRPostConstruction;
-import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.config.annotation.MCRPropertyList;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRLinkTableManager;
@@ -40,11 +37,10 @@ import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.iiif.image.impl.MCRIIIFImageNotFoundException;
-import org.mycore.iview2.backend.MCRDefaultTileFileProvider;
 import org.mycore.iview2.backend.MCRTileFileProvider;
 import org.mycore.iview2.backend.MCRTileInfo;
 
-@MCRConfigurationProxy(proxyClass = MCRThumbnailImageImpl.Factory.class )
+@MCRConfigurationProxy(proxyClass = MCRThumbnailImageImpl.Factory.class)
 public class MCRThumbnailImageImpl extends MCRIVIEWIIIFImageImpl {
 
     protected static final String DERIVATE_TYPES_PROPERTY = "Derivate.Types";
@@ -145,38 +141,19 @@ public class MCRThumbnailImageImpl extends MCRIVIEWIIIFImageImpl {
             .filter(t -> getTileFileProvider().getTileFile(t).filter(Files::exists).isPresent());
     }
 
-    public static class Factory implements Supplier<MCRThumbnailImageImpl> {
-
-        @MCRInstance(name = TILE_FILE_PROVIDER_PROPERTY, valueClass = MCRTileFileProvider.class, required = false)
-        public MCRTileFileProvider tileFileProvider;
-
-        @MCRPropertyList(name = TRANSPARENT_FORMATS_PROPERTY, required = false)
-        public List<String> transparentFormats;
-
-        @MCRProperty(name = MAX_BYTES_PROPERTY, defaultName = MAX_BYTES_DEFAULT_PROPERTY)
-        public String maxImageSize;
-
-        @MCRProperty(name = IDENTIFIER_SEPARATOR_PROPERTY, defaultName = IDENTIFIER_SEPARATOR_DEFAULT_PROPERTY)
-        public String identifierSeparator;
+    public static abstract class FactoryBase extends MCRIVIEWIIIFImageImpl.FactoryBase {
 
         @MCRPropertyList(name = DERIVATE_TYPES_PROPERTY)
         public List<String> derivateTypes;
 
-        public String implName;
+    }
 
-        @MCRPostConstruction(MCRPostConstruction.Value.TRAILING_NAME)
-        public void setImplName(String implName) {
-            this.implName = implName;
-        }
+    public static final class Factory extends FactoryBase implements Supplier<MCRThumbnailImageImpl> {
 
         @Override
         public MCRThumbnailImageImpl get() {
             return new MCRThumbnailImageImpl(implName, getTileFileProvider(), transparentFormats,
                 Long.parseLong(maxImageSize), identifierSeparator, new LinkedHashSet<>(derivateTypes));
-        }
-
-        private MCRTileFileProvider getTileFileProvider() {
-            return tileFileProvider != null ? tileFileProvider : new MCRDefaultTileFileProvider();
         }
 
     }

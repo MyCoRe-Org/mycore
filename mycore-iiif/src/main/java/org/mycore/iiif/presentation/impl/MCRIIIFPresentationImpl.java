@@ -19,6 +19,7 @@
 package org.mycore.iiif.presentation.impl;
 
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.iiif.presentation.model.basic.MCRIIIFManifest;
 
 public abstract class MCRIIIFPresentationImpl {
@@ -62,5 +63,16 @@ public abstract class MCRIIIFPresentationImpl {
     }
 
     public abstract MCRIIIFManifest getManifest(String id);
+
+    public static abstract class FactoryBase {
+
+        public String implName;
+
+        @MCRPostConstruction(MCRPostConstruction.Value.TRAILING_NAME)
+        public void setImplName(String implName) {
+            this.implName = implName;
+        }
+
+    }
 
 }
