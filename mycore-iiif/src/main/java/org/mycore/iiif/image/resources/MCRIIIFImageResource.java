@@ -23,7 +23,7 @@ import static org.mycore.iiif.image.MCRIIIFImageUtil.buildProfileURL;
 import static org.mycore.iiif.image.MCRIIIFImageUtil.completeProfile;
 import static org.mycore.iiif.image.MCRIIIFImageUtil.encodeImageIdentifier;
 import static org.mycore.iiif.image.MCRIIIFImageUtil.getIIIFURL;
-import static org.mycore.iiif.image.MCRIIIFImageUtil.getImpl;
+import static org.mycore.iiif.image.impl.MCRIIIFImageImpl.obtainInstance;
 
 import java.awt.image.BufferedImage;
 import java.net.URI;
@@ -92,7 +92,7 @@ public class MCRIIIFImageResource {
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     public Response getInfo(@PathParam(IMPL_PARAM) String implString, @PathParam(IDENTIFIER_PARAM) String identifier) {
         try {
-            MCRIIIFImageImpl impl = getImpl(implString);
+            MCRIIIFImageImpl impl = obtainInstance(implString);
             MCRIIIFImageInformation information = impl.getInformation(identifier);
 
             Optional<Response> cachedResponse = getCachedResponse(information.lastModified);
@@ -129,7 +129,7 @@ public class MCRIIIFImageResource {
     public Response getInfoRedirect(@PathParam(IMPL_PARAM) String impl,
         @PathParam(IDENTIFIER_PARAM) String identifier) {
         try {
-            String uriString = getIIIFURL(getImpl(impl)) + encodeImageIdentifier(identifier) + "/info.json";
+            String uriString = getIIIFURL(obtainInstance(impl)) + encodeImageIdentifier(identifier) + "/info.json";
             return Response.temporaryRedirect(new URI(uriString)).build();
         } catch (URISyntaxException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
@@ -147,7 +147,7 @@ public class MCRIIIFImageResource {
         @PathParam("quality") String quality,
         @PathParam("format") String format) {
         try {
-            MCRIIIFImageImpl impl = getImpl(implStr);
+            MCRIIIFImageImpl impl = obtainInstance(implStr);
             MCRIIIFImageInformation information = impl.getInformation(identifier);
 
             Optional<Response> cachedResponse = getCachedResponse(information.lastModified);
@@ -201,7 +201,7 @@ public class MCRIIIFImageResource {
         sMaxAge = @MCRCacheControl.Age(time = 7, unit = TimeUnit.DAYS))
     public Response getDereferencedProfile(@PathParam(IMPL_PARAM) String implStr) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        MCRIIIFImageProfile profile = getProfile(getImpl(implStr));
+        MCRIIIFImageProfile profile = getProfile(obtainInstance(implStr));
         profile.setContext(MCRIIIFBase.API_IMAGE_2);
         return Response.ok().entity(gson.toJson(profile)).build();
     }
