@@ -20,6 +20,7 @@ package org.mycore.mets.iiif;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.function.Supplier;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,8 +29,11 @@ import org.jdom2.JDOMException;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRPostConstruction;
+import org.mycore.common.config.annotation.MCRPostConstruction.Value;
+import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRPathContent;
@@ -47,17 +51,26 @@ import org.mycore.iiif.presentation.model.basic.MCRIIIFManifest;
 import org.mycore.mets.model.MCRMETSGeneratorFactory;
 import org.mycore.mets.tools.MCRMetsSave;
 
+@MCRConfigurationProxy(proxyClass = MCRMetsIIIFPresentationImpl.Factory.class)
 public class MCRMetsIIIFPresentationImpl extends MCRIIIFPresentationImpl {
 
-    private static final String TRANSFORMER_ID_CONFIGURATION_KEY = "Transformer";
+    public static final String TRANSFORMER_PROPERTY = "Transformer";
+
+    public static final String STORE_METS_ON_GENERATE_PROPERTY = "StoreMetsOnGenerate";
+
+    private static final String STORE_METS_ON_GENERATE_DEFAULT_PROPERTY = DEFAULT_PROPERTY_PREFIX
+            + STORE_METS_ON_GENERATE_PROPERTY;
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public static final boolean STORE_METS_ON_GENERATE = MCRConfiguration2
-        .getOrThrow("MCR.Mets.storeMetsOnGenerate", Boolean::parseBoolean);
+    private final String transformerId;
 
-    public MCRMetsIIIFPresentationImpl(String implName) {
+    private final boolean storeMetsOnGenerate;
+
+    public MCRMetsIIIFPresentationImpl(String implName, String transformerId, boolean storeMetsOnGenerate) {
         super(implName);
+        this.transformerId = transformerId;
+        this.storeMetsOnGenerate = storeMetsOnGenerate;
     }
 
     @Override
@@ -76,13 +89,10 @@ public class MCRMetsIIIFPresentationImpl extends MCRIIIFPresentationImpl {
     }
 
     protected MCRContentTransformer getTransformer() {
-        String transformerID = getProperties().get(TRANSFORMER_ID_CONFIGURATION_KEY);
-        MCRContentTransformer transformer = MCRContentTransformerFactory.getTransformer(transformerID);
-
+        MCRContentTransformer transformer = MCRContentTransformerFactory.getTransformer(transformerId);
         if (transformer == null) {
-            throw new MCRConfigurationException("Could not resolve transformer with id : " + transformerID);
+            throw new MCRConfigurationException("Could not resolve transformer with id : " + transformerId);
         }
-
         return transformer;
     }
 
@@ -92,7 +102,7 @@ public class MCRMetsIIIFPresentationImpl extends MCRIIIFPresentationImpl {
         MCRContentTransformer transformer = getTransformer();
         MCRParameterCollector parameter = new MCRParameterCollector();
 
-        if (objectid != null && objectid.length() != 0) {
+        if (objectid != null && !objectid.isEmpty()) {
             MCRDerivate derObj = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(id));
             MCRObjectID ownerID = derObj.getOwnerID();
             objectid = ownerID.toString();
@@ -111,9 +121,32 @@ public class MCRMetsIIIFPresentationImpl extends MCRIIIFPresentationImpl {
 
     private synchronized MCRJDOMContent generateMets(String id) {
         final Document document = MCRMETSGeneratorFactory.create(MCRPath.getPath(id, "/")).generate().asDocument();
-        if (STORE_METS_ON_GENERATE) {
+        if (storeMetsOnGenerate) {
             MCRMetsSave.saveMets(document, MCRObjectID.getInstance(id));
         }
         return new MCRJDOMContent(document);
     }
+
+    public static class Factory implements Supplier<MCRMetsIIIFPresentationImpl> {
+
+        @MCRProperty(name = TRANSFORMER_PROPERTY)
+        public String transformerId;
+
+        @MCRProperty(name = STORE_METS_ON_GENERATE_PROPERTY, defaultName = STORE_METS_ON_GENERATE_DEFAULT_PROPERTY)
+        public String storeMetsOnGenerate;
+
+        public String implName;
+
+        @MCRPostConstruction(Value.TRAILING_NAME)
+        public void setImplName(String implName) {
+            this.implName = implName;
+        }
+
+        @Override
+        public MCRMetsIIIFPresentationImpl get() {
+            return new MCRMetsIIIFPresentationImpl(implName, transformerId, Boolean.parseBoolean(storeMetsOnGenerate));
+        }
+
+    }
+
 }

@@ -20,11 +20,18 @@ package org.mycore.iview2.iiif;
 
 import java.nio.file.Files;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.SequencedSet;
+import java.util.function.Supplier;
 
 import org.mycore.access.MCRAccessManager;
-import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRInstance;
+import org.mycore.common.config.annotation.MCRPostConstruction;
+import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.config.annotation.MCRPropertyList;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -33,17 +40,21 @@ import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.iiif.image.impl.MCRIIIFImageNotFoundException;
+import org.mycore.iview2.backend.MCRDefaultTileFileProvider;
+import org.mycore.iview2.backend.MCRTileFileProvider;
 import org.mycore.iview2.backend.MCRTileInfo;
 
+@MCRConfigurationProxy(proxyClass = MCRThumbnailImageImpl.Factory.class )
 public class MCRThumbnailImageImpl extends MCRIVIEWIIIFImageImpl {
 
-    protected static final String DERIVATE_TYPES = "Derivate.Types";
+    protected static final String DERIVATE_TYPES_PROPERTY = "Derivate.Types";
 
-    private List<String> derivateTypes;
+    private final SequencedSet<String> derivateTypes;
 
-    public MCRThumbnailImageImpl(String implName) {
-        super(implName);
-        derivateTypes = MCRConfiguration2.splitValue(getProperties().get(DERIVATE_TYPES)).distinct().toList();
+    public MCRThumbnailImageImpl(String implName, MCRTileFileProvider tileFileProvider, List<String> transparentFormats,
+        long maxImageSize, String identifierSeparator, SequencedSet<String> derivateTypes) {
+        super(implName, tileFileProvider, transparentFormats, maxImageSize, identifierSeparator);
+        this.derivateTypes = derivateTypes;
     }
 
     @Override
@@ -131,6 +142,43 @@ public class MCRThumbnailImageImpl extends MCRIVIEWIIIFImageImpl {
     private Optional<MCRTileInfo> createTileInfoForFile(String derID, String file) {
         final MCRTileInfo mcrTileInfo = new MCRTileInfo(derID, file, null);
         return Optional.of(mcrTileInfo)
-            .filter(t -> this.tileFileProvider.getTileFile(t).filter(Files::exists).isPresent());
+            .filter(t -> getTileFileProvider().getTileFile(t).filter(Files::exists).isPresent());
     }
+
+    public static class Factory implements Supplier<MCRThumbnailImageImpl> {
+
+        @MCRInstance(name = TILE_FILE_PROVIDER_PROPERTY, valueClass = MCRTileFileProvider.class, required = false)
+        public MCRTileFileProvider tileFileProvider;
+
+        @MCRPropertyList(name = TRANSPARENT_FORMATS_PROPERTY, required = false)
+        public List<String> transparentFormats;
+
+        @MCRProperty(name = MAX_BYTES_PROPERTY, defaultName = MAX_BYTES_DEFAULT_PROPERTY)
+        public String maxImageSize;
+
+        @MCRProperty(name = IDENTIFIER_SEPARATOR_PROPERTY, defaultName = IDENTIFIER_SEPARATOR_DEFAULT_PROPERTY)
+        public String identifierSeparator;
+
+        @MCRPropertyList(name = DERIVATE_TYPES_PROPERTY)
+        public List<String> derivateTypes;
+
+        public String implName;
+
+        @MCRPostConstruction(MCRPostConstruction.Value.TRAILING_NAME)
+        public void setImplName(String implName) {
+            this.implName = implName;
+        }
+
+        @Override
+        public MCRThumbnailImageImpl get() {
+            return new MCRThumbnailImageImpl(implName, getTileFileProvider(), transparentFormats,
+                Long.parseLong(maxImageSize), identifierSeparator, new LinkedHashSet<>(derivateTypes));
+        }
+
+        private MCRTileFileProvider getTileFileProvider() {
+            return tileFileProvider != null ? tileFileProvider : new MCRDefaultTileFileProvider();
+        }
+
+    }
+
 }

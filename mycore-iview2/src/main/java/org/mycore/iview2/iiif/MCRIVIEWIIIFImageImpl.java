@@ -27,9 +27,10 @@ import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
@@ -40,7 +41,12 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.access.MCRMissingPermissionException;
-import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRInstance;
+import org.mycore.common.config.annotation.MCRPostConstruction;
+import org.mycore.common.config.annotation.MCRPostConstruction.Value;
+import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.config.annotation.MCRPropertyList;
 import org.mycore.iiif.image.MCRIIIFImageUtil;
 import org.mycore.iiif.image.impl.MCRIIIFImageImpl;
 import org.mycore.iiif.image.impl.MCRIIIFImageNotFoundException;
@@ -61,38 +67,50 @@ import org.mycore.iview2.backend.MCRTileFileProvider;
 import org.mycore.iview2.backend.MCRTileInfo;
 import org.mycore.iview2.services.MCRIView2Tools;
 
+@MCRConfigurationProxy(proxyClass = MCRIVIEWIIIFImageImpl.Factory.class)
 public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
 
     public static final String DEFAULT_PROTOCOL = "http://iiif.io/api/image";
 
     public static final double LOG_HALF = Math.log(1.0 / 2.0);
 
-    public static final java.util.List<String> SUPPORTED_FORMATS = Arrays.asList(ImageIO.getReaderFileSuffixes());
+    public static final List<String> SUPPORTED_FORMATS = Arrays.asList(ImageIO.getReaderFileSuffixes());
+
+    public static final String TILE_FILE_PROVIDER_PROPERTY = "TileFileProvider";
+
+    public static final String TRANSPARENT_FORMATS_PROPERTY = "TransparentFormats";
 
     public static final String MAX_BYTES_PROPERTY = "MaxImageBytes";
 
-    private static final String TILE_FILE_PROVIDER_PROPERTY = "TileFileProvider";
+    public static final String IDENTIFIER_SEPARATOR_PROPERTY = "IdentifierSeparator";
 
-    private static final String IDENTIFIER_SEPARATOR_PROPERTY = "IdentifierSeparator";
+    private static final String MAX_BYTES_DEFAULT_PROPERTY = DEFAULT_PROPERTY_PREFIX
+        + MAX_BYTES_PROPERTY;
+
+    private static final String IDENTIFIER_SEPARATOR_DEFAULT_PROPERTY = DEFAULT_PROPERTY_PREFIX
+        + IDENTIFIER_SEPARATOR_PROPERTY;
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final java.util.List<String> transparentFormats;
+    private final MCRTileFileProvider tileFileProvider;
 
-    protected final MCRTileFileProvider tileFileProvider;
+    private final List<String> transparentFormats;
 
-    public MCRIVIEWIIIFImageImpl(String implName) {
+    private final long maxImageSize;
+
+    private final String identifierSeparator;
+
+    public MCRIVIEWIIIFImageImpl(String implName, MCRTileFileProvider tileFileProvider,
+        List<String> transparentFormats, long maxImageSize, String identifierSeparator) {
         super(implName);
-        Map<String, String> properties = getProperties();
-        String tileFileProviderClassName = properties.get(TILE_FILE_PROVIDER_PROPERTY);
-        if (tileFileProviderClassName == null) {
-            tileFileProvider = new MCRDefaultTileFileProvider();
-        } else {
-            tileFileProvider = MCRConfiguration2.getInstanceOfOrThrow(
-                MCRTileFileProvider.class, getConfigPrefix() + TILE_FILE_PROVIDER_PROPERTY);
-        }
+        this.tileFileProvider = tileFileProvider;
+        this.transparentFormats = transparentFormats;
+        this.maxImageSize = maxImageSize;
+        this.identifierSeparator = identifierSeparator;
+    }
 
-        transparentFormats = Arrays.asList(properties.get("TransparentFormats").split(","));
+    protected final MCRTileFileProvider getTileFileProvider() {
+        return tileFileProvider;
     }
 
     private String buildURL(String identifier) {
@@ -204,9 +222,6 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
         throws MCRIIIFImageProvidingException {
         long resultingSize = (long) targetSize.height() * targetSize.width()
             * (imageQuality.equals(MCRIIIFImageQuality.COLOR) ? 3 : 1);
-
-        long maxImageSize = Optional.ofNullable(getProperties().get(MAX_BYTES_PROPERTY)).map(Long::parseLong)
-            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(getConfigPrefix() + MAX_BYTES_PROPERTY));
         if (resultingSize > maxImageSize) {
             throw new MCRIIIFImageProvidingException("Maximal image size is " + (maxImageSize / 1024 / 1024) + "MB. ["
                 + resultingSize + "/" + maxImageSize + "]");
@@ -327,8 +342,7 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
 
     protected MCRTileInfo createTileInfo(String identifier) throws MCRIIIFImageNotFoundException {
         String id = identifier.contains(":/") ? identifier.replaceFirst(":/", "/") : identifier;
-        String separator = getProperties().getOrDefault(IDENTIFIER_SEPARATOR_PROPERTY, "/");
-        String[] splittedIdentifier = id.split(separator, 2);
+        String[] splittedIdentifier = id.split(identifierSeparator, 2);
         return switch (splittedIdentifier.length) {
             case 1 -> new MCRTileInfo(null, identifier, null);
             case 2 -> new MCRTileInfo(splittedIdentifier[0], splittedIdentifier[1], null);
@@ -352,4 +366,38 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
         return MCRAccessManager.checkPermission(tileInfo.derivate(), MCRAccessManager.PERMISSION_VIEW) ||
             MCRAccessManager.checkPermission(tileInfo.derivate(), MCRAccessManager.PERMISSION_READ);
     }
+
+    public static class Factory implements Supplier<MCRIVIEWIIIFImageImpl> {
+
+        @MCRInstance(name = TILE_FILE_PROVIDER_PROPERTY, valueClass = MCRTileFileProvider.class, required = false)
+        public MCRTileFileProvider tileFileProvider;
+
+        @MCRPropertyList(name = TRANSPARENT_FORMATS_PROPERTY, required = false)
+        public List<String> transparentFormats;
+
+        @MCRProperty(name = MAX_BYTES_PROPERTY, defaultName = MAX_BYTES_DEFAULT_PROPERTY)
+        public String maxImageSize;
+
+        @MCRProperty(name = IDENTIFIER_SEPARATOR_PROPERTY, defaultName = IDENTIFIER_SEPARATOR_DEFAULT_PROPERTY)
+        public String identifierSeparator;
+
+        public String implName;
+
+        @MCRPostConstruction(Value.TRAILING_NAME)
+        public void setImplName(String implName) {
+            this.implName = implName;
+        }
+
+        @Override
+        public MCRIVIEWIIIFImageImpl get() {
+            return new MCRIVIEWIIIFImageImpl(implName, getTileFileProvider(), transparentFormats,
+                Long.parseLong(maxImageSize), identifierSeparator);
+        }
+
+        private MCRTileFileProvider getTileFileProvider() {
+            return tileFileProvider != null ? tileFileProvider : new MCRDefaultTileFileProvider();
+        }
+
+    }
+
 }

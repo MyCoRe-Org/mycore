@@ -37,26 +37,43 @@ public class MCRInstantiatorProxyTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithConfigurationProxy.class),
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClass.class),
             @MCRTestProperty(key = "Foo.Property1", string = "Value1"),
             @MCRTestProperty(key = "Foo.Property2", string = "Value2")
         })
-    public void annotated() {
+    public void classWithProxy() {
 
-        TestClassWithConfigurationProxy instance = ofName(TestClassWithConfigurationProxy.class,
-            "Foo").instantiate();
+        TestClass instance = ofName(TestClass.class, "Foo").instantiate();
 
         assertNotNull(instance);
         assertEquals("Value1-Value2", instance.value());
 
     }
 
-    @MCRConfigurationProxy(proxyClass = TestClassWithConfigurationProxy.Factory.class)
-    public static class TestClassWithConfigurationProxy {
+    @Test
+    @MCRTestConfiguration(
+        properties = {
+            @MCRTestProperty(key = "Foo.Class", classNameOf = ExtendedTestClass.class),
+            @MCRTestProperty(key = "Foo.Property1", string = "Value1"),
+            @MCRTestProperty(key = "Foo.Property2", string = "Value2"),
+            @MCRTestProperty(key = "Foo.AdditionalProperty", string = "AdditionalValue")
+        })
+    public void subClassWithProxy() {
+
+        ExtendedTestClass instance = ofName(ExtendedTestClass.class, "Foo").instantiate();
+
+        assertNotNull(instance);
+        assertEquals("Value1-Value2", instance.value());
+        assertEquals("AdditionalValue", instance.additionalValue());
+
+    }
+
+    @MCRConfigurationProxy(proxyClass = TestClass.Factory.class)
+    public static class TestClass {
 
         private final String value;
 
-        public TestClassWithConfigurationProxy(String value) {
+        public TestClass(String value) {
             this.value = value;
         }
 
@@ -64,7 +81,7 @@ public class MCRInstantiatorProxyTest {
             return value;
         }
 
-        public static class Factory implements Supplier<TestClassWithConfigurationProxy> {
+        public static class Factory implements Supplier<TestClass> {
 
             @MCRProperty(name = "Property1")
             public String value1;
@@ -73,8 +90,44 @@ public class MCRInstantiatorProxyTest {
             public String value2;
 
             @Override
-            public TestClassWithConfigurationProxy get() {
-                return new TestClassWithConfigurationProxy(value1 + "-" + value2);
+            public TestClass get() {
+                return new TestClass(getValue());
+            }
+
+            protected final String getValue() {
+                return value1 + "-" + value2;
+            }
+
+        }
+
+    }
+
+    @MCRConfigurationProxy(proxyClass = ExtendedTestClass.Factory.class)
+    public static class ExtendedTestClass extends TestClass {
+
+        private final String additionalValue;
+
+        public ExtendedTestClass(String value, String additionalValue) {
+            super(value);
+            this.additionalValue = additionalValue;
+        }
+
+        public String additionalValue() {
+            return additionalValue;
+        }
+
+        // Java doesn't allow subclasses to implement an interface with a narrower subtype.
+        // Therefore, we can not guarantee that ExtendedTestClass#get returns an ExtendedTestClass.
+        // This is an argument against extending configuration proxy factories, even though
+        // the alternative is duplicating some boilerplate code.
+        public static class Factory extends TestClass.Factory /* implements Supplier<ExtendedTestClass> */ {
+
+            @MCRProperty(name = "AdditionalProperty")
+            public String additionalValue;
+
+            @Override
+            public ExtendedTestClass get() {
+                return new ExtendedTestClass(getValue(), additionalValue);
             }
 
         }

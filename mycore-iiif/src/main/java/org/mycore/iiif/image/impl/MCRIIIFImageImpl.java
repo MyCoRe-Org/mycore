@@ -19,15 +19,9 @@
 package org.mycore.iiif.image.impl;
 
 import java.awt.image.BufferedImage;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.mycore.access.MCRAccessException;
-import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.iiif.image.model.MCRIIIFImageInformation;
 import org.mycore.iiif.image.model.MCRIIIFImageProfile;
 import org.mycore.iiif.image.model.MCRIIIFImageQuality;
@@ -39,7 +33,7 @@ public abstract class MCRIIIFImageImpl {
 
     private static final String MCR_IIIF_IMAGE_CONFIG_PREFIX = "MCR.IIIFImage.";
 
-    private static final Map<String, MCRIIIFImageImpl> IMPLHOLDER = new HashMap<>();
+    protected static final String DEFAULT_PROPERTY_PREFIX = "MCR.Default.IIIFImage.";
 
     private final String implName;
 
@@ -47,43 +41,19 @@ public abstract class MCRIIIFImageImpl {
         this.implName = implName;
     }
 
-    public static synchronized MCRIIIFImageImpl obtainInstance(String implNameParameter) {
-        String implName = (implNameParameter == null || implNameParameter.isBlank())
+    public static MCRIIIFImageImpl obtainInstance(String implName) {
+
+        String checkedImplName = (implName == null || implName.isBlank())
             ? MCRConfiguration2.getStringOrThrow("MCR.IIIFImage.Default")
-            : implNameParameter;
+            : implName;
 
-        if (IMPLHOLDER.containsKey(implName)) {
-            return IMPLHOLDER.get(implName);
-        }
+        String implPropertyName = MCR_IIIF_IMAGE_CONFIG_PREFIX + checkedImplName;
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRIIIFImageImpl.class, implPropertyName);
 
-        String classPropertyName = MCR_IIIF_IMAGE_CONFIG_PREFIX + implName + ".Class";
-        Class<? extends MCRIIIFImageImpl> classObject = MCRConfiguration2.<MCRIIIFImageImpl>getClass(classPropertyName)
-            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(classPropertyName));
-
-        try {
-            Constructor<? extends MCRIIIFImageImpl> constructor = classObject.getConstructor(String.class);
-            MCRIIIFImageImpl imageImpl = constructor.newInstance(implName);
-            IMPLHOLDER.put(implName, imageImpl);
-            return imageImpl;
-        } catch (NoSuchMethodException e) {
-            throw new MCRConfigurationException(
-                "Configurated class (" + classObject.getName() + ") needs a string constructor: " + classPropertyName,
-                e);
-        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
-            throw new MCRException(e);
-        }
     }
 
     public String getImplName() {
         return implName;
-    }
-
-    protected final Map<String, String> getProperties() {
-        return MCRConfiguration2.getSubPropertiesMap(getConfigPrefix());
-    }
-
-    protected String getConfigPrefix() {
-        return MCR_IIIF_IMAGE_CONFIG_PREFIX + implName + ".";
     }
 
     public abstract BufferedImage provide(String identifier,
