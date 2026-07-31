@@ -10,8 +10,6 @@
   <xsl:param name="Referer" />
   <xsl:param name="returnUrl" select="$Referer" />
 
-  <xsl:variable name="dojoV" select="'1.17.3'" />
-
   <xsl:template match="/wcms2">
     <xsl:variable name="resourcesPath" select="concat($WebApplicationBaseURL, 'modules/wcms2/resources')" />
     <xsl:variable name="jsPath" select="concat($WebApplicationBaseURL, 'modules/wcms2/js')" />
