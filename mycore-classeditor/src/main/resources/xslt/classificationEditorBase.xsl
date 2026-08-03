@@ -15,7 +15,7 @@
   <xsl:param name="classeditor.debug" select="false()" />
 
   <!-- Variables -->
-  <xsl:variable name="classeditor.dojoVersion" select="'1.16.3'" />
+  <xsl:variable name="classeditor.dojoVersion" select="'1.17.3'" />
 
   <xsl:variable name="classeditor.resourceURL" select="concat($WebApplicationBaseURL, 'rsc/classifications/')" />
   <xsl:variable name="classeditor.webURL" select="concat($WebApplicationBaseURL, 'modules/classeditor')"/>
