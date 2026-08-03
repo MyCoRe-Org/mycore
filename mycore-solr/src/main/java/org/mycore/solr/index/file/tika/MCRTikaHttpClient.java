@@ -41,17 +41,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class MCRTikaHttpClient {
 
+    // default endpoint for Tika v2 and v3 / for v4 use 'tika/json/text'
+    private static final String DEFAULT_TIKA_EXTRACT_TEXT_ENDPOINT = "tika/text";
+
     private final String url;
 
-    // default endpoint for Tika v2 and v3 / for v4 use 'tika/json/text'
-    private String extractTextEndpoint = "tika/text";
+    private final String extractTextEndpoint;
 
     public MCRTikaHttpClient(String url) {
-        this.url = url.endsWith("/") ? url : url + "/";
+        this(url, DEFAULT_TIKA_EXTRACT_TEXT_ENDPOINT);
     }
 
     public MCRTikaHttpClient(String url, String extractTextEndpoint) {
-        this(url);
+        this.url = url.endsWith("/") ? url : url + "/";
         this.extractTextEndpoint = extractTextEndpoint.startsWith("/")
             ? extractTextEndpoint.replaceFirst("^\\/+", "") : extractTextEndpoint;
     }

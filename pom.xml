@@ -69,14 +69,14 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <hk2.version>3.1.1</hk2.version>
     <httpclient.version>5.6.1</httpclient.version>
     <httpcore.version>5.4.1</httpcore.version>
-    <jackson.version>2.21.1</jackson.version>
+    <jackson.version>2.21.5</jackson.version>
     <jakarta.activation.version>2.1.4</jakarta.activation.version>
     <jakarta.mail.version>2.1.5</jakarta.mail.version>
     <java.target.version>25</java.target.version>
     <jaxb.version>4.0.6</jaxb.version>
     <jersey.version>4.0.2</jersey.version>
     <junit.version>6.0.3</junit.version>
-    <log4j.version>2.25.3</log4j.version>
+    <log4j.version>2.25.4</log4j.version>
     <!-- lowest is 99, highest is 0 -->
     <manifest.priority>99</manifest.priority>
     <maven.compiler.arg>-Werror</maven.compiler.arg>
@@ -86,6 +86,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <neo4j.version>6.0.3</neo4j.version>
     <net.bytebuddy.experimental>true</net.bytebuddy.experimental>
     <net.bytebuddy.processor>CLASS_FILE_API_FIRST</net.bytebuddy.processor>
+    <netty.version>4.1.136.Final</netty.version>
     <node.version>v20.19.0</node.version>
     <oaipmh.version>3.0</oaipmh.version>
     <ocfl-java.version>2.2.3</ocfl-java.version>
@@ -103,6 +104,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <xalan.version>2.7.3</xalan.version>
     <xsonify.version>1.1.1</xsonify.version>
     <yarn.install.args>--mutex network</yarn.install.args>
+    <zookeeper.version>3.9.5</zookeeper.version>
   </properties>
   <build>
     <pluginManagement>
@@ -968,6 +970,20 @@ Applications based on MyCoRe use a common core, which provides the functionality
   <dependencyManagement>
     <dependencies>
       <dependency>
+        <groupId>com.fasterxml.jackson</groupId>
+        <artifactId>jackson-bom</artifactId>
+        <version>${jackson.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty-bom</artifactId>
+        <version>${netty.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
         <groupId>org.apache.logging.log4j</groupId>
         <artifactId>log4j-bom</artifactId>
         <version>${log4j.version}</version>
@@ -1001,6 +1017,11 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <version>0.10.2</version>
       </dependency>
       <dependency>
+        <groupId>at.yawk.lz4</groupId>
+        <artifactId>lz4-java</artifactId>
+        <version>1.11.1</version>
+      </dependency>
+      <dependency>
         <groupId>com.auth0</groupId>
         <artifactId>java-jwt</artifactId>
         <version>4.5.1</version>
@@ -1014,41 +1035,6 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <groupId>com.cronutils</groupId>
         <artifactId>cron-utils</artifactId>
         <version>9.2.1</version>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-annotations</artifactId>
-        <version>2.21</version>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-core</artifactId>
-        <version>${jackson.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-databind</artifactId>
-        <version>${jackson.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson.datatype</groupId>
-        <artifactId>jackson-datatype-jsr310</artifactId>
-        <version>${jackson.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
-        <artifactId>jackson-jakarta-rs-base</artifactId>
-        <version>${jackson.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
-        <artifactId>jackson-jakarta-rs-json-provider</artifactId>
-        <version>${jackson.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson.module</groupId>
-        <artifactId>jackson-module-jakarta-xmlbind-annotations</artifactId>
-        <version>${jackson.version}</version>
       </dependency>
       <dependency>
         <groupId>com.github.java-json-tools</groupId>
@@ -1462,6 +1448,16 @@ Applications based on MyCoRe use a common core, which provides the functionality
         </exclusions>
       </dependency>
       <dependency>
+        <groupId>org.apache.zookeeper</groupId>
+        <artifactId>zookeeper</artifactId>
+        <version>${zookeeper.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.zookeeper</groupId>
+        <artifactId>zookeeper-jute</artifactId>
+        <version>${zookeeper.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.bibsonomy</groupId>
         <artifactId>bibsonomy-bibtex-parser</artifactId>
         <version>3.9.4</version>
@@ -1580,6 +1576,11 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <groupId>org.jsoup</groupId>
         <artifactId>jsoup</artifactId>
         <version>1.22.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mozilla</groupId>
+        <artifactId>rhino</artifactId>
+        <version>1.7.14.1</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
@@ -1883,6 +1884,18 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <version>1.10.11</version>
         <exclusions>
           <exclusion>
+            <groupId>org.apache.sshd</groupId>
+            <artifactId>sshd-core</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.apache.sshd</groupId>
+            <artifactId>sshd-common</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>net.i2p.crypto</groupId>
+            <artifactId>eddsa</artifactId>
+          </exclusion>
+          <exclusion>
             <groupId>com.trilead</groupId>
             <artifactId>trilead-ssh2</artifactId>
           </exclusion>
@@ -1893,6 +1906,10 @@ Applications based on MyCoRe use a common core, which provides the functionality
           <exclusion>
             <groupId>com.jcraft</groupId>
             <artifactId>jsch.agentproxy.svnkit-trilead-ssh2</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.lz4</groupId>
+            <artifactId>lz4-java</artifactId>
           </exclusion>
         </exclusions>
       </dependency>

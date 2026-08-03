@@ -39,7 +39,7 @@ var AccessTable = function() {
       $("#acle2-ruleAllocation").show();
       $("a.tab").attr("data-toggle", "tab");
       $("select.acle2-access-rule").each(function() {
-        $(this).siblings("div.acle2-access-rule").attr("title", $(this).children("option:selected").attr("title"));
+        $(this).siblings(".select2-container").attr("title", $(this).children("option:selected").attr("title"));
       });
     },
     add: function(accessID, accessPool, rule, prepend) {
@@ -91,7 +91,7 @@ var AccessTable = function() {
       entry.find(".acle2-access-pool").html(accessPool + "<i class='fas fa-pencil-alt acle2-icon acle2-button-edit' title='" + geti18n("ACLE.title.edit") + "'></i>");
       entry.find(".acle2-access-pool").attr("title", accessPool);
       entry.find(".acle2-access-pool").removeClass("acle2-show-input");
-      entry.find(".acle2-access-rule").select2("val", rule);
+      entry.find("select.acle2-access-rule").val(rule).trigger("change.select2");
     },
     editMulti: function(data) {
       var successAll = true;
@@ -102,7 +102,7 @@ var AccessTable = function() {
         $.each(data.access, function(i, l) {
           if (l.success == 1) {
             if (id == l.accessID && pool == l.accessPool) {
-              parent.find(".acle2-access-rule").select2("val", l.accessRule);
+              parent.find("select.acle2-access-rule").val(l.accessRule).trigger("change.select2");
               return;
             }
           }

@@ -32,7 +32,7 @@
   <properties>
     <enforcer.skip>true</enforcer.skip>
     <manifest.priority>54</manifest.priority>
-    <orcidModelVersion>3.3.0</orcidModelVersion>
+    <orcidModelVersion>4.0.0</orcidModelVersion>
   </properties>
   <dependencies>
     <dependency>
@@ -72,11 +72,6 @@
       <artifactId>log4j-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.dspace</groupId>
-      <artifactId>orcid-model-jakarta</artifactId>
-      <version>${orcidModelVersion}</version>
-    </dependency>
-    <dependency>
       <groupId>org.glassfish.jersey.core</groupId>
       <artifactId>jersey-server</artifactId>
     </dependency>
@@ -106,8 +101,29 @@
       <artifactId>mycore-user2</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.orcid</groupId>
+      <artifactId>orcid-model</artifactId>
+      <version>${orcidModelVersion}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>io.swagger.core.v3</groupId>
+          <artifactId>swagger-annotations</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>io.swagger.core.v3</groupId>
+          <artifactId>swagger-jaxrs2</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
       <groupId>com.fasterxml.jackson.datatype</groupId>
       <artifactId>jackson-datatype-jsr310</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <!-- required by orcid model -->
+      <groupId>io.swagger.core.v3</groupId>
+      <artifactId>swagger-annotations-jakarta</artifactId>
       <scope>runtime</scope>
     </dependency>
     <dependency>
