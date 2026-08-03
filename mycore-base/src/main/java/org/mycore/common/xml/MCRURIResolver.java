@@ -54,7 +54,7 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPathExpressionException;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
@@ -1271,9 +1271,9 @@ public final class MCRURIResolver implements URIResolver {
             final String baseURI = getParentDirectoryResourceURI(base);
             // set xslt folder
             final String xslFolder;
-            if (StringUtils.startsWith(baseURI, "resource:xsl/")) {
+            if (Strings.CS.startsWith(baseURI, "resource:xsl/")) {
                 xslFolder = "xsl";
-            } else if (StringUtils.startsWith(baseURI, "resource:xslt/")) {
+            } else if (Strings.CS.startsWith(baseURI, "resource:xslt/")) {
                 xslFolder = "xslt";
             } else {
                 xslFolder = MCRConfiguration2.getStringOrThrow(PROPERTY_XSL_FOLDER);

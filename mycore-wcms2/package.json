@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "description": "mycore-wcms2",
   "devDependencies": {
-    "tinymce": "^7.2.1",
+    "tinymce": "^7.9.3",
     "tinymce-i18n": "^24.7.15",
-    "dijit": "1.7.12",
-    "dojo": "1.7.12",
+    "dijit": "1.17.3",
+    "dojo": "1.17.3",
     "grunt": "^1.5.3",
     "grunt-cli": "^1.3.2",
     "grunt-contrib-copy": "^1.0.0"

@@ -31,7 +31,7 @@ var ACLEditor = function() {
         if ($(this).children("option:selected").val() == "new") {
           $('#acle2-lightbox-new-rule').modal('show');
         }
-        $(this).siblings("div.acle2-access-rule").attr("title", $(this).children("option:selected").attr("title"));
+        $(this).siblings(".select2-container").attr("title", $(this).children("option:selected").attr("title"));
       });
 
       $("body").on("change", ".acle2-access-rule-parent > .acle2-access-rule", function() {
@@ -42,10 +42,10 @@ var ACLEditor = function() {
           "mode": "rule",
           "accessIDNew": access.find(".acle2-access-id").text(),
           "accessPoolNew": access.find(".acle2-access-pool").text(),
-          "accessRuleNew": access.find(".acle2-access-rule:not(.select2-container)").val()
+          "accessRuleNew": access.find("select.acle2-access-rule").val()
         };
         editAccess(json);
-        $(this).siblings("div.acle2-access-rule").attr("title", $(this).children("option:selected").attr("title"));
+        $(this).siblings(".select2-container").attr("title", $(this).children("option:selected").attr("title"));
       });
 
       $("body").on("click", "#acle2-button-new-access", function() {
@@ -77,7 +77,7 @@ var ACLEditor = function() {
           $(".acle2-table-access-entry .acle2-access-select:checked").each(function() {
             var access = $(this).parents(".acle2-table-access-entry");
             var p = $("<p></p>");
-            p.html(access.find(".acle2-access-id").text() + " : " + access.find(".acle2-access-pool").text() + " : " + access.find(".acle2-access-rule:not(.select2-container)").val());
+            p.html(access.find(".acle2-access-id").text() + " : " + access.find(".acle2-access-pool").text() + " : " + access.find("select.acle2-access-rule").val());
             $("#acle2-lightbox-multi-delete-list").append(p);
           });
           $('#acle2-lightbox-multi-delete').modal('show');
@@ -128,7 +128,7 @@ var ACLEditor = function() {
       });
 
       $("body").on("click", ".acle2-new-rule-cancel", function(event) {
-        $(".acle2-new-access-rule > select").select2("val", "");
+        $(".acle2-new-access-rule > select").val("").trigger("change.select2");
       });
 
       $("body").on("click", ".tab", function(event) {
@@ -212,7 +212,7 @@ var ACLEditor = function() {
 
             json.accessIDNew = entry.find(".acle2-access-id").hasClass("acle2-show-input") ? entry.find(".acle2-access-id input").val() : entry.find(".acle2-access-id").text();
             json.accessPoolNew = entry.find(".acle2-access-pool").hasClass("acle2-show-input") ? entry.find(".acle2-access-pool input").val() : entry.find(".acle2-access-pool").text();
-            json.accessRuleNew = entry.find(".acle2-access-rule:not(.select2-container)").val();
+            json.accessRuleNew = entry.find("select.acle2-access-rule").val();
             $(".acle2-edit").removeClass("acle2-edit");
             entry.addClass("acle2-edit");
             editAccess(json);
@@ -228,7 +228,7 @@ var ACLEditor = function() {
           $(".acle2-edit").find(".acle2-show-input").removeClass("form-group mcr-invalid");
           var parent = $(this).parent();
           var entry = parent.parent();
-          accessTableInstance.edit(entry, entry.find(".acle2-access-id").attr("title"), entry.find(".acle2-access-pool").attr("title"), entry.find(".acle2-access-rule:not(.select2-container)").val());
+          accessTableInstance.edit(entry, entry.find(".acle2-access-id").attr("title"), entry.find(".acle2-access-pool").attr("title"), entry.find("select.acle2-access-rule").val());
         }
       });
 
@@ -298,7 +298,7 @@ var ACLEditor = function() {
           $(".acle2-table-access-entry .acle2-access-select:checked").each(function() {
             var access = $(this).parents(".acle2-table-access-entry");
             var p = $("<p></p>");
-            p.html(access.find(".acle2-access-id").text() + " : " + access.find(".acle2-access-pool").text() + " : " + access.find(".acle2-access-rule:not(.select2-container)").val());
+            p.html(access.find(".acle2-access-id").text() + " : " + access.find(".acle2-access-pool").text() + " : " + access.find("select.acle2-access-rule").val());
             $("#acle2-lightbox-multi-edit-list").append(p);
           });
           $("#acle2-lightbox-multi-edit-list").show();
@@ -372,7 +372,7 @@ var ACLEditor = function() {
           splitTable();
           $("#acle2-new-access-id").val("");
           $("#acle2-new-access-pool").val("");
-          $(".acle2-new-access-rule > select").select2("val", "");
+          $(".acle2-new-access-rule > select").val("").trigger("change.select2");
           ruleListInstance.updateCanDelete();
           showAlert(geti18n("ACLE.alert.access.add.success", accessID), true);
         },
@@ -480,8 +480,8 @@ var ACLEditor = function() {
           if (ruleID != "") {
             ruleSelectorInstance.add(ruleID, ruleDesc, ruleText);
             ruleSelectorInstance.update();
-            $(".acle2-new-access-rule > select").select2("val", ruleID);
-            $(".acle2-new-access-rule > select").siblings("div.acle2-access-rule").attr("title", $(".acle2-new-access-rule > select").children("option:selected").attr("title"));
+            $(".acle2-new-access-rule > select").val(ruleID).trigger("change.select2");
+            $(".acle2-new-access-rule > select").siblings(".select2-container").attr("title", $(".acle2-new-access-rule > select").children("option:selected").attr("title"));
             ruleListInstance.add(ruleID, ruleDesc, ruleText);
             ruleListInstance.select(ruleID);
             $('#acle2-rule-list').animate({ scrollTop: $('#acle2-rule-list').height() });
@@ -489,12 +489,12 @@ var ACLEditor = function() {
           }
           else {
             showAlert(geti18n("ACLE.alert.rule.add.error"));
-            $(".acle2-new-access-rule > select").select2("val", "");
+            $(".acle2-new-access-rule > select").val("").trigger("change.select2");
           }
         },
         500: function(error) {
           showAlert(geti18n("ACLE.alert.rule.add.error"));
-          $(".acle2-new-access-rule > select").select2("val", "");
+          $(".acle2-new-access-rule > select").val("").trigger("change.select2");
         }
       }
     });
@@ -510,7 +510,7 @@ var ACLEditor = function() {
       statusCode: {
         200: function(data) {
           if ($(".acle2-new-access-rule > select").val() == ruleID) {
-            $(".acle2-new-access-rule > select").select2("val", "");
+            $(".acle2-new-access-rule > select").val("").trigger("change.select2");
           }
           ruleSelectorInstance.remove(ruleID);
           ruleSelectorInstance.update();
