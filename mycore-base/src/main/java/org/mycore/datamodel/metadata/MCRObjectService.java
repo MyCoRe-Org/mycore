@@ -27,6 +27,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -444,7 +445,7 @@ public class MCRObjectService {
      */
     protected final List<MCRMetaLangText> getFlagsAsMCRMetaLangText(String type) {
         return flags.stream()
-            .filter(metaLangText -> StringUtils.equals(type, metaLangText.getType()))
+            .filter(metaLangText -> Strings.CS.equals(type, metaLangText.getType()))
             .collect(Collectors.toCollection(ArrayList::new));
     }
 
@@ -519,7 +520,7 @@ public class MCRObjectService {
      *          otherwise false
      */
     public final boolean isFlagTypeSet(String type) {
-        return flags.stream().anyMatch(flag -> StringUtils.equals(type, flag.getType()));
+        return flags.stream().anyMatch(flag -> Strings.CS.equals(type, flag.getType()));
     }
 
     /**
@@ -546,7 +547,7 @@ public class MCRObjectService {
      *            a type as string
      */
     public final void removeFlags(String type) {
-        flags.removeIf(f -> StringUtils.equals(type, f.getType()));
+        flags.removeIf(f -> Strings.CS.equals(type, f.getType()));
     }
 
     /**
@@ -1276,7 +1277,7 @@ public class MCRObjectService {
      */
     public final void removeClassifications(String type) {
         String lType = StringUtils.trim(type);
-        classifications.removeIf(c -> StringUtils.equals(lType, c.getType()));
+        classifications.removeIf(c -> Strings.CS.equals(lType, c.getType()));
     }
 
     @Override

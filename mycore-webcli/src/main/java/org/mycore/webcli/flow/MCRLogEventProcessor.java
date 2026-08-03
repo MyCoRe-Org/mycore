@@ -45,10 +45,11 @@ public class MCRLogEventProcessor extends SubmissionPublisher<JsonObject>
             logEvent.addProperty("logLevel", event.getLevel().toString());
             logEvent.addProperty("message", event.getMessage().getFormattedMessage());
             String exception = null;
-            if (event.getThrownProxy() != null) {
+            Throwable throwable = event.getThrown();
+            if (throwable != null) {
                 StringWriter sw = new StringWriter();
                 PrintWriter pw = new PrintWriter(sw);
-                event.getThrownProxy().getThrowable().printStackTrace(pw);
+                throwable.printStackTrace(pw);
                 pw.close();
                 exception = sw.toString();
             }
