@@ -17,23 +17,25 @@
  */
 package org.mycore.pi.condition;
 
+import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.pi.MCRPIManager;
+import org.mycore.pi.MCRPIServiceManager;
 
 /**
  * PI Predicate, that checks if another PersistentIdentifier was registered within the PI component
  * before the current PI will be created or registered.
  * <p>
- * Use the properties *.Service and *.Type 
- * to specify the PI service and type of the PI which should be checked. 
+ * Use the property *.Service to specify the PI service which should be checked.
  * <p>
- * sample configuration:
+ * Example configuration:
+ * <pre><code>
  * MCR.PI.Service.RosDokURN.CreationPredicate.Class=org.mycore.pi.condition.MCRPIAndPredicate
  * MCR.PI.Service.RosDokURN.CreationPredicate.1.Class=org.mycore.pi.condition.MCRPIOtherPIRegisteredPredicate
  * MCR.PI.Service.RosDokURN.CreationPredicate.1.Service=MCRLocalID
- * MCR.PI.Service.RosDokURN.CreationPredicate.1.Type=local_id
  * ...
+ * </code></pre>
  * 
  * @author Robert Stephan
  *
@@ -41,11 +43,15 @@ import org.mycore.pi.MCRPIManager;
 public class MCRPIOtherPIRegisteredPredicate extends MCRPIPredicateBase
     implements MCRPICreationPredicate, MCRPIObjectRegistrationPredicate {
 
-    @MCRProperty(name = "Type")
-    public String type;
+    private String type;
 
     @MCRProperty(name = "Service")
     public String service;
+
+    @MCRPostConstruction
+    public void init() {
+        type = MCRPIServiceManager.getInstance().getRegistrationService(service).getType();
+    }
 
     @Override
     public boolean test(MCRBase mcrBase) {
