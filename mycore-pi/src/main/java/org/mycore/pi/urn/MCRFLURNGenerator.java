@@ -23,7 +23,7 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRBase;
 
 /**
  * Builds a new, unique NISS based on the current date and time expressed
@@ -37,7 +37,7 @@ public class MCRFLURNGenerator extends MCRDNBURNGenerator {
     private String last;
 
     @Override
-    protected synchronized String buildNISS(MCRObjectID mcrID, String additional) {
+    protected synchronized String buildNISS(MCRBase mcrObj, String additional) {
         Calendar now = new GregorianCalendar(TimeZone.getTimeZone("GMT+01:00"), Locale.ENGLISH);
         int yyy = 2268 - now.get(Calendar.YEAR);
         int ddd = 500 - now.get(Calendar.DAY_OF_YEAR);
@@ -58,7 +58,7 @@ public class MCRFLURNGenerator extends MCRDNBURNGenerator {
             } catch (InterruptedException ignored) {
             }
 
-            return buildNISS(mcrID, additional);
+            return buildNISS(mcrObj, additional);
         } else {
             last = niss;
             return niss;
