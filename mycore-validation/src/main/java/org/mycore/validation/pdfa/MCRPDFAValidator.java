@@ -29,6 +29,7 @@ import org.verapdf.gf.foundry.VeraGreenfieldFoundryProvider;
 import org.verapdf.pdfa.Foundries;
 import org.verapdf.pdfa.PDFAParser;
 import org.verapdf.pdfa.PDFAValidator;
+import org.verapdf.pdfa.flavours.PDFAFlavour;
 import org.verapdf.pdfa.results.ValidationResult;
 
 /**
@@ -64,7 +65,8 @@ public class MCRPDFAValidator {
      */
     public ValidationResult validate(InputStream inputStream) throws MCRPDFAValidationException, IOException {
         initialise();
-        try (PDFAParser parser = Foundries.defaultInstance().createParser(inputStream);
+        try (PDFAParser parser = Foundries.defaultInstance().createParser(inputStream, PDFAFlavour.NO_FLAVOUR,
+            Foundries.defaultInstance().defaultFlavour());
             PDFAValidator validator = Foundries.defaultInstance().createValidator(parser.getFlavour(), false)) {
             return validator.validate(parser);
         } catch (ValidationException | ModelParsingException | EncryptedPdfException e) {
