@@ -19,10 +19,14 @@
 package org.mycore.pi;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.function.Predicate;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRException;
 import org.mycore.common.events.MCREvent;
@@ -31,6 +35,8 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 public class MCRPICreationEventHandler extends MCREventHandlerBase {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
@@ -43,26 +49,60 @@ public class MCRPICreationEventHandler extends MCREventHandlerBase {
     }
 
     private void processPIServices(MCRObject obj) {
-        List<MCRPIRegistrationInfo> registered = MCRPIManager.getInstance().getRegistered(obj);
 
-        final List<String> services = registered.stream().map(MCRPIRegistrationInfo::getService)
-            .collect(Collectors.toList());
+        // list of service IDs for PI service for which an PI is already registered
+        Set<String> servicesWithRegisteredIdentifier = MCRPIManager
+            .getInstance()
+            .getRegistered(obj)
+            .stream()
+            .map(MCRPIRegistrationInfo::getService)
+            .collect(Collectors.toSet());
 
-        List<MCRPIService<MCRPersistentIdentifier>> listOfServicesWithCreatablePIs = MCRPIServiceManager
-            .getInstance().getAutoCreationList().stream()
-            .filter(Predicate.not(s -> services.contains(s.getServiceID())))
-            .filter(Predicate.not(s -> MCRPIService.hasFlag(obj, "", s)))
-            .filter(s -> s.getCreationPredicate().test(obj))
-            .collect(Collectors.toList());
+        // map of auto-creating PI services for which no PI is registered yet
+        Map<String, MCRPIService<MCRPersistentIdentifier>> autoCreatingServices = MCRPIServiceManager
+            .getInstance()
+            .getAutoCreationList()
+            .stream()
+            .filter(service -> !servicesWithRegisteredIdentifier.contains(service.getServiceID()))
+            .filter(service -> !MCRPIService.hasFlag(obj, "", service))
+            .collect(Collectors.toMap(MCRPIService::getServiceID, Function.identity()));
 
-        listOfServicesWithCreatablePIs
-            .forEach((serviceToRegister) -> {
+        boolean mayRegisterAdditionalIdentifiers = true;
+        while (mayRegisterAdditionalIdentifiers && !autoCreatingServices.isEmpty()) {
+
+            // list of auto-creating PI services that will register a PI in this iteration
+            List<MCRPIService<MCRPersistentIdentifier>> matchingAutoCreatingServices = autoCreatingServices
+                .values()
+                .stream()
+                .filter(service -> service.getCreationPredicate().test(obj))
+                .toList();
+
+            // additional PIs will be registered in this iteration, so the conditions will change
+            // and additional predicates may evaluate to true in the next iteration
+            mayRegisterAdditionalIdentifiers = !matchingAutoCreatingServices.isEmpty();
+
+            for (MCRPIService<MCRPersistentIdentifier> service : matchingAutoCreatingServices) {
                 try {
-                    serviceToRegister.register(obj, "", false);
+
+                    // register new PI, succeeds or throws exception
+                    MCRPersistentIdentifier identifier = service.register(obj, "", false);
+
+                    if (LOGGER.isInfoEnabled()) {
+                        LOGGER.info("Created new identifier {} for object  {} using auto-creating PI service {}",
+                            identifier, obj.getId(), service.getServiceID());
+                    }
+
+                    // each auto-creating PI service ony gets one shot at registering a PI
+                    autoCreatingServices.remove(service.getServiceID());
+
                 } catch (MCRAccessException | MCRPersistentIdentifierException | ExecutionException
                     | InterruptedException e) {
                     throw new MCRException("Error while register pi for object " + obj.getId().toString(), e);
                 }
-            });
+            }
+
+        }
+
     }
+
 }

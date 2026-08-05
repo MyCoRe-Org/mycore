@@ -30,8 +30,9 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.backend.MCRPI;
+import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.pi.urn.MCRDNBURN;
-import org.mycore.pi.urn.MCRUUIDURNGenerator;
+import org.mycore.pi.urn.MCRUUIDDNBURNGenerator;
 import org.mycore.pi.urn.rest.MCRDNBURNRestClient;
 import org.mycore.pi.urn.rest.MCRURNJsonBundle;
 
@@ -44,9 +45,10 @@ public class MCRPIUtils {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public static MCRPI generateMCRPI(String fileName, String serviceID) {
+    public static MCRPI generateMCRPI(String fileName, String serviceID, String namespace)
+        throws MCRPersistentIdentifierException {
         MCRObjectID mycoreID = getNextFreeID();
-        return new MCRPI(generateURNFor(mycoreID).asString(), MCRDNBURN.TYPE,
+        return new MCRPI(generateURNFor(mycoreID, namespace).asString(), MCRDNBURN.TYPE,
             mycoreID.toString(), fileName, serviceID, null);
     }
 
@@ -54,13 +56,12 @@ public class MCRPIUtils {
         return MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId("MyCoRe_test");
     }
 
-    private static MCRDNBURN generateURNFor(MCRObjectID mycoreID) {
-        String testGenerator = "testGenerator";
-        MCRUUIDURNGenerator mcruuidurnGenerator = new MCRUUIDURNGenerator();
-        mcruuidurnGenerator.init(MCRPIService.GENERATOR_CONFIG_PREFIX + testGenerator);
+    private static MCRDNBURN generateURNFor(MCRObjectID mycoreID, String namespace)
+        throws MCRPersistentIdentifierException {
+        MCRUUIDDNBURNGenerator generator = new MCRUUIDDNBURNGenerator(namespace, "");
         MCRObject mcrObject1 = new MCRObject();
         mcrObject1.setId(mycoreID);
-        return mcruuidurnGenerator.generate(mcrObject1, "");
+        return generator.generate(mcrObject1, "");
     }
 
     public static String randomFilename() {

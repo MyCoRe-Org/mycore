@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.pi.doi;
+package org.mycore.pi.urn;
 
 import static org.mycore.pi.util.MCRPIGeneratorUtils.formatCount;
 import static org.mycore.pi.util.MCRPIGeneratorUtils.getCountPattern;
@@ -40,29 +40,32 @@ import org.mycore.pi.MCRPIGenerator;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 /**
- * {@link MCRCreateDateDOIGenerator} is a {@link MCRPIGenerator} for {@link MCRDigitalObjectIdentifier} identifiers
+ * {@link MCRCreateDateDNBURNGenerator} is a {@link MCRPIGenerator} for {@link MCRDNBURN} identifiers
  * that generates identifiers using a given prefix and the current date and a per-date counter for the suffix.
  * <p>
  * The following configuration options are available:
  * <ul>
- * <li> The property suffix {@link MCRCreateDateDOIGenerator#DATE_FORMAT_KEY} can be used to
- * specify the date format to be used (optional, defaults to {@link MCRCreateDateDOIGenerator#DEFAULT_DATE_FORMAT}).
- * <li> The property suffix {@link MCRCreateDateDOIGenerator#PREFIX_KEY} can be used to
- * specify the prefix.
- * <li> The property suffix {@link MCRCreateDateDOIGenerator#COUNT_PRECISION_KEY} can be used to
+ * <li> The property suffix {@link MCRCreateDateDNBURNGenerator#DATE_FORMAT_KEY} can be used to
+ * specify the date format to be used (optional, defaults to {@link MCRCreateDateDNBURNGenerator#DEFAULT_DATE_FORMAT}).
+ * <li> The property suffix {@link MCRCreateDateDNBURNGenerator#NAMESPACE_KEY} can be used to
+ * specify the namespace.
+ * <li> The property suffix {@link MCRCreateDateDNBURNGenerator#DELIMITER_KEY} can be used to
+ * specify a delimiter to be placed before and after the NISS (optional, defaults to the empty string).
+ * <li> The property suffix {@link MCRCreateDateDNBURNGenerator#COUNT_PRECISION_KEY} can be used to
  * specify number of digits to be used for the count (optional, defaults to <code>-1</code>,
  * which uses the natural number of digits).
  * </ul>
  * Example:
  * <pre><code>
- * [...].Class=org.mycore.pi.doi.MCRCreateDateDOIGenerator
+ * [...].Class=org.mycore.pi.urn.MCRCreateDateDNBURNGenerator
  * [...].DateFormat=yyyy-MM-dd
- * [...].Prefix=10.1234
+ * [...].Namespace=urn:nbn:de:gbv:xyz
+ * [...].Delimiter=-
  * [...].CountPrecision=6
  * </code></pre>
  */
-@MCRConfigurationProxy(proxyClass = MCRCreateDateDOIGenerator.Factory.class)
-public class MCRCreateDateDOIGenerator extends MCRDOIGeneratorBase {
+@MCRConfigurationProxy(proxyClass = MCRCreateDateDNBURNGenerator.Factory.class)
+public class MCRCreateDateDNBURNGenerator extends MCRDNBURNGeneratorBase {
 
     public static final String DEFAULT_DATE_FORMAT = "yyyyMMdd-HHmmss";
 
@@ -70,7 +73,9 @@ public class MCRCreateDateDOIGenerator extends MCRDOIGeneratorBase {
 
     public static final String DATE_FORMAT_KEY = "DateFormat";
 
-    public static final String PREFIX_KEY = "Prefix";
+    public static final String NAMESPACE_KEY = "Namespace";
+
+    public static final String DELIMITER_KEY = "Delimiter";
 
     public static final String COUNT_PRECISION_KEY = "CountPrecision";
 
@@ -78,26 +83,24 @@ public class MCRCreateDateDOIGenerator extends MCRDOIGeneratorBase {
 
     private final String dateFormat;
 
-    private final String prefix;
-
     private final int countPrecision;
 
     private final String countPattern;
 
-    public MCRCreateDateDOIGenerator(MCRDOIParser parser, String dateFormat, String prefix,
-        int countPrecision) {
-        super(parser);
+    public MCRCreateDateDNBURNGenerator(String dateFormat, String namespace,
+        String delimiter, int countPrecision) {
+        super(namespace, delimiter);
         this.dateFormat = Objects.requireNonNull(dateFormat, "Date format must not be null");
-        this.prefix = Objects.requireNonNull(prefix, "Prefix must not be null");
         this.countPrecision = countPrecision;
         this.countPattern = getCountPattern(countPrecision);
     }
 
     @Override
-    protected String buildDOI(MCRBase base, String additional) throws MCRPersistentIdentifierException {
+    protected String buildNISS(MCRBase base, String additional) throws MCRPersistentIdentifierException {
 
-        String prefixWithDate = prefix + "/" + formatDate(getCreateDate(base)) + "-";
-        int count = getCount(Pattern.quote(prefixWithDate) + countPattern);
+        String prefixWithDate = formatDate(getCreateDate(base)) + "-";
+        int count = getCount(Pattern.quote(namespace() + delimiter() + prefixWithDate)
+            + countPattern + Pattern.quote(delimiter()) + "[0-9]");
 
         return prefixWithDate + formatCount(count, countPrecision);
 
@@ -114,24 +117,27 @@ public class MCRCreateDateDOIGenerator extends MCRDOIGeneratorBase {
 
     private synchronized int getCount(final String pattern) {
         return PATTERN_COUNT_MAP
-            .computeIfAbsent(pattern, p -> readCountFromDatabase(MCRDigitalObjectIdentifier.TYPE, p))
+            .computeIfAbsent(pattern, p -> readCountFromDatabase(MCRDNBURN.TYPE, p))
             .getAndIncrement();
     }
 
-    public static class Factory implements Supplier<MCRCreateDateDOIGenerator> {
+    public static class Factory implements Supplier<MCRCreateDateDNBURNGenerator> {
 
         @MCRProperty(name = DATE_FORMAT_KEY, required = false)
         public String dateFormat;
 
-        @MCRProperty(name = PREFIX_KEY, defaultName = "MCR.DOI.Prefix")
-        public String prefix;
+        @MCRProperty(name = NAMESPACE_KEY)
+        public String namespace;
+
+        @MCRProperty(name = DELIMITER_KEY, required = false)
+        public String delimiter = "";
 
         @MCRProperty(name = COUNT_PRECISION_KEY, required = false)
         public String countPrecision = "-1";
 
         @Override
-        public MCRCreateDateDOIGenerator get() {
-            return new MCRCreateDateDOIGenerator(new MCRDOIParser(), getDateFormat(), prefix,
+        public MCRCreateDateDNBURNGenerator get() {
+            return new MCRCreateDateDNBURNGenerator(getDateFormat(), namespace, delimiter,
                 Integer.parseInt(countPrecision));
         }
 
