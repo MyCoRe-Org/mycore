@@ -20,60 +20,77 @@ package org.mycore.pi.doi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mycore.pi.doi.MCRDigitalObjectIdentifier.TEST_DOI_PREFIX;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.jupiter.api.BeforeEach;
+import java.util.Map;
+
 import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.test.MyCoReTest;
 
-/**
- * @author Thomas Scheffler (yagee)
- */
 @MyCoReTest
 @MCRTestConfiguration(properties = {
     @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true"),
-    @MCRTestProperty(key = "MCR.PI.Generator.MapObjectIDDOI.Class", classNameOf = MCRMapObjectIDDOIGenerator.class),
-    @MCRTestProperty(key = "MCR.PI.Generator.MapObjectIDDOI.Prefix.junit_test", string = TEST_DOI_PREFIX),
-    @MCRTestProperty(key = "MCR.PI.Generator.MapObjectIDDOI.Prefix.my_test", string = TEST_DOI_PREFIX + "/my.")
 })
 public class MCRMapObjectIDDOIGeneratorTest {
 
-    MCRMapObjectIDDOIGenerator doiGenerator;
+    public static final String PREFIX = "10.1234";
 
-    @BeforeEach
-    public void setUp() {
-        doiGenerator = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRMapObjectIDDOIGenerator.class, "MCR.PI.Generator.MapObjectIDDOI");
+    @Test
+    public void generate() throws MCRPersistentIdentifierException {
+
+        MCRObject object = new MCRObject();
+        object.setSchema("http://www.w3.org/2001/XMLSchema");
+        object.setId(MCRObjectID.getInstance("my_test_00000123"));
+
+        Map<String, String> prefixMap = Map.of("my_test", PREFIX);
+        MCRMapObjectIDDOIGenerator generator = new MCRMapObjectIDDOIGenerator(new MCRDOIParser(), prefixMap);
+        String doi = generator.generate(object, "").asString();
+
+        assertTrue(doi.startsWith(PREFIX));
+        assertEquals('/', doi.charAt(PREFIX.length()));
+
+        String value = doi.substring(PREFIX.length() + 1);
+
+        assertEquals("123", value);
+
     }
 
     @Test
-    public void generate() throws Exception {
-        MCRObjectID testID1 = MCRObjectID.getInstance("junit_test_00004711");
-        MCRObject mcrObject1 = new MCRObject();
-        mcrObject1.setId(testID1);
-        MCRObjectID testID2 = MCRObjectID.getInstance("my_test_00000815");
-        MCRObject mcrObject2 = new MCRObject();
-        mcrObject2.setId(testID2);
-        assertEquals(TEST_DOI_PREFIX + "/4711", doiGenerator.generate(mcrObject1, null).asString());
-        assertEquals(TEST_DOI_PREFIX + "/my.815", doiGenerator.generate(mcrObject2, null).asString());
+    public void generateWithInfix() throws MCRPersistentIdentifierException {
+
+        MCRObject object = new MCRObject();
+        object.setSchema("http://www.w3.org/2001/XMLSchema");
+        object.setId(MCRObjectID.getInstance("my_test_00000123"));
+
+        Map<String, String> prefixMap = Map.of("my_test", PREFIX + "/xyz-");
+        MCRMapObjectIDDOIGenerator generator = new MCRMapObjectIDDOIGenerator(new MCRDOIParser(), prefixMap);
+        String doi = generator.generate(object, "").asString();
+
+        assertTrue(doi.startsWith(PREFIX));
+        assertEquals('/', doi.charAt(PREFIX.length()));
+
+        String value = doi.substring(PREFIX.length() + 1);
+
+        assertEquals("xyz-123", value);
+
     }
 
     @Test
-    public void missingMappingTest() {
-        assertThrows(
-            MCRPersistentIdentifierException.class,
-            () -> {
-                MCRObjectID testID = MCRObjectID.getInstance("brandNew_test_00000001");
-                MCRObject mcrObject = new MCRObject();
-                mcrObject.setId(testID);
-                doiGenerator.generate(mcrObject, null);
-            });
+    public void missingMapping() {
+
+        MCRObject object = new MCRObject();
+        object.setSchema("http://www.w3.org/2001/XMLSchema");
+        object.setId(MCRObjectID.getInstance("my_test_00000123"));
+
+        Map<String, String> prefixMap = Map.of();
+        MCRMapObjectIDDOIGenerator generator = new MCRMapObjectIDDOIGenerator(new MCRDOIParser(), prefixMap);
+
+        assertThrows(MCRPersistentIdentifierException.class, () -> generator.generate(object, ""));
     }
 
 }
