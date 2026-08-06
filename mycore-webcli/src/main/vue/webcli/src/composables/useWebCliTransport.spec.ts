@@ -82,9 +82,15 @@ describe('useWebCliTransport', () => {
 
   it('keeps only the configured number of log entries in memory', async () => {
     const transport = new MockTransport();
+    let renderFrame: FrameRequestCallback | undefined;
+    const requestAnimationFrameFn = vi.fn((callback: FrameRequestCallback) => {
+      renderFrame = callback;
+      return 7;
+    });
     wrapper = mount(createHarness({
       runtime: {
         createTransport: () => transport,
+        requestAnimationFrameFn,
       },
     }));
 
@@ -117,7 +123,19 @@ describe('useWebCliTransport', () => {
     });
     await nextTick();
 
-    expect(((wrapper.vm as unknown) as { logs: { message: string }[] }).logs.map(entry => entry.message)).toEqual(['second', 'third']);
+    const vm = (wrapper.vm as unknown) as {
+      lastLogAnnouncement: string;
+      logs: { message: string }[];
+    };
+    expect(requestAnimationFrameFn).toHaveBeenCalledTimes(1);
+    expect(vm.logs).toEqual([]);
+    expect(vm.lastLogAnnouncement).toBe('');
+
+    renderFrame?.(0);
+    await nextTick();
+
+    expect(vm.logs.map(entry => entry.message)).toEqual(['second', 'third']);
+    expect(vm.lastLogAnnouncement).toBe('INFO: third');
   });
 
   it('updates queue, current command, and permission state from transport events', async () => {

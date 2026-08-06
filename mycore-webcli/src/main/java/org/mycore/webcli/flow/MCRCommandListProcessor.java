@@ -18,8 +18,8 @@
 
 package org.mycore.webcli.flow;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.SequencedCollection;
 import java.util.concurrent.Flow;
 import java.util.concurrent.SubmissionPublisher;
 
@@ -28,7 +28,7 @@ import org.mycore.common.MCRJSONUtils;
 import com.google.gson.JsonObject;
 
 public class MCRCommandListProcessor extends SubmissionPublisher<JsonObject>
-    implements Flow.Processor<List<String>, JsonObject> {
+    implements Flow.Processor<SequencedCollection<String>, JsonObject> {
     private Flow.Subscription upstreamSubscription;
 
     @Override
@@ -38,17 +38,16 @@ public class MCRCommandListProcessor extends SubmissionPublisher<JsonObject>
     }
 
     @Override
-    public void onNext(List<String> item) {
+    public void onNext(SequencedCollection<String> item) {
         try {
-            List<String> copy;
+            MCRCommandQueueUpdate update;
             synchronized (item) {
-                copy = new ArrayList<>(item);
+                update = new MCRCommandQueueUpdate(item.stream().limit(100).toList(), item.size());
             }
             JsonObject jObject = new JsonObject();
             jObject.addProperty("type", "commandQueue");
-            jObject.add("return", MCRJSONUtils
-                .getJsonArray(copy.subList(0, Math.min(copy.size(), 100))));
-            jObject.addProperty("size", copy.size());
+            jObject.add("return", MCRJSONUtils.getJsonArray(update.commands()));
+            jObject.addProperty("size", update.size());
             submit(jObject);
         } finally {
             upstreamSubscription.request(1);
@@ -69,5 +68,8 @@ public class MCRCommandListProcessor extends SubmissionPublisher<JsonObject>
     public void close() {
         upstreamSubscription.cancel();
         super.close();
+    }
+
+    record MCRCommandQueueUpdate(List<String> commands, int size) {
     }
 }

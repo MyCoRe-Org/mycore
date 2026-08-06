@@ -71,10 +71,16 @@ const visibleQueue = computed(() => {
 });
 const hiddenQueueCount = computed(() => Math.max(queueLength.value - visibleQueue.value.length, 0));
 const visibleLogLines = computed(() => {
-  return logs.value.slice(-settings.value.historySize).flatMap(entry => {
-    const lines = [`${entry.logLevel}: ${entry.message}`];
+  return logs.value.flatMap(entry => {
+    const lines = [{
+      key: `${entry.renderId}:message`,
+      text: `${entry.logLevel}: ${entry.message}`,
+    }];
     if (entry.exception) {
-      lines.push(entry.exception);
+      lines.push({
+        key: `${entry.renderId}:exception`,
+        text: entry.exception,
+      });
     }
     return lines;
   });
@@ -293,7 +299,7 @@ watch(queueLength, value => {
         aria-labelledby="webcli-log-tab"
       >
         <div ref="logElement" class="col-12 web-cli-log" role="log" aria-live="polite" aria-relevant="additions text">
-          <pre v-for="(line, index) in visibleLogLines" :key="`${index}-${line}`">{{ line }}</pre>
+          <pre v-for="line in visibleLogLines" :key="line.key">{{ line.text }}</pre>
         </div>
       </div>
       <div
