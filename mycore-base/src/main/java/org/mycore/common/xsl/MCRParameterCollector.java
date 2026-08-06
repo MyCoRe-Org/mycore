@@ -38,6 +38,7 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -444,7 +445,7 @@ public class MCRParameterCollector {
 
             PROPERTIES_CHANGE_LISTENER_ID.set(uuid);
 
-            MCRConfiguration2.getPropertiesMap().forEach((key, value) -> {
+            MCRConfigurationBase.getAllPropertiesMap().forEach((key, value) -> {
                 safeProperties.put(xmlSafe(key), value);
             });
 

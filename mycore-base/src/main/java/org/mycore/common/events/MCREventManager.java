@@ -29,6 +29,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationBase;
 
 /**
  * Acts as a multiplexer to forward events that are created to all registered
@@ -60,7 +61,7 @@ public final class MCREventManager {
 
         // collect all properties like 'MCR.EventHandler.{type}.{number}.Class,
         // but without the leading 'MCR.EventHandler.'
-        Map<String, String> propertyKeySuffixes = MCRConfiguration2.getSubPropertiesMap(CONFIG_PREFIX)
+        Map<String, String> propertyKeySuffixes = MCRConfigurationBase.getSubpropertiesMap(CONFIG_PREFIX)
                 .entrySet()
                 .stream()
                 .filter(property -> !property.getValue().isBlank())

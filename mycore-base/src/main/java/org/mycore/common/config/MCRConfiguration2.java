@@ -18,13 +18,13 @@
 
 package org.mycore.common.config;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -107,10 +107,43 @@ public class MCRConfiguration2 {
         .softValues()
         .build();
 
+    private static final AtomicReference<Map<String, String>> PROPERTIES = new AtomicReference<>(null);
+
     static Map<SingletonKey, Object> instanceHolder = new MCRConcurrentHashMap<>();
 
+    /**
+     * @deprecated Use {@link MCRConfigurationBase#getAllPropertiesMap()} as one-to-one-replacement
+     * or {@link #getAllPropertiesMap()} as an alternative version that is better aligned with
+     * {@link MCRConfiguration2} (because it excludes properties with blank values).
+     */
+    @Deprecated(forRemoval = true)
     public static Map<String, String> getPropertiesMap() {
-        return Collections.unmodifiableMap(MCRConfigurationBase.getResolvedProperties().getAsMap());
+        return MCRConfigurationBase.getAllPropertiesMap();
+    }
+
+    /**
+     * Returns all configuration properties, excluding properties with blank values, i.e.
+     * only properties that are recognized by, for example, {@link #getString(String)}.
+     */
+    public static Map<String, String> getAllPropertiesMap() {
+        return PROPERTIES.updateAndGet(existingValue -> {
+            if (existingValue != null) {
+                return existingValue;
+            }
+            return MCRConfigurationBase.getAllPropertiesMap().entrySet().stream()
+                .filter(entry -> !entry.getValue().isBlank())
+                .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, entry -> entry.getValue().trim()));
+        });
+    }
+
+    /**
+     * @deprecated Use {@link MCRConfigurationBase#getSubpropertiesMap(String)} as one-to-one-replacement
+     * or {@link #getSubpropertiesMap(String)} as an alternative version that is better aligned with
+     * {@link MCRConfiguration2} (because it excludes properties with blank values).
+     */
+    @Deprecated(forRemoval = true)
+    public static Map<String, String> getSubPropertiesMap(String propertyPrefix) {
+        return MCRConfigurationBase.getSubpropertiesMap(propertyPrefix);
     }
 
     /**
@@ -134,8 +167,8 @@ public class MCRConfiguration2 {
      * @param propertyPrefix prefix of the property name
      * @return a map of the properties as stated above
      */
-    public static Map<String, String> getSubPropertiesMap(String propertyPrefix) {
-        return getPropertiesMap()
+    public static Map<String, String> getSubpropertiesMap(String propertyPrefix) {
+        return getAllPropertiesMap()
             .entrySet()
             .stream()
             .filter(e -> e.getKey().startsWith(propertyPrefix))
@@ -326,7 +359,7 @@ public class MCRConfiguration2 {
      * @return a list of properties which represent a configurable class
      */
     public static Stream<String> getInstantiatablePropertyKeys(String prefix) {
-        return getSubPropertiesMap(prefix).entrySet()
+        return getSubpropertiesMap(prefix).entrySet()
             .stream()
             .filter(entry -> {
                 String s = entry.getKey();
@@ -336,8 +369,6 @@ public class MCRConfiguration2 {
                 String key = s.substring(0, s.length() - CLASS_SUFFIX.length());
                 return !key.contains(".");
             })
-            .filter(es -> es.getValue() != null)
-            .filter(es -> !es.getValue().isBlank())
             .map(Map.Entry::getKey)
             .map(key -> key.substring(0, key.length() - CLASS_SUFFIX.length()))
             .map(prefix::concat);
@@ -494,6 +525,7 @@ public class MCRConfiguration2 {
     }
 
     static void clearCaches() {
+        PROPERTIES.set(null);
         CONFIGURATIONS.invalidateAll();
     }
 

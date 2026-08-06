@@ -118,7 +118,7 @@ public class MCRStartupHandler {
 
     private static SortedSet<PropertyClassStatus> checkClassProperties() {
         Pattern classPattern = Pattern.compile(MCRConfiguration2.getString("MCR.Startup.CheckClassRegEx").orElse("^$"));
-        return MCRConfiguration2.getPropertiesMap()
+        return MCRConfiguration2.getAllPropertiesMap()
             .entrySet()
             .stream()
             .filter(entry -> isClassProperty(entry.getKey(), entry.getValue(), classPattern))
