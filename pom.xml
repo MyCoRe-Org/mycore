@@ -115,6 +115,22 @@ Applications based on MyCoRe use a common core, which provides the functionality
           <version>0.10</version>
         </plugin>
         <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <configuration>
+            <archive>
+              <manifest>
+                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+              </manifest>
+              <manifestEntries>
+                <MCR-Artifact-Id>${project.artifactId}</MCR-Artifact-Id>
+                <Priority>${manifest.priority}</Priority>
+              </manifestEntries>
+            </archive>
+          </configuration>
+        </plugin>
+        <plugin>
           <groupId>com.github.eirslett</groupId>
           <artifactId>frontend-maven-plugin</artifactId>
           <version>${frontend.maven.plugin.version}</version>
@@ -254,22 +270,6 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <build>
         <pluginManagement>
           <plugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-jar-plugin</artifactId>
-              <configuration>
-                <archive>
-                  <manifest>
-                    <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                    <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                  </manifest>
-                  <manifestEntries>
-                    <MCR-Artifact-Id>${project.artifactId}</MCR-Artifact-Id>
-                    <Priority>${manifest.priority}</Priority>
-                  </manifestEntries>
-                </archive>
-              </configuration>
-            </plugin>
             <plugin>
               <artifactId>maven-javadoc-plugin</artifactId>
               <configuration>
@@ -1634,6 +1634,11 @@ Applications based on MyCoRe use a common core, which provides the functionality
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
+        <artifactId>mycore-dedup-gui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore</groupId>
         <artifactId>mycore-fo</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -2639,6 +2644,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <module>mycore-classeditor</module>
     <module>mycore-csl</module>
     <module>mycore-dedup</module>
+    <module>mycore-dedup-gui</module>
     <module>mycore-fo</module>
     <module>mycore-indexing</module>
     <module>mycore-ifs</module>

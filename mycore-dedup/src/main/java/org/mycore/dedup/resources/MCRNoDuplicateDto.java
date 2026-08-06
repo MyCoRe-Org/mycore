@@ -21,19 +21,23 @@ package org.mycore.dedup.resources;
 import org.mycore.dedup.backend.MCRDeDupNoDuplicate;
 
 /**
- * JSON representation of a {@link MCRDeDupNoDuplicate} marking, with the creation timestamp rendered as
- * an ISO-8601 string.
+ * JSON representation of a {@link MCRDeDupNoDuplicate} marking, enriched with the display titles of both
+ * objects and with the creation timestamp rendered as an ISO-8601 string.
  *
  * @param id        the database id of the marking
  * @param objectId1 the lexicographically smaller object id of the pair
+ * @param title1    the display title of {@code objectId1}, or {@code null} if unknown
  * @param objectId2 the lexicographically larger object id of the pair
+ * @param title2    the display title of {@code objectId2}, or {@code null} if unknown
  * @param creator   the id of the user that created the marking
  * @param created   the creation timestamp as ISO-8601 string
  */
-public record MCRNoDuplicateDto(long id, String objectId1, String objectId2, String creator, String created) {
+public record MCRNoDuplicateDto(long id, String objectId1, String title1, String objectId2, String title2,
+    String creator, String created) {
 
-    public static MCRNoDuplicateDto of(MCRDeDupNoDuplicate noDuplicate) {
-        return new MCRNoDuplicateDto(noDuplicate.getId(), noDuplicate.getObjectId1(), noDuplicate.getObjectId2(),
-            noDuplicate.getCreator(), noDuplicate.getCreated() == null ? null : noDuplicate.getCreated().toString());
+    public static MCRNoDuplicateDto of(MCRDeDupNoDuplicate noDuplicate, String title1, String title2) {
+        return new MCRNoDuplicateDto(noDuplicate.getId(), noDuplicate.getObjectId1(), title1,
+            noDuplicate.getObjectId2(), title2, noDuplicate.getCreator(),
+            noDuplicate.getCreated() == null ? null : noDuplicate.getCreated().toString());
     }
 }

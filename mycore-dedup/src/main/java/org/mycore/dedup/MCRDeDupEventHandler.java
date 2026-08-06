@@ -18,6 +18,7 @@
 
 package org.mycore.dedup;
 
+import java.util.Optional;
 import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
@@ -61,11 +62,25 @@ public class MCRDeDupEventHandler extends MCREventHandlerBase {
         MCRDeDupKeyManager keyManager = MCRDeDupKeyManager.obtainInstance();
         keyManager.removeKeys(object.getId());
         keyManager.removeNoDuplicates(object.getId());
+        keyManager.removeTitle(object.getId());
     }
 
     private void updateKeys(MCRObject object) {
         Set<MCRDeDupCriterion> criteria = MCRDeDupCriteriaProvider.obtainInstance().getCriteria(object);
         LOGGER.info("Updating {} deduplication key(s) for object {}", criteria::size, object::getId);
-        MCRDeDupKeyManager.obtainInstance().storeKeys(object.getId(), criteria);
+        MCRDeDupKeyManager keyManager = MCRDeDupKeyManager.obtainInstance();
+        keyManager.storeKeys(object.getId(), criteria);
+        updateTitle(keyManager, object, criteria);
+    }
+
+    private void updateTitle(MCRDeDupKeyManager keyManager, MCRObject object, Set<MCRDeDupCriterion> criteria) {
+        if (criteria.isEmpty()) {
+            keyManager.removeTitle(object.getId());
+            return;
+        }
+        Optional<String> title = MCRDeDupTitleProvider.obtainInstance().resolveTitle(object);
+        title.ifPresentOrElse(
+            resolved -> keyManager.storeTitle(object.getId(), resolved),
+            () -> keyManager.removeTitle(object.getId()));
     }
 }

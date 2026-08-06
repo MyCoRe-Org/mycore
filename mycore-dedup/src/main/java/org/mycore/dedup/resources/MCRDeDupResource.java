@@ -18,13 +18,21 @@
 
 package org.mycore.dedup.resources;
 
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.dedup.MCRDeDupKeyManager;
 import org.mycore.dedup.MCRPossibleDuplicate;
+import org.mycore.dedup.backend.MCRDeDupNoDuplicate;
+import org.mycore.frontend.jersey.MCRCacheControl;
+import org.mycore.restapi.annotations.MCRRequireTransaction;
 
 import com.google.gson.Gson;
 
@@ -53,6 +61,7 @@ import jakarta.ws.rs.core.Response;
  */
 @Path("/")
 @Produces(MediaType.APPLICATION_JSON)
+@MCRRequireTransaction
 public class MCRDeDupResource {
 
     /** Permission required to use the deduplication API. */
@@ -62,28 +71,40 @@ public class MCRDeDupResource {
 
     @GET
     @Path("duplicates")
+    @MCRCacheControl(noStore = true,
+        codeIsPrivate = @MCRCacheControl.FieldArgument(active = true),
+        noCache = @MCRCacheControl.FieldArgument(active = true))
     public Response listAllDuplicates() {
         checkAccess();
-        List<MCRPossibleDuplicate> duplicates = MCRDeDupKeyManager.obtainInstance().findAllDuplicates();
-        return Response.ok(GSON.toJson(duplicates)).build();
+        return Response.ok(GSON.toJson(enrich(MCRDeDupKeyManager.obtainInstance().findAllDuplicates()))).build();
     }
 
     @GET
     @Path("duplicates/{id}")
+    @MCRCacheControl(noStore = true,
+        codeIsPrivate = @MCRCacheControl.FieldArgument(active = true),
+        noCache = @MCRCacheControl.FieldArgument(active = true))
     public Response listDuplicates(@PathParam("id") String id) {
         checkAccess();
-        List<MCRPossibleDuplicate> duplicates = MCRDeDupKeyManager.obtainInstance().findDuplicates(parseId(id));
-        return Response.ok(GSON.toJson(duplicates)).build();
+        return Response.ok(GSON.toJson(enrich(MCRDeDupKeyManager.obtainInstance().findDuplicates(parseId(id)))))
+            .build();
     }
 
     @GET
     @Path("no-duplicates")
+    @MCRCacheControl(noStore = true,
+        codeIsPrivate = @MCRCacheControl.FieldArgument(active = true),
+        noCache = @MCRCacheControl.FieldArgument(active = true))
     public Response listNoDuplicates() {
         checkAccess();
-        List<MCRNoDuplicateDto> markings = MCRDeDupKeyManager.obtainInstance().listNoDuplicates().stream()
-            .map(MCRNoDuplicateDto::of)
+        List<MCRDeDupNoDuplicate> markings = MCRDeDupKeyManager.obtainInstance().listNoDuplicates();
+        Map<String, String> titles = resolveTitles(markings.stream()
+            .flatMap(marking -> Stream.of(marking.getObjectId1(), marking.getObjectId2())));
+        List<MCRNoDuplicateDto> dtos = markings.stream()
+            .map(marking -> MCRNoDuplicateDto.of(marking,
+                titles.get(marking.getObjectId1()), titles.get(marking.getObjectId2())))
             .toList();
-        return Response.ok(GSON.toJson(markings)).build();
+        return Response.ok(GSON.toJson(dtos)).build();
     }
 
     @POST
@@ -106,6 +127,19 @@ public class MCRDeDupResource {
         checkAccess();
         MCRDeDupKeyManager.obtainInstance().removeNoDuplicate(markingId);
         return Response.noContent().build();
+    }
+
+    private static List<MCRDuplicateDto> enrich(List<MCRPossibleDuplicate> duplicates) {
+        Map<String, String> titles = resolveTitles(duplicates.stream()
+            .flatMap(duplicate -> Stream.of(duplicate.objectId1(), duplicate.objectId2())));
+        return duplicates.stream()
+            .map(duplicate -> MCRDuplicateDto.of(duplicate, titles))
+            .toList();
+    }
+
+    private static Map<String, String> resolveTitles(Stream<String> objectIds) {
+        Set<String> ids = objectIds.collect(Collectors.toCollection(LinkedHashSet::new));
+        return MCRDeDupKeyManager.obtainInstance().getTitles(ids);
     }
 
     private static void checkAccess() {

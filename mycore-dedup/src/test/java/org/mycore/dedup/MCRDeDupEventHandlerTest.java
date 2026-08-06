@@ -21,6 +21,8 @@ package org.mycore.dedup;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.common.MCRTestConfiguration;
@@ -36,15 +38,27 @@ import org.mycore.test.MyCoReTest;
 @MCRTestConfiguration(properties = {
     @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true"),
     @MCRTestProperty(key = "MCR.DeDup.CriterionBuilder.test.dummy.Class",
-        classNameOf = MCRDeDupTestCriterionBuilder.class)
+        classNameOf = MCRDeDupTestCriterionBuilder.class),
+    @MCRTestProperty(key = "MCR.DeDup.TitleResolver.test.Class",
+        classNameOf = MCRDeDupLabelTitleResolver.class)
 })
 public class MCRDeDupEventHandlerTest {
 
     private final MCRDeDupEventHandler handler = new MCRDeDupEventHandler();
 
+    private static MCRObjectID id(int number) {
+        return MCRObjectID.getInstance(MCRObjectID.formatID("mcr", "test", number));
+    }
+
     private static MCRObject object(int number) {
         MCRObject object = new MCRObject();
-        object.setId(MCRObjectID.getInstance(MCRObjectID.formatID("mcr", "test", number)));
+        object.setId(id(number));
+        return object;
+    }
+
+    private static MCRObject object(int number, String label) {
+        MCRObject object = object(number);
+        object.setLabel(label);
         return object;
     }
 
@@ -86,5 +100,35 @@ public class MCRDeDupEventHandlerTest {
 
         assertEquals(1, MCRDeDupKeyManager.obtainInstance().findAllDuplicates().size(),
             "updating must replace the keys, not add additional ones");
+    }
+
+    @Test
+    public void createStoresTitleAndDeleteRemovesIt() {
+        handler.doHandleEvent(event(MCREvent.EventType.CREATE, object(1, "A title")));
+
+        MCRDeDupKeyManager manager = MCRDeDupKeyManager.obtainInstance();
+        assertEquals("A title", manager.getTitles(List.of(id(1).toString())).get(id(1).toString()));
+
+        handler.doHandleEvent(event(MCREvent.EventType.DELETE, object(1, "A title")));
+
+        assertTrue(manager.getTitles(List.of(id(1).toString())).isEmpty(),
+            "deleting an object should remove its stored title");
+    }
+
+    @Test
+    public void updateReplacesTitle() {
+        handler.doHandleEvent(event(MCREvent.EventType.CREATE, object(1, "Old title")));
+        handler.doHandleEvent(event(MCREvent.EventType.UPDATE, object(1, "New title")));
+
+        assertEquals("New title",
+            MCRDeDupKeyManager.obtainInstance().getTitles(List.of(id(1).toString())).get(id(1).toString()));
+    }
+
+    @Test
+    public void blankLabelStoresNoTitle() {
+        handler.doHandleEvent(event(MCREvent.EventType.CREATE, object(1, "   ")));
+
+        assertTrue(MCRDeDupKeyManager.obtainInstance().getTitles(List.of(id(1).toString())).isEmpty(),
+            "a blank label must not be stored as a title");
     }
 }

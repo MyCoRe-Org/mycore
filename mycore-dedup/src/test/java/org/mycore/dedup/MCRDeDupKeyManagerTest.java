@@ -33,6 +33,7 @@ import org.mycore.common.MCRTestProperty;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.dedup.backend.MCRDeDupKey;
 import org.mycore.dedup.backend.MCRDeDupNoDuplicate;
+import org.mycore.dedup.backend.MCRDeDupTitle;
 import org.mycore.test.MCRJPAExtension;
 import org.mycore.test.MyCoReTest;
 
@@ -268,5 +269,41 @@ public class MCRDeDupKeyManagerTest {
         assertEquals(1, list.size());
         assertEquals(id(2).toString(), list.get(0).getObjectId1());
         assertEquals(id(3).toString(), list.get(0).getObjectId2());
+    }
+
+    @Test
+    public void storesReadsAndReplacesTitles() {
+        manager.storeTitle(id(1), "First title");
+        manager.storeTitle(id(2), "Second title");
+
+        Map<String, String> titles = manager.getTitles(List.of(id(1).toString(), id(2).toString()));
+        assertEquals("First title", titles.get(id(1).toString()));
+        assertEquals("Second title", titles.get(id(2).toString()));
+
+        manager.storeTitle(id(1), "New title");
+        assertEquals("New title", manager.getTitles(List.of(id(1).toString())).get(id(1).toString()));
+    }
+
+    @Test
+    public void removeTitleRemovesIt() {
+        manager.storeTitle(id(1), "A title");
+        manager.removeTitle(id(1));
+
+        assertTrue(manager.getTitles(List.of(id(1).toString())).isEmpty());
+    }
+
+    @Test
+    public void getTitlesForEmptyCollectionReturnsEmptyMap() {
+        manager.storeTitle(id(1), "A title");
+
+        assertTrue(manager.getTitles(List.of()).isEmpty());
+    }
+
+    @Test
+    public void longTitlesAreTruncated() {
+        manager.storeTitle(id(1), "x".repeat(MCRDeDupTitle.MAX_TITLE_LENGTH + 100));
+
+        String stored = manager.getTitles(List.of(id(1).toString())).get(id(1).toString());
+        assertEquals(MCRDeDupTitle.MAX_TITLE_LENGTH, stored.length());
     }
 }
