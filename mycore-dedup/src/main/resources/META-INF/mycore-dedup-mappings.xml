@@ -4,4 +4,5 @@
                  version="2.2">
   <entity class="org.mycore.dedup.backend.MCRDeDupKey" />
   <entity class="org.mycore.dedup.backend.MCRDeDupNoDuplicate" />
+  <entity class="org.mycore.dedup.backend.MCRDeDupTitle" />
 </entity-mappings>

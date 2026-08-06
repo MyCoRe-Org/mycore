@@ -20,11 +20,13 @@ package org.mycore.dedup;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -33,6 +35,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.dedup.backend.MCRDeDupKey;
 import org.mycore.dedup.backend.MCRDeDupNoDuplicate;
+import org.mycore.dedup.backend.MCRDeDupTitle;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
@@ -48,6 +51,8 @@ import jakarta.persistence.TypedQuery;
  * The manager is configurable through {@code MCR.DeDup.KeyManager.Class}.
  */
 public class MCRDeDupKeyManager {
+
+    private static final String PARAM_OBJECT_ID = "objectId";
 
     /**
      * @return the configured instance of the deduplication key manager
@@ -81,8 +86,57 @@ public class MCRDeDupKeyManager {
      */
     public void removeKeys(MCRObjectID objectId) {
         getEntityManager().createNamedQuery(MCRDeDupKey.DELETE_BY_OBJECT_ID)
-            .setParameter("objectId", objectId.toString())
+            .setParameter(PARAM_OBJECT_ID, objectId.toString())
             .executeUpdate();
+    }
+
+    /**
+     * Stores the display title of the given object, replacing a previously stored title. The title is
+     * truncated to {@link MCRDeDupTitle#MAX_TITLE_LENGTH} characters. Titles are stored for the objects
+     * that have deduplication keys, so that the possible-duplicate lists can be rendered without loading
+     * the object metadata per row.
+     *
+     * @param objectId the object the title belongs to
+     * @param title    the display title
+     */
+    public void storeTitle(MCRObjectID objectId, String title) {
+        EntityManager em = getEntityManager();
+        String truncated = truncateTitle(title);
+        findTitle(em, objectId.toString())
+            .ifPresentOrElse(existing -> existing.setTitle(truncated),
+                () -> em.persist(new MCRDeDupTitle(objectId.toString(), truncated)));
+    }
+
+    /**
+     * Removes the stored display title of the given object, if any.
+     *
+     * @param objectId the object whose title is removed
+     */
+    public void removeTitle(MCRObjectID objectId) {
+        getEntityManager().createNamedQuery(MCRDeDupTitle.DELETE_BY_OBJECT_ID)
+            .setParameter(PARAM_OBJECT_ID, objectId.toString())
+            .executeUpdate();
+    }
+
+    /**
+     * Returns the stored display titles of the given objects.
+     *
+     * @param objectIds the object ids to look up, may be empty
+     * @return a map from object id to title, containing only ids that have a stored title
+     */
+    public Map<String, String> getTitles(Collection<String> objectIds) {
+        if (objectIds.isEmpty()) {
+            return Map.of();
+        }
+        List<Object[]> rows = getEntityManager()
+            .createQuery("SELECT t.objectId, t.title FROM MCRDeDupTitle t WHERE t.objectId IN (:ids)", Object[].class)
+            .setParameter("ids", objectIds)
+            .getResultList();
+        Map<String, String> titles = new LinkedHashMap<>();
+        for (Object[] row : rows) {
+            titles.put((String) row[0], (String) row[1]);
+        }
+        return titles;
     }
 
     /**
@@ -92,12 +146,13 @@ public class MCRDeDupKeyManager {
      */
     public void removeNoDuplicates(MCRObjectID objectId) {
         getEntityManager().createNamedQuery(MCRDeDupNoDuplicate.DELETE_BY_OBJECT_ID)
-            .setParameter("objectId", objectId.toString())
+            .setParameter(PARAM_OBJECT_ID, objectId.toString())
             .executeUpdate();
     }
 
     /**
-     * Marks the unordered pair of the two given objects as confirmed non-duplicates.
+     * Marks the unordered pair of the two given objects as confirmed non-duplicates. If the pair is
+     * already marked, the existing marking is kept.
      *
      * @param objectIdA one object
      * @param objectIdB the other object
@@ -105,7 +160,16 @@ public class MCRDeDupKeyManager {
      */
     public void addNoDuplicate(MCRObjectID objectIdA, MCRObjectID objectIdB, String creator) {
         ObjectIdPair pair = ObjectIdPair.of(objectIdA.toString(), objectIdB.toString());
-        getEntityManager().persist(new MCRDeDupNoDuplicate(pair.first(), pair.second(), creator, Instant.now()));
+        EntityManager em = getEntityManager();
+        boolean exists = !em
+            .createQuery("SELECT n FROM MCRDeDupNoDuplicate n WHERE n.objectId1 = :id1 AND n.objectId2 = :id2",
+                MCRDeDupNoDuplicate.class)
+            .setParameter("id1", pair.first())
+            .setParameter("id2", pair.second())
+            .getResultList().isEmpty();
+        if (!exists) {
+            em.persist(new MCRDeDupNoDuplicate(pair.first(), pair.second(), creator, Instant.now()));
+        }
     }
 
     /**
@@ -249,7 +313,7 @@ public class MCRDeDupKeyManager {
 
     private void removeManagedKeys(EntityManager em, String objectId) {
         em.createQuery("SELECT k FROM MCRDeDupKey k WHERE k.objectId = :objectId", MCRDeDupKey.class)
-            .setParameter("objectId", objectId)
+            .setParameter(PARAM_OBJECT_ID, objectId)
             .getResultList()
             .forEach(em::remove);
     }
@@ -264,6 +328,19 @@ public class MCRDeDupKeyManager {
         return value.length() > MCRDeDupKey.MAX_VALUE_LENGTH
             ? value.substring(0, MCRDeDupKey.MAX_VALUE_LENGTH)
             : value;
+    }
+
+    private static String truncateTitle(String title) {
+        return title.length() > MCRDeDupTitle.MAX_TITLE_LENGTH
+            ? title.substring(0, MCRDeDupTitle.MAX_TITLE_LENGTH)
+            : title;
+    }
+
+    private static Optional<MCRDeDupTitle> findTitle(EntityManager em, String objectId) {
+        return em.createQuery("SELECT t FROM MCRDeDupTitle t WHERE t.objectId = :objectId", MCRDeDupTitle.class)
+            .setParameter(PARAM_OBJECT_ID, objectId)
+            .getResultList().stream()
+            .findFirst();
     }
 
     private static EntityManager getEntityManager() {
