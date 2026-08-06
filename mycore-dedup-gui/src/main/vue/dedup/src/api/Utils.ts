@@ -19,16 +19,6 @@
 import { getWebApplicationBaseURL } from "@/api/BaseURL";
 
 /**
- * Returns the numeric part of a MyCoRe object id (e.g. "mir_mods_00000042" -> "42"), falling back to
- * the full id if it does not follow the {@code prefix_type_number} pattern.
- */
-export function getShortID(mcrId: string): string {
-  const parts = mcrId.split("_");
-  const number = parseInt(parts[parts.length - 1] ?? "", 10);
-  return isNaN(number) ? mcrId : number.toString();
-}
-
-/**
  * Returns the URL that displays the metadata of the given object.
  */
 export function getObjectURL(mcrId: string): string {
