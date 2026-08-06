@@ -1,5 +1,6 @@
 <template>
   <main>
+    <p class="text-muted">{{ i18n["dedup.gui.duplicates.description"] }}</p>
     <div v-if="model.loading" class="text-center">
       <div class="spinner-border" role="status">
         <span class="visually-hidden">Loading...</span>
@@ -98,6 +99,7 @@ const model = reactive({
 });
 
 const i18n = reactive<{ [key: string]: string }>({
+  "dedup.gui.duplicates.description": "dedup.gui.duplicates.description",
   "dedup.gui.duplicates.table.criterion": "dedup.gui.duplicates.table.criterion",
   "dedup.gui.duplicates.table.object1": "dedup.gui.duplicates.table.object1",
   "dedup.gui.duplicates.table.object2": "dedup.gui.duplicates.table.object2",

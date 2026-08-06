@@ -1,7 +1,7 @@
 <template>
   <div class="entry">
     <span v-if="title">{{ title }}</span>
-    <span class="text-muted"> ({{ getShortID(mcrId) }})</span>
+    <span class="text-muted" :title="i18n['dedup.gui.objectId']"> ({{ mcrId }})</span>
     <a :href="getObjectURL(mcrId)" :aria-label="i18n['dedup.gui.action.showMetadata']"
        :title="i18n['dedup.gui.action.showMetadata']">
       <span class="fas fa-file-alt d-inline-block ms-2"> </span>
@@ -11,7 +11,7 @@
 
 <script setup lang="ts">
 import { onMounted, reactive } from "vue";
-import { getObjectURL, getShortID } from "@/api/Utils";
+import { getObjectURL } from "@/api/Utils";
 import { resolveI18N } from "@/api/I18N";
 
 defineProps<{
@@ -21,6 +21,7 @@ defineProps<{
 
 const i18n = reactive<{ [key: string]: string }>({
   "dedup.gui.action.showMetadata": "dedup.gui.action.showMetadata",
+  "dedup.gui.objectId": "dedup.gui.objectId",
 });
 
 onMounted(() => {
