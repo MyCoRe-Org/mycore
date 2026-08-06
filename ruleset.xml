@@ -15,7 +15,11 @@
   <rule ref="category/xsl/codestyle.xml/UseConcatOnce"/>
 
   <!-- Best Practices Rules -->
-  <rule ref="category/java/bestpractices.xml/AbstractClassWithoutAbstractMethod"/>
+  <rule ref="category/java/bestpractices.xml/AbstractClassWithoutAbstractMethod">
+    <properties>
+      <property name="violationSuppressXPath" value="//ClassDeclaration[matches(@SimpleName, '^FactoryBase$')]" />
+    </properties>
+  </rule>
   <rule ref="category/java/bestpractices.xml/ArrayIsStoredDirectly"/>
   <rule ref="category/java/bestpractices.xml/AvoidMessageDigestField"/>
   <rule ref="category/java/bestpractices.xml/AvoidPrintStackTrace"/>
@@ -115,7 +119,11 @@
   <rule ref="category/java/codestyle.xml/UseUnderscoresInNumericLiterals"/>
 
   <!-- Design Rules -->
-  <rule ref="category/java/design.xml/AbstractClassWithoutAnyMethod"/>
+  <rule ref="category/java/design.xml/AbstractClassWithoutAnyMethod">
+    <properties>
+      <property name="violationSuppressXPath" value="//ClassDeclaration[matches(@SimpleName, '^FactoryBase$')]" />
+    </properties>
+  </rule>
   <!-- TODO: Create PR to fix this rule -->
   <!--
   <rule ref="category/java/design.xml/AvoidDeeplyNestedIfStmts">

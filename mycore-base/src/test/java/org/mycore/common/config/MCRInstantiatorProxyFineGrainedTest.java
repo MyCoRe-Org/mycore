@@ -32,7 +32,7 @@ import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
-public class MCRInstantiatorProxyTest {
+public class MCRInstantiatorProxyFineGrainedTest {
 
     @Test
     @MCRTestConfiguration(
@@ -81,7 +81,7 @@ public class MCRInstantiatorProxyTest {
             return value;
         }
 
-        public static class Factory implements Supplier<TestClass> {
+        public static abstract class FactoryBase {
 
             @MCRProperty(name = "Property1")
             public String value1;
@@ -89,13 +89,17 @@ public class MCRInstantiatorProxyTest {
             @MCRProperty(name = "Property2")
             public String value2;
 
+            public final String getValue() {
+                return value1 + "-" + value2;
+            }
+
+        }
+
+        public static final class Factory extends FactoryBase implements Supplier<TestClass> {
+
             @Override
             public TestClass get() {
                 return new TestClass(getValue());
-            }
-
-            protected final String getValue() {
-                return value1 + "-" + value2;
             }
 
         }
@@ -116,14 +120,14 @@ public class MCRInstantiatorProxyTest {
             return additionalValue;
         }
 
-        // Java doesn't allow subclasses to implement an interface with a narrower subtype.
-        // Therefore, we can not guarantee that ExtendedTestClass#get returns an ExtendedTestClass.
-        // This is an argument against extending configuration proxy factories, even though
-        // the alternative is duplicating some boilerplate code.
-        public static class Factory extends TestClass.Factory /* implements Supplier<ExtendedTestClass> */ {
+        public static abstract class FactoryBase extends TestClass.FactoryBase {
 
             @MCRProperty(name = "AdditionalProperty")
             public String additionalValue;
+
+        }
+
+        public static final class Factory extends FactoryBase implements Supplier<ExtendedTestClass> {
 
             @Override
             public ExtendedTestClass get() {
