@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.services.queuedjob.MCRJob;
 import org.mycore.services.queuedjob.MCRJobAction;
 
@@ -87,7 +88,7 @@ public class MCRPackerJobAction extends MCRJobAction {
 
     public static Map<String, String> getConfiguration(String packerId) {
         String packerConfigPrefix = MCRPacker.PACKER_CONFIGURATION_PREFIX + packerId + ".";
-        return MCRConfiguration2.getPropertiesMap()
+        return MCRConfigurationBase.getAllPropertiesMap()
             .entrySet()
             .stream()
             .filter(p -> p.getKey().startsWith(packerConfigPrefix))

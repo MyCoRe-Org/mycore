@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.iiif.presentation.model.basic.MCRIIIFManifest;
 
@@ -73,7 +74,7 @@ public abstract class MCRIIIFPresentationImpl {
     }
 
     protected final Map<String, String> getProperties() {
-        return MCRConfiguration2.getSubPropertiesMap(getConfigPrefix());
+        return MCRConfigurationBase.getSubpropertiesMap(getConfigPrefix());
     }
 
     private String getConfigPrefix() {

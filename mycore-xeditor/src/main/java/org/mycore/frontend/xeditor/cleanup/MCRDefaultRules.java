@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationBase;
 
 /**
  * <p>
@@ -60,7 +60,7 @@ class MCRDefaultRules {
     static {
         List<MCRCleaningRule> defaultRules = new ArrayList<>();
 
-        Map<String, String> config = MCRConfiguration2.getSubPropertiesMap(CONFIG_PREFIX);
+        Map<String, String> config = MCRConfigurationBase.getSubpropertiesMap(CONFIG_PREFIX);
 
         config.keySet().stream().sorted().filter(key -> key.endsWith(CONFIG_KEY_NODES_TO_INSPECT)).forEach(key -> {
             String rulePrefix = key.substring(0, key.indexOf(CONFIG_KEY_NODES_TO_INSPECT));

@@ -50,9 +50,13 @@ public class MCRInstantiatorConfigTest {
 
     public static final String INSTANCE_2_KEY = "Test2";
 
+    public static final String INSTANCE_3_KEY = "Test3";
+
     private static final String INSTANCE_1_NAME = INSTANCE_NAME_PREFIX + INSTANCE_1_KEY;
 
     private static final String INSTANCE_2_NAME = INSTANCE_NAME_PREFIX + INSTANCE_2_KEY;
+
+    private static final String INSTANCE_3_NAME = INSTANCE_NAME_PREFIX + INSTANCE_3_KEY;
 
     private static final String DEFAULT_KEY = "DefaultKey";
 
@@ -166,7 +170,9 @@ public class MCRInstantiatorConfigTest {
         Optional<String> fullInstanceValue = MCRConfiguration2.getString(fullInstanceName);
         assertTrue(fullInstanceValue.isPresent(), "Properties should contain " + instanceName);
 
-        ConfigurableTestInstance instance = ofName(ConfigurableTestInstance.class, fullInstanceName).instantiate();
+        ConfigurableTestInstance instance = ofName(ConfigurableTestInstance.class, fullInstanceName,
+            MCRConfiguration2.getAllPropertiesTree()).instantiate();
+
         assertNotNull(instance, "Test " + fullInstanceName + " should be present");
 
         validateFields(instance);
@@ -295,6 +301,9 @@ public class MCRInstantiatorConfigTest {
 
         configureInstance(INSTANCE_1_NAME);
         configureInstance(INSTANCE_2_NAME);
+
+        // configuration for Test3 will be ignored, because it is not instantiatable
+        set(INSTANCE_3_NAME, "Ignored");
 
     }
 

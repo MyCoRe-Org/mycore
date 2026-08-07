@@ -31,7 +31,7 @@ import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolver;
-import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.tmatesoft.svn.core.internal.wc.SVNFileUtil;
 
@@ -76,7 +76,7 @@ public class MCRMetadataExtension implements Extension, BeforeAllCallback, Befor
 
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
-        MCRConfiguration2.getSubPropertiesMap("MCR.Metadata.Store.").forEach(
+        MCRConfigurationBase.getSubpropertiesMap("MCR.Metadata.Store.").forEach(
             (key, value) -> LOGGER.debug("MCR Metadata Store Property: {}={}", key, value));
         Files.createDirectories(getStoreBaseDir(context));
         Files.createDirectories(getSvnBaseDir(context));
