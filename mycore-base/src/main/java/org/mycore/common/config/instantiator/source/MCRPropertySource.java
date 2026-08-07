@@ -114,12 +114,12 @@ final class MCRPropertySource extends MCRSourceBase<String> {
     }
 
     @Override
-    protected MCRConfigurationException missingException(MCRSourceContext context) {
+    protected MCRConfigurationException missingResultException(MCRSourceContext context) {
         return context.missingException();
     }
 
     @Override
-    protected String nullResultReplacement() {
+    protected String missingResultReplacement() {
         return null;
     }
 
