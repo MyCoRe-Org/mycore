@@ -20,7 +20,6 @@ package org.mycore.common.config;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mycore.common.config.instantiator.MCRInstanceConfiguration.ofName;
 
 import java.util.function.Supplier;
 
@@ -29,6 +28,7 @@ import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
@@ -37,26 +37,30 @@ public class MCRInstantiatorProxyTest {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithConfigurationProxy.class),
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClass.class),
             @MCRTestProperty(key = "Foo.Property1", string = "Value1"),
             @MCRTestProperty(key = "Foo.Property2", string = "Value2")
         })
     public void annotated() {
 
-        TestClassWithConfigurationProxy instance = ofName(TestClassWithConfigurationProxy.class,
-            "Foo").instantiate();
+        TestClass instance = ofName(TestClass.class);
 
         assertNotNull(instance);
         assertEquals("Value1-Value2", instance.value());
 
     }
 
-    @MCRConfigurationProxy(proxyClass = TestClassWithConfigurationProxy.Factory.class)
-    public static class TestClassWithConfigurationProxy {
+    private <S> S ofName(Class<S> superClass) {
+        return MCRInstanceConfiguration.ofName(superClass, "Foo", MCRConfiguration2
+            .getAllPropertiesTree()).instantiate();
+    }
+
+    @MCRConfigurationProxy(proxyClass = TestClass.Factory.class)
+    public static class TestClass {
 
         private final String value;
 
-        public TestClassWithConfigurationProxy(String value) {
+        public TestClass(String value) {
             this.value = value;
         }
 
@@ -64,7 +68,7 @@ public class MCRInstantiatorProxyTest {
             return value;
         }
 
-        public static class Factory implements Supplier<TestClassWithConfigurationProxy> {
+        public static class Factory implements Supplier<TestClass> {
 
             @MCRProperty(name = "Property1")
             public String value1;
@@ -73,8 +77,8 @@ public class MCRInstantiatorProxyTest {
             public String value2;
 
             @Override
-            public TestClassWithConfigurationProxy get() {
-                return new TestClassWithConfigurationProxy(value1 + "-" + value2);
+            public TestClass get() {
+                return new TestClass(value1 + "-" + value2);
             }
 
         }
