@@ -42,6 +42,7 @@ import com.fasterxml.jackson.annotation.JsonClassDescription;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonValue;
+import org.mycore.common.config.MCRConfigurationBase;
 
 /**
  * This class holds all information and methods to handle the MyCoRe Object ID.
@@ -83,7 +84,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID>, Serializable 
 
     static {
         final String confPrefix = "MCR.Metadata.Type.";
-        VALID_TYPE_LIST = MCRConfiguration2.getSubPropertiesMap(confPrefix)
+        VALID_TYPE_LIST = MCRConfigurationBase.getSubpropertiesMap(confPrefix)
             .entrySet()
             .stream()
             .filter(p -> Boolean.parseBoolean(p.getValue()))

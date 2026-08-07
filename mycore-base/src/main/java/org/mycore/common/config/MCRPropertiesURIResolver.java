@@ -80,7 +80,7 @@ public class MCRPropertiesURIResolver implements URIResolver {
     private JDOMSource resolveKeyPrefix(String keyPrefix) {
         final Element propertiesElement = new Element("properties");
 
-        MCRConfiguration2.getSubPropertiesMap(keyPrefix).forEach((key, value) -> {
+        MCRConfiguration2.getSubpropertiesMap(keyPrefix).forEach((key, value) -> {
             final Element entryElement = new Element("entry");
             entryElement.setAttribute("key", keyPrefix + key);
             entryElement.setText(value);
@@ -105,7 +105,7 @@ public class MCRPropertiesURIResolver implements URIResolver {
         final Element entryElement = new Element("entry");
 
         entryElement.setAttribute("key", key);
-        String value = MCRConfiguration2.getPropertiesMap().get(key);
+        String value = MCRConfiguration2.getAllPropertiesMap().get(key);
         if (value != null) {
             entryElement.setText(value);
         }

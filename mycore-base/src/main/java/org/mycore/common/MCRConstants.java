@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.logging.log4j.LogManager;
 import org.jdom2.Namespace;
 import org.jdom2.xpath.XPathFactory;
-import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationBase;
 
 /**
  * This class replaces the deprecated MCRDefaults interface and provides some
@@ -138,7 +138,7 @@ public final class MCRConstants {
                 }
             }
         }
-        MCRConfiguration2.getSubPropertiesMap("MCR.Namespace.")
+        MCRConfigurationBase.getSubpropertiesMap("MCR.Namespace.")
             .forEach(MCRConstants::registerNamespace);
     }
 
