@@ -27,6 +27,7 @@ import java.util.Map;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.iiif.image.model.MCRIIIFImageInformation;
 import org.mycore.iiif.image.model.MCRIIIFImageProfile;
@@ -79,7 +80,7 @@ public abstract class MCRIIIFImageImpl {
     }
 
     protected final Map<String, String> getProperties() {
-        return MCRConfiguration2.getSubPropertiesMap(getConfigPrefix());
+        return MCRConfigurationBase.getSubpropertiesMap(getConfigPrefix());
     }
 
     protected String getConfigPrefix() {

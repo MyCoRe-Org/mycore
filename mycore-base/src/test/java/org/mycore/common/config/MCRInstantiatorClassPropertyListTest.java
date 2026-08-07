@@ -35,12 +35,12 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
-import org.mycore.common.config.annotation.MCRPropertyList;
+import org.mycore.common.config.annotation.MCRClassPropertyList;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.test.MyCoReTest;
 
 /**
- * Tests for the following conditions (for relative properties and for absolute properties):
+ * Tests for the following conditions:
  * <ol>
  *   <li>Annotation has <code>required = false</code> or not</li>
  *   <li>Property value (for a single-element list) is not set, set empty in short form,
@@ -103,7 +103,7 @@ import org.mycore.test.MyCoReTest;
  * </table>
  */
 @MyCoReTest
-public class MCRInstantiatorPropertyListTest {
+public class MCRInstantiatorClassPropertyListTest {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -115,32 +115,19 @@ public class MCRInstantiatorPropertyListTest {
 
     public static final String LIST_PROPERTY_2 = "Foo.List.2";
 
-    public static final String ABSOLUTE_LIST_PROPERTY = "MCR.List";
+    public static final String DEFAULT_LIST_PROPERTY = "MCR.List";
 
-    public static final String ABSOLUTE_LIST_PROPERTY_1 = "MCR.List.1";
+    public static final String DEFAULT_LIST_PROPERTY_1 = "MCR.List.1";
 
-    public static final String ABSOLUTE_LIST_PROPERTY_2 = "MCR.List.2";
-
-    public static final String DEFAULT_LIST_PROPERTY = "MCR.Default.List";
-
-    public static final String DEFAULT_LIST_PROPERTY_1 = "MCR.Default.List.1";
-
-    public static final String DEFAULT_LIST_PROPERTY_2 = "MCR.Default.List.2";
+    public static final String DEFAULT_LIST_PROPERTY_2 = "MCR.List.2";
 
     private static Stream<Arguments> provideAllParameterCombinations() {
         List<Arguments> argumentsList = new ArrayList<>();
-        for (Boolean absolute : List.of(false, true)) {
-            for (Boolean required : List.of(false, true)) {
-                for (ValueProperty valueProperty : ValueProperty.values()) {
-                    for (Boolean defaultValue : List.of(false, true)) {
-                        for (DefaultProperty defaultProperty : DefaultProperty.values()) {
-                            argumentsList.add(Arguments.of(
-                                absolute,
-                                required,
-                                valueProperty,
-                                defaultValue,
-                                defaultProperty));
-                        }
+        for (Boolean required : List.of(false, true)) {
+            for (ValueProperty valueProperty : ValueProperty.values()) {
+                for (Boolean defaultValue : List.of(false, true)) {
+                    for (DefaultProperty defaultProperty : DefaultProperty.values()) {
+                        argumentsList.add(Arguments.of(required, valueProperty, defaultValue, defaultProperty));
                     }
                 }
             }
@@ -158,12 +145,10 @@ public class MCRInstantiatorPropertyListTest {
         @MCRTestProperty(key = DEFAULT_LIST_PROPERTY_1, empty = true),
         @MCRTestProperty(key = DEFAULT_LIST_PROPERTY_2, empty = true)
     })
-    void test(boolean absolute, boolean required, ValueProperty valueProperty, boolean defaultValue,
-        DefaultProperty defaultProperty) {
+    void test(boolean required, ValueProperty valueProperty, boolean defaultValue, DefaultProperty defaultProperty) {
 
         // log all parameters
         LOGGER.info("TEST PARAMETERS");
-        LOGGER.info("absolute={}", absolute);
         LOGGER.info("required={}", required);
         LOGGER.info("valueProperty={}", valueProperty);
         LOGGER.info("defaultValue={}", defaultValue);
@@ -171,33 +156,17 @@ public class MCRInstantiatorPropertyListTest {
 
         // select class to be configured
         Class<? extends Configurable> configuredClass;
-        if (absolute) {
-            if (required) {
-                if (defaultValue) {
-                    configuredClass = AbsoluteRequiredDefaultSet.class;
-                } else {
-                    configuredClass = AbsoluteRequiredDefaultNotSet.class;
-                }
+        if (required) {
+            if (defaultValue) {
+                configuredClass = RequiredDefaultSet.class;
             } else {
-                if (defaultValue) {
-                    configuredClass = AbsoluteNotRequiredDefaultSet.class;
-                } else {
-                    configuredClass = AbsoluteNotRequiredDefaultNotSet.class;
-                }
+                configuredClass = RequiredDefaultNotSet.class;
             }
         } else {
-            if (required) {
-                if (defaultValue) {
-                    configuredClass = RelativeRequiredDefaultSet.class;
-                } else {
-                    configuredClass = RelativeRequiredDefaultNotSet.class;
-                }
+            if (defaultValue) {
+                configuredClass = NotRequiredDefaultSet.class;
             } else {
-                if (defaultValue) {
-                    configuredClass = RelativeNotRequiredDefaultSet.class;
-                } else {
-                    configuredClass = RelativeNotRequiredDefaultNotSet.class;
-                }
+                configuredClass = NotRequiredDefaultNotSet.class;
             }
         }
 
@@ -206,28 +175,25 @@ public class MCRInstantiatorPropertyListTest {
 
         // set class property for nested instance
         // empty strings are default via @MCRTestProperty above, may need to overwrite
-        String listKey = absolute ? ABSOLUTE_LIST_PROPERTY : LIST_PROPERTY;
-        String listProperty1Key = absolute ? ABSOLUTE_LIST_PROPERTY_1 : LIST_PROPERTY_1;
-        String listProperty2Key = absolute ? ABSOLUTE_LIST_PROPERTY_2 : LIST_PROPERTY_2;
         switch (valueProperty) {
             case NOT_SET -> {
-                MCRConfiguration2.set(listKey, (String) null);
-                MCRConfiguration2.set(listProperty1Key, (String) null);
-                MCRConfiguration2.set(listProperty2Key, (String) null);
+                MCRConfiguration2.set(LIST_PROPERTY, (String) null);
+                MCRConfiguration2.set(LIST_PROPERTY_1, (String) null);
+                MCRConfiguration2.set(LIST_PROPERTY_2, (String) null);
             }
             case SET_EMPTY -> {
-                MCRConfiguration2.set(listKey, "");
-                MCRConfiguration2.set(listProperty1Key, (String) null);
-                MCRConfiguration2.set(listProperty2Key, (String) null);
+                MCRConfiguration2.set(LIST_PROPERTY, "");
+                MCRConfiguration2.set(LIST_PROPERTY_1, (String) null);
+                MCRConfiguration2.set(LIST_PROPERTY_2, (String) null);
             }
             case SET_SHORT_FORM -> {
-                MCRConfiguration2.set(listKey, "Value,");
-                MCRConfiguration2.set(listProperty1Key, (String) null);
-                MCRConfiguration2.set(listProperty2Key, (String) null);
+                MCRConfiguration2.set(LIST_PROPERTY, Value.class.getName() + ",");
+                MCRConfiguration2.set(LIST_PROPERTY_1, (String) null);
+                MCRConfiguration2.set(LIST_PROPERTY_2, (String) null);
             }
             case SET_LONG_FORM -> {
-                MCRConfiguration2.set(listKey, (String) null);
-                MCRConfiguration2.set(listProperty1Key, "Value");
+                MCRConfiguration2.set(LIST_PROPERTY, (String) null);
+                MCRConfiguration2.set(LIST_PROPERTY_1, Value.class.getName());
             }
         }
 
@@ -245,13 +211,13 @@ public class MCRInstantiatorPropertyListTest {
                 MCRConfiguration2.set(DEFAULT_LIST_PROPERTY_2, (String) null);
             }
             case SET_SHORT_FORM -> {
-                MCRConfiguration2.set(DEFAULT_LIST_PROPERTY, "DefaultValue,");
+                MCRConfiguration2.set(DEFAULT_LIST_PROPERTY, DefaultValue.class.getName() + ",");
                 MCRConfiguration2.set(DEFAULT_LIST_PROPERTY_1, (String) null);
                 MCRConfiguration2.set(DEFAULT_LIST_PROPERTY_2, (String) null);
             }
             case SET_LONG_FORM -> {
                 MCRConfiguration2.set(DEFAULT_LIST_PROPERTY, (String) null);
-                MCRConfiguration2.set(DEFAULT_LIST_PROPERTY_1, "DefaultValue");
+                MCRConfiguration2.set(DEFAULT_LIST_PROPERTY_1, DefaultValue.class.getName());
             }
         }
 
@@ -259,9 +225,9 @@ public class MCRInstantiatorPropertyListTest {
         LOGGER.info("CONFIGURATION PROPERTIES");
         Map<String, String> propertiesMap = MCRConfigurationBase.getAllPropertiesMap();
         LOGGER.info("{}={}", CONFIGURED_CLASS_PROPERTY, get(propertiesMap, CONFIGURED_CLASS_PROPERTY));
-        LOGGER.info("{}={}", listKey, get(propertiesMap, LIST_PROPERTY));
-        LOGGER.info("{}={}", listProperty1Key, get(propertiesMap, LIST_PROPERTY_1));
-        LOGGER.info("{}={}", listProperty2Key, get(propertiesMap, LIST_PROPERTY_2));
+        LOGGER.info("{}={}", LIST_PROPERTY, get(propertiesMap, LIST_PROPERTY));
+        LOGGER.info("{}={}", LIST_PROPERTY_1, get(propertiesMap, LIST_PROPERTY_1));
+        LOGGER.info("{}={}", LIST_PROPERTY_2, get(propertiesMap, LIST_PROPERTY_2));
         LOGGER.info("{}={}", DEFAULT_LIST_PROPERTY, get(propertiesMap, DEFAULT_LIST_PROPERTY));
         LOGGER.info("{}={}", DEFAULT_LIST_PROPERTY_1, get(propertiesMap, DEFAULT_LIST_PROPERTY_1));
         LOGGER.info("{}={}", DEFAULT_LIST_PROPERTY_2, get(propertiesMap, DEFAULT_LIST_PROPERTY_2));
@@ -283,7 +249,7 @@ public class MCRInstantiatorPropertyListTest {
             assertNull(instance);
             assertNotNull(exception);
 
-            assertEquals("Default property list, configured in MCR.Default.List (and its sub-properties),"
+            assertEquals("Default class list, configured in MCR.List (and its sub-properties),"
                 + " for target field 'list' in configured class " + configuredClass.getName()
                 + " is empty", exception.getMessage());
 
@@ -292,22 +258,16 @@ public class MCRInstantiatorPropertyListTest {
             assertNull(instance);
             assertNotNull(exception);
 
-            if (absolute) {
-                assertEquals("Absolute property list, configured in MCR.List (and its sub-properties),"
-                    + " for target field 'list' in configured class " + configuredClass.getName()
-                    + " is empty", exception.getMessage());
-            } else {
-                assertEquals("Property list, configured in Foo.List (and its sub-properties),"
-                    + " for target field 'list' in configured class " + configuredClass.getName()
-                    + " is empty", exception.getMessage());
-            }
+            assertEquals("Class list, configured in Foo.List (and its sub-properties),"
+                + " for target field 'list' in configured class " + configuredClass.getName()
+                + " is empty", exception.getMessage());
 
         } else {
 
             assertNull(exception);
             assertNotNull(instance);
 
-            List<String> list = instance.list();
+            List<Class<?>> list = instance.list();
             assertNotNull(list);
 
             if (emptyResultExpected) {
@@ -317,13 +277,13 @@ public class MCRInstantiatorPropertyListTest {
             } else {
 
                 assertEquals(1, list.size());
-                String value = list.getFirst();
+                Class<?> value = list.getFirst();
                 assertNotNull(value);
 
                 if (valueProperty.set()) {
-                    assertEquals("Value", value);
+                    assertEquals(Value.class, value);
                 } else {
-                    assertEquals("DefaultValue", value);
+                    assertEquals(DefaultValue.class, value);
                 }
 
             }
@@ -371,103 +331,63 @@ public class MCRInstantiatorPropertyListTest {
 
     public interface Configurable {
 
-        List<String> list();
+        List<Class<?>> list();
 
     }
 
-    public static class RelativeNotRequiredDefaultNotSet implements Configurable {
+    public static class NotRequiredDefaultNotSet implements Configurable {
 
-        @MCRPropertyList(name = "List", required = false)
-        public List<String> list;
+        @MCRClassPropertyList(name = "List", required = false)
+        public List<Class<?>> list;
 
         @Override
-        public List<String> list() {
+        public List<Class<?>> list() {
             return list;
         }
 
     }
 
-    public static class RelativeNotRequiredDefaultSet implements Configurable {
+    public static class NotRequiredDefaultSet implements Configurable {
 
-        @MCRPropertyList(name = "List", required = false, defaultName = "MCR.Default.List")
-        public List<String> list;
+        @MCRClassPropertyList(name = "List", required = false, defaultName = "MCR.List")
+        public List<Class<?>> list;
 
         @Override
-        public List<String> list() {
+        public List<Class<?>> list() {
             return list;
         }
 
     }
 
-    public static class RelativeRequiredDefaultNotSet implements Configurable {
+    public static class RequiredDefaultNotSet implements Configurable {
 
-        @MCRPropertyList(name = "List")
-        public List<String> list;
+        @MCRClassPropertyList(name = "List")
+        public List<Class<?>> list;
 
         @Override
-        public List<String> list() {
+        public List<Class<?>> list() {
             return list;
         }
 
     }
 
-    public static class RelativeRequiredDefaultSet implements Configurable {
+    public static class RequiredDefaultSet implements Configurable {
 
-        @MCRPropertyList(name = "List", defaultName = "MCR.Default.List")
-        public List<String> list;
+        @MCRClassPropertyList(name = "List", defaultName = "MCR.List")
+        public List<Class<?>> list;
 
         @Override
-        public List<String> list() {
+        public List<Class<?>> list() {
             return list;
         }
 
     }
 
-    public static class AbsoluteNotRequiredDefaultNotSet implements Configurable {
-
-        @MCRPropertyList(name = "MCR.List", absolute = true, required = false)
-        public List<String> list;
-
-        @Override
-        public List<String> list() {
-            return list;
-        }
+    public static final class Value {
 
     }
 
-    public static class AbsoluteNotRequiredDefaultSet implements Configurable {
-
-        @MCRPropertyList(name = "MCR.List", absolute = true, required = false, defaultName = "MCR.Default.List")
-        public List<String> list;
-
-        @Override
-        public List<String> list() {
-            return list;
-        }
-
-    }
-
-    public static class AbsoluteRequiredDefaultNotSet implements Configurable {
-
-        @MCRPropertyList(name = "MCR.List", absolute = true)
-        public List<String> list;
-
-        @Override
-        public List<String> list() {
-            return list;
-        }
-
-    }
-
-    public static class AbsoluteRequiredDefaultSet implements Configurable {
-
-        @MCRPropertyList(name = "MCR.List", absolute = true, defaultName = "MCR.Default.List")
-        public List<String> list;
-
-        @Override
-        public List<String> list() {
-            return list;
-        }
+    public static final class DefaultValue {
 
     }
 

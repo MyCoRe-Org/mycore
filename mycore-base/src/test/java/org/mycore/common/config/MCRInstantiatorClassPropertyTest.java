@@ -34,12 +34,12 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
-import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.config.annotation.MCRClassProperty;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.test.MyCoReTest;
 
 /**
- * Tests for the following conditions (for relative properties and for absolute properties):
+ * Tests for the following conditions:
  * <ol>
  *   <li>Annotation has <code>required = false</code> or not</li>
  *   <li>Property value is not set, empty or non-empty</li>
@@ -86,7 +86,7 @@ import org.mycore.test.MyCoReTest;
  * </table>
  */
 @MyCoReTest
-public class MCRInstantiatorPropertyTest {
+public class MCRInstantiatorClassPropertyTest {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -94,24 +94,17 @@ public class MCRInstantiatorPropertyTest {
 
     public static final String VALUE_PROPERTY = "Foo.Value";
 
-    public static final String ABSOLUTE_VALUE_PROPERTY = "MCR.Value";
-
-    public static final String DEFAULT_VALUE_PROPERTY = "MCR.Default.Value";
+    public static final String DEFAULT_VALUE_PROPERTY = "MCR.Value";
 
     private static Stream<Arguments> provideAllParameterCombinations() {
         List<Arguments> argumentsList = new ArrayList<>();
-        for (Boolean absolute : List.of(false, true)) {
-            for (Boolean required : List.of(false, true)) {
-                for (ValueProperty valueProperty : ValueProperty.values()) {
-                    for (Boolean defaultValue : List.of(false, true)) {
-                        for (DefaultProperty defaultProperty : DefaultProperty.values()) {
-                            argumentsList.add(Arguments.of(
-                                absolute,
-                                required,
-                                valueProperty,
-                                defaultValue,
-                                defaultProperty));
-                        }
+        for (Boolean required : List.of(false, true)) {
+            for (ValueProperty valueProperty : ValueProperty
+                .values()) {
+                for (Boolean defaultValue : List.of(false, true)) {
+                    for (DefaultProperty defaultProperty : DefaultProperty
+                        .values()) {
+                        argumentsList.add(Arguments.of(required, valueProperty, defaultValue, defaultProperty));
                     }
                 }
             }
@@ -125,12 +118,11 @@ public class MCRInstantiatorPropertyTest {
         @MCRTestProperty(key = VALUE_PROPERTY, empty = true),
         @MCRTestProperty(key = DEFAULT_VALUE_PROPERTY, empty = true)
     })
-    void test(boolean absolute, boolean required, ValueProperty valueProperty, boolean defaultValue,
-        DefaultProperty defaultProperty) {
+    void test(boolean required, ValueProperty valueProperty,
+        boolean defaultValue, DefaultProperty defaultProperty) {
 
         // log all parameters
         LOGGER.info("TEST PARAMETERS");
-        LOGGER.info("absolute={}", absolute);
         LOGGER.info("required={}", required);
         LOGGER.info("valueProperty={}", valueProperty);
         LOGGER.info("defaultValue={}", defaultValue);
@@ -138,33 +130,17 @@ public class MCRInstantiatorPropertyTest {
 
         // select class to be configured
         Class<? extends Configurable> configuredClass;
-        if (absolute) {
-            if (required) {
-                if (defaultValue) {
-                    configuredClass = AbsoluteRequiredDefaultSet.class;
-                } else {
-                    configuredClass = AbsoluteRequiredDefaultNotSet.class;
-                }
+        if (required) {
+            if (defaultValue) {
+                configuredClass = RequiredDefaultSet.class;
             } else {
-                if (defaultValue) {
-                    configuredClass = AbsoluteNotRequiredDefaultSet.class;
-                } else {
-                    configuredClass = AbsoluteNotRequiredDefaultNotSet.class;
-                }
+                configuredClass = RequiredDefaultNotSet.class;
             }
         } else {
-            if (required) {
-                if (defaultValue) {
-                    configuredClass = RelativeRequiredDefaultSet.class;
-                } else {
-                    configuredClass = RelativeRequiredDefaultNotSet.class;
-                }
+            if (defaultValue) {
+                configuredClass = NotRequiredDefaultSet.class;
             } else {
-                if (defaultValue) {
-                    configuredClass = RelativeNotRequiredDefaultSet.class;
-                } else {
-                    configuredClass = RelativeNotRequiredDefaultNotSet.class;
-                }
+                configuredClass = NotRequiredDefaultNotSet.class;
             }
         }
 
@@ -173,11 +149,10 @@ public class MCRInstantiatorPropertyTest {
 
         // set class property for nested instance
         // empty strings are default via @MCRTestProperty above, may need to overwrite
-        String valueKey = absolute ? ABSOLUTE_VALUE_PROPERTY : VALUE_PROPERTY;
         switch (valueProperty) {
-            case NOT_SET -> MCRConfiguration2.set(valueKey, (String) null);
-            case SET_EMPTY -> MCRConfiguration2.set(valueKey, "");
-            case SET_NON_EMPTY -> MCRConfiguration2.set(valueKey, "Value");
+            case NOT_SET -> MCRConfiguration2.set(VALUE_PROPERTY, (String) null);
+            case SET_EMPTY -> MCRConfiguration2.set(VALUE_PROPERTY, "");
+            case SET_NON_EMPTY -> MCRConfiguration2.set(VALUE_PROPERTY, Value.class.getName());
         }
 
         // set value property for property of nested instance
@@ -185,14 +160,14 @@ public class MCRInstantiatorPropertyTest {
         switch (defaultProperty) {
             case NOT_SET -> MCRConfiguration2.set(DEFAULT_VALUE_PROPERTY, (String) null);
             case SET_EMPTY -> MCRConfiguration2.set(DEFAULT_VALUE_PROPERTY, "");
-            case SET_NON_EMPTY -> MCRConfiguration2.set(DEFAULT_VALUE_PROPERTY, "DefaultValue");
+            case SET_NON_EMPTY -> MCRConfiguration2.set(DEFAULT_VALUE_PROPERTY, DefaultValue.class.getName());
         }
 
         // log all relevant configuration entries
         LOGGER.info("CONFIGURATION PROPERTIES");
         Map<String, String> propertiesMap = MCRConfigurationBase.getAllPropertiesMap();
         LOGGER.info("{}={}", CONFIGURED_CLASS_PROPERTY, get(propertiesMap, CONFIGURED_CLASS_PROPERTY));
-        LOGGER.info("{}={}", valueKey, get(propertiesMap, VALUE_PROPERTY));
+        LOGGER.info("{}={}", VALUE_PROPERTY, get(propertiesMap, VALUE_PROPERTY));
         LOGGER.info("{}={}", DEFAULT_VALUE_PROPERTY, get(propertiesMap, DEFAULT_VALUE_PROPERTY));
 
         // perform instantiation of configured class
@@ -212,7 +187,7 @@ public class MCRInstantiatorPropertyTest {
             assertNull(instance);
             assertNotNull(exception);
 
-            assertEquals("Default property, configured in MCR.Default.Value (and its sub-properties),"
+            assertEquals("Default class, configured in MCR.Value (and its sub-properties),"
                 + " for target field 'value' in configured class " + configuredClass.getName()
                 + " is missing", exception.getMessage());
 
@@ -221,22 +196,16 @@ public class MCRInstantiatorPropertyTest {
             assertNull(instance);
             assertNotNull(exception);
 
-            if (absolute) {
-                assertEquals("Absolute property, configured in MCR.Value (and its sub-properties),"
-                    + " for target field 'value' in configured class " + configuredClass.getName()
-                    + " is missing", exception.getMessage());
-            } else {
-                assertEquals("Property, configured in Foo.Value (and its sub-properties),"
-                    + " for target field 'value' in configured class " + configuredClass.getName()
-                    + " is missing", exception.getMessage());
-            }
+            assertEquals("Class, configured in Foo.Value (and its sub-properties),"
+                + " for target field 'value' in configured class " + configuredClass.getName()
+                + " is missing", exception.getMessage());
 
         } else {
 
             assertNull(exception);
             assertNotNull(instance);
 
-            String value = instance.value();
+            Class<?> value = instance.value();
 
             if (nullResultExpected) {
 
@@ -247,9 +216,9 @@ public class MCRInstantiatorPropertyTest {
                 assertNotNull(value);
 
                 if (valueProperty.set()) {
-                    assertEquals("Value", value);
+                    assertEquals(Value.class, value);
                 } else {
-                    assertEquals("DefaultValue", value);
+                    assertEquals(DefaultValue.class, value);
                 }
 
             }
@@ -293,103 +262,63 @@ public class MCRInstantiatorPropertyTest {
 
     public interface Configurable {
 
-        String value();
+        Class<?> value();
 
     }
 
-    public static class RelativeNotRequiredDefaultNotSet implements Configurable {
+    public static class NotRequiredDefaultNotSet implements Configurable {
 
-        @MCRProperty(name = "Value", required = false)
-        public String value;
+        @MCRClassProperty(name = "Value", required = false)
+        public Class<?> value;
 
         @Override
-        public String value() {
+        public Class<?> value() {
             return value;
         }
 
     }
 
-    public static class RelativeNotRequiredDefaultSet implements Configurable {
+    public static class NotRequiredDefaultSet implements Configurable {
 
-        @MCRProperty(name = "Value", required = false, defaultName = "MCR.Default.Value")
-        public String value;
+        @MCRClassProperty(name = "Value", required = false, defaultName = "MCR.Value")
+        public Class<?> value;
 
         @Override
-        public String value() {
+        public Class<?> value() {
             return value;
         }
 
     }
 
-    public static class RelativeRequiredDefaultNotSet implements Configurable {
+    public static class RequiredDefaultNotSet implements Configurable {
 
-        @MCRProperty(name = "Value")
-        public String value;
+        @MCRClassProperty(name = "Value")
+        public Class<?> value;
 
         @Override
-        public String value() {
+        public Class<?> value() {
             return value;
         }
 
     }
 
-    public static class RelativeRequiredDefaultSet implements Configurable {
+    public static class RequiredDefaultSet implements Configurable {
 
-        @MCRProperty(name = "Value", defaultName = "MCR.Default.Value")
-        public String value;
+        @MCRClassProperty(name = "Value", defaultName = "MCR.Value")
+        public Class<?> value;
 
         @Override
-        public String value() {
+        public Class<?> value() {
             return value;
         }
 
     }
 
-    public static class AbsoluteNotRequiredDefaultNotSet implements Configurable {
-
-        @MCRProperty(name = "MCR.Value", absolute = true, required = false)
-        public String value;
-
-        @Override
-        public String value() {
-            return value;
-        }
+    public static final class Value {
 
     }
 
-    public static class AbsoluteNotRequiredDefaultSet implements Configurable {
-
-        @MCRProperty(name = "MCR.Value", absolute = true, required = false, defaultName = "MCR.Default.Value")
-        public String value;
-
-        @Override
-        public String value() {
-            return value;
-        }
-
-    }
-
-    public static class AbsoluteRequiredDefaultNotSet implements Configurable {
-
-        @MCRProperty(name = "MCR.Value", absolute = true)
-        public String value;
-
-        @Override
-        public String value() {
-            return value;
-        }
-
-    }
-
-    public static class AbsoluteRequiredDefaultSet implements Configurable {
-
-        @MCRProperty(name = "MCR.Value", absolute = true, defaultName = "MCR.Default.Value")
-        public String value;
-
-        @Override
-        public String value() {
-            return value;
-        }
+    public static final class DefaultValue {
 
     }
 

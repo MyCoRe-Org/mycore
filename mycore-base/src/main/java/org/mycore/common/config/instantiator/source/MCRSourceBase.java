@@ -28,8 +28,8 @@ import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.common.config.instantiator.MCRInstantiatorUtils;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
-abstract sealed class MCRSourceBase<Result> implements MCRSource permits MCRInstanceListSource, MCRInstanceMapSource,
-    MCRInstanceSource, MCRPropertyListSource, MCRPropertyMapSource, MCRPropertySource {
+abstract sealed class MCRSourceBase<Result> implements MCRSource permits MCRInstanceSourceBase, MCRValueListSourceBase, 
+        MCRValueMapSourceBase, MCRValueSourceBase {
 
     protected final Logger logger = LogManager.getLogger(getClass());
 
@@ -60,7 +60,7 @@ abstract sealed class MCRSourceBase<Result> implements MCRSource permits MCRInst
         }
 
         String defaultName = defaultName();
-        if (result == null && !defaultName.isEmpty()) {
+        if (isMissingResult(result) && !defaultName.isEmpty()) {
             context = new MCRSourceContext(target, defaultName, "default " + description());
             result = getResult(context, configuration, configuration.fullProperties(), defaultName);
             if (logger.isDebugEnabled() && isMissingResult(result)) {
@@ -68,11 +68,11 @@ abstract sealed class MCRSourceBase<Result> implements MCRSource permits MCRInst
             }
         }
 
-        if ((result == null || isMissingResult(result)) && required()) {
-            throw missingException(context);
+        if (isMissingResult(result) && required()) {
+            throw missingResultException(context);
         }
 
-        return result == null ? nullResultReplacement() : result;
+        return isMissingResult(result) ? missingResultReplacement() : result;
 
     }
 
@@ -93,34 +93,9 @@ abstract sealed class MCRSourceBase<Result> implements MCRSource permits MCRInst
 
     protected abstract boolean isMissingResult(Result result);
 
-    protected abstract MCRConfigurationException missingException(MCRSourceContext context);
+    protected abstract MCRConfigurationException missingResultException(MCRSourceContext context);
 
-    protected abstract Result nullResultReplacement();
-
-    protected final Object createInstance(MCRSourceContext context, MCRInstanceConfiguration<?> configuration,
-        MCRSentinel sentinel) {
-
-        if (rejectedBySentinel(sentinel, context, configuration.properties(), "")) {
-            return null;
-        }
-
-        if (!configuration.instantiatable()) {
-            if (logger.isInfoEnabled()) {
-                logger.info("[CLEAN-UP] Ignoring {} {} and all sub-properties (no or empty class name)",
-                    context.description(), context.property());
-            }
-            return null;
-        }
-
-        Object instance = configuration.instantiate();
-
-        if (!configuration.valueClass().isAssignableFrom(instance.getClass())) {
-            throw context.incompatibilityException(configuration.valueClass(), instance);
-        }
-
-        return instance;
-
-    }
+    protected abstract Result missingResultReplacement();
 
     protected final boolean rejectedBySentinel(MCRSentinel sentinel, MCRSourceContext context,
         Map<String, String> properties, String prefix) {

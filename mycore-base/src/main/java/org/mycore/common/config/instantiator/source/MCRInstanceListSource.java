@@ -32,7 +32,7 @@ import org.mycore.common.config.instantiator.target.MCRTarget;
 /**
  * A {@link MCRInstanceListSource} is a {@link MCRSource} that interprets a {@link MCRInstanceList}.
  */
-final class MCRInstanceListSource extends MCRSourceBase<List<Object>> {
+final class MCRInstanceListSource extends MCRInstanceSourceBase<List<Object>> {
 
     private final MCRInstanceList annotation;
 
@@ -130,12 +130,12 @@ final class MCRInstanceListSource extends MCRSourceBase<List<Object>> {
     }
 
     @Override
-    protected MCRConfigurationException missingException(MCRSourceContext context) {
+    protected MCRConfigurationException missingResultException(MCRSourceContext context) {
         return context.emptyException();
     }
 
     @Override
-    protected List<Object> nullResultReplacement() {
+    protected List<Object> missingResultReplacement() {
         return new ArrayList<>();
     }
 
