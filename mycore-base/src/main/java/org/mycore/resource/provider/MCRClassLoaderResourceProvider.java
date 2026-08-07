@@ -45,13 +45,15 @@ import org.mycore.resource.locator.MCRClassLoaderResourceLocator;
 @MCRConfigurationProxy(proxyClass = MCRClassLoaderResourceProvider.Factory.class)
 public final class MCRClassLoaderResourceProvider extends MCRLocatorResourceProvider {
 
+    public static final String DEFAULT_KEY_PREFIX = MCRResourceProviderBase.DEFAULT_KEY_PREFIX + ".ClassLoader";
+
     public MCRClassLoaderResourceProvider(String coverage) {
         super(coverage, new MCRClassLoaderResourceLocator());
     }
 
     public static class Factory implements Supplier<MCRClassLoaderResourceProvider> {
 
-        @MCRProperty(name = COVERAGE_KEY, defaultName = "MCR.Resource.Provider.Default.ClassLoader.Coverage")
+        @MCRProperty(name = COVERAGE_KEY, defaultNamePrefix = DEFAULT_KEY_PREFIX)
         public String coverage;
 
         @Override

@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRPostConstruction;
@@ -98,7 +99,7 @@ public class MCRObjectStaticContentGenerator {
     }
 
     public static List<String> getContentGenerators() {
-        return MCRConfiguration2.getPropertiesMap()
+        return MCRConfigurationBase.getAllPropertiesMap()
             .keySet()
             .stream()
             .filter(k -> k.startsWith(CONFIG_ID_PREFIX))

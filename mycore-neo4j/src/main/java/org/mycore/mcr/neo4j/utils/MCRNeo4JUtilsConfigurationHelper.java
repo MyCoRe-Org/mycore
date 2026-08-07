@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationBase;
 
 /**
  * The MCRNeo4JUtilsConfigurationHelper class provides utility methods for managing configuration settings related to
@@ -64,7 +64,7 @@ public final class MCRNeo4JUtilsConfigurationHelper {
             return ATTRIBUTE_PATHS.get(type);
         }
 
-        Map<String, String> properties = MCRConfiguration2.getSubPropertiesMap(NEO4J_CONFIG_PREFIX
+        Map<String, String> properties = MCRConfigurationBase.getSubpropertiesMap(NEO4J_CONFIG_PREFIX
             + "NodeAttribute." + type + ".");
         Map<String, String> attributes = new HashMap<>();
         attributes.put("id", "/mycoreobject/@ID");

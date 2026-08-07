@@ -25,7 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.text.StringSubstitutor;
-import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationBase;
 
 public final class MCRClassificationMappingUtil {
 
@@ -63,8 +63,8 @@ public final class MCRClassificationMappingUtil {
         Matcher matcher = pattern.matcher(updatedXPath);
         while (matcher.find()) {
             String patternName = matcher.group(1);
-            String placeholderText = MCRConfiguration2
-                .getSubPropertiesMap("MCR.Category.XPathMapping.Pattern.").get(patternName);
+            String placeholderText = MCRConfigurationBase
+                .getSubpropertiesMap("MCR.Category.XPathMapping.Pattern.").get(patternName);
             if (placeholderText != null) {
                 if (!matcher.group(2).isEmpty()) { // if there are values to substitute
                     String[] placeholderValues = matcher.group(2).split(",");
