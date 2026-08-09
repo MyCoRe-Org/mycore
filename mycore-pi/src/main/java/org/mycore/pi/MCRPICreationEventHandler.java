@@ -20,7 +20,6 @@ package org.mycore.pi;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -50,20 +49,11 @@ public class MCRPICreationEventHandler extends MCREventHandlerBase {
 
     private void processPIServices(MCRObject obj) {
 
-        // list of service IDs for PI service for which an PI is already registered
-        Set<String> servicesWithRegisteredIdentifier = MCRPIManager
-            .getInstance()
-            .getRegistered(obj)
-            .stream()
-            .map(MCRPIRegistrationInfo::getService)
-            .collect(Collectors.toSet());
-
         // map of auto-creating PI services for which no PI is registered yet
         Map<String, MCRPIService<MCRPersistentIdentifier>> autoCreatingServices = MCRPIServiceManager
             .getInstance()
             .getAutoCreationList()
             .stream()
-            .filter(service -> !servicesWithRegisteredIdentifier.contains(service.getServiceID()))
             .filter(service -> !MCRPIService.hasFlag(obj, "", service))
             .collect(Collectors.toMap(MCRPIService::getServiceID, Function.identity()));
 
