@@ -18,6 +18,7 @@
 
 package org.mycore.common.config;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -107,7 +108,7 @@ public class MCRConfiguration2 {
         .softValues()
         .build();
 
-    private static final AtomicReference<Map<String, String>> PROPERTIES = new AtomicReference<>(null);
+    private static final AtomicReference<Map<String, String>> PROPERTIES = new AtomicReference<>(Map.of());
 
     static Map<SingletonKey, Object> instanceHolder = new MCRConcurrentHashMap<>();
 
@@ -127,12 +128,14 @@ public class MCRConfiguration2 {
      */
     public static Map<String, String> getAllPropertiesMap() {
         return PROPERTIES.updateAndGet(existingValue -> {
-            if (existingValue != null) {
-                return existingValue;
+            if (existingValue.isEmpty()) {
+                return MCRConfigurationBase.getAllPropertiesMap()
+                    .entrySet()
+                    .stream()
+                    .filter(entry -> !entry.getValue().isBlank())
+                    .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, entry -> entry.getValue().trim()));
             }
-            return MCRConfigurationBase.getAllPropertiesMap().entrySet().stream()
-                .filter(entry -> !entry.getValue().isBlank())
-                .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, entry -> entry.getValue().trim()));
+            return existingValue;
         });
     }
 
@@ -525,7 +528,9 @@ public class MCRConfiguration2 {
     }
 
     static void clearCaches() {
-        PROPERTIES.set(null);
+        // BEWARE: do NOT replace with constant value, i.e. do NOT replace with PROPERTIES.set(Map.of());
+        // AtomicReference#updateAndGet only works as expected, when each update sets a distinct value
+        PROPERTIES.set(new HashMap<>());
         CONFIGURATIONS.invalidateAll();
     }
 
