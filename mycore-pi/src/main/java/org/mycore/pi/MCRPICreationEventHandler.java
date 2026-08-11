@@ -78,7 +78,7 @@ public class MCRPICreationEventHandler extends MCREventHandlerBase {
                     MCRPersistentIdentifier identifier = service.register(obj, "", false);
 
                     if (LOGGER.isInfoEnabled()) {
-                        LOGGER.info("Created new identifier {} for object  {} using auto-creating PI service {}",
+                        LOGGER.info("Created new identifier {} for object {} using auto-creating PI service {}",
                             identifier, obj.getId(), service.getServiceID());
                     }
 

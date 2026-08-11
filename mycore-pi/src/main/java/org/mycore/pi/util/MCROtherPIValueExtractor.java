@@ -57,7 +57,7 @@ public final class MCROtherPIValueExtractor {
         List<MCRPI> pis = MCRPIService.getFlags(base, "", service);
 
         if (pis.isEmpty()) {
-            throw new MCRException("No identifier found for " + base + " and service " + service);
+            throw new MCRException("No identifier found for " + base + " and service " + this.service);
         }
 
         String identifier = pis.getFirst().getIdentifier();
@@ -65,14 +65,14 @@ public final class MCROtherPIValueExtractor {
 
         if (!matcher.find()) {
             throw new MCRException("Identifier " + identifier + ", found for " + base + " and service "
-                + service + ", doesn't match pattern " + pattern.pattern());
+                + this.service + ", doesn't match pattern " + pattern.pattern());
         }
 
         String value = matcher.group(1);
 
         if (value.isEmpty()) {
             throw new MCRException("Identifier " + identifier + ", found for " + base + " and service "
-                + service + ", contains empty value for pattern " + pattern.pattern());
+                + this.service + ", contains empty value for pattern " + pattern.pattern());
         }
 
         return value;
