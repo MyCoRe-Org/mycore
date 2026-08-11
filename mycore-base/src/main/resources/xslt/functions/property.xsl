@@ -19,7 +19,7 @@
     <xsl:sequence select="$entryDoc/entry/text()"/>
   </xsl:function>
 
-  <xsl:function name="mcrproperty:get-sub-properties" as="map(xs:string, xs:string)">
+  <xsl:function name="mcrproperty:get-subproperties" as="map(xs:string, xs:string)">
     <xsl:param name="keyPrefix" as="xs:string"/>
     <xsl:variable name="propDoc" select="fn:document(concat('property:', $keyPrefix, '*'))" />
     <xsl:map>
@@ -31,7 +31,7 @@
 
   <xsl:function name="mcrproperty:map" as="map(xs:string, xs:string)">
     <xsl:param name="keyPrefix" as="xs:string"/>
-    <xsl:message>mcrproperty:map is deprecated, use mcrproperty:get-sub-properties instead</xsl:message>
+    <xsl:message>mcrproperty:map is deprecated, use mcrproperty:get-subproperties instead</xsl:message>
     <xsl:variable name="propDoc" select="fn:document(concat('property:', $keyPrefix, '*'))" />
     <xsl:map>
       <xsl:for-each select="$propDoc/properties/entry">
