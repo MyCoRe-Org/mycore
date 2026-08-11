@@ -271,7 +271,7 @@ public class MCRInstantiatorPropertyListTest {
 
         // log all relevant configuration entries
         LOGGER.info("CONFIGURATION PROPERTIES");
-        Map<String, String> propertiesMap = MCRConfiguration2.getPropertiesMap();
+        Map<String, String> propertiesMap = MCRConfigurationBase.getAllPropertiesMap();
         LOGGER.info("{}={}", CONFIGURED_CLASS_PROPERTY, get(propertiesMap, CONFIGURED_CLASS_PROPERTY));
         LOGGER.info("{}={}", listKey, get(propertiesMap, LIST_PROPERTY));
         LOGGER.info("{}={}", listProperty1Key, get(propertiesMap, LIST_PROPERTY_1));

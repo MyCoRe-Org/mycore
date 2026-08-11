@@ -37,6 +37,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationBase;
 
 import com.fasterxml.jackson.annotation.JsonClassDescription;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -83,7 +84,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID>, Serializable 
 
     static {
         final String confPrefix = "MCR.Metadata.Type.";
-        VALID_TYPE_LIST = MCRConfiguration2.getSubPropertiesMap(confPrefix)
+        VALID_TYPE_LIST = MCRConfigurationBase.getSubpropertiesMap(confPrefix)
             .entrySet()
             .stream()
             .filter(p -> Boolean.parseBoolean(p.getValue()))

@@ -31,7 +31,7 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
@@ -75,7 +75,7 @@ public class MCRVersioningMetadataStoreMigrator {
      * @throws JDOMException if a JDOM error occurs during XML processing
      */
     public void migrate() throws SVNException, IOException, JDOMException {
-        Map<String, String> subPropertiesMap = MCRConfiguration2.getSubPropertiesMap(
+        Map<String, String> subPropertiesMap = MCRConfigurationBase.getSubpropertiesMap(
             "MCR.IFS2.Store." + versioningStore.getID() + ".");
         LOGGER.info(subPropertiesMap);
         String svnUrl = subPropertiesMap.get("SVNRepositoryURL");
