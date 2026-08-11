@@ -9,6 +9,11 @@ import { cleanupDomTestEnvironment, setupDomTestEnvironment } from '@/test/helpe
 describe('WebCLI app console and settings', () => {
   let wrapper: VueWrapper | null = null;
 
+  async function flushLogFrame(): Promise<void> {
+    await new Promise<void>(resolve => window.requestAnimationFrame(() => resolve()));
+    await nextTick();
+  }
+
   beforeEach(() => {
     setupDomTestEnvironment();
   });
@@ -36,10 +41,10 @@ describe('WebCLI app console and settings', () => {
       });
     };
 
-    emitLog('first', 1);
+    emitLog('first', 1, 'first exception');
     emitLog('second', 2);
     emitLog('third', 3);
-    await nextTick();
+    await flushLogFrame();
 
     let lines = wrapper.findAll('.web-cli-log pre').map(node => node.text());
     expect(lines).toEqual(['INFO: second', 'INFO: third']);
@@ -59,7 +64,7 @@ describe('WebCLI app console and settings', () => {
         time: 4,
       },
     });
-    await nextTick();
+    await flushLogFrame();
 
     lines = wrapper.findAll('.web-cli-log pre').map(node => node.text());
     expect(lines).toEqual(['ERROR: failed', 'boom']);

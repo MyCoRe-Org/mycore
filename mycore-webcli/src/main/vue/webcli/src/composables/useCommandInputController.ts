@@ -73,7 +73,7 @@ export function useCommandInputController(options: CommandInputControllerOptions
     if (!input || !command.value) {
       return false;
     }
-    const regex = /\{[0-9]+\}/g;
+    const regex = /\{[0-9]+(?:,[^{}]*)?\}/g;
     regex.lastIndex = startFrom;
     const match = regex.exec(command.value);
     if (match) {
