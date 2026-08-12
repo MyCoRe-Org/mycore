@@ -24,12 +24,13 @@ import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.pi.MCRPIGenerator;
 
 import jakarta.validation.constraints.NotNull;
+import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 public abstract class MCRDNBURNGenerator extends MCRPIGenerator<MCRDNBURN> {
 
     private static final String URN_NBN_DE = "urn:nbn:de:";
 
-    protected abstract String buildNISS(MCRBase mcrObj, String additional);
+    protected abstract String buildNISS(MCRBase mcrObj, String additional) throws MCRPersistentIdentifierException;
 
     /**
      * Allows the generation of a URN with a specific Namespace
@@ -39,13 +40,14 @@ public abstract class MCRDNBURNGenerator extends MCRPIGenerator<MCRDNBURN> {
      * @param additional additional information dedicated to the object like a mcrpath
      * @return a unique persistence identifier
      */
-    protected MCRDNBURN generate(@NotNull String namespace, MCRBase mcrObj, String additional) {
+    protected MCRDNBURN generate(@NotNull String namespace, MCRBase mcrObj, String additional)
+        throws MCRPersistentIdentifierException {
         Objects.requireNonNull(namespace, "Namespace for an URN must not be null!");
         return new MCRDNBURN(namespace, buildNISS(mcrObj, additional));
     }
 
     @Override
-    public MCRDNBURN generate(MCRBase mcrObj, String additional) {
+    public MCRDNBURN generate(MCRBase mcrObj, String additional) throws MCRPersistentIdentifierException {
         return generate(getNamespace(), mcrObj, additional);
     }
 

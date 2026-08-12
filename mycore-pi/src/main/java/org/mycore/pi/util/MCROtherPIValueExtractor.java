@@ -23,15 +23,19 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.mycore.common.MCRException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.pi.MCRPIService;
 import org.mycore.pi.MCRPIServiceManager;
 import org.mycore.pi.MCRPersistentIdentifier;
 import org.mycore.pi.backend.MCRPI;
+import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 public final class MCROtherPIValueExtractor {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private final String service;
 
@@ -50,29 +54,34 @@ public final class MCROtherPIValueExtractor {
         return pattern;
     }
 
-    public String extractValue(MCRBase base) {
+    public String extractValue(MCRBase base) throws MCRPersistentIdentifierException {
 
         MCRPIServiceManager serviceManager = MCRPIServiceManager.getInstance();
         MCRPIService<MCRPersistentIdentifier> service = serviceManager.getRegistrationService(this.service);
         List<MCRPI> pis = MCRPIService.getFlags(base, "", service);
 
         if (pis.isEmpty()) {
-            throw new MCRException("No identifier found for " + base + " and service " + this.service);
+            throw new MCRPersistentIdentifierException("No identifier found for " + base
+                + " and service " + this.service);
+        }
+
+        if (pis.size() != 1 && LOGGER.isWarnEnabled()) {
+            LOGGER.warn("Service flags for {} contain more than one flag for service {}", base, this.service);
         }
 
         String identifier = pis.getFirst().getIdentifier();
         Matcher matcher = pattern.matcher(identifier);
 
         if (!matcher.find()) {
-            throw new MCRException("Identifier " + identifier + ", found for " + base + " and service "
-                + this.service + ", doesn't match pattern " + pattern.pattern());
+            throw new MCRPersistentIdentifierException("Identifier " + identifier + ", found for " + base
+                + " and service " + this.service + ", doesn't match pattern " + pattern.pattern());
         }
 
         String value = matcher.group(1);
 
         if (value.isEmpty()) {
-            throw new MCRException("Identifier " + identifier + ", found for " + base + " and service "
-                + this.service + ", contains empty value for pattern " + pattern.pattern());
+            throw new MCRPersistentIdentifierException("Identifier " + identifier + ", found for " + base
+                + " and service " + this.service + ", contains empty value for pattern " + pattern.pattern());
         }
 
         return value;

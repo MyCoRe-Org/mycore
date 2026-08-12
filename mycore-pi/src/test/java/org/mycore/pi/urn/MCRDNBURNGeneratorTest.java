@@ -31,6 +31,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.test.MCRJPAExtension;
 import org.mycore.test.MCRMetadataExtension;
 import org.mycore.test.MyCoReTest;
@@ -54,7 +55,7 @@ public class MCRDNBURNGeneratorTest {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Test
-    public void generate()  {
+    public void generate() throws MCRPersistentIdentifierException {
         MCRObjectID getID = MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId("test", "mock");
         MCRObject mcrObject1 = new MCRObject();
         mcrObject1.setId(getID);

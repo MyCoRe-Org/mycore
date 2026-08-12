@@ -26,6 +26,7 @@ import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.pi.MCRPIGenerator;
 import org.mycore.pi.MCRPersistentIdentifier;
+import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.pi.util.MCROtherPIValueExtractor;
 
 public class MCROtherPIDOIGenerator extends MCRPIGenerator<MCRDigitalObjectIdentifier> {
@@ -53,7 +54,8 @@ public class MCROtherPIDOIGenerator extends MCRPIGenerator<MCRDigitalObjectIdent
     }
 
     @Override
-    public MCRDigitalObjectIdentifier generate(MCRBase mcrObject, String additional) {
+    public MCRDigitalObjectIdentifier generate(MCRBase mcrObject, String additional)
+        throws MCRPersistentIdentifierException {
         String suffix = extractor.extractValue(mcrObject);
         Optional<MCRDigitalObjectIdentifier> parse = mcrdoiParser.parse(prefix + "/" + suffix);
         MCRPersistentIdentifier doi = parse.get();

@@ -82,7 +82,7 @@ public class MCRPICreationEventHandler extends MCREventHandlerBase {
                             identifier, obj.getId(), service.getServiceID());
                     }
 
-                    // each auto-creating PI service ony gets one shot at registering a PI
+                    // each auto-creating PI service only gets one shot at registering a PI
                     autoCreatingServices.remove(service.getServiceID());
 
                 } catch (MCRAccessException | MCRPersistentIdentifierException | ExecutionException

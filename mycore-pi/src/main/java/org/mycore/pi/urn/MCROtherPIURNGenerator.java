@@ -21,6 +21,7 @@ package org.mycore.pi.urn;
 import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.datamodel.metadata.MCRBase;
+import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.pi.util.MCROtherPIValueExtractor;
 
 public class MCROtherPIURNGenerator extends MCRDNBURNGenerator {
@@ -39,7 +40,7 @@ public class MCROtherPIURNGenerator extends MCRDNBURNGenerator {
     }
 
     @Override
-    protected String buildNISS(MCRBase mcrObj, String additional) {
+    protected String buildNISS(MCRBase mcrObj, String additional) throws MCRPersistentIdentifierException {
         return extractor.extractValue(mcrObj);
     }
 
