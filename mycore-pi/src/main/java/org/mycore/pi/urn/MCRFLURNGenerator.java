@@ -18,20 +18,70 @@
 
 package org.mycore.pi.urn;
 
+import java.util.Date;
 import java.util.function.Supplier;
 
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.datamodel.metadata.MCRBase;
+import org.mycore.pi.MCRPIGenerator;
+import org.mycore.pi.util.MCRFLDateScrambler;
 
 /**
- * @deprecated Use {@link MCRCurrentDateDNBURNGenerator} instead.
+ * {@link MCRFLURNGenerator} is a {@link MCRPIGenerator} for {@link MCRDNBURN} identifiers
+ * that generates identifiers using a given namespace and the current date (in seconds) value as the NISS.
+ * <p>
+ * It uses a date scrambling algorithm introduced by <strong>F</strong>rank <strong>L</strong>ützenkirchen.
+ * <p>
+ * Only one suffix per second will be generated.
+ * <p>
+ * The following configuration options are available:
+ * <ul>
+ * <li> The property suffix {@link MCRFLURNGenerator#NAMESPACE_KEY} can be used to
+ * specify the namespace.
+ * <li> The property suffix {@link MCRFLURNGenerator#DELIMITER_KEY} can be used to
+ * specify a delimiter to be placed before and after the NISS (optional, defaults to the empty string).
+ * </ul>
+ * Example:
+ * <pre><code>
+ * [...].Class=org.mycore.pi.urn.MCRFLURNGenerator
+ * [...].Namespace=urn:nbn:de:gbv:xyz
+ * [...].Delimiter=-
+ * </code></pre>
+ * 
+ * @see MCRFLDateScrambler
  */
-@Deprecated(forRemoval = true)
 @MCRConfigurationProxy(proxyClass = MCRFLURNGenerator.Factory.class)
-public class MCRFLURNGenerator extends MCRCurrentDateDNBURNGenerator {
+public class MCRFLURNGenerator extends MCRDNBURNGeneratorBase {
+
+    public static final String NAMESPACE_KEY = "Namespace";
+
+    public static final String DELIMITER_KEY = "Delimiter";
+
+    private String lastNIss;
 
     public MCRFLURNGenerator(String namespace, String delimiter) {
         super(namespace, delimiter);
+    }
+
+    @Override
+    protected synchronized String buildNISS(MCRBase base, String additional) {
+
+        Date date = new Date((System.currentTimeMillis() / 1000) * 1000);
+        String niss = MCRFLDateScrambler.scrambleDate(date);
+
+        if (niss.equals(lastNIss)) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException ignored) {
+            }
+            return buildNISS(base, additional);
+        }
+
+        lastNIss = niss;
+
+        return niss;
+
     }
 
     public static class Factory implements Supplier<MCRFLURNGenerator> {
