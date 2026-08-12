@@ -21,33 +21,34 @@ package org.mycore.pi.urn;
 import java.util.Objects;
 
 import org.mycore.datamodel.metadata.MCRBase;
-import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.MCRPIGenerator;
 
 import jakarta.validation.constraints.NotNull;
+import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 public abstract class MCRDNBURNGenerator extends MCRPIGenerator<MCRDNBURN> {
 
     private static final String URN_NBN_DE = "urn:nbn:de:";
 
-    protected abstract String buildNISS(MCRObjectID mcrID, String additional);
+    protected abstract String buildNISS(MCRBase mcrObj, String additional) throws MCRPersistentIdentifierException;
 
     /**
      * Allows the generation of a URN with a specific Namespace
      *
      * @param namespace  the namespace of the generated URN
-     * @param mcrID      the mycore object for which the identifier is generated
+     * @param mcrObj    the mycore object for which the identifier is generated
      * @param additional additional information dedicated to the object like a mcrpath
      * @return a unique persistence identifier
      */
-    protected MCRDNBURN generate(@NotNull String namespace, MCRObjectID mcrID, String additional) {
+    protected MCRDNBURN generate(@NotNull String namespace, MCRBase mcrObj, String additional)
+        throws MCRPersistentIdentifierException {
         Objects.requireNonNull(namespace, "Namespace for an URN must not be null!");
-        return new MCRDNBURN(namespace, buildNISS(mcrID, additional));
+        return new MCRDNBURN(namespace, buildNISS(mcrObj, additional));
     }
 
     @Override
-    public MCRDNBURN generate(MCRBase mcrObj, String additional) {
-        return generate(getNamespace(), mcrObj.getId(), additional);
+    public MCRDNBURN generate(MCRBase mcrObj, String additional) throws MCRPersistentIdentifierException {
+        return generate(getNamespace(), mcrObj, additional);
     }
 
     public String getNamespace() {

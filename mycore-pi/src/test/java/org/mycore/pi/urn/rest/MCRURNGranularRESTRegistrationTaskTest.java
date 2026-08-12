@@ -38,6 +38,7 @@ import org.mycore.pi.MCRPIManager;
 import org.mycore.pi.MCRPIRegistrationInfo;
 import org.mycore.pi.MCRPIUtils;
 import org.mycore.pi.backend.MCRPI;
+import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.pi.urn.MCRDNBURN;
 import org.mycore.test.MCRMetadataExtension;
 import org.mycore.test.MyCoReTest;
@@ -64,7 +65,7 @@ public class MCRURNGranularRESTRegistrationTaskTest {
 
     @Disabled
     @Test
-    public void run()  {
+    public void run() throws MCRPersistentIdentifierException {
         MCRPI urn1 = generateMCRPI(randomFilename(), countRegistered);
         MCREntityManagerProvider.getCurrentEntityManager()
             .persist(urn1);
