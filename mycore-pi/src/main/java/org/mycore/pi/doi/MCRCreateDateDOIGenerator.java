@@ -46,7 +46,7 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
  * The following configuration options are available:
  * <ul>
  * <li> The property suffix {@link MCRCreateDateDOIGenerator#DATE_FORMAT_KEY} can be used to
- * specify the date format to be used (optional, defaults to {@link MCRCreateDateDOIGenerator#DEFAULT_DATE_FORMAT}).
+ * specify the date format to be used.
  * <li> The property suffix {@link MCRCreateDateDOIGenerator#PREFIX_KEY} can be used to
  * specify the prefix.
  * <li> The property suffix {@link MCRCreateDateDOIGenerator#COUNT_PRECISION_KEY} can be used to
@@ -64,9 +64,7 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 @MCRConfigurationProxy(proxyClass = MCRCreateDateDOIGenerator.Factory.class)
 public class MCRCreateDateDOIGenerator extends MCRDOIGeneratorBase {
 
-    public static final String DEFAULT_DATE_FORMAT = "yyyyMMdd-HHmmss";
-
-    public static final Locale DEFAULT_DATE_LOCALE = Locale.ENGLISH;
+    public static final String DEFAULT_PROPERTY_PREFIX = "MCR.Default.PI.Generator.CreateDate.";
 
     public static final String DATE_FORMAT_KEY = "DateFormat";
 
@@ -108,7 +106,7 @@ public class MCRCreateDateDOIGenerator extends MCRDOIGeneratorBase {
         MCRISO8601Date isoDate = new MCRISO8601Date();
         isoDate.setDate(date);
 
-        return isoDate.format(dateFormat, DEFAULT_DATE_LOCALE);
+        return isoDate.format(dateFormat, Locale.ENGLISH);
 
     }
 
@@ -120,23 +118,19 @@ public class MCRCreateDateDOIGenerator extends MCRDOIGeneratorBase {
 
     public static class Factory implements Supplier<MCRCreateDateDOIGenerator> {
 
-        @MCRProperty(name = DATE_FORMAT_KEY, required = false)
+        @MCRProperty(name = DATE_FORMAT_KEY, defaultName = DEFAULT_PROPERTY_PREFIX + DATE_FORMAT_KEY)
         public String dateFormat;
 
         @MCRProperty(name = PREFIX_KEY, defaultName = "MCR.DOI.Prefix")
         public String prefix;
 
-        @MCRProperty(name = COUNT_PRECISION_KEY, required = false)
+        @MCRProperty(name = COUNT_PRECISION_KEY, defaultName = DEFAULT_PROPERTY_PREFIX + COUNT_PRECISION_KEY)
         public String countPrecision = "-1";
 
         @Override
         public MCRCreateDateDOIGenerator get() {
-            return new MCRCreateDateDOIGenerator(new MCRDOIParser(), getDateFormat(), prefix,
+            return new MCRCreateDateDOIGenerator(new MCRDOIParser(),dateFormat, prefix,
                 Integer.parseInt(countPrecision));
-        }
-
-        private String getDateFormat() {
-            return dateFormat != null ? dateFormat : DEFAULT_DATE_FORMAT;
         }
 
     }

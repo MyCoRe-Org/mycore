@@ -21,12 +21,11 @@ package org.mycore.pi;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mycore.pi.MCRGenericPIGenerator.DEFAULT_DATE_FORMAT;
-import static org.mycore.pi.MCRGenericPIGenerator.DEFAULT_DATE_LOCALE;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.jdom2.Element;
@@ -51,6 +50,8 @@ import org.mycore.test.MyCoReTest;
 })
 public class MCRGenericPIGeneratorTest {
 
+    public static final String DATE_FORMAT = "mmDDyyyy";
+
     @Test
     public void testGenerate() throws MCRPersistentIdentifierException {
 
@@ -70,7 +71,7 @@ public class MCRGenericPIGeneratorTest {
 
         MCRGenericPIGenerator generator = new MCRGenericPIGenerator(
             "urn:nbn:de:gbv:xyz:$CurrentDate-$1-$2-$ObjectType-$ObjectProject-$ObjectNumber-$Count-",
-            DEFAULT_DATE_FORMAT,
+            DATE_FORMAT,
             Map.of("my", "MY"),
             Map.of("test", "TEST"),
             3,
@@ -79,7 +80,7 @@ public class MCRGenericPIGeneratorTest {
 
         String pi = generator.generate(object, "").asString();
 
-        SimpleDateFormat dateFormatter = new SimpleDateFormat(DEFAULT_DATE_FORMAT, DEFAULT_DATE_LOCALE);
+        SimpleDateFormat dateFormatter = new SimpleDateFormat(DATE_FORMAT, Locale.ROOT);
         String currenDate = dateFormatter.format(new Date());
 
         assertEquals("urn:nbn:de:gbv:xyz:" + currenDate + "-result1-result2-TEST-MY-00000123-000-",
@@ -96,7 +97,7 @@ public class MCRGenericPIGeneratorTest {
 
         MCRGenericPIGenerator generator = new MCRGenericPIGenerator(
             "10.1234/$ObjectType-$Count",
-            DEFAULT_DATE_FORMAT,
+            DATE_FORMAT,
             Map.of(),
             Map.of(),
             -1,

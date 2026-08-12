@@ -107,7 +107,7 @@ import org.mycore.pi.urn.MCRDNBURN;
  * <li> The property suffix {@link MCRGenericPIGenerator#GENERAL_PATTERN_KEY} can be used to
  * specify the pattern.
  * <li> The property suffix {@link MCRGenericPIGenerator#DATE_FORMAT_KEY} can be used to
- * specify the date format to be used (optional, defaults to {@link MCRGenericPIGenerator#DEFAULT_DATE_FORMAT}).
+ * specify the date format to be used.
  * <li> The property suffix {@link MCRGenericPIGenerator#OBJECT_PROJECT_MAPPING_KEY} can be used to
  * specify the project ID mappings to be used.
  * <li> The property suffix {@link MCRGenericPIGenerator#OBJECT_TYPE_MAPPING_KEY} can be used to
@@ -136,9 +136,7 @@ import org.mycore.pi.urn.MCRDNBURN;
 @MCRConfigurationProxy(proxyClass = MCRGenericPIGenerator.Factory.class)
 public class MCRGenericPIGenerator implements MCRPIGenerator<MCRPersistentIdentifier> {
 
-    public static final String DEFAULT_DATE_FORMAT = "ddMMyyyy";
-
-    public static final Locale DEFAULT_DATE_LOCALE = Locale.ROOT;
+    public static final String DEFAULT_PROPERTY_PREFIX = "MCR.Default.PI.Generator.Generic.";
 
     public static final String GENERAL_PATTERN_KEY = "GeneralPattern";
 
@@ -213,7 +211,7 @@ public class MCRGenericPIGenerator implements MCRPIGenerator<MCRPersistentIdenti
         String resultingPI = generalPattern;
 
         if (resultingPI.contains(PLACE_HOLDER_CURRENT_DATE)) {
-            SimpleDateFormat dateFormatter = new SimpleDateFormat(dateFormat, DEFAULT_DATE_LOCALE);
+            SimpleDateFormat dateFormatter = new SimpleDateFormat(dateFormat, Locale.ROOT);
             resultingPI = resultingPI.replace(PLACE_HOLDER_CURRENT_DATE, dateFormatter.format(new Date()));
         }
 
@@ -222,7 +220,7 @@ public class MCRGenericPIGenerator implements MCRPIGenerator<MCRPersistentIdenti
             if (objectCreateDate == null) {
                 throw new MCRPersistentIdentifierException("Object " + base.getId() + " doesn't have a create date!");
             }
-            SimpleDateFormat dateFormatter = new SimpleDateFormat(dateFormat, DEFAULT_DATE_LOCALE);
+            SimpleDateFormat dateFormatter = new SimpleDateFormat(dateFormat, Locale.ROOT);
             resultingPI = resultingPI.replace(PLACE_HOLDER_OBJECT_DATE, dateFormatter.format(objectCreateDate));
         }
 
@@ -331,7 +329,7 @@ public class MCRGenericPIGenerator implements MCRPIGenerator<MCRPersistentIdenti
         @MCRProperty(name = GENERAL_PATTERN_KEY)
         public String generalPattern;
 
-        @MCRProperty(name = DATE_FORMAT_KEY, required = false)
+        @MCRProperty(name = DATE_FORMAT_KEY, defaultName = DEFAULT_PROPERTY_PREFIX + DATE_FORMAT_KEY)
         public String dateFormat;
 
         @MCRPropertyMap(name = OBJECT_PROJECT_MAPPING_KEY, required = false)
@@ -340,8 +338,8 @@ public class MCRGenericPIGenerator implements MCRPIGenerator<MCRPersistentIdenti
         @MCRPropertyMap(name = OBJECT_TYPE_MAPPING_KEY, required = false)
         public Map<String, String> typeIdMappings;
 
-        @MCRProperty(name = COUNT_PRECISION_KEY, required = false)
-        public String countPrecision = "-1";
+        @MCRProperty(name = COUNT_PRECISION_KEY, defaultName = DEFAULT_PROPERTY_PREFIX + COUNT_PRECISION_KEY)
+        public String countPrecision;
 
         @MCRProperty(name = TYPE_KEY)
         public String type;
@@ -351,13 +349,8 @@ public class MCRGenericPIGenerator implements MCRPIGenerator<MCRPersistentIdenti
 
         @Override
         public MCRGenericPIGenerator get() {
-            return new MCRGenericPIGenerator(generalPattern, getDateFormat(),
-                projectIdMappings, typeIdMappings,
+            return new MCRGenericPIGenerator(generalPattern, dateFormat, projectIdMappings, typeIdMappings,
                 Integer.parseInt(countPrecision), type, xPaths);
-        }
-
-        private String getDateFormat() {
-            return dateFormat != null ? dateFormat : DEFAULT_DATE_FORMAT;
         }
 
     }
