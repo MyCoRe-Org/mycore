@@ -92,25 +92,14 @@
             </configuration>
           </execution>
           <execution>
-            <id>yarn-install-processing</id>
-            <goals>
-              <goal>yarn</goal>
-            </goals>
-            <phase>generate-resources</phase>
-            <configuration>
-              <workingDirectory>${basedir}/src/main/vue/processing</workingDirectory>
-              <arguments>install ${yarn.install.args}</arguments>
-            </configuration>
-          </execution>
-          <execution>
             <id>yarn-build-processing</id>
             <goals>
               <goal>yarn</goal>
             </goals>
             <phase>generate-resources</phase>
             <configuration>
-              <workingDirectory>${basedir}/src/main/vue/processing</workingDirectory>
-              <arguments>build</arguments>
+              <workingDirectory>${basedir}/../mycore-vue</workingDirectory>
+              <arguments>build:processing</arguments>
             </configuration>
           </execution>
         </executions>
