@@ -37,7 +37,7 @@ import org.mycore.test.MyCoReTest;
 @MCRTestConfiguration(properties = {
     @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true"),
 })
-public class MCRUUIDDNBURNGeneratorTest {
+public class MCRUUIDURNGeneratorTest {
 
     public static final String NAMESPACE = "urn:nbn:de:gbv:xyz";
 
@@ -48,7 +48,7 @@ public class MCRUUIDDNBURNGeneratorTest {
         object.setSchema("http://www.w3.org/2001/XMLSchema");
         object.setId(MCRObjectID.getInstance("my_test_00000123"));
 
-        MCRUUIDDNBURNGenerator generator = new MCRUUIDDNBURNGenerator(NAMESPACE, "-");
+        MCRUUIDURNGenerator generator = new MCRUUIDURNGenerator(NAMESPACE, "-");
         String urn = generator.generate(object, "").asString();
 
         assertTrue(urn.startsWith(NAMESPACE));
@@ -74,7 +74,7 @@ public class MCRUUIDDNBURNGeneratorTest {
         object.setSchema("http://www.w3.org/2001/XMLSchema");
         object.setId(MCRObjectID.getInstance("my_test_00000123"));
 
-        MCRUUIDDNBURNGenerator generator = new MCRUUIDDNBURNGenerator(NAMESPACE, "-");
+        MCRUUIDURNGenerator generator = new MCRUUIDURNGenerator(NAMESPACE, "-");
         String urn1 = generator.generate(object, "").asString();
         String urn2 = generator.generate(object, "").asString();
         String urn3 = generator.generate(object, "").asString();

@@ -18,20 +18,46 @@
 
 package org.mycore.pi.urn;
 
+import java.util.UUID;
 import java.util.function.Supplier;
 
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.datamodel.metadata.MCRBase;
+import org.mycore.pi.MCRPIGenerator;
 
 /**
- * @deprecated Use {@link MCRUUIDDNBURNGenerator} instead.
+ * {@link MCRUUIDURNGenerator} is a {@link MCRPIGenerator} for {@link MCRDNBURN} identifiers
+ * that generates identifiers using a given namespace and a {@link UUID} as the NISS.
+ * <p>
+ * The following configuration options are available:
+ * <ul>
+ * <li> The property suffix {@link MCRUUIDURNGenerator#NAMESPACE_KEY} can be used to
+ * specify the namespace.
+ * <li> The property suffix {@link MCRUUIDURNGenerator#DELIMITER_KEY} can be used to
+ * specify a delimiter to be placed before and after the NISS (optional, defaults to the empty string).
+ * </ul>
+ * Example:
+ * <pre><code>
+ * [...].Class=org.mycore.pi.urn.MCRUUIDURNGenerator
+ * [...].Namespace=urn:nbn:de:gbv:xyz
+ * [...].Delimiter=-
+ * </code></pre>
  */
-@Deprecated(forRemoval = true)
 @MCRConfigurationProxy(proxyClass = MCRUUIDURNGenerator.Factory.class)
-public class MCRUUIDURNGenerator extends MCRUUIDDNBURNGenerator {
+public class MCRUUIDURNGenerator extends MCRDNBURNGeneratorBase {
+
+    public static final String NAMESPACE_KEY = "Namespace";
+
+    public static final String DELIMITER_KEY = "Delimiter";
 
     public MCRUUIDURNGenerator(String namespace, String delimiter) {
         super(namespace, delimiter);
+    }
+
+    @Override
+    protected String buildNISS(MCRBase base, String additional) {
+        return UUID.randomUUID().toString();
     }
 
     public static class Factory implements Supplier<MCRUUIDURNGenerator> {

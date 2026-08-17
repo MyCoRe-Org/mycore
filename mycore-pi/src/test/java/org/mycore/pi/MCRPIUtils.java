@@ -32,7 +32,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.pi.urn.MCRDNBURN;
-import org.mycore.pi.urn.MCRUUIDDNBURNGenerator;
+import org.mycore.pi.urn.MCRUUIDURNGenerator;
 import org.mycore.pi.urn.rest.MCRDNBURNRestClient;
 import org.mycore.pi.urn.rest.MCRURNJsonBundle;
 
@@ -58,7 +58,7 @@ public class MCRPIUtils {
 
     private static MCRDNBURN generateURNFor(MCRObjectID mycoreID, String namespace)
         throws MCRPersistentIdentifierException {
-        MCRUUIDDNBURNGenerator generator = new MCRUUIDDNBURNGenerator(namespace, "");
+        MCRUUIDURNGenerator generator = new MCRUUIDURNGenerator(namespace, "");
         MCRObject mcrObject1 = new MCRObject();
         mcrObject1.setId(mycoreID);
         return generator.generate(mcrObject1, "");
