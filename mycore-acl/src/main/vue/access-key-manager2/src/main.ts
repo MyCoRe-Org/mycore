@@ -17,6 +17,24 @@ import { AppConfigKey, AccessKeyConfigKey } from './keys';
 
 const APP_ID = 'app';
 
+const VUE_I18N_PREFIX = 'component.vue.';
+
+const LEGACY_VUE_I18N_PREFIX = 'component.webtools.vue.';
+
+/**
+ * Maps the error view translations onto the key prefix that is compiled into @mycore-org/vue-components. Can be
+ * dropped once that package looks the keys up under {@link VUE_I18N_PREFIX}.
+ */
+const withLegacyVueKeys = (
+  translations: Record<string, string>
+): Record<string, string> =>
+  Object.fromEntries(
+    Object.entries(translations).map(([key, value]) => [
+      key.replace(VUE_I18N_PREFIX, LEGACY_VUE_I18N_PREFIX),
+      value,
+    ])
+  );
+
 const setErrorHandler = (app: App): void => {
   app.config.errorHandler = error => {
     if (error instanceof UnauthorizedActionError) {
@@ -34,14 +52,12 @@ const langClient = new LangApiClient(appConfig.baseUrl);
 const initApp = async () => {
   try {
     const [vueTranslations, accessKeyTranslations] = await Promise.all([
-      langClient.getTranslations(
-        'component.webtools.vue.*',
-        appConfig.currentLang
-      ),
+      langClient.getTranslations(`${VUE_I18N_PREFIX}*`, appConfig.currentLang),
       langClient.getTranslations(I18N_PREFIX, appConfig.currentLang),
     ]);
     const translations: Record<string, string> = {
       ...vueTranslations,
+      ...withLegacyVueKeys(vueTranslations),
       ...accessKeyTranslations,
     };
     const i18n = createI18n({

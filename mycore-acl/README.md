@@ -22,7 +22,7 @@ This module provides an Access Key Manager, which can be integrated into the Vue
 ```xml
 <servlet>
   <servlet-name>AccessKeyManager</servlet-name>
-  <servlet-class>org.mycore.webtools.vue.MCRVueRootServlet</servlet-class>
+  <servlet-class>org.mycore.frontend.vue.MCRVueRootServlet</servlet-class>
   <init-param>
     <param-name>heading</param-name>
     <param-value>component.acl.accesskey.frontend.title.main</param-value>

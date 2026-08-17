@@ -65,7 +65,7 @@
             <phase>generate-resources</phase>
             <configuration>
               <workingDirectory>${basedir}/src/main/ts/upload</workingDirectory>
-              <arguments>install</arguments>
+              <arguments>install ${yarn.install.args}</arguments>
             </configuration>
           </execution>
           <execution>
@@ -87,7 +87,7 @@
             <phase>generate-resources</phase>
             <configuration>
               <workingDirectory>${basedir}/src/main/vue/texteditor</workingDirectory>
-              <arguments>install</arguments>
+              <arguments>install ${yarn.install.args}</arguments>
             </configuration>
           </execution>
           <execution>
@@ -109,7 +109,7 @@
             <phase>generate-resources</phase>
             <configuration>
               <workingDirectory>${basedir}/src/main/vue/processing</workingDirectory>
-              <arguments>install</arguments>
+              <arguments>install ${yarn.install.args}</arguments>
             </configuration>
           </execution>
           <execution>
@@ -165,12 +165,13 @@
       <artifactId>jdom2</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.jsoup</groupId>
-      <artifactId>jsoup</artifactId>
+      <groupId>org.mycore</groupId>
+      <artifactId>mycore-base</artifactId>
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
-      <artifactId>mycore-base</artifactId>
+      <artifactId>mycore-vue</artifactId>
+      <scope>runtime</scope>
     </dependency>
   </dependencies>
 </project>
