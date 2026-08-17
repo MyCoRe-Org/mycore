@@ -250,6 +250,24 @@ public class MCRSessionStoreListenerTest {
     }
 
     @Test
+    public void doesNotReindexDestroyedHttpSession() {
+
+        // create and destroy an HTTP session
+        HttpSession httpSession = getMockHttpSession(servletContext, "httpSession1");
+        listener.sessionCreated(new HttpSessionEvent(httpSession));
+        listener.sessionDestroyed(new HttpSessionEvent(httpSession));
+
+        // deliver an ID-change event that was already in progress when the session was destroyed
+        changeMockHttpSessionId(httpSession, "httpSession2");
+        listener.sessionIdChanged(new HttpSessionEvent(httpSession), "httpSession1");
+
+        // the destroyed session must not be added back to the store
+        assertTrue(obtainHttpSessionIdsAsSet(sessionStore).isEmpty());
+        assertTrue(obtainHttpSessionsAsSet(sessionStore).isEmpty());
+
+    }
+
+    @Test
     public void createsHttpSessionsConcurrently()
         throws InterruptedException, ExecutionException, TimeoutException {
         CountDownLatch firstCreationStarted = new CountDownLatch(1);

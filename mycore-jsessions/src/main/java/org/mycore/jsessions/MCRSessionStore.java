@@ -140,7 +140,9 @@ public final class MCRSessionStore {
         }
         sessionIndex.lock.lock();
         try {
-            reindex(session, sessionIndex);
+            if (!sessionIndex.removed) {
+                reindex(session, sessionIndex);
+            }
         } finally {
             sessionIndex.lock.unlock();
         }
@@ -154,6 +156,7 @@ public final class MCRSessionStore {
         }
         sessionIndex.lock.lock();
         try {
+            sessionIndex.removed = true;
             if (sessionIndex.indexedId != null) {
                 httpSessions.remove(sessionIndex.indexedId, session);
                 sessionIndex.indexedId = null;
@@ -188,6 +191,8 @@ public final class MCRSessionStore {
         private final ReentrantLock lock = new ReentrantLock();
 
         private String indexedId;
+
+        private boolean removed;
 
     }
 
