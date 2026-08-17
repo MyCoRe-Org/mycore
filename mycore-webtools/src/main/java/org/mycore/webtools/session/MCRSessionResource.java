@@ -29,6 +29,7 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.frontend.jersey.MCRJerseyUtil;
+import org.mycore.frontend.servlets.MCRServlet;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -109,7 +110,7 @@ public class MCRSessionResource {
 
         sessionJSON.addProperty("id", session.getID());
 
-        Object httpId = session.get("http.session");
+        Object httpId = session.get(MCRServlet.HTTP_SESSION_ID_KEY);
         if (httpId != null) {
             String httpIdString = httpId.toString();
             int prefixLength = Math.min(8, httpIdString.length() / 4);

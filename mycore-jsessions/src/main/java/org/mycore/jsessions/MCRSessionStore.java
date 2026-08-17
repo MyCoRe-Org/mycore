@@ -18,10 +18,13 @@
 
 package org.mycore.jsessions;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 import org.mycore.common.MCRSession;
@@ -38,6 +41,8 @@ import jakarta.servlet.http.HttpSession;
  * an attribute with name {@link MCRServlet#ATTR_MYCORE_SESSION}.
  */
 public final class MCRSessionStore {
+
+    private static final String SESSION_INDEX_KEY = MCRSessionStore.class.getName() + ".SESSION_INDEX";
 
     private final ConcurrentMap<String, HttpSession> httpSessions = new ConcurrentHashMap<>();
 
@@ -107,14 +112,83 @@ public final class MCRSessionStore {
     }
 
     void add(HttpSession session) {
-        httpSessions.put(session.getId(), session);
+        SessionIndex sessionIndex = new SessionIndex();
+        sessionIndex.lock.lock();
+        try {
+            session.setAttribute(SESSION_INDEX_KEY, sessionIndex);
+            reindex(session, sessionIndex);
+        } finally {
+            sessionIndex.lock.unlock();
+        }
+    }
+
+    /**
+     * Reindexes a HTTP session whose ID has been changed by the servlet container, i.e. by
+     * {@link jakarta.servlet.http.HttpServletRequest#changeSessionId()}.
+     * <p>
+     * The session is indexed by its current ID and all other IDs it is indexed by are dropped. This
+     * restores the invariant that each HTTP session is indexed by exactly one ID, even if a previous
+     * ID change was never reported to this store. The current ID is added before the previous IDs are
+     * dropped, so that the session can always be looked up by at least one ID.
+     *
+     * @param session the HTTP session, already carrying its new ID
+     */
+    void changeId(HttpSession session) {
+        SessionIndex sessionIndex = sessionIndex(session);
+        if (sessionIndex == null) {
+            return;
+        }
+        sessionIndex.lock.lock();
+        try {
+            reindex(session, sessionIndex);
+        } finally {
+            sessionIndex.lock.unlock();
+        }
     }
 
     void remove(HttpSession session) {
-        httpSessions.remove(session.getId());
+        SessionIndex sessionIndex = sessionIndex(session);
+        if (sessionIndex == null) {
+            httpSessions.values().removeIf(value -> value.equals(session));
+            return;
+        }
+        sessionIndex.lock.lock();
+        try {
+            if (sessionIndex.indexedId != null) {
+                httpSessions.remove(sessionIndex.indexedId, session);
+                sessionIndex.indexedId = null;
+            }
+        } finally {
+            sessionIndex.lock.unlock();
+        }
+    }
+
+    private void reindex(HttpSession session, SessionIndex sessionIndex) {
+        String currentId = session.getId();
+        httpSessions.put(currentId, session);
+        if (sessionIndex.indexedId != null && !sessionIndex.indexedId.equals(currentId)) {
+            httpSessions.remove(sessionIndex.indexedId, session);
+        }
+        sessionIndex.indexedId = currentId;
+    }
+
+    private static SessionIndex sessionIndex(HttpSession session) {
+        Object sessionIndex = session.getAttribute(SESSION_INDEX_KEY);
+        return sessionIndex instanceof SessionIndex index ? index : null;
     }
 
     public record Sessions(HttpSession httpSession, MCRSession session) {
+    }
+
+    private static final class SessionIndex implements Serializable {
+
+        @Serial
+        private static final long serialVersionUID = 1L;
+
+        private final ReentrantLock lock = new ReentrantLock();
+
+        private String indexedId;
+
     }
 
 }
