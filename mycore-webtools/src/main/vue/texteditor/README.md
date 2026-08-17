@@ -28,19 +28,27 @@ local MyCoRe instance at `http://localhost:8080/jportal/`. If your application
 runs on a different URL, update the base URL in `src/router/index.ts`. In
 production it is built and served as part of the MyCoRe Java application.
 
+The toolchain is shared by all MyCoRe Vue apps and lives in `mycore-vue`, so
+all commands are run from there.
+
 Install dependencies:
 ```sh
-yarn
+cd ../../../../../mycore-vue && yarn
 ```
 
 Start dev server:
 ```sh
-yarn dev
+yarn dev:texteditor
 ```
 
 Type-check:
 ```sh
-yarn type-check
+yarn type-check:texteditor
+```
+
+Build:
+```sh
+yarn build:texteditor
 ```
 
 ### Example URLs (dev)

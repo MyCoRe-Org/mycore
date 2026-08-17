@@ -79,17 +79,7 @@
               <arguments>build</arguments>
             </configuration>
           </execution>
-          <execution>
-            <id>yarn-install-texteditor</id>
-            <goals>
-              <goal>yarn</goal>
-            </goals>
-            <phase>generate-resources</phase>
-            <configuration>
-              <workingDirectory>${basedir}/src/main/vue/texteditor</workingDirectory>
-              <arguments>install ${yarn.install.args}</arguments>
-            </configuration>
-          </execution>
+          <!-- the texteditor uses the shared toolchain in mycore-vue, which already ran yarn install -->
           <execution>
             <id>yarn-build-texteditor</id>
             <goals>
@@ -97,8 +87,8 @@
             </goals>
             <phase>generate-resources</phase>
             <configuration>
-              <workingDirectory>${basedir}/src/main/vue/texteditor</workingDirectory>
-              <arguments>build</arguments>
+              <workingDirectory>${basedir}/../mycore-vue</workingDirectory>
+              <arguments>build:texteditor</arguments>
             </configuration>
           </execution>
           <execution>
