@@ -14,7 +14,10 @@
     "build-only:processing": "vite build --config ../mycore-webtools/src/main/vue/processing/vite.config.mts",
     "type-check:processing": "vue-tsc --noEmit -p ../mycore-webtools/src/main/vue/processing/tsconfig.json",
     "dev:processing": "vite --config ../mycore-webtools/src/main/vue/processing/vite.config.mts",
-    "build:jobqueue": "vite build --config ../mycore-jobqueue/src/main/vue/jobqueue/vite.config.mts",
+    "build:jobqueue": "run-s type-check:jobqueue build-only:jobqueue",
+    "build-only:jobqueue": "vite build --config ../mycore-jobqueue/src/main/vue/jobqueue/vite.config.mts",
+    "type-check:jobqueue": "vue-tsc --noEmit -p ../mycore-jobqueue/src/main/vue/jobqueue/tsconfig.json",
+    "dev:jobqueue": "vite --config ../mycore-jobqueue/src/main/vue/jobqueue/vite.config.mts",
     "build:webcli": "vite build --config ../mycore-webcli/src/main/vue/webcli/vite.config.mts",
     "build:access-key-manager": "vite build --config ../mycore-acl/src/main/vue/access-key-manager2/vite.config.mts",
     "build:all": "run-s build:texteditor build:processing build:jobqueue build:webcli build:access-key-manager"

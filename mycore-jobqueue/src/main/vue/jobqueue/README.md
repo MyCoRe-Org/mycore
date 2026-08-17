@@ -1,21 +1,28 @@
 # jobqueue
 
-This template should help get you started developing with Vue 3 in Vite.
+The toolchain is shared by all MyCoRe Vue apps and lives in `mycore-vue`, so
+all commands are run from there.
 
 ## Project Setup
 
 ```sh
-npm install
+cd ../../../../../mycore-vue && yarn
 ```
 
 ### Compile and Hot-Reload for Development
 
 ```sh
-npm run dev
+yarn dev:jobqueue
+```
+
+### Type-Check
+
+```sh
+yarn type-check:jobqueue
 ```
 
 ### Type-Check, Compile and Minify for Production
 
 ```sh
-npm run build
+yarn build:jobqueue
 ```
