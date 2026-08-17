@@ -6,8 +6,9 @@ import { fileURLToPath } from 'node:url';
 import { defineConfig } from '@playwright/test';
 
 const port = 4174;
-const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
-const artifactsRoot = path.resolve(currentDirectory, '../../../../target/playwright');
+const toolchainDirectory = path.dirname(fileURLToPath(import.meta.url));
+const appDirectory = path.resolve(toolchainDirectory, '../mycore-webcli/src/main/vue/webcli');
+const artifactsRoot = path.resolve(appDirectory, '../../../../target/playwright');
 
 function detectChromiumBinary(): string | undefined {
   if (process.env.CHROME_BIN && existsSync(process.env.CHROME_BIN)) {
@@ -45,7 +46,7 @@ function detectChromiumBinary(): string | undefined {
 const chromiumExecutablePath = detectChromiumBinary();
 
 export default defineConfig({
-  testDir: './tests/a11y',
+  testDir: path.join(appDirectory, 'tests/a11y'),
   outputDir: path.join(artifactsRoot, 'test-results'),
   timeout: 30_000,
   reporter: [['list'], ['html', { open: 'never', outputFolder: path.join(artifactsRoot, 'report') }]],
@@ -61,6 +62,7 @@ export default defineConfig({
   },
   webServer: {
     command: 'node ./tests/a11y/static-server.mjs',
+    cwd: appDirectory,
     port,
     reuseExistingServer: !process.env.CI,
   },
