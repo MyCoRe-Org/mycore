@@ -10,7 +10,7 @@ import { WebSocketServer } from 'ws';
 const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
 const staticRoot = path.resolve(
   currentDirectory,
-  '../../../../../../target/classes/META-INF/resources/modules/webcli/gui',
+  '../../mycore-webcli/target/classes/META-INF/resources/modules/webcli/gui',
 );
 const port = 4175;
 const webSocketPath = '/ws/mycore-webcli/socket';

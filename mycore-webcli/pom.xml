@@ -42,20 +42,16 @@
             <id>yarn-install</id>
             <phase>none</phase>
           </execution>
+          <!-- node and yarn come from mycore-vue, which installs them into the shared directory derived from
+               node.version and yarn.version. Installing them here as well would let this module run the shared
+               node_modules under a different node version, should it ever override those properties. -->
           <execution>
-            <id>grunt-build</id>
+            <id>install-node-and-yarn</id>
             <phase>none</phase>
           </execution>
           <execution>
-            <id>yarn-install-webcli</id>
-            <goals>
-              <goal>yarn</goal>
-            </goals>
-            <phase>generate-resources</phase>
-            <configuration>
-              <workingDirectory>${basedir}/src/main/vue/webcli</workingDirectory>
-              <arguments>install ${yarn.install.args}</arguments>
-            </configuration>
+            <id>grunt-build</id>
+            <phase>none</phase>
           </execution>
           <execution>
             <id>yarn-build-webcli</id>
@@ -64,8 +60,8 @@
             </goals>
             <phase>generate-resources</phase>
             <configuration>
-              <workingDirectory>${basedir}/src/main/vue/webcli</workingDirectory>
-              <arguments>build</arguments>
+              <workingDirectory>${basedir}/../mycore-vue</workingDirectory>
+              <arguments>build:webcli</arguments>
             </configuration>
           </execution>
           <execution>
@@ -75,8 +71,8 @@
             </goals>
             <phase>test</phase>
             <configuration>
-              <workingDirectory>${basedir}/src/main/vue/webcli</workingDirectory>
-              <arguments>test --run</arguments>
+              <workingDirectory>${basedir}/../mycore-vue</workingDirectory>
+              <arguments>test:webcli</arguments>
             </configuration>
           </execution>
           <execution>
@@ -86,8 +82,8 @@
             </goals>
             <phase>test</phase>
             <configuration>
-              <workingDirectory>${basedir}/src/main/vue/webcli</workingDirectory>
-              <arguments>lint</arguments>
+              <workingDirectory>${basedir}/../mycore-vue</workingDirectory>
+              <arguments>lint:webcli</arguments>
             </configuration>
           </execution>
           <execution>
@@ -97,8 +93,8 @@
             </goals>
             <phase>test</phase>
             <configuration>
-              <workingDirectory>${basedir}/src/main/vue/webcli</workingDirectory>
-              <arguments>typecheck</arguments>
+              <workingDirectory>${basedir}/../mycore-vue</workingDirectory>
+              <arguments>typecheck:webcli</arguments>
             </configuration>
           </execution>
         </executions>
@@ -169,8 +165,8 @@
                 </goals>
                 <phase>test</phase>
                 <configuration>
-                  <workingDirectory>${basedir}/src/main/vue/webcli</workingDirectory>
-                  <arguments>ci:check</arguments>
+                  <workingDirectory>${basedir}/../mycore-vue</workingDirectory>
+                  <arguments>ci-check:webcli</arguments>
                 </configuration>
               </execution>
             </executions>
@@ -193,8 +189,8 @@
                 </goals>
                 <phase>integration-test</phase>
                 <configuration>
-                  <workingDirectory>${basedir}/src/main/vue/webcli</workingDirectory>
-                  <arguments>test:a11y</arguments>
+                  <workingDirectory>${basedir}/../mycore-vue</workingDirectory>
+                  <arguments>test-a11y:webcli</arguments>
                 </configuration>
               </execution>
             </executions>

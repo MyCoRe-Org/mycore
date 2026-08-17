@@ -1,21 +1,23 @@
 {
+  "extends": "../../../../../mycore-vue/tsconfig.json",
   "compilerOptions": {
-    "target": "ES2022",
     "useDefineForClassFields": true,
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "strict": true,
-    "jsx": "preserve",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
     "esModuleInterop": true,
-    "skipLibCheck": true,
+    "noUncheckedIndexedAccess": false,
     "baseUrl": ".",
+    "typeRoots": ["../../../../../mycore-vue/node_modules/@types"],
     "paths": {
-      "@/*": ["src/*"]
-    },
-    "lib": ["ES2022", "DOM", "DOM.Iterable", "ESNext"],
-    "types": ["vite/client", "vitest/globals", "node"]
+      "@/*": ["src/*"],
+      "*": [
+        "../../../../../mycore-vue/node_modules/@types/*",
+        "../../../../../mycore-vue/node_modules/*"
+      ]
+    }
   },
-  "include": ["src/**/*.ts", "src/**/*.vue", "vite.config.ts", "playwright.config.ts", "tests/**/*.ts"]
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.vue",
+    "vite.config.mts",
+    "tests/**/*.ts"
+  ]
 }
