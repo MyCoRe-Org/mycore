@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.jsession;
+package org.mycore.jsessions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -26,6 +26,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,9 +40,7 @@ import org.mockito.Mockito;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionResolver;
 import org.mycore.frontend.servlets.MCRServlet;
-import org.mycore.jsessions.MCRSessionStore;
 import org.mycore.jsessions.MCRSessionStore.Sessions;
-import org.mycore.jsessions.MCRSessionStoreListener;
 import org.mycore.test.MyCoReTest;
 
 import jakarta.servlet.ServletContext;
@@ -147,6 +152,134 @@ public class MCRSessionStoreListenerTest {
 
     }
 
+    @Test
+    public void trackHttpSessionsWithChangedIds() {
+
+        // create sessions
+        MCRSession sessionA = getMockSession("sessionA");
+
+        // create HTTP sessions
+        HttpSession httpSession1 = getMockHttpSession(servletContext, "httpSession1", sessionA);
+        HttpSession httpSession2 = getMockHttpSession(servletContext, "httpSession2");
+
+        // fire session created events
+        listener.sessionCreated(new HttpSessionEvent(httpSession1));
+        listener.sessionCreated(new HttpSessionEvent(httpSession2));
+
+        // change the ID of the first HTTP session, as done after a successful login
+        changeMockHttpSessionId(httpSession1, "httpSession3");
+        listener.sessionIdChanged(new HttpSessionEvent(httpSession1), "httpSession1");
+
+        // the HTTP session should be indexed by its new ID only
+        assertEquals(Set.of("httpSession3", "httpSession2"), obtainHttpSessionIdsAsSet(sessionStore));
+        assertEquals(Optional.of(httpSession1), sessionStore.httpSessionById("httpSession3"));
+        assertEquals(Optional.empty(), sessionStore.httpSessionById("httpSession1"));
+
+        // the corresponding MyCoRe session should be retrievable by the new ID only
+        assertEquals(Optional.of(new Sessions(httpSession1, sessionA)),
+            sessionStore.sessionsByHttpSessionId("httpSession3"));
+        assertEquals(Optional.empty(), sessionStore.sessionsByHttpSessionId("httpSession1"));
+        assertEquals(Set.of(httpSession1), sessionStore.httpSessionsByMycoreSession(sessionA));
+
+        // change the ID again
+        changeMockHttpSessionId(httpSession1, "httpSession4");
+        listener.sessionIdChanged(new HttpSessionEvent(httpSession1), "httpSession3");
+
+        assertEquals(Set.of("httpSession4", "httpSession2"), obtainHttpSessionIdsAsSet(sessionStore));
+        assertEquals(Optional.of(httpSession1), sessionStore.httpSessionById("httpSession4"));
+        assertEquals(Optional.empty(), sessionStore.httpSessionById("httpSession3"));
+
+        // fire session destroyed events
+        listener.sessionDestroyed(new HttpSessionEvent(httpSession1));
+        listener.sessionDestroyed(new HttpSessionEvent(httpSession2));
+
+        // no sessions should be there anymore
+        assertTrue(obtainHttpSessionIdsAsSet(sessionStore).isEmpty());
+        assertTrue(obtainHttpSessionsAsSet(sessionStore).isEmpty());
+
+    }
+
+    @Test
+    public void removesHttpSessionAfterUnreportedIdChange() {
+
+        // create HTTP session
+        HttpSession httpSession1 = getMockHttpSession(servletContext, "httpSession1");
+
+        // fire session created event
+        listener.sessionCreated(new HttpSessionEvent(httpSession1));
+
+        // change the ID without a corresponding event
+        changeMockHttpSessionId(httpSession1, "httpSession2");
+
+        // fire session destroyed event
+        listener.sessionDestroyed(new HttpSessionEvent(httpSession1));
+
+        // no stale entry should be left behind
+        assertTrue(obtainHttpSessionIdsAsSet(sessionStore).isEmpty());
+        assertTrue(obtainHttpSessionsAsSet(sessionStore).isEmpty());
+
+    }
+
+    @Test
+    public void indexesHttpSessionByOneIdAfterUnreportedIdChange() {
+
+        // create HTTP session
+        HttpSession httpSession1 = getMockHttpSession(servletContext, "httpSession1");
+
+        // fire session created event
+        listener.sessionCreated(new HttpSessionEvent(httpSession1));
+
+        // change the ID without a corresponding event
+        changeMockHttpSessionId(httpSession1, "httpSession2");
+
+        // change the ID again, this time with a corresponding event
+        changeMockHttpSessionId(httpSession1, "httpSession3");
+        listener.sessionIdChanged(new HttpSessionEvent(httpSession1), "httpSession2");
+
+        // the HTTP session should be indexed by its current ID only, the unreported ID
+        // must not be left behind as an alias
+        assertEquals(Set.of("httpSession3"), obtainHttpSessionIdsAsSet(sessionStore));
+
+        // fire session destroyed event
+        listener.sessionDestroyed(new HttpSessionEvent(httpSession1));
+
+        // no stale entry should be left behind
+        assertTrue(obtainHttpSessionIdsAsSet(sessionStore).isEmpty());
+        assertTrue(obtainHttpSessionsAsSet(sessionStore).isEmpty());
+
+    }
+
+    @Test
+    public void createsHttpSessionsConcurrently()
+        throws InterruptedException, ExecutionException, TimeoutException {
+        CountDownLatch firstCreationStarted = new CountDownLatch(1);
+        CountDownLatch continueFirstCreation = new CountDownLatch(1);
+        HttpSession httpSession1 = getMockHttpSession(servletContext, "httpSession1");
+        Mockito.when(httpSession1.getId()).thenAnswer(invocation -> {
+            firstCreationStarted.countDown();
+            assertTrue(continueFirstCreation.await(5, TimeUnit.SECONDS));
+            return "httpSession1";
+        });
+        HttpSession httpSession2 = getMockHttpSession(servletContext, "httpSession2");
+
+        try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            Future<?> firstCreation = executor.submit(
+                () -> listener.sessionCreated(new HttpSessionEvent(httpSession1)));
+            try {
+                assertTrue(firstCreationStarted.await(5, TimeUnit.SECONDS));
+
+                Future<?> secondCreation = executor.submit(
+                    () -> listener.sessionCreated(new HttpSessionEvent(httpSession2)));
+                secondCreation.get(5, TimeUnit.SECONDS);
+            } finally {
+                continueFirstCreation.countDown();
+            }
+            firstCreation.get(5, TimeUnit.SECONDS);
+        }
+
+        assertEquals(Set.of("httpSession1", "httpSession2"), obtainHttpSessionIdsAsSet(sessionStore));
+    }
+
     private static Set<String> obtainHttpSessionIdsAsSet(MCRSessionStore sessionStore) {
         Set<String> httpSessionIds = new HashSet<>();
         sessionStore.httpSessionIds().forEach(httpSessionIds::add);
@@ -178,9 +311,16 @@ public class MCRSessionStoreListenerTest {
     }
 
     private static HttpSession getMockHttpSession(ServletContext servletContext, String httpSessionId) {
+        Map<String, Object> attributes = new HashMap<>();
         HttpSession httpSession = Mockito.mock(HttpSession.class);
         Mockito.when(httpSession.getServletContext()).thenReturn(servletContext);
         Mockito.when(httpSession.getId()).thenReturn(httpSessionId);
+        Mockito.doAnswer(invocation -> attributes.put(invocation.getArgument(0), invocation.getArgument(1)))
+            .when(httpSession).setAttribute(Mockito.anyString(), Mockito.any());
+        Mockito.doAnswer(invocation -> attributes.get((String) invocation.getArgument(0))).when(httpSession)
+            .getAttribute(Mockito.anyString());
+        Mockito.doAnswer(invocation -> attributes.remove((String) invocation.getArgument(0))).when(httpSession)
+            .removeAttribute(Mockito.anyString());
         return httpSession;
     }
 
@@ -191,8 +331,12 @@ public class MCRSessionStoreListenerTest {
         Mockito.when(sessionResolver.getSessionID()).thenReturn(sessionId);
         Mockito.when(sessionResolver.resolveSession()).thenReturn(Optional.of(session));
         HttpSession httpSession = getMockHttpSession(servletContext, httpSessionId);
-        Mockito.when(httpSession.getAttribute(MCRServlet.ATTR_MYCORE_SESSION)).thenReturn(sessionResolver);
+        httpSession.setAttribute(MCRServlet.ATTR_MYCORE_SESSION, sessionResolver);
         return httpSession;
+    }
+
+    private static void changeMockHttpSessionId(HttpSession httpSession, String httpSessionId) {
+        Mockito.when(httpSession.getId()).thenReturn(httpSessionId);
     }
 
     private MCRSession getMockSession(String sessionId) {

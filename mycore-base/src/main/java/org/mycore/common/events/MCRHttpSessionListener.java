@@ -28,17 +28,20 @@ import org.mycore.frontend.servlets.MCRServlet;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpSessionEvent;
+import jakarta.servlet.http.HttpSessionIdListener;
 import jakarta.servlet.http.HttpSessionListener;
 
 /**
  * Handles different HttpSession events.
  * <p>
  * This class is used to free up MCRSessions when their associated HttpSession
- * is destroyed or a new MCRSession replaces an old one.
+ * is destroyed or a new MCRSession replaces an old one. It also keeps
+ * {@link MCRServlet#HTTP_SESSION_ID_KEY} in the associated MCRSession in sync when the servlet
+ * container changes the ID of an HttpSession, e.g. after a successful login (MCR-1154).
  *
  * @author Thomas Scheffler (yagee)
  */
-public class MCRHttpSessionListener implements HttpSessionListener {
+public class MCRHttpSessionListener implements HttpSessionListener, HttpSessionIdListener {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -69,6 +72,35 @@ public class MCRHttpSessionListener implements HttpSessionListener {
             .ifPresent(MCRSession::close);
         httpSession.removeAttribute(MCRServlet.ATTR_MYCORE_SESSION);
         LOGGER.debug("Clearing up done");
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see jakarta.servlet.http.HttpSessionIdListener#sessionIdChanged(jakarta.servlet.http.HttpSessionEvent,
+     * java.lang.String)
+     */
+    @Override
+    public void sessionIdChanged(HttpSessionEvent hse, String oldSessionId) {
+        HttpSession httpSession = hse.getSession();
+        String newSessionId = httpSession.getId();
+        LOGGER.debug(() -> "HttpSession " + oldSessionId + " changed its ID to " + newSessionId + ", updating "
+            + MCRServlet.HTTP_SESSION_ID_KEY + " of any MCRSession.");
+        Optional.ofNullable(httpSession.getAttribute(MCRServlet.ATTR_MYCORE_SESSION))
+            .map(MCRSessionResolver.class::cast)
+            .flatMap(MCRSessionResolver::resolveSession)
+            .ifPresent(session -> updateHttpSessionId(session, newSessionId));
+    }
+
+    /**
+     * Updates the HTTP session ID stored in the given MCRSession, but only if it is already present.
+     * {@link MCRServlet} uses the absence of that value to detect the first request of a session, so this
+     * method must not introduce it.
+     */
+    private static void updateHttpSessionId(MCRSession session, String newSessionId) {
+        if (session.get(MCRServlet.HTTP_SESSION_ID_KEY) != null) {
+            session.put(MCRServlet.HTTP_SESSION_ID_KEY, newSessionId);
+        }
     }
 
 }
