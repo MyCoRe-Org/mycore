@@ -16,16 +16,21 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.pi.urn;
+package org.mycore.pi;
 
-/**
- * @deprecated Use {@link MCRCountingDNBURNGeneratorBase} instead.
- */
-@Deprecated(forRemoval = true)
-public abstract class MCRCountingDNBURNGenerator extends MCRCountingDNBURNGeneratorBase {
+import org.mycore.pi.util.MCRPIGeneratorUtils;
 
-    MCRCountingDNBURNGenerator(String namespace) {
-        super(DEFAULT_COUNTER, namespace, "");
+public class MCRMockCounter implements MCRPIGeneratorUtils.Counter {
+
+    int nextValue;
+
+    public MCRMockCounter(int initialValue) {
+        this.nextValue = initialValue;
+    }
+
+    @Override
+    public synchronized int getCount(String pattern, String type) {
+        return nextValue++;
     }
 
 }

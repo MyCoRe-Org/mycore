@@ -18,25 +18,30 @@
 
 package org.mycore.pi.urn;
 
-import static org.mycore.pi.util.MCRPIGeneratorUtils.readCountFromDatabase;
+import java.util.Objects;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
+import org.mycore.pi.util.MCRPIGeneratorUtils;
 
 /**
  * A Generator which helps to generate a URN with a counter inside.
  */
 public abstract class MCRCountingDNBURNGeneratorBase extends MCRDNBURNGeneratorBase {
 
-    private static final Map<String, AtomicInteger> PATTERN_COUNT_MAP = new HashMap<>();
+    public static final MCRPIGeneratorUtils.Counter DEFAULT_COUNTER = new MCRPIGeneratorUtils.CachingDatabaseCounter();
 
-    MCRCountingDNBURNGeneratorBase(String namespace, String delimiter) {
+    private final MCRPIGeneratorUtils.Counter counter;
+
+    MCRCountingDNBURNGeneratorBase(MCRPIGeneratorUtils.Counter counter, String namespace, String delimiter) {
         super(namespace, delimiter);
+        this.counter = Objects.requireNonNull(counter, "Counter must not be null");
     }
 
+    /**
+     * @deprecated Use {@link MCRCountingDNBURNGeneratorBase(MCRPIGeneratorUtils.Counter, String, String)} instead.
+     */
+    @Deprecated(forRemoval = true)
     MCRCountingDNBURNGeneratorBase(String namespace) {
-        super(namespace, "");
+        this(DEFAULT_COUNTER, namespace, "");
     }
 
     /**
@@ -49,9 +54,7 @@ public abstract class MCRCountingDNBURNGeneratorBase extends MCRDNBURNGeneratorB
      * @return the next count
      */
     public final synchronized int getCount(String pattern) {
-        return PATTERN_COUNT_MAP
-            .computeIfAbsent(pattern, p -> readCountFromDatabase(MCRDNBURN.TYPE, p))
-            .getAndIncrement();
+        return counter.getCount(MCRDNBURN.TYPE, pattern);
     }
 
 }

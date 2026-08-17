@@ -19,18 +19,15 @@
 package org.mycore.pi;
 
 import static org.mycore.pi.util.MCRPIGeneratorUtils.getCountPattern;
-import static org.mycore.pi.util.MCRPIGeneratorUtils.readCountFromDatabase;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -56,6 +53,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.pi.urn.MCRDNBURN;
+import org.mycore.pi.util.MCRPIGeneratorUtils;
 
 /**
  * {@link MCRGenericPIGenerator} is a {@link MCRPIGenerator} for arbitrary identifiers
@@ -136,6 +134,8 @@ import org.mycore.pi.urn.MCRDNBURN;
 @MCRConfigurationProxy(proxyClass = MCRGenericPIGenerator.Factory.class)
 public class MCRGenericPIGenerator implements MCRPIGenerator<MCRPersistentIdentifier> {
 
+    public static final MCRPIGeneratorUtils.Counter DEFAULT_COUNTER = new MCRPIGeneratorUtils.CachingDatabaseCounter();
+
     public static final String DEFAULT_PROPERTY_PREFIX = "MCR.Default.PI.Generator.Generic.";
 
     public static final String GENERAL_PATTERN_KEY = "GeneralPattern";
@@ -166,9 +166,9 @@ public class MCRGenericPIGenerator implements MCRPIGenerator<MCRPersistentIdenti
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final Map<String, AtomicInteger> PATTERN_COUNT_MAP = new HashMap<>();
-
     private static final Pattern XPATH_PATTERN = Pattern.compile("\\$([0-9]+)", Pattern.DOTALL);
+
+    private final MCRPIGeneratorUtils.Counter counter;
 
     private final String generalPattern;
 
@@ -184,9 +184,10 @@ public class MCRGenericPIGenerator implements MCRPIGenerator<MCRPersistentIdenti
 
     private final List<String> xPaths;
 
-    public MCRGenericPIGenerator(String generalPattern, String dateFormat,
+    public MCRGenericPIGenerator(MCRPIGeneratorUtils.Counter counter, String generalPattern, String dateFormat,
         Map<String, String> projectIdMappings, Map<String, String> typeIdMappings,
         int countPrecision, String type, List<String> xPaths) {
+        this.counter = Objects.requireNonNull(counter, "Counter must not be null");
         this.generalPattern = Objects.requireNonNull(generalPattern, "General pattern must not be null");
         this.dateFormat = Objects.requireNonNull(dateFormat, "Date format must not be null");
         this.projectIdMappings = Objects.requireNonNull(projectIdMappings, "Project ID mappings must not be null");
@@ -295,7 +296,7 @@ public class MCRGenericPIGenerator implements MCRPIGenerator<MCRPersistentIdenti
 
             LOGGER.info("Counter pattern is {}", counterPattern);
 
-            final int count = getCount(counterPattern);
+            final int count = counter.getCount(counterPattern, type);
             LOGGER.info("Count is {}", count);
             final String pattern = IntStream.range(0, Math.abs(countPrecision)).mapToObj((i) -> "0")
                 .collect(Collectors.joining(""));
@@ -307,21 +308,6 @@ public class MCRGenericPIGenerator implements MCRPIGenerator<MCRPersistentIdenti
             result = resultingPI;
         }
         return result;
-    }
-
-    /**
-     * Gets the count for a specific pattern and increase the internal counter. If there is no internal counter it will
-     * look into the Database and detect the highest count with the pattern.
-     *
-     * @param pattern a regex pattern which will be used to detect the highest count. The first group is the count.
-     *                e.G. [0-9]+-mods-2017-([0-9][0-9][0-9][0-9])-[0-9] will match 31-mods-2017-0003-3 and the returned
-     *                count will be 4 (3+1).
-     * @return the next count
-     */
-    public final synchronized int getCount(String pattern) {
-        return PATTERN_COUNT_MAP
-            .computeIfAbsent(pattern, p -> readCountFromDatabase(type, p))
-            .getAndIncrement();
     }
 
     public static class Factory implements Supplier<MCRGenericPIGenerator> {
@@ -349,8 +335,8 @@ public class MCRGenericPIGenerator implements MCRPIGenerator<MCRPersistentIdenti
 
         @Override
         public MCRGenericPIGenerator get() {
-            return new MCRGenericPIGenerator(generalPattern, dateFormat, projectIdMappings, typeIdMappings,
-                Integer.parseInt(countPrecision), type, xPaths);
+            return new MCRGenericPIGenerator(DEFAULT_COUNTER, generalPattern, dateFormat,
+                projectIdMappings, typeIdMappings, Integer.parseInt(countPrecision), type, xPaths);
         }
 
     }

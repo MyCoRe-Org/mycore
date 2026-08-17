@@ -21,14 +21,10 @@ package org.mycore.pi.doi;
 import static org.mycore.pi.util.MCRPIGeneratorUtils.formatCount;
 import static org.mycore.pi.util.MCRPIGeneratorUtils.getCountPattern;
 import static org.mycore.pi.util.MCRPIGeneratorUtils.getCreateDate;
-import static org.mycore.pi.util.MCRPIGeneratorUtils.readCountFromDatabase;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
@@ -38,6 +34,7 @@ import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.pi.MCRPIGenerator;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
+import org.mycore.pi.util.MCRPIGeneratorUtils;
 
 /**
  * {@link MCRCreateDateDOIGenerator} is a {@link MCRPIGenerator} for {@link MCRDigitalObjectIdentifier} identifiers
@@ -64,6 +61,8 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 @MCRConfigurationProxy(proxyClass = MCRCreateDateDOIGenerator.Factory.class)
 public class MCRCreateDateDOIGenerator extends MCRDOIGeneratorBase {
 
+    public static final MCRPIGeneratorUtils.Counter DEFAULT_COUNTER = new MCRPIGeneratorUtils.CachingDatabaseCounter();
+
     public static final String DEFAULT_PROPERTY_PREFIX = "MCR.Default.PI.Generator.CreateDate.";
 
     public static final String DATE_FORMAT_KEY = "DateFormat";
@@ -72,7 +71,7 @@ public class MCRCreateDateDOIGenerator extends MCRDOIGeneratorBase {
 
     public static final String COUNT_PRECISION_KEY = "CountPrecision";
 
-    private static final Map<String, AtomicInteger> PATTERN_COUNT_MAP = new HashMap<>();
+    private final MCRPIGeneratorUtils.Counter counter;
 
     private final String dateFormat;
 
@@ -82,9 +81,10 @@ public class MCRCreateDateDOIGenerator extends MCRDOIGeneratorBase {
 
     private final String countPattern;
 
-    public MCRCreateDateDOIGenerator(MCRDOIParser parser, String dateFormat, String prefix,
-        int countPrecision) {
+    public MCRCreateDateDOIGenerator(MCRDOIParser parser, MCRPIGeneratorUtils.Counter counter, String dateFormat,
+        String prefix, int countPrecision) {
         super(parser);
+        this.counter = Objects.requireNonNull(counter, "Counter must not be null");
         this.dateFormat = Objects.requireNonNull(dateFormat, "Date format must not be null");
         this.prefix = Objects.requireNonNull(prefix, "Prefix must not be null");
         this.countPrecision = countPrecision;
@@ -95,7 +95,7 @@ public class MCRCreateDateDOIGenerator extends MCRDOIGeneratorBase {
     protected String buildDOI(MCRBase base, String additional) throws MCRPersistentIdentifierException {
 
         String prefixWithDate = prefix + "/" + formatDate(getCreateDate(base)) + "-";
-        int count = getCount(Pattern.quote(prefixWithDate) + countPattern);
+        int count = counter.getCount(MCRDigitalObjectIdentifier.TYPE, Pattern.quote(prefixWithDate) + countPattern);
 
         return prefixWithDate + formatCount(count, countPrecision);
 
@@ -108,12 +108,6 @@ public class MCRCreateDateDOIGenerator extends MCRDOIGeneratorBase {
 
         return isoDate.format(dateFormat, Locale.ENGLISH);
 
-    }
-
-    private synchronized int getCount(final String pattern) {
-        return PATTERN_COUNT_MAP
-            .computeIfAbsent(pattern, p -> readCountFromDatabase(MCRDigitalObjectIdentifier.TYPE, p))
-            .getAndIncrement();
     }
 
     public static class Factory implements Supplier<MCRCreateDateDOIGenerator> {
@@ -129,7 +123,7 @@ public class MCRCreateDateDOIGenerator extends MCRDOIGeneratorBase {
 
         @Override
         public MCRCreateDateDOIGenerator get() {
-            return new MCRCreateDateDOIGenerator(new MCRDOIParser(), dateFormat, prefix,
+            return new MCRCreateDateDOIGenerator(new MCRDOIParser(), DEFAULT_COUNTER, dateFormat, prefix,
                 Integer.parseInt(countPrecision));
         }
 

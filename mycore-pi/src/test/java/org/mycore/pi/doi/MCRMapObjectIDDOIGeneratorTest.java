@@ -27,8 +27,10 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.pi.MCRPIGenerator;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.test.MyCoReTest;
 
@@ -49,6 +51,7 @@ public class MCRMapObjectIDDOIGeneratorTest {
 
         Map<String, String> prefixMap = Map.of("my_test", PREFIX);
         MCRMapObjectIDDOIGenerator generator = new MCRMapObjectIDDOIGenerator(new MCRDOIParser(), prefixMap);
+
         String doi = generator.generate(object, "").asString();
 
         assertTrue(doi.startsWith(PREFIX));
@@ -69,6 +72,7 @@ public class MCRMapObjectIDDOIGeneratorTest {
 
         Map<String, String> prefixMap = Map.of("my_test", PREFIX + "/xyz-");
         MCRMapObjectIDDOIGenerator generator = new MCRMapObjectIDDOIGenerator(new MCRDOIParser(), prefixMap);
+
         String doi = generator.generate(object, "").asString();
 
         assertTrue(doi.startsWith(PREFIX));
@@ -91,6 +95,31 @@ public class MCRMapObjectIDDOIGeneratorTest {
         MCRMapObjectIDDOIGenerator generator = new MCRMapObjectIDDOIGenerator(new MCRDOIParser(), prefixMap);
 
         assertThrows(MCRPersistentIdentifierException.class, () -> generator.generate(object, ""));
+
+    }
+
+    @Test
+    @MCRTestConfiguration(properties = {
+        @MCRTestProperty(key = "Test.Class", classNameOf = MCRMapObjectIDDOIGenerator.class),
+        @MCRTestProperty(key = "Test.Prefix.my_test", string = PREFIX),
+    })
+    public void configuration() throws MCRPersistentIdentifierException {
+
+        MCRObject object = new MCRObject();
+        object.setSchema("http://www.w3.org/2001/XMLSchema");
+        object.setId(MCRObjectID.getInstance("my_test_00000123"));
+
+        MCRPIGenerator<?> generator = MCRConfiguration2.getInstanceOfOrThrow(MCRPIGenerator.class, "Test");
+
+        String pi = generator.generate(object, "").asString();
+
+        assertTrue(pi.startsWith(PREFIX));
+        assertEquals('/', pi.charAt(PREFIX.length()));
+
+        String value = pi.substring(PREFIX.length() + 1);
+
+        assertEquals("123", value);
+
     }
 
 }

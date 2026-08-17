@@ -23,8 +23,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.pi.MCRPIGenerator;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.test.MyCoReTest;
 
@@ -42,6 +44,7 @@ public class MCRIDPURLGeneratorTest {
         object.setId(MCRObjectID.getInstance("my_test_00000123"));
 
         MCRIDPURLGenerator generator = new MCRIDPURLGenerator("https://purl.example.com/$ID");
+
         String purl = generator.generate(object, "").asString();
 
         assertEquals("https://purl.example.com/my_test_00000123", purl, "");
@@ -56,9 +59,29 @@ public class MCRIDPURLGeneratorTest {
         object.setId(MCRObjectID.getInstance("my_test_00000123"));
 
         MCRIDPURLGenerator generator = new MCRIDPURLGenerator("https://purl.example.com/$ID/$ID/XYZ");
+
         String purl = generator.generate(object, "").asString();
 
         assertEquals("https://purl.example.com/my_test_00000123/my_test_00000123/XYZ", purl, "");
+
+    }
+
+    @Test
+    @MCRTestConfiguration(properties = {
+        @MCRTestProperty(key = "Test.Class", classNameOf = MCRIDPURLGenerator.class),
+        @MCRTestProperty(key = "Test.BaseURLTemplate", string = "https://purl.example.com/$ID")
+    })
+    public void configuration() throws MCRPersistentIdentifierException {
+
+        MCRObject object = new MCRObject();
+        object.setSchema("http://www.w3.org/2001/XMLSchema");
+        object.setId(MCRObjectID.getInstance("my_test_00000123"));
+
+        MCRPIGenerator<?> generator = MCRConfiguration2.getInstanceOfOrThrow(MCRPIGenerator.class, "Test");
+
+        String pi = generator.generate(object, "").asString();
+
+        assertEquals("https://purl.example.com/my_test_00000123", pi, "");
 
     }
 

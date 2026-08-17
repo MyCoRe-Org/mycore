@@ -28,8 +28,10 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.pi.MCRPIGenerator;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.test.MyCoReTest;
 
@@ -49,6 +51,7 @@ public class MCRUUIDDOIGeneratorTest {
         object.setId(MCRObjectID.getInstance("my_test_00000123"));
 
         MCRUUIDDOIGenerator generator = new MCRUUIDDOIGenerator(new MCRDOIParser(), PREFIX);
+
         String doi = generator.generate(object, "").asString();
 
         assertTrue(doi.startsWith(PREFIX));
@@ -72,6 +75,7 @@ public class MCRUUIDDOIGeneratorTest {
         object.setId(MCRObjectID.getInstance("my_test_00000123"));
 
         MCRUUIDDOIGenerator generator = new MCRUUIDDOIGenerator(new MCRDOIParser(), PREFIX);
+
         String doi1 = generator.generate(object, "").asString();
         String doi2 = generator.generate(object, "").asString();
         String doi3 = generator.generate(object, "").asString();
@@ -79,6 +83,34 @@ public class MCRUUIDDOIGeneratorTest {
         assertNotEquals(doi1, doi2);
         assertNotEquals(doi2, doi3);
         assertNotEquals(doi3, doi1);
+
+    }
+
+    @Test
+    @MCRTestConfiguration(properties = {
+        @MCRTestProperty(key = "Test.Class", classNameOf = MCRUUIDDOIGenerator.class),
+        @MCRTestProperty(key = "Test.Prefix", string = PREFIX),
+    })
+    public void configuration() throws MCRPersistentIdentifierException {
+
+        MCRObject object = new MCRObject();
+        object.setSchema("http://www.w3.org/2001/XMLSchema");
+        object.setId(MCRObjectID.getInstance("my_test_00000123"));
+
+        MCRPIGenerator<?> generator = MCRConfiguration2.getInstanceOfOrThrow(MCRPIGenerator.class, "Test");
+
+        String pi = generator.generate(object, "").asString();
+
+        assertTrue(pi.startsWith(PREFIX));
+        assertEquals('/', pi.charAt(PREFIX.length()));
+
+        String uuid = pi.substring(PREFIX.length() + 1);
+
+        try {
+            UUID.fromString(uuid);
+        } catch (Exception e) {
+            fail("NISS is not a valid UUID", e);
+        }
 
     }
 

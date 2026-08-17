@@ -33,6 +33,8 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.pi.MCRMockCounter;
+import org.mycore.pi.MCRPIGenerator;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.test.MCRJPAExtension;
 import org.mycore.test.MyCoReTest;
@@ -44,8 +46,7 @@ import org.mycore.test.MyCoReTest;
 })
 public class MCRCreateDateDOIGeneratorTest {
 
-    public static final String DATE_FORMAT = MCRConfiguration2.getStringOrThrow(
-        MCRCreateDateDOIGenerator.DEFAULT_PROPERTY_PREFIX + MCRCreateDateDOIGenerator.DATE_FORMAT_KEY);
+    public static final String DATE_FORMAT = "yyyyMMdd-HHmmss";
 
     public static final String PREFIX = "10.1234";
 
@@ -56,7 +57,9 @@ public class MCRCreateDateDOIGeneratorTest {
         object.setSchema("http://www.w3.org/2001/XMLSchema");
         object.setId(MCRObjectID.getInstance("my_test_00000123"));
 
-        MCRCreateDateDOIGenerator generator = new MCRCreateDateDOIGenerator(new MCRDOIParser(), DATE_FORMAT, PREFIX, 3);
+        MCRCreateDateDOIGenerator generator = new MCRCreateDateDOIGenerator(
+            new MCRDOIParser(), new MCRMockCounter(42), DATE_FORMAT, PREFIX, 3);
+
         String doi = generator.generate(object, "").asString();
 
         assertTrue(doi.startsWith(PREFIX));
@@ -65,7 +68,7 @@ public class MCRCreateDateDOIGeneratorTest {
         String value = doi.substring(PREFIX.length() + 1);
 
         assertTrue(value.startsWith(formatDate(new Date()) + "-"));
-        assertTrue(value.endsWith("-000"));
+        assertTrue(value.endsWith("-042"));
 
     }
 
@@ -85,8 +88,9 @@ public class MCRCreateDateDOIGeneratorTest {
         object.setSchema("http://www.w3.org/2001/XMLSchema");
         object.setId(MCRObjectID.getInstance("my_test_00000123"));
 
-        MCRCreateDateDOIGenerator generator =
-            new MCRCreateDateDOIGenerator(new MCRDOIParser(), DATE_FORMAT, PREFIX, -1);
+        MCRCreateDateDOIGenerator generator = new MCRCreateDateDOIGenerator(
+            new MCRDOIParser(), new MCRMockCounter(42), DATE_FORMAT, PREFIX, -1);
+
         String doi1 = generator.generate(object, "").asString();
         String doi2 = generator.generate(object, "").asString();
         String doi3 = generator.generate(object, "").asString();
@@ -95,9 +99,36 @@ public class MCRCreateDateDOIGeneratorTest {
         assertNotEquals(doi2, doi3);
         assertNotEquals(doi3, doi1);
 
-        assertTrue(doi1.endsWith("-0"));
-        assertTrue(doi2.endsWith("-1"));
-        assertTrue(doi3.endsWith("-2"));
+        assertTrue(doi1.endsWith("-42"));
+        assertTrue(doi2.endsWith("-43"));
+        assertTrue(doi3.endsWith("-44"));
+
+    }
+
+    @Test
+    @MCRTestConfiguration(properties = {
+        @MCRTestProperty(key = "Test.Class", classNameOf = MCRCreateDateDOIGenerator.class),
+        @MCRTestProperty(key = "Test.DateFormat", string = DATE_FORMAT),
+        @MCRTestProperty(key = "Test.Prefix", string = PREFIX),
+        @MCRTestProperty(key = "Test.CountPrecision", string = "3"),
+    })
+    public void configuration() throws MCRPersistentIdentifierException {
+
+        MCRObject object = new MCRObject();
+        object.setSchema("http://www.w3.org/2001/XMLSchema");
+        object.setId(MCRObjectID.getInstance("my_test_00000123"));
+
+        MCRPIGenerator<?> generator = MCRConfiguration2.getInstanceOfOrThrow(MCRPIGenerator.class, "Test");
+
+        String pi = generator.generate(object, "").asString();
+
+        assertTrue(pi.startsWith(PREFIX));
+        assertEquals('/', pi.charAt(PREFIX.length()));
+
+        String value = pi.substring(PREFIX.length() + 1);
+
+        assertTrue(value.startsWith(formatDate(new Date()) + "-"));
+        assertTrue(value.endsWith("-000"));
 
     }
 

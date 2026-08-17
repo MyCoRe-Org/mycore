@@ -26,8 +26,10 @@ import org.junit.jupiter.api.Test;
 import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.pi.MCRPIGenerator;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.test.MyCoReTest;
 
@@ -48,6 +50,7 @@ public class MCRFLURNGeneratorTest {
         object.setId(MCRObjectID.getInstance("my_test_00000123"));
 
         MCRFLURNGenerator generator = new MCRFLURNGenerator(NAMESPACE, "-");
+
         String urn = generator.generate(object, "").asString();
 
         assertTrue(urn.startsWith(NAMESPACE));
@@ -69,6 +72,7 @@ public class MCRFLURNGeneratorTest {
         object.setId(MCRObjectID.getInstance("my_test_00000123"));
 
         MCRFLURNGenerator generator = new MCRFLURNGenerator(NAMESPACE, "-");
+
         String urn1 = generator.generate(object, "").asString();
         String urn2 = generator.generate(object, "").asString();
         String urn3 = generator.generate(object, "").asString();
@@ -76,6 +80,33 @@ public class MCRFLURNGeneratorTest {
         assertNotEquals(urn1, urn2);
         assertNotEquals(urn2, urn3);
         assertNotEquals(urn3, urn1);
+
+    }
+
+    @Test
+    @MCRTestConfiguration(properties = {
+        @MCRTestProperty(key = "Test.Class", classNameOf = MCRFLURNGenerator.class),
+        @MCRTestProperty(key = "Test.Namespace", string = NAMESPACE),
+        @MCRTestProperty(key = "Test.Delimiter", string = "-")
+    })
+    public void configuration() throws MCRPersistentIdentifierException {
+
+        MCRObject object = new MCRObject();
+        object.setSchema("http://www.w3.org/2001/XMLSchema");
+        object.setId(MCRObjectID.getInstance("my_test_00000123"));
+
+        MCRPIGenerator<?> generator = MCRConfiguration2.getInstanceOfOrThrow(MCRPIGenerator.class, "Test");
+
+        String pi = generator.generate(object, "").asString();
+
+        assertTrue(pi.startsWith(NAMESPACE));
+        assertEquals('-', pi.charAt(NAMESPACE.length()));
+        assertEquals('-', pi.charAt(pi.length() - 2));
+
+        String value = pi.substring(NAMESPACE.length() + 1, pi.length() - 2);
+        char checksum = Character.forDigit(new MCRDNBURN("gbv:xyz", "-" + value + "-").calculateChecksum(), 10);
+
+        assertEquals(checksum, pi.charAt(pi.length() - 1));
 
     }
 

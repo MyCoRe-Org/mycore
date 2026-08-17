@@ -22,8 +22,10 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -44,34 +46,6 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 public final class MCRPIGeneratorUtils {
 
     private MCRPIGeneratorUtils() {
-    }
-
-    public static AtomicInteger readCountFromDatabase(String type, String countPattern) {
-
-        Pattern pattern = Pattern.compile(countPattern);
-        Predicate<String> matching = pattern.asPredicate();
-
-        List<MCRPIRegistrationInfo> list = MCRPIManager.getInstance().getList(type, -1, -1);
-
-        // extract the number of the PI
-        Optional<Integer> highestNumber = list.stream()
-            .map(MCRPIRegistrationInfo::getIdentifier)
-            .filter(matching)
-            .map(pi -> {
-                // extract the number of the PI
-                Matcher matcher = pattern.matcher(pi);
-                if (matcher.find() && matcher.groupCount() == 1) {
-                    String group = matcher.group(1);
-                    return Integer.parseInt(group, 10);
-                } else {
-                    return null;
-                }
-            }).filter(Objects::nonNull)
-            .max(Comparator.naturalOrder())
-            .map(n -> n + 1);
-
-        return new AtomicInteger(highestNumber.orElse(0));
-
     }
 
     public static String getCountPattern(int countPrecision) {
@@ -110,6 +84,70 @@ public final class MCRPIGeneratorUtils {
             throw new MCRPersistentIdentifierException("Object " + base.getId() + " doesn't have a create date!");
         }
         return createDate;
+    }
+
+    public interface Counter {
+
+        /**
+         * Returns the next counter value to be used for a specific type and pattern. The returned value
+         * needs to be unique. Returned values should be increasing.
+         *
+         * @param type   the type of persistent identifier.
+         * @param pattern a regex pattern which can be used to extract count value in existing identifiers.
+         *                The first capturing group captures the count.
+         *                Example: <code>[0-9]+-mods-2017-([0-9][0-9][0-9][0-9])-[0-9]</code>
+         *                will match <code>31-mods-2017-0003-3</code> and the returned count should be <code>4</code>
+         *                (<code>3+1</code>).
+         *
+         * @return the next count
+         */
+        int getCount(String pattern, String type);
+
+    }
+
+    /**
+     * {@link Counter} that gets the count for a specific type and pattern and increase the internal counter.
+     * If there is no internal counter, it will look into the Database and detect the highest count with the pattern.
+     */
+    public static final class CachingDatabaseCounter implements Counter {
+
+        private static final Map<String, AtomicInteger> PATTERN_COUNT_MAP = new HashMap<>();
+
+        @Override
+        public synchronized int getCount(String pattern, String type) {
+            return PATTERN_COUNT_MAP
+                .computeIfAbsent(pattern, p -> readCountFromDatabase(type, p))
+                .getAndIncrement();
+        }
+
+        private static AtomicInteger readCountFromDatabase(String type, String countPattern) {
+
+            Pattern pattern = Pattern.compile(countPattern);
+            Predicate<String> matching = pattern.asPredicate();
+
+            List<MCRPIRegistrationInfo> list = MCRPIManager.getInstance().getList(type, -1, -1);
+
+            // extract the number of the PI
+            Optional<Integer> highestNumber = list.stream()
+                .map(MCRPIRegistrationInfo::getIdentifier)
+                .filter(matching)
+                .map(pi -> {
+                    // extract the number of the PI
+                    Matcher matcher = pattern.matcher(pi);
+                    if (matcher.find() && matcher.groupCount() == 1) {
+                        String group = matcher.group(1);
+                        return Integer.parseInt(group, 10);
+                    } else {
+                        return null;
+                    }
+                }).filter(Objects::nonNull)
+                .max(Comparator.naturalOrder())
+                .map(n -> n + 1);
+
+            return new AtomicInteger(highestNumber.orElse(0));
+
+        }
+
     }
 
 }

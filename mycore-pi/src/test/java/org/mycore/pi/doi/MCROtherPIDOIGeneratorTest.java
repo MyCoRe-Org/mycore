@@ -31,11 +31,13 @@ import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.MCRMockIdentifierGenerator;
 import org.mycore.pi.MCRMockIdentifierService;
 import org.mycore.pi.MCRMockMetadataService;
+import org.mycore.pi.MCRPIGenerator;
 import org.mycore.pi.MCRPIService;
 import org.mycore.pi.MCRPIServiceManager;
 import org.mycore.pi.MCRPersistentIdentifier;
@@ -49,6 +51,7 @@ import org.mycore.test.MyCoReTest;
 @MCRTestConfiguration(properties = {
     @MCRTestProperty(key = "MCR.Access.Class", classNameOf = MCRAccessBaseImpl.class),
     @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true"),
+    @MCRTestProperty(key = "MCR.Metadata.Type.test2", string = "true"),
     @MCRTestProperty(key = "MCR.PI.Service.Mock.Class", classNameOf = MCRMockIdentifierService.class),
     @MCRTestProperty(key = "MCR.PI.Service.Mock.Generator", string = "Mock"),
     @MCRTestProperty(key = "MCR.PI.Service.Mock.MetadataService", string = "Mock"),
@@ -74,12 +77,44 @@ public class MCROtherPIDOIGeneratorTest {
 
         MCROtherPIValueExtractor extractor = new MCROtherPIValueExtractor("Mock", "MOCK:my_test_(.*):");
         MCROtherPIDOIGenerator generator = new MCROtherPIDOIGenerator(new MCRDOIParser(), PREFIX, extractor);
+
         String doi = generator.generate(object, "").asString();
 
         assertTrue(doi.startsWith(PREFIX));
         assertEquals('/', doi.charAt(PREFIX.length()));
 
         String value = doi.substring(PREFIX.length() + 1);
+
+        assertEquals("00000123", value);
+
+    }
+
+    @Test
+    @MCRTestConfiguration(properties = {
+        @MCRTestProperty(key = "Test.Class", classNameOf = MCROtherPIDOIGenerator.class),
+        @MCRTestProperty(key = "Test.Prefix", string = PREFIX),
+        @MCRTestProperty(key = "Test.Service", string = "Mock"),
+        @MCRTestProperty(key = "Test.Pattern", string = "MOCK:my_test2_(.*):")
+    })
+    public void configuration()
+        throws MCRPersistentIdentifierException, MCRAccessException, ExecutionException, InterruptedException {
+
+        MCRObject object = new MCRObject();
+        object.setSchema("http://www.w3.org/2001/XMLSchema");
+        object.setId(MCRObjectID.getInstance("my_test2_00000123"));
+
+        MCRPIServiceManager manager = MCRPIServiceManager.getInstance();
+        MCRPIService<MCRPersistentIdentifier> mockService = manager.getRegistrationService("Mock");
+        mockService.register(object, "", true);
+
+        MCRPIGenerator<?> generator = MCRConfiguration2.getInstanceOfOrThrow(MCRPIGenerator.class, "Test");
+
+        String pi = generator.generate(object, "").asString();
+
+        assertTrue(pi.startsWith(PREFIX));
+        assertEquals('/', pi.charAt(PREFIX.length()));
+
+        String value = pi.substring(PREFIX.length() + 1);
 
         assertEquals("00000123", value);
 
