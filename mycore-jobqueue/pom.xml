@@ -34,24 +34,8 @@
         <groupId>com.github.eirslett</groupId>
         <artifactId>frontend-maven-plugin</artifactId>
         <executions>
-          <execution>
-            <id>install node and yarn</id>
-            <goals>
-              <goal>install-node-and-yarn</goal>
-            </goals>
-            <phase>generate-resources</phase>
-          </execution>
-          <execution>
-            <id>yarn-install-jobqueue</id>
-            <goals>
-              <goal>yarn</goal>
-            </goals>
-            <phase>process-resources</phase>
-            <configuration>
-              <arguments>install ${yarn.install.args}</arguments>
-              <workingDirectory>src/main/vue/jobqueue/</workingDirectory>
-            </configuration>
-          </execution>
+          <!-- the jobqueue app uses the shared toolchain in mycore-vue, which already installed node, yarn
+               and the dependencies -->
           <execution>
             <id>yarn-build-jobqueue</id>
             <goals>
@@ -59,8 +43,8 @@
             </goals>
             <phase>process-resources</phase>
             <configuration>
-              <arguments>build</arguments>
-              <workingDirectory>src/main/vue/jobqueue/</workingDirectory>
+              <arguments>build:jobqueue</arguments>
+              <workingDirectory>${basedir}/../mycore-vue</workingDirectory>
             </configuration>
           </execution>
           <execution>
@@ -69,6 +53,13 @@
           </execution>
           <execution>
             <id>yarn-install</id>
+            <phase>none</phase>
+          </execution>
+          <!-- node and yarn come from mycore-vue, which installs them into the shared directory derived from
+               node.version and yarn.version. Installing them here as well would let this module run the shared
+               node_modules under a different node version, should it ever override those properties. -->
+          <execution>
+            <id>install-node-and-yarn</id>
             <phase>none</phase>
           </execution>
         </executions>
