@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -43,7 +44,8 @@ import org.mycore.test.MyCoReTest;
 })
 public class MCRCreateDateDOIGeneratorTest {
 
-    public static final String DATE_FORMAT = "yyyyMMdd";
+    public static final String DATE_FORMAT = MCRConfiguration2.getStringOrThrow(
+        MCRCreateDateDOIGenerator.DEFAULT_PROPERTY_PREFIX + MCRCreateDateDOIGenerator.DATE_FORMAT_KEY);
 
     public static final String PREFIX = "10.1234";
 

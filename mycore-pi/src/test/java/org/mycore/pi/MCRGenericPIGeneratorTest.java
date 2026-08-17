@@ -33,6 +33,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.doi.MCRDigitalObjectIdentifier;
@@ -50,7 +51,8 @@ import org.mycore.test.MyCoReTest;
 })
 public class MCRGenericPIGeneratorTest {
 
-    public static final String DATE_FORMAT = "mmDDyyyy";
+    public static final String DATE_FORMAT = MCRConfiguration2.getStringOrThrow(
+        MCRGenericPIGenerator.DEFAULT_PROPERTY_PREFIX + MCRGenericPIGenerator.DATE_FORMAT_KEY);
 
     @Test
     public void testGenerate() throws MCRPersistentIdentifierException {
