@@ -122,7 +122,7 @@ import org.mycore.pi.urn.MCRDNBURN;
  * </ul>
  * Example:
  * <pre><code>
- * [...].Class=org.mycore.org.mycore.pi.MCRGenericPIGenerator
+ * [...].Class=org.mycore.pi.MCRGenericPIGenerator
  * [...].GeneralPattern=urn:nbn:de:gbv:$CurrentDate-$1-$2-$ObjectType-$ObjectProject-$ObjectNumber-$Count-
  * [...].DateFormat=yyyy-MM-dd
  * [...].ObjectProjectMapping.mycore=MyCoRe

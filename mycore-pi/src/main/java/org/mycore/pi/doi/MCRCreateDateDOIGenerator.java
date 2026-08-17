@@ -129,7 +129,7 @@ public class MCRCreateDateDOIGenerator extends MCRDOIGeneratorBase {
 
         @Override
         public MCRCreateDateDOIGenerator get() {
-            return new MCRCreateDateDOIGenerator(new MCRDOIParser(),dateFormat, prefix,
+            return new MCRCreateDateDOIGenerator(new MCRDOIParser(), dateFormat, prefix,
                 Integer.parseInt(countPrecision));
         }
 
