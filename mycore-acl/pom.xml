@@ -42,7 +42,7 @@
             </goals>
             <phase>process-resources</phase>
             <configuration>
-              <arguments>install</arguments>
+              <arguments>install ${yarn.install.args}</arguments>
               <workingDirectory>src/main/vue/access-key-manager2/</workingDirectory>
             </configuration>
           </execution>
