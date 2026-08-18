@@ -59,6 +59,8 @@ public class MCRErrorServlet extends HttpServlet {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    private static final String ERROR_ELEMENT = MCRConfiguration2.getStringOrThrow("MCR.Frontend.ErrorPage");
+
     private static final MCRLayoutService LAYOUT_SERVICE = MCRLayoutService.obtainInstance();
 
     /* (non-Javadoc)
@@ -161,8 +163,7 @@ public class MCRErrorServlet extends HttpServlet {
      */
     public static Document buildErrorPage(String msg, Integer statusCode, String requestURI,
         Class<? extends Throwable> exceptionType, String source, Throwable ex) {
-        String rootname = MCRConfiguration2.getString("MCR.Frontend.ErrorPage").orElse("mcr_error");
-        Element root = new Element(rootname);
+        Element root = new Element(ERROR_ELEMENT);
         root.setAttribute("errorServlet", Boolean.TRUE.toString());
         root.setAttribute("space", "preserve", Namespace.XML_NAMESPACE);
         if (msg != null) {
@@ -192,7 +193,7 @@ public class MCRErrorServlet extends HttpServlet {
             root.addContent(exception);
             throwableException = throwableException.getCause();
         }
-        return new Document(root, new DocType(rootname));
+        return new Document(root, new DocType(ERROR_ELEMENT));
     }
 
     protected void generateErrorPage(HttpServletRequest request, HttpServletResponse response, String msg,

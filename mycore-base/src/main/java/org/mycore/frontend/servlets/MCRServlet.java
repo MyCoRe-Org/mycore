@@ -75,6 +75,13 @@ import jakarta.servlet.http.HttpSession;
 public class MCRServlet extends HttpServlet {
     public static final String ATTR_MYCORE_SESSION = "mycore.session";
 
+    /**
+     * Key under which the ID of the associated {@link HttpSession} is stored in the {@link MCRSession}.
+     * The value is kept up to date by {@link org.mycore.common.events.MCRHttpSessionListener}
+     * when the servlet container changes the HTTP session ID.
+     */
+    public static final String HTTP_SESSION_ID_KEY = "http.session";
+
     public static final String CURRENT_THREAD_NAME_KEY = "currentThreadName";
 
     public static final String INITIAL_SERVLET_NAME_KEY = "currentServletName";
@@ -243,7 +250,7 @@ public class MCRServlet extends HttpServlet {
         // Store current session in HttpSession
         theSession.setAttribute(ATTR_MYCORE_SESSION, new MCRSessionResolver(session));
         // store the HttpSession ID in MCRSession
-        if (session.put("http.session", theSession.getId()) == null) {
+        if (session.put(HTTP_SESSION_ID_KEY, theSession.getId()) == null) {
             //first request
             //for MCRTranslation.getAvailableLanguages()
             MCRTransactionManager.beginTransactions();

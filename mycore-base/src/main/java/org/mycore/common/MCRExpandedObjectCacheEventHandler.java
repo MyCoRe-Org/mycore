@@ -27,7 +27,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * Event handler that clears the {@link MCRExpandedObjectCache} for affected objects
- * when certain events occur (delete, update, link update, ancestor update, derivate link update).
+ * when certain events occur (delete, update, repair, link update, ancestor update, derivate link update).
  * This ensures that the cache does not contain stale expanded object data.
  */
 public class MCRExpandedObjectCacheEventHandler extends MCREventHandlerBase {
@@ -65,6 +65,18 @@ public class MCRExpandedObjectCacheEventHandler extends MCREventHandlerBase {
      */
     @Override
     protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
+        MCRExpandedObjectCache.getInstance().clear(obj.getId());
+    }
+
+    /**
+     * Clears the cache for the repaired object.
+     * The metadata of the object may have been changed without an update event, e.g. by an import.
+     *
+     * @param evt the repair event
+     * @param obj the repaired object
+     */
+    @Override
+    protected void handleObjectRepaired(MCREvent evt, MCRObject obj) {
         MCRExpandedObjectCache.getInstance().clear(obj.getId());
     }
 

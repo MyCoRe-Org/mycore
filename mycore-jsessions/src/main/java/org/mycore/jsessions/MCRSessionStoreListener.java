@@ -20,17 +20,21 @@ package org.mycore.jsessions;
 
 import java.util.Optional;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpSessionEvent;
+import jakarta.servlet.http.HttpSessionIdListener;
 import jakarta.servlet.http.HttpSessionListener;
 
 /**
- * A {@link MCRSessionStoreListener} is a {@link ServletContextListener} and {@link HttpSessionListener}
- * that, if registered, keeps track of all HTTP session known to the MyCoRe application.
- * It provides access to the stored HTTP sessions with
+ * A {@link MCRSessionStoreListener} is a {@link ServletContextListener}, {@link HttpSessionListener} and
+ * {@link HttpSessionIdListener} that, if registered, keeps track of all HTTP session known to the
+ * MyCoRe application. It provides access to the stored HTTP sessions with
  * {@link MCRSessionStoreListener#getSessionStore(ServletContext)}.
  * <p>
  * <strong>Limitation:</strong> {@link HttpSessionListener#sessionCreated(HttpSessionEvent)} is only called
@@ -39,7 +43,9 @@ import jakarta.servlet.http.HttpSessionListener;
  * In a MyCoRe application, this is typically not a problem, because MyCoRe sessions aren't persisted
  * across restarts.
  */
-public class MCRSessionStoreListener implements ServletContextListener, HttpSessionListener {
+public class MCRSessionStoreListener implements ServletContextListener, HttpSessionListener, HttpSessionIdListener {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String SESSION_STORE_KEY = "MCR_HTTP_SESSION_STORE";
 
@@ -52,6 +58,13 @@ public class MCRSessionStoreListener implements ServletContextListener, HttpSess
     public void sessionCreated(HttpSessionEvent event) {
         HttpSession session = event.getSession();
         getSessionStore(session.getServletContext()).ifPresent(sessionStore -> sessionStore.add(session));
+    }
+
+    @Override
+    public void sessionIdChanged(HttpSessionEvent event, String oldSessionId) {
+        HttpSession session = event.getSession();
+        LOGGER.debug("HTTP session {} changed its ID to {}", () -> oldSessionId, session::getId);
+        getSessionStore(session.getServletContext()).ifPresent(sessionStore -> sessionStore.changeId(session));
     }
 
     @Override

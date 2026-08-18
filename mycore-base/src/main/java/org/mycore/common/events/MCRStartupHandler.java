@@ -94,7 +94,8 @@ public class MCRStartupHandler {
                 MCRTableMessage<PropertyClassStatus> propertyTable = new MCRTableMessage<>(
                     new MCRTableMessage.Column<>("Property", PropertyClassStatus::property),
                     new MCRTableMessage.Column<>("Class", PropertyClassStatus::className),
-                    new MCRTableMessage.Column<>("Status", PropertyClassStatus::status));
+                    new MCRTableMessage.Column<>("Status", PropertyClassStatus::status),
+                    new MCRTableMessage.Column<>("Hint", PropertyClassStatus::hint));
                 propertyClassStatuses.forEach(propertyTable::add);
                 LOGGER.warn(() -> propertyTable.logMessage("Configured Classes report:"));
             }
@@ -123,16 +124,19 @@ public class MCRStartupHandler {
             .stream()
             .filter(entry -> isClassProperty(entry.getKey(), entry.getValue(), classPattern))
             .flatMap(entry -> MCRConfiguration2.splitValue(entry.getValue())
-                .map(value -> new PropertyClassStatus(entry.getKey(), value, null)))
+                .map(value -> new PropertyClassStatus(entry.getKey(), value, null, "")))
             .filter(pcs -> !pcs.className.isBlank())
             .map(pcs -> {
                 try {
                     Class<?> aClass = Class.forName(pcs.className(), false, MCRClassTools.getClassLoader());
                     if (aClass.getAnnotation(Deprecated.class) != null) {
-                        return new PropertyClassStatus(pcs.property(), pcs.className(), ClassStatus.DEPRECATED);
+                        return new PropertyClassStatus(pcs.property(), pcs.className(), ClassStatus.DEPRECATED, "");
                     }
-                } catch (ClassNotFoundException | LinkageError e) {
-                    return new PropertyClassStatus(pcs.property(), pcs.className(), ClassStatus.NOT_FOUND);
+                } catch (LinkageError e) {
+                    return new PropertyClassStatus(pcs.property(), pcs.className(), ClassStatus.LINKAGE_ERROR,
+                        e.getClass().getSimpleName() + ": " + e.getMessage());
+                } catch (ClassNotFoundException e) {
+                    return new PropertyClassStatus(pcs.property(), pcs.className(), ClassStatus.NOT_FOUND, "");
                 }
                 return null;
             })
@@ -216,7 +220,11 @@ public class MCRStartupHandler {
     }
 
     private enum ClassStatus {
-        NOT_FOUND("not found"), DEPRECATED("deprecated");
+        NOT_FOUND("not found"),
+
+        LINKAGE_ERROR("linkage error"),
+
+        DEPRECATED("deprecated");
 
         private final String tableValue;
 
@@ -230,7 +238,7 @@ public class MCRStartupHandler {
         }
     }
 
-    private record PropertyClassStatus(String property, String className, ClassStatus status)
+    private record PropertyClassStatus(String property, String className, ClassStatus status, String hint)
         implements Comparable<PropertyClassStatus> {
 
         private static final Comparator<PropertyClassStatus> COMPARATOR =

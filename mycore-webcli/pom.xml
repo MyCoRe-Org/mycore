@@ -147,6 +147,11 @@
       <artifactId>mycore-webtools</artifactId>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <profiles>
     <profile>

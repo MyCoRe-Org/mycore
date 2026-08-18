@@ -6,13 +6,14 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint": "eslint src tests vite.config.ts playwright.config.ts",
+    "lint": "eslint src tests vite.config.ts playwright.config.ts playwright.performance.config.ts",
     "test": "vitest",
     "test:run": "vitest --run",
     "test:coverage": "vitest --run --coverage",
     "typecheck": "vue-tsc --noEmit --pretty false -p tsconfig.typecheck.json",
     "ci:check": "yarn lint && yarn typecheck && yarn test:coverage",
-    "test:a11y": "playwright test"
+    "test:a11y": "playwright test",
+    "test:performance": "yarn build && playwright test --config=playwright.performance.config.ts"
   },
   "dependencies": {
     "bootstrap": "^5.3.3",
@@ -35,6 +36,7 @@
     "typescript-eslint": "^8.57.1",
     "vite": "^8.0.0",
     "vitest": "^4.1.0",
+    "ws": "^8.18.0",
     "vue-eslint-parser": "^10.4.0",
     "vue-tsc": "^3.2.6"
   }
