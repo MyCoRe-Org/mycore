@@ -18,18 +18,29 @@
 
 package org.mycore.common.config.instantiator.source;
 
-import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.common.config.instantiator.MCRProperTree;
 import org.mycore.common.config.annotation.MCRSentinel;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.common.config.instantiator.MCRInstantiatorUtils;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
-abstract sealed class MCRSourceBase<Result> implements MCRSource permits MCRInstanceListSource, MCRInstanceMapSource,
-    MCRInstanceSource, MCRPropertyListSource, MCRPropertyMapSource, MCRPropertySource {
+/**
+ * A {@link MCRSourceBase} is a base implementation of {@link MCRSource} that
+ * handles basic aspects for obtaining a value for annotation based injection from properties, i.e.
+ * <ul>
+ *   <li>whether annotation name are allowed</li>
+ *   <li>whether the annotation name is absolute or not,</li>
+ *   <li>whether falling back to a default value is necessary, if no value is configured</li>
+ *   <li>whether an exception is thrown id no value and no default value is configured.</li>
+ * </ul>
+ *
+ * @param <Result> the type of injected value.
+ */
+abstract sealed class MCRSourceBase<Result> implements MCRSource permits MCRValueListSourceBase, MCRValueMapSourceBase,
+    MCRValueSourceBase {
 
     protected final Logger logger = LogManager.getLogger(getClass());
 
@@ -38,41 +49,43 @@ abstract sealed class MCRSourceBase<Result> implements MCRSource permits MCRInst
     public final Result get(MCRInstanceConfiguration<?> configuration, MCRTarget target) {
 
         String name = name();
+        MCRProperTree fullProperties = configuration.fullProperties();
+
         MCRSourceContext context;
         Result result;
 
-        if (name.isEmpty() && (absolute() || !allowsEmptyName())) {
+        if (name.isEmpty() && (absoluteName() || !supportsEmptyName())) {
             throw MCRInstantiatorUtils.emptyNameException(target);
         }
 
-        if (absolute()) {
+        if (absoluteName()) {
             context = new MCRSourceContext(target, name, "absolute " + description());
-            result = getResult(context, configuration, configuration.fullProperties(), name);
-        } else if (name.isEmpty()) {
+            result = getResult(context, fullProperties.deeplyNested(name), fullProperties);
+        } else if (supportsEmptyName() && name.isEmpty()) {
             context = new MCRSourceContext(target, configuration.name().canonical(), description());
-            result = getResult(context, configuration, configuration.properties(), "");
+            result = getResult(context, configuration.properties(), fullProperties);
         } else {
             context = new MCRSourceContext(target, configuration.name().canonical() + "." + name, description());
-            result = getResult(context, configuration, configuration.properties(), name);
+            result = getResult(context, configuration.properties().deeplyNested(name), fullProperties);
         }
         if (logger.isDebugEnabled() && isMissingResult(result)) {
             logger.debug(context.missingValueMessage(target));
         }
 
         String defaultName = defaultName();
-        if (result == null && !defaultName.isEmpty()) {
+        if (isMissingResult(result) && !defaultName.isEmpty()) {
             context = new MCRSourceContext(target, defaultName, "default " + description());
-            result = getResult(context, configuration, configuration.fullProperties(), defaultName);
+            result = getResult(context, fullProperties.deeplyNested(defaultName), fullProperties);
             if (logger.isDebugEnabled() && isMissingResult(result)) {
                 logger.debug(context.missingValueMessage(target));
             }
         }
 
-        if ((result == null || isMissingResult(result)) && required()) {
-            throw missingException(context);
+        if (isMissingResult(result) && required()) {
+            throw missingResultException(context);
         }
 
-        return result == null ? nullResultReplacement() : result;
+        return isMissingResult(result) ? missingResultReplacement() : result;
 
     }
 
@@ -80,61 +93,37 @@ abstract sealed class MCRSourceBase<Result> implements MCRSource permits MCRInst
 
     protected abstract String name();
 
-    protected abstract boolean allowsEmptyName();
+    protected abstract String defaultName();
 
-    protected abstract boolean absolute();
+    protected abstract boolean supportsEmptyName();
+
+    protected abstract boolean absoluteName();
+
+    protected abstract Result getResult(MCRSourceContext context, MCRProperTree properties,
+        MCRProperTree fullProperties);
 
     protected abstract boolean required();
 
-    protected abstract String defaultName();
-
-    protected abstract Result getResult(MCRSourceContext context, MCRInstanceConfiguration<?> configuration,
-        Map<String, String> properties, String prefix);
-
     protected abstract boolean isMissingResult(Result result);
 
-    protected abstract MCRConfigurationException missingException(MCRSourceContext context);
+    protected abstract MCRConfigurationException missingResultException(MCRSourceContext context);
 
-    protected abstract Result nullResultReplacement();
-
-    protected final Object createInstance(MCRSourceContext context, MCRInstanceConfiguration<?> configuration,
-        MCRSentinel sentinel) {
-
-        if (rejectedBySentinel(sentinel, context, configuration.properties(), "")) {
-            return null;
-        }
-
-        if (!configuration.instantiatable()) {
-            if (logger.isInfoEnabled()) {
-                logger.info("[CLEAN-UP] Ignoring {} {} and all sub-properties (no or empty class name)",
-                    context.description(), context.property());
-            }
-            return null;
-        }
-
-        Object instance = configuration.instantiate();
-
-        if (!configuration.valueClass().isAssignableFrom(instance.getClass())) {
-            throw context.incompatibilityException(configuration.valueClass(), instance);
-        }
-
-        return instance;
-
-    }
+    protected abstract Result missingResultReplacement();
 
     protected final boolean rejectedBySentinel(MCRSentinel sentinel, MCRSourceContext context,
-        Map<String, String> properties, String prefix) {
+        MCRProperTree properties) {
 
         if (sentinel != null) {
             boolean sentinelValue = sentinel.defaultValue();
-            String configuredSentinelValue = properties.get(prefix + sentinel.name());
+            String configuredSentinelValue = properties.nested(sentinel.name()).value();
             if (configuredSentinelValue != null) {
                 sentinelValue = Boolean.parseBoolean(configuredSentinelValue);
             }
             if (sentinelValue == sentinel.rejectionValue()) {
                 if (logger.isInfoEnabled()) {
-                    logger.info("[SENTINEL] Ignoring {} {} and all sub-properties",
-                        context.description(), context.property());
+                    logger.info("[SENTINEL] Ignoring {}, configured in {} (and sub-properties thereof), " +
+                        "because {}.{} has value {}", context.description(), context.property(),
+                        context.property(), sentinel.name(), sentinel.rejectionValue());
                 }
                 return true;
             }

@@ -18,27 +18,21 @@
 
 package org.mycore.common.config.instantiator.source;
 
-import java.util.Map;
 import java.util.Set;
 
-import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRProperty;
-import org.mycore.common.config.annotation.MCRSentinel;
-import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
 /**
  * A {@link MCRPropertySource} is a {@link MCRSource} that interprets a {@link MCRProperty}.
  */
-final class MCRPropertySource extends MCRSourceBase<String> {
+final class MCRPropertySource extends MCRValueSourceBase<String> {
 
     private final MCRProperty annotation;
 
-    private final MCRSentinel sentinel;
-
     MCRPropertySource(MCRProperty annotation, MCRAnnotationProvider annotationProvider) {
+        super(annotationProvider, new MCRPropertyExtractor());
         this.annotation = annotation;
-        this.sentinel = annotationProvider.get(MCRSentinel.class);
     }
 
     @Override
@@ -77,50 +71,23 @@ final class MCRPropertySource extends MCRSourceBase<String> {
     }
 
     @Override
-    protected boolean allowsEmptyName() {
+    protected String defaultName() {
+        return annotation.defaultName();
+    }
+
+    @Override
+    protected boolean supportsEmptyName() {
         return false;
     }
 
     @Override
-    protected boolean absolute() {
+    protected boolean absoluteName() {
         return annotation.absolute();
     }
 
     @Override
     protected boolean required() {
         return annotation.required();
-    }
-
-    @Override
-    protected String defaultName() {
-        return annotation.defaultName();
-    }
-
-    @Override
-    protected String getResult(MCRSourceContext context, MCRInstanceConfiguration<?> configuration,
-        Map<String, String> properties, String prefix) {
-
-        if (rejectedBySentinel(sentinel, context, properties, prefix + ".")) {
-            return null;
-        }
-
-        return properties.get(prefix);
-
-    }
-
-    @Override
-    protected boolean isMissingResult(String result) {
-        return result == null;
-    }
-
-    @Override
-    protected MCRConfigurationException missingException(MCRSourceContext context) {
-        return context.missingException();
-    }
-
-    @Override
-    protected String nullResultReplacement() {
-        return null;
     }
 
 }
