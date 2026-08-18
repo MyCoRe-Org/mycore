@@ -59,9 +59,14 @@ public class MCRLayoutService {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    private static final String ERROR_ELEMENT = MCRConfiguration2.getStringOrThrow("MCR.Frontend.ErrorPage");
+
     private static final MCRLayoutService SHARED_INSTANCE = new MCRLayoutService();
 
     private static final String TRANSFORMER_FACTORY_PROPERTY = "MCR.Layout.Transformer.Factory";
+
+    private static final MCRLayoutTransformerFactory FACTORY =
+        MCRConfiguration2.getInstanceOfOrThrow(MCRLayoutTransformerFactory.class, TRANSFORMER_FACTORY_PROPERTY);
 
     public static MCRLayoutService obtainInstance() {
         return SHARED_INSTANCE;
@@ -90,15 +95,19 @@ public class MCRLayoutService {
         String docType = source.getDocType();
         try {
             MCRParameterCollector parameter = new MCRParameterCollector(req);
-            MCRContentTransformer transformer = getContentTransformer(docType, parameter);
-            String filename = getFileName(req, parameter);
-            transform(res, transformer, source, parameter, filename);
+            if (Objects.equals(docType, ERROR_ELEMENT)) {
+                transform(res, FACTORY.getTransformer(ERROR_ELEMENT), source, parameter, null);
+            } else {
+                MCRContentTransformer transformer = getContentTransformer(docType, parameter);
+                String filename = getFileName(req, parameter);
+                transform(res, transformer, source, parameter, filename);
+            }
         } catch (IOException | TransformerException | SAXException ex) {
             throw ex;
         } catch (MCRException ex) {
             // Check if it is an error page to suppress later recursively
             // generating an error page when there is an error in the stylesheet
-            if (!Objects.equals(docType, "mcr_error")) {
+            if (!Objects.equals(docType, ERROR_ELEMENT)) {
                 throw ex;
             }
 
@@ -115,6 +124,9 @@ public class MCRLayoutService {
         String docType = source.getDocType();
         try {
             MCRParameterCollector parameter = new MCRParameterCollector(req);
+            if (Objects.equals(docType, ERROR_ELEMENT)) {
+                return transform(FACTORY.getTransformer(ERROR_ELEMENT), source, parameter);
+            }
             MCRContentTransformer transformer = getContentTransformer(docType, parameter);
             return transform(transformer, source, parameter);
         } catch (IOException | TransformerException | SAXException ex) {
@@ -122,7 +134,7 @@ public class MCRLayoutService {
         } catch (MCRException ex) {
             // Check if it is an error page to suppress later recursively
             // generating an error page when there is an error in the stylesheet
-            if (!Objects.equals(docType, "mcr_error")) {
+            if (!Objects.equals(docType, ERROR_ELEMENT)) {
                 throw ex;
             }
 
@@ -141,9 +153,7 @@ public class MCRLayoutService {
             String style = parameter.getParameter("Style", "default");
             transformerId = new MessageFormat("{0}-{1}", Locale.ROOT).format(new Object[] { docType, style });
         }
-        MCRLayoutTransformerFactory factory = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRLayoutTransformerFactory.class, TRANSFORMER_FACTORY_PROPERTY);
-        return factory.getTransformer(transformerId);
+        return FACTORY.getTransformer(transformerId);
     }
 
     private String getFileName(HttpServletRequest req, MCRParameterCollector parameter) {
