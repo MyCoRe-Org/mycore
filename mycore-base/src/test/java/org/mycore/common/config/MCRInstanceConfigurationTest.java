@@ -23,10 +23,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mycore.common.config.instantiator.MCRInstanceConfiguration.ofClass;
 import static org.mycore.common.config.instantiator.MCRInstanceConfiguration.ofName;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.test.MyCoReTest;
 
@@ -44,29 +45,28 @@ public class MCRInstanceConfigurationTest {
     private static final String NESTED_TEST_CLASS_C = NestedTestClassC.class.getName();
 
     @Test
+    @MCRTestConfiguration(properties = {
+        @MCRTestProperty(key = "Foo.Bar.Class", classNameOf = TestClass.class)
+    })
     public void configuration() {
 
-        Map<String, String> properties = new HashMap<>();
-        properties.put("Foo.Bar.Class", TEST_CLASS);
-
-        MCRInstanceConfiguration<?> configuration = ofName(Object.class, "Foo.Bar", properties);
+        MCRInstanceConfiguration<?> configuration = ofName(Object.class, "Foo.Bar");
 
         assertEquals("Foo.Bar.Class", configuration.name().actual());
         assertEquals("Foo.Bar", configuration.name().canonical());
         assertEquals(TestClass.class, configuration.valueClass());
-        assertEquals(properties, configuration.fullProperties());
 
     }
 
     @Test
+    @MCRTestConfiguration(properties = {
+        @MCRTestProperty(key = "Foo.Bar.Class", classNameOf = TestClass.class),
+        @MCRTestProperty(key = "Foo.Bar.Key1", string = "Value1"),
+        @MCRTestProperty(key = "Foo.Bar.Key2", string = "Value2")
+    })
     public void configurationMovesEntries() {
 
-        Map<String, String> properties = new HashMap<>();
-        properties.put("Foo.Bar.Class", TEST_CLASS);
-        properties.put("Foo.Bar.Key1", "Value1");
-        properties.put("Foo.Bar.Key2", "Value2");
-
-        MCRInstanceConfiguration<?> configuration = ofName(Object.class, "Foo.Bar", properties);
+        MCRInstanceConfiguration<?> configuration = ofName(Object.class, "Foo.Bar");
 
         assertEquals("Value1", configuration.properties().get("Key1"));
         assertEquals("Value2", configuration.properties().get("Key2"));
@@ -75,35 +75,31 @@ public class MCRInstanceConfigurationTest {
     }
 
     @Test
+    @MCRTestConfiguration(properties = {
+        @MCRTestProperty(key = "Foo.Bar.Class", classNameOf = TestClass.class),
+        @MCRTestProperty(key = "Foo.Bar.Baz.Class", classNameOf = NestedTestClass.class)
+    })
     public void nestedConfiguration() {
 
-        Map<String, String> properties = new HashMap<>();
-        properties.put("Foo.Bar.Class", TEST_CLASS);
-        properties.put("Foo.Bar.Baz.Class", NESTED_TEST_CLASS);
-
-        MCRInstanceConfiguration<?> configuration = ofName(Object.class, "Foo.Bar", properties);
+        MCRInstanceConfiguration<?> configuration = ofName(Object.class, "Foo.Bar");
         MCRInstanceConfiguration<?> nestedConfiguration = configuration.nested(Object.class, "Baz");
-
-        System.out.println(configuration);
-        System.out.println(nestedConfiguration);
 
         assertEquals("Foo.Bar.Baz.Class", nestedConfiguration.name().actual());
         assertEquals("Foo.Bar.Baz", nestedConfiguration.name().canonical());
         assertEquals(NestedTestClass.class, nestedConfiguration.valueClass());
-        assertEquals(properties, nestedConfiguration.fullProperties());
 
     }
 
     @Test
+    @MCRTestConfiguration(properties = {
+        @MCRTestProperty(key = "Foo.Bar.Class", classNameOf = TestClass.class),
+        @MCRTestProperty(key = "Foo.Bar.Baz.Class", classNameOf = NestedTestClass.class),
+        @MCRTestProperty(key = "Foo.Bar.Baz.Key1", string = "Value1"),
+        @MCRTestProperty(key = "Foo.Bar.Baz.Key2", string = "Value2")
+    })
     public void nestedConfigurationMovesEntries() {
 
-        Map<String, String> properties = new HashMap<>();
-        properties.put("Foo.Bar.Class", TEST_CLASS);
-        properties.put("Foo.Bar.Baz.Class", NESTED_TEST_CLASS);
-        properties.put("Foo.Bar.Baz.Key1", "Value1");
-        properties.put("Foo.Bar.Baz.Key2", "Value2");
-
-        MCRInstanceConfiguration<?> configuration = ofName(Object.class, "Foo.Bar", properties);
+        MCRInstanceConfiguration<?> configuration = ofName(Object.class, "Foo.Bar");
         MCRInstanceConfiguration<?> nestedConfiguration = configuration.nested(Object.class, "Baz");
 
         assertEquals("Value1", nestedConfiguration.properties().get("Key1"));
@@ -113,15 +109,15 @@ public class MCRInstanceConfigurationTest {
     }
 
     @Test
+    @MCRTestConfiguration(properties = {
+        @MCRTestProperty(key = "Foo.Bar.Class", classNameOf = TestClass.class),
+        @MCRTestProperty(key = "Foo.Bar.A.Class", classNameOf = NestedTestClassA.class),
+        @MCRTestProperty(key = "Foo.Bar.B.Class", classNameOf = NestedTestClassB.class),
+        @MCRTestProperty(key = "Foo.Bar.C.Class", classNameOf = NestedTestClassC.class)
+    })
     public void nestedMap() {
 
-        Map<String, String> properties = new HashMap<>();
-        properties.put("Foo.Bar.Class", TEST_CLASS);
-        properties.put("Foo.Bar.A.Class", NESTED_TEST_CLASS_A);
-        properties.put("Foo.Bar.B.Class", NESTED_TEST_CLASS_B);
-        properties.put("Foo.Bar.C.Class", NESTED_TEST_CLASS_C);
-
-        MCRInstanceConfiguration<?> configuration = ofName(Object.class, "Foo.Bar", properties);
+        MCRInstanceConfiguration<?> configuration = ofName(Object.class, "Foo.Bar");
         Map<String, ? extends MCRInstanceConfiguration<?>> nestedConfigurations = configuration.nestedMap(Object.class);
         MCRInstanceConfiguration<?> nestedConfigurationA = nestedConfigurations.get("A");
         MCRInstanceConfiguration<?> nestedConfigurationB = nestedConfigurations.get("B");
@@ -131,36 +127,33 @@ public class MCRInstanceConfigurationTest {
         assertEquals("Foo.Bar.A.Class", nestedConfigurationA.name().actual());
         assertEquals("Foo.Bar.A", nestedConfigurationA.name().canonical());
         assertEquals(NestedTestClassA.class, nestedConfigurationA.valueClass());
-        assertEquals(properties, nestedConfigurationA.fullProperties());
 
         assertEquals("Foo.Bar.B.Class", nestedConfigurationB.name().actual());
         assertEquals("Foo.Bar.B", nestedConfigurationB.name().canonical());
         assertEquals(NestedTestClassB.class, nestedConfigurationB.valueClass());
-        assertEquals(properties, nestedConfigurationB.fullProperties());
 
         assertEquals("Foo.Bar.C.Class", nestedConfigurationC.name().actual());
         assertEquals("Foo.Bar.C", nestedConfigurationC.name().canonical());
         assertEquals(NestedTestClassC.class, nestedConfigurationC.valueClass());
-        assertEquals(properties, nestedConfigurationC.fullProperties());
 
     }
 
     @Test
+    @MCRTestConfiguration(properties = {
+        @MCRTestProperty(key = "Foo.Bar.Class", classNameOf = TestClass.class),
+        @MCRTestProperty(key = "Foo.Bar.A.Class", classNameOf = NestedTestClassA.class),
+        @MCRTestProperty(key = "Foo.Bar.A.Key1", string = "ValueA1"),
+        @MCRTestProperty(key = "Foo.Bar.A.Key2", string = "ValueA2"),
+        @MCRTestProperty(key = "Foo.Bar.B.Class", classNameOf = NestedTestClassB.class),
+        @MCRTestProperty(key = "Foo.Bar.B.Key1", string = "ValueB1"),
+        @MCRTestProperty(key = "Foo.Bar.B.Key2", string = "ValueB2"),
+        @MCRTestProperty(key = "Foo.Bar.C.Class", classNameOf = NestedTestClassC.class),
+        @MCRTestProperty(key = "Foo.Bar.C.Key1", string = "ValueC1"),
+        @MCRTestProperty(key = "Foo.Bar.C.Key2", string = "ValueC2")
+    })
     public void nestedMapMovesEntries() {
 
-        Map<String, String> properties = new HashMap<>();
-        properties.put("Foo.Bar.Class", TEST_CLASS);
-        properties.put("Foo.Bar.A.Class", NESTED_TEST_CLASS_A);
-        properties.put("Foo.Bar.A.Key1", "ValueA1");
-        properties.put("Foo.Bar.A.Key2", "ValueA2");
-        properties.put("Foo.Bar.B.Class", NESTED_TEST_CLASS_B);
-        properties.put("Foo.Bar.B.Key1", "ValueB1");
-        properties.put("Foo.Bar.B.Key2", "ValueB2");
-        properties.put("Foo.Bar.C.Class", NESTED_TEST_CLASS_C);
-        properties.put("Foo.Bar.C.Key1", "ValueC1");
-        properties.put("Foo.Bar.C.Key2", "ValueC2");
-
-        MCRInstanceConfiguration<?> configuration = ofName(Object.class, "Foo.Bar", properties);
+        MCRInstanceConfiguration<?> configuration = ofName(Object.class, "Foo.Bar");
         Map<String, ? extends MCRInstanceConfiguration<?>> nestedConfigurations = configuration.nestedMap(Object.class);
         MCRInstanceConfiguration<?> nestedConfigurationA = nestedConfigurations.get("A");
         MCRInstanceConfiguration<?> nestedConfigurationB = nestedConfigurations.get("B");
@@ -182,69 +175,58 @@ public class MCRInstanceConfigurationTest {
     }
 
     @Test
+    @MCRTestConfiguration(properties = {
+        @MCRTestProperty(key = "Foo.Bar.Class", classNameOf = TestClass.class),
+        @MCRTestProperty(key = "Foo.Bar.Baz.A.Class", classNameOf = NestedTestClassA.class),
+        @MCRTestProperty(key = "Foo.Bar.Baz.B.Class", classNameOf = NestedTestClassB.class),
+        @MCRTestProperty(key = "Foo.Bar.Baz.C.Class", classNameOf = NestedTestClassC.class)
+    })
     public void nestedMapWithPrefix() {
 
-        Map<String, String> properties = new HashMap<>();
-        properties.put("Foo.Bar.Class", TEST_CLASS);
-        properties.put("Foo.Bar.Baz.A.Class", NESTED_TEST_CLASS_A);
-        properties.put("Foo.Bar.Baz.B.Class", NESTED_TEST_CLASS_B);
-        properties.put("Foo.Bar.Baz.C.Class", NESTED_TEST_CLASS_C);
-
-        MCRInstanceConfiguration<?> configuration =
-            ofName(Object.class, "Foo.Bar", properties);
+        MCRInstanceConfiguration<?> configuration = ofName(Object.class, "Foo.Bar");
         Map<String, ? extends MCRInstanceConfiguration<?>> nestedConfigurations =
             configuration.nestedMap(Object.class, "Baz");
-        MCRInstanceConfiguration<?> nestedConfigurationA =
-            nestedConfigurations.get("A");
-        MCRInstanceConfiguration<?> nestedConfigurationB =
-            nestedConfigurations.get("B");
-        MCRInstanceConfiguration<?> nestedConfigurationC =
-            nestedConfigurations.get("C");
+        MCRInstanceConfiguration<?> nestedConfigurationA = nestedConfigurations.get("A");
+        MCRInstanceConfiguration<?> nestedConfigurationB = nestedConfigurations.get("B");
+        MCRInstanceConfiguration<?> nestedConfigurationC = nestedConfigurations.get("C");
 
         assertEquals(3, nestedConfigurations.size());
 
         assertEquals("Foo.Bar.Baz.A.Class", nestedConfigurationA.name().actual());
         assertEquals("Foo.Bar.Baz.A", nestedConfigurationA.name().canonical());
         assertEquals(NestedTestClassA.class, nestedConfigurationA.valueClass());
-        assertEquals(properties, nestedConfigurationA.fullProperties());
 
         assertEquals("Foo.Bar.Baz.B.Class", nestedConfigurationB.name().actual());
         assertEquals("Foo.Bar.Baz.B", nestedConfigurationB.name().canonical());
         assertEquals(NestedTestClassB.class, nestedConfigurationB.valueClass());
-        assertEquals(properties, nestedConfigurationB.fullProperties());
 
         assertEquals("Foo.Bar.Baz.C.Class", nestedConfigurationC.name().actual());
         assertEquals("Foo.Bar.Baz.C", nestedConfigurationC.name().canonical());
         assertEquals(NestedTestClassC.class, nestedConfigurationC.valueClass());
-        assertEquals(properties, nestedConfigurationC.fullProperties());
 
     }
 
     @Test
+    @MCRTestConfiguration(properties = {
+        @MCRTestProperty(key = "Foo.Bar.Class", classNameOf = TestClass.class),
+        @MCRTestProperty(key = "Foo.Bar.Baz.A.Class", classNameOf = NestedTestClassA.class),
+        @MCRTestProperty(key = "Foo.Bar.Baz.A.Key1", string = "ValueA1"),
+        @MCRTestProperty(key = "Foo.Bar.Baz.A.Key2", string = "ValueA2"),
+        @MCRTestProperty(key = "Foo.Bar.Baz.B.Class", classNameOf = NestedTestClassB.class),
+        @MCRTestProperty(key = "Foo.Bar.Baz.B.Key1", string = "ValueB1"),
+        @MCRTestProperty(key = "Foo.Bar.Baz.B.Key2", string = "ValueB2"),
+        @MCRTestProperty(key = "Foo.Bar.Baz.C.Class", classNameOf = NestedTestClassC.class),
+        @MCRTestProperty(key = "Foo.Bar.Baz.C.Key1", string = "ValueC1"),
+        @MCRTestProperty(key = "Foo.Bar.Baz.C.Key2", string = "ValueC2")
+    })
     public void nestedMapWithPrefixMovesEntries() {
 
-        Map<String, String> properties = new HashMap<>();
-        properties.put("Foo.Bar.Class", TEST_CLASS);
-        properties.put("Foo.Bar.Baz.A.Class", NESTED_TEST_CLASS_A);
-        properties.put("Foo.Bar.Baz.A.Key1", "ValueA1");
-        properties.put("Foo.Bar.Baz.A.Key2", "ValueA2");
-        properties.put("Foo.Bar.Baz.B.Class", NESTED_TEST_CLASS_B);
-        properties.put("Foo.Bar.Baz.B.Key1", "ValueB1");
-        properties.put("Foo.Bar.Baz.B.Key2", "ValueB2");
-        properties.put("Foo.Bar.Baz.C.Class", NESTED_TEST_CLASS_C);
-        properties.put("Foo.Bar.Baz.C.Key1", "ValueC1");
-        properties.put("Foo.Bar.Baz.C.Key2", "ValueC2");
-
-        MCRInstanceConfiguration<?> configuration =
-            ofName(Object.class, "Foo.Bar", properties);
+        MCRInstanceConfiguration<?> configuration = ofName(Object.class, "Foo.Bar");
         Map<String, ? extends MCRInstanceConfiguration<?>> nestedConfigurations =
             configuration.nestedMap(Object.class, "Baz");
-        MCRInstanceConfiguration<?> nestedConfigurationA =
-            nestedConfigurations.get("A");
-        MCRInstanceConfiguration<?> nestedConfigurationB =
-            nestedConfigurations.get("B");
-        MCRInstanceConfiguration<?> nestedConfigurationC =
-            nestedConfigurations.get("C");
+        MCRInstanceConfiguration<?> nestedConfigurationA = nestedConfigurations.get("A");
+        MCRInstanceConfiguration<?> nestedConfigurationB = nestedConfigurations.get("B");
+        MCRInstanceConfiguration<?> nestedConfigurationC = nestedConfigurations.get("C");
 
         assertEquals(3, nestedConfigurations.size());
 
@@ -265,28 +247,24 @@ public class MCRInstanceConfigurationTest {
     @Test
     public void directConfiguration() {
 
-        Map<String, String> properties = new HashMap<>();
-
-        MCRInstanceConfiguration<?> configuration =
-            ofClass(Object.class, TestClass.class, "Instance", properties);
+        MCRInstanceConfiguration<?> configuration = ofClass(Object.class, TestClass.class, "Instance");
 
         assertEquals("Instance.Class", configuration.name().actual());
         assertEquals("Instance", configuration.name().canonical());
         assertEquals(TestClass.class, configuration.valueClass());
-        assertEquals(properties, configuration.fullProperties());
 
     }
 
     @Test
+    @MCRTestConfiguration(properties = {
+        @MCRTestProperty(key = "Instance.Class", string = "ClassValue"),
+        @MCRTestProperty(key = "Instance.class", string = "ClassValue"),
+        @MCRTestProperty(key = "Instance", string = "ClassValue")
+    })
     public void directConfigurationRemovesClassEntry() {
 
-        Map<String, String> properties = new HashMap<>();
-        properties.put("Instance.Class", "ClassValue");
-        properties.put("Instance.class", "ClassValue");
-        properties.put("Instance", "ClassValue");
-
         MCRInstanceConfiguration<?> configuration =
-            ofClass(Object.class, TestClass.class, "Instance", properties);
+            ofClass(Object.class, TestClass.class, "Instance");
 
         assertFalse(configuration.properties().containsKey("Class"));
         assertEquals("ClassValue", configuration.properties().get("class"));
@@ -296,85 +274,71 @@ public class MCRInstanceConfigurationTest {
     }
 
     @Test
+    @MCRTestConfiguration(properties = {
+        @MCRTestProperty(key = "Instance.Baz.Class", classNameOf = NestedTestClass.class)
+    })
     public void nestedDirectConfiguration() {
 
-        Map<String, String> properties = new HashMap<>();
-        properties.put("Instance.Baz.Class", NESTED_TEST_CLASS);
-
-        MCRInstanceConfiguration<?> configuration =
-            ofClass(Object.class, TestClass.class, "Instance", properties);
-        MCRInstanceConfiguration<?> nestedConfiguration =
-            configuration.nested(Object.class, "Baz");
+        MCRInstanceConfiguration<?> configuration = ofClass(Object.class, TestClass.class, "Instance");
+        MCRInstanceConfiguration<?> nestedConfiguration = configuration.nested(Object.class, "Baz");
 
         assertEquals("Instance.Baz.Class", nestedConfiguration.name().actual());
         assertEquals("Instance.Baz", nestedConfiguration.name().canonical());
         assertEquals(NestedTestClass.class, nestedConfiguration.valueClass());
-        assertEquals(properties, nestedConfiguration.fullProperties());
 
     }
 
     @Test
+    @MCRTestConfiguration(properties = {
+        @MCRTestProperty(key = "Instance.A.Class", classNameOf = NestedTestClassA.class),
+        @MCRTestProperty(key = "Instance.B.Class", classNameOf = NestedTestClassB.class),
+        @MCRTestProperty(key = "Instance.C.Class", classNameOf = NestedTestClassC.class)
+    })
     public void nestedDirectConfigurationMap() {
 
-        Map<String, String> properties = new HashMap<>();
-        properties.put("Instance.A.Class", NESTED_TEST_CLASS_A);
-        properties.put("Instance.B.Class", NESTED_TEST_CLASS_B);
-        properties.put("Instance.C.Class", NESTED_TEST_CLASS_C);
-
-        MCRInstanceConfiguration<?> configuration =
-            ofClass(Object.class, TestClass.class, "Instance", properties);
+        MCRInstanceConfiguration<?> configuration = ofClass(Object.class, TestClass.class, "Instance");
         Map<String, ? extends MCRInstanceConfiguration<?>> nestedConfigurations =
             configuration.nestedMap(Object.class);
-        MCRInstanceConfiguration<?> nestedConfigurationA =
-            nestedConfigurations.get("A");
-        MCRInstanceConfiguration<?> nestedConfigurationB =
-            nestedConfigurations.get("B");
-        MCRInstanceConfiguration<?> nestedConfigurationC =
-            nestedConfigurations.get("C");
+        MCRInstanceConfiguration<?> nestedConfigurationA = nestedConfigurations.get("A");
+        MCRInstanceConfiguration<?> nestedConfigurationB = nestedConfigurations.get("B");
+        MCRInstanceConfiguration<?> nestedConfigurationC = nestedConfigurations.get("C");
 
         assertEquals(3, nestedConfigurations.size());
 
         assertEquals("Instance.A.Class", nestedConfigurationA.name().actual());
         assertEquals("Instance.A", nestedConfigurationA.name().canonical());
         assertEquals(NestedTestClassA.class, nestedConfigurationA.valueClass());
-        assertEquals(properties, nestedConfigurationA.fullProperties());
 
         assertEquals("Instance.B.Class", nestedConfigurationB.name().actual());
         assertEquals("Instance.B", nestedConfigurationB.name().canonical());
         assertEquals(NestedTestClassB.class, nestedConfigurationB.valueClass());
-        assertEquals(properties, nestedConfigurationB.fullProperties());
 
         assertEquals("Instance.C.Class", nestedConfigurationC.name().actual());
         assertEquals("Instance.C", nestedConfigurationC.name().canonical());
         assertEquals(NestedTestClassC.class, nestedConfigurationC.valueClass());
-        assertEquals(properties, nestedConfigurationC.fullProperties());
 
     }
 
     @Test
+    @MCRTestConfiguration(properties = {
+        @MCRTestProperty(key = "Instance.A.Class", classNameOf = NestedTestClassA.class),
+        @MCRTestProperty(key = "Instance.A.class", string = "ClassValue"),
+        @MCRTestProperty(key = "Instance.A", string = "ClassValue"),
+        @MCRTestProperty(key = "Instance.B.Class", classNameOf = NestedTestClassB.class),
+        @MCRTestProperty(key = "Instance.B.class", string = "ClassValue"),
+        @MCRTestProperty(key = "Instance.B", string = "ClassValue"),
+        @MCRTestProperty(key = "Instance.C.Class", classNameOf = NestedTestClassC.class),
+        @MCRTestProperty(key = "Instance.C.class", string = "ClassValue"),
+        @MCRTestProperty(key = "Instance.C", string = "ClassValue")
+    })
     public void nestedDirectConfigurationMapRemovesClassEntries() {
 
-        Map<String, String> properties = new HashMap<>();
-        properties.put("Instance.A.Class", NESTED_TEST_CLASS_A);
-        properties.put("Instance.A.class", "ClassValue");
-        properties.put("Instance.A", "ClassValue");
-        properties.put("Instance.B.Class", NESTED_TEST_CLASS_B);
-        properties.put("Instance.B.class", "ClassValue");
-        properties.put("Instance.B", "ClassValue");
-        properties.put("Instance.C.Class", NESTED_TEST_CLASS_C);
-        properties.put("Instance.C.class", "ClassValue");
-        properties.put("Instance.C", "ClassValue");
-
-        MCRInstanceConfiguration<?> configuration =
-            ofClass(Object.class, TestClass.class, "Instance", properties);
+        MCRInstanceConfiguration<?> configuration = ofClass(Object.class, TestClass.class, "Instance");
         Map<String, ? extends MCRInstanceConfiguration<?>> nestedConfigurations =
             configuration.nestedMap(Object.class);
-        MCRInstanceConfiguration<?> nestedConfigurationA =
-            nestedConfigurations.get("A");
-        MCRInstanceConfiguration<?> nestedConfigurationB =
-            nestedConfigurations.get("B");
-        MCRInstanceConfiguration<?> nestedConfigurationC =
-            nestedConfigurations.get("C");
+        MCRInstanceConfiguration<?> nestedConfigurationA = nestedConfigurations.get("A");
+        MCRInstanceConfiguration<?> nestedConfigurationB = nestedConfigurations.get("B");
+        MCRInstanceConfiguration<?> nestedConfigurationC = nestedConfigurations.get("C");
 
         assertEquals(3, nestedConfigurations.size());
 
@@ -396,67 +360,56 @@ public class MCRInstanceConfigurationTest {
     }
 
     @Test
+    @MCRTestConfiguration(properties = {
+        @MCRTestProperty(key = "Instance.Baz.A.Class", classNameOf = NestedTestClassA.class),
+        @MCRTestProperty(key = "Instance.Baz.B.Class", classNameOf = NestedTestClassB.class),
+        @MCRTestProperty(key = "Instance.Baz.C.Class", classNameOf = NestedTestClassC.class)
+    })
     public void nestedDirectConfigurationMapWithPrefix() {
 
-        Map<String, String> properties = new HashMap<>();
-        properties.put("Instance.Baz.A.Class", NESTED_TEST_CLASS_A);
-        properties.put("Instance.Baz.B.Class", NESTED_TEST_CLASS_B);
-        properties.put("Instance.Baz.C.Class", NESTED_TEST_CLASS_C);
-
-        MCRInstanceConfiguration<?> configuration =
-            ofClass(Object.class, TestClass.class, "Instance", properties);
+        MCRInstanceConfiguration<?> configuration = ofClass(Object.class, TestClass.class, "Instance");
         Map<String, ? extends MCRInstanceConfiguration<?>> nestedConfigurations =
             configuration.nestedMap(Object.class, "Baz");
-        MCRInstanceConfiguration<?> nestedConfigurationA =
-            nestedConfigurations.get("A");
-        MCRInstanceConfiguration<?> nestedConfigurationB =
-            nestedConfigurations.get("B");
-        MCRInstanceConfiguration<?> nestedConfigurationC =
-            nestedConfigurations.get("C");
+        MCRInstanceConfiguration<?> nestedConfigurationA = nestedConfigurations.get("A");
+        MCRInstanceConfiguration<?> nestedConfigurationB = nestedConfigurations.get("B");
+        MCRInstanceConfiguration<?> nestedConfigurationC = nestedConfigurations.get("C");
 
         assertEquals(3, nestedConfigurations.size());
 
         assertEquals("Instance.Baz.A.Class", nestedConfigurationA.name().actual());
         assertEquals("Instance.Baz.A", nestedConfigurationA.name().canonical());
         assertEquals(NestedTestClassA.class, nestedConfigurationA.valueClass());
-        assertEquals(properties, nestedConfigurationA.fullProperties());
 
         assertEquals("Instance.Baz.B.Class", nestedConfigurationB.name().actual());
         assertEquals("Instance.Baz.B", nestedConfigurationB.name().canonical());
         assertEquals(NestedTestClassB.class, nestedConfigurationB.valueClass());
-        assertEquals(properties, nestedConfigurationB.fullProperties());
 
         assertEquals("Instance.Baz.C.Class", nestedConfigurationC.name().actual());
         assertEquals("Instance.Baz.C", nestedConfigurationC.name().canonical());
         assertEquals(NestedTestClassC.class, nestedConfigurationC.valueClass());
-        assertEquals(properties, nestedConfigurationC.fullProperties());
 
     }
 
     @Test
+    @MCRTestConfiguration(properties = {
+        @MCRTestProperty(key = "Instance.A.Class", classNameOf = NestedTestClassA.class),
+        @MCRTestProperty(key = "Instance.Baz.A.class", string = "ClassValue"),
+        @MCRTestProperty(key = "Instance.Baz.A", string = "ClassValue"),
+        @MCRTestProperty(key = "Instance.Baz.B.Class", classNameOf = NestedTestClassB.class),
+        @MCRTestProperty(key = "Instance.Baz.B.class", string = "ClassValue"),
+        @MCRTestProperty(key = "Instance.Baz.B", string = "ClassValue"),
+        @MCRTestProperty(key = "Instance.Baz.C.Class", classNameOf = NestedTestClassC.class),
+        @MCRTestProperty(key = "Instance.Baz.C.class", string = "ClassValue"),
+        @MCRTestProperty(key = "Instance.Baz.C", string = "ClassValue")
+    })
     public void nestedDirectConfigurationMapWithPrefixRemovesClassEntries() {
 
-        Map<String, String> properties = new HashMap<>();
-        properties.put("Instance.Baz.A.Class", NESTED_TEST_CLASS_A);
-        properties.put("Instance.Baz.A.class", "ClassValue");
-        properties.put("Instance.Baz.A", "ClassValue");
-        properties.put("Instance.Baz.B.Class", NESTED_TEST_CLASS_B);
-        properties.put("Instance.Baz.B.class", "ClassValue");
-        properties.put("Instance.Baz.B", "ClassValue");
-        properties.put("Instance.Baz.C.Class", NESTED_TEST_CLASS_C);
-        properties.put("Instance.Baz.C.class", "ClassValue");
-        properties.put("Instance.Baz.C", "ClassValue");
-
-        MCRInstanceConfiguration<?> configuration =
-            ofClass(Object.class, TestClass.class, "Instance", properties);
+        MCRInstanceConfiguration<?> configuration = ofClass(Object.class, TestClass.class, "Instance");
         Map<String, ? extends MCRInstanceConfiguration<?>> nestedConfigurations =
             configuration.nestedMap(Object.class, "Baz");
-        MCRInstanceConfiguration<?> nestedConfigurationA =
-            nestedConfigurations.get("A");
-        MCRInstanceConfiguration<?> nestedConfigurationB =
-            nestedConfigurations.get("B");
-        MCRInstanceConfiguration<?> nestedConfigurationC =
-            nestedConfigurations.get("C");
+        MCRInstanceConfiguration<?> nestedConfigurationA = nestedConfigurations.get("A");
+        MCRInstanceConfiguration<?> nestedConfigurationB = nestedConfigurations.get("B");
+        MCRInstanceConfiguration<?> nestedConfigurationC = nestedConfigurations.get("C");
 
         assertEquals(3, nestedConfigurations.size());
 

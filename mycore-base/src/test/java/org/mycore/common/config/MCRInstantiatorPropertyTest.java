@@ -56,39 +56,25 @@ import org.mycore.test.MyCoReTest;
  *     <th style="border: 1px solid;">Expected Required Result</th>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">not set</td>
+ *     <td style="border: 1px solid;">not set / empty</td>
  *     <td style="border: 1px solid;">no</td>
  *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;"><code>null</code></td>
  *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">not set</td>
+ *     <td style="border: 1px solid;">not set / empty</td>
  *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;"><code>null</code></td>
+ *     <td style="border: 1px solid;">not set / empty</td>
+ *     <td style="border: 1px solid;">Exception</td>
  *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;">empty</td>
- *     <td style="border: 1px solid;">empty</td>
- *     <td style="border: 1px solid;">empty</td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">not set</td>
+ *     <td style="border: 1px solid;">not set / empty</td>
  *     <td style="border: 1px solid;">yes</td>
  *     <td style="border: 1px solid;"><code>DefaultValue</code></td>
  *     <td style="border: 1px solid;"><code>DefaultValue</code></td>
  *     <td style="border: 1px solid;"><code>DefaultValue</code></td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">empty</td>
- *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;">empty</td>
- *     <td style="border: 1px solid;">empty</td>
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;"><code>Value</code></td>
@@ -218,14 +204,10 @@ public class MCRInstantiatorPropertyTest {
             exception = e;
         }
 
-        boolean missingDefaultConfiguration = required && valueProperty.notSet()
-            && defaultValue && defaultProperty.notSet();
+        boolean missingDefault = required && !valueProperty.set() && defaultValue && !defaultProperty.set();
+        boolean nullResultExpected = !valueProperty.set() && (!defaultValue || !defaultProperty.set());
 
-        // all the indications a nested property should not be created (or creation should be suppressed)
-        boolean shouldNotCreateProperty = valueProperty.notSet() &&
-            (!defaultValue || (!required && defaultProperty.notSet()));
-
-        if (missingDefaultConfiguration) {
+        if (missingDefault) {
 
             assertNull(instance);
             assertNotNull(exception);
@@ -234,7 +216,7 @@ public class MCRInstantiatorPropertyTest {
                 + " for target field 'value' in configured class " + configuredClass.getName()
                 + " is missing", exception.getMessage());
 
-        } else if (required && shouldNotCreateProperty) {
+        } else if (required && nullResultExpected) {
 
             assertNull(instance);
             assertNotNull(exception);
@@ -256,7 +238,7 @@ public class MCRInstantiatorPropertyTest {
 
             String value = instance.value();
 
-            if (shouldNotCreateProperty) {
+            if (nullResultExpected) {
 
                 assertNull(value);
 
@@ -264,22 +246,10 @@ public class MCRInstantiatorPropertyTest {
 
                 assertNotNull(value);
 
-                if (valueProperty.notSet()) {
-
-                    if (defaultProperty.setEmpty()) {
-                        assertEquals("", value);
-                    } else {
-                        assertEquals("DefaultValue", value);
-                    }
-
+                if (valueProperty.set()) {
+                    assertEquals("Value", value);
                 } else {
-
-                    if (valueProperty.setEmpty()) {
-                        assertEquals("", value);
-                    } else {
-                        assertEquals("Value", value);
-                    }
-
+                    assertEquals("DefaultValue", value);
                 }
 
             }
@@ -301,12 +271,8 @@ public class MCRInstantiatorPropertyTest {
 
         SET_NON_EMPTY;
 
-        public boolean notSet() {
-            return this == NOT_SET;
-        }
-
-        public boolean setEmpty() {
-            return this == SET_EMPTY;
+        public boolean set() {
+            return this == SET_NON_EMPTY;
         }
 
     }
@@ -319,12 +285,8 @@ public class MCRInstantiatorPropertyTest {
 
         SET_NON_EMPTY;
 
-        public boolean notSet() {
-            return this == NOT_SET;
-        }
-
-        public boolean setEmpty() {
-            return this == SET_EMPTY;
+        public boolean set() {
+            return this == SET_NON_EMPTY;
         }
 
     }

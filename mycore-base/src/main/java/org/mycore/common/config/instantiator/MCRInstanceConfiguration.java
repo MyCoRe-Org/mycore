@@ -28,11 +28,10 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.config.MCRConfigurationException;
 
 /**
- * Represents an extract of properties (typically {@link MCRConfigurationBase#getAllPropertiesMap()}) used to
+ * Represents an extract of properties (obtained via {@link MCRConfiguration2#getAllPropertiesMap()}) used to
  * instantiate an object. Provides methods to extract nested configurations.
  * <p>
  * Generally speaking, a configuration has a {@link MCRInstanceConfiguration#name()} that represents the
@@ -84,42 +83,25 @@ public final class MCRInstanceConfiguration<S> {
     }
 
     /**
-     * Shorthand for {@link MCRInstanceConfiguration#ofClass(Class, Class, String, Map)} that
-     * uses {@link MCRClassTools#forName(String)} to resolve the value class and
-     * uses {@link MCRConfigurationBase#getAllPropertiesMap()} as the properties.
-     */
-    public static <S> MCRInstanceConfiguration<S> ofClassName(Class<S> superClass, String className,
-        String prefix) {
-        return ofClassName(superClass, className, prefix, MCRConfigurationBase.getAllPropertiesMap());
-    }
-
-    /**
-     * Shorthand for {@link MCRInstanceConfiguration#ofClass(Class, Class, String, Map)} that
+     * Shorthand for {@link MCRInstanceConfiguration#ofClass(Class, Class, String)} that
      * uses {@link MCRClassTools#forName(String)} to resolve the value class.
      */
     public static <S> MCRInstanceConfiguration<S> ofClassName(Class<S> superClass, String className,
-        String prefix, Map<String, String> properties) {
+        String prefix) {
         try {
             Class<? extends S> valueClass = MCRClassTools.forName(className);
-            return ofClass(superClass, valueClass, prefix, properties);
+            return ofClass(superClass, valueClass, prefix);
         } catch (ClassNotFoundException e) {
             throw new MCRException("Failed to load class " + className, e);
         }
     }
 
     /**
-     * Shorthand for {@link MCRInstanceConfiguration#ofClass(Class, Class, String, Map)} that
-     * uses {@link MCRConfigurationBase#getAllPropertiesMap()} as the properties.
-     */
-    public static <S> MCRInstanceConfiguration<S> ofClass(Class<S> superClass, Class<? extends S> valueClass,
-        String prefix) {
-        return ofClass(superClass, valueClass, prefix, MCRConfigurationBase.getAllPropertiesMap());
-    }
-
-    /**
-     * Creates a new configuration for the given super class and value class based on the given properties.
+     * Creates a new configuration for the given super class and value class.
      * <p>
-     * Example: Given value class <code>Some.Instance.Name</code>, prefix <code>Some.Instance.Name</code> and properties
+     * Example: Given value class <code>Some.Instance.Name</code>,
+     * prefix <code>Some.Instance.Name</code> and
+     * properties
      * <ul>
      *     <li><code>Some.Instance.Name.Key1=Value1</code></li>
      *     <li><code>Some.Instance.Name.Key2=Value1</code></li>
@@ -132,58 +114,37 @@ public final class MCRInstanceConfiguration<S> {
      *     <li><code>Key1=Value1</code></li>
      *     <li><code>Key2=Value2</code></li>
      * </ul>
-     * and {@link MCRInstanceConfiguration#fullProperties()} that are equal to the given properties.
      */
     public static <S> MCRInstanceConfiguration<S> ofClass(Class<S> superClass, Class<? extends S> valueClass,
-        String prefix, Map<String, String> properties) {
+        String prefix) {
         MCRInstanceName name = MCRInstanceName.of(prefix);
+        Map<String, String> properties = MCRConfiguration2.getAllPropertiesMap();
         Map<String, String> reducedProperties = reduceProperties(prefix, properties);
         return new MCRInstanceConfiguration<>(superClass, valueClass, name, reducedProperties, properties);
     }
 
     /**
-     * Shorthand for {@link MCRInstanceConfiguration#ofName(Class, MCRInstanceName, Map, Set)} that
+     * Shorthand for {@link MCRInstanceConfiguration#ofName(Class, MCRInstanceName, Set)} that
      * creates the name with {@link MCRInstanceName#of(String)} and
-     * uses {@link MCRConfigurationBase#getAllPropertiesMap()} as the properties and
      * uses {@link Options#NONE} as the options.
      */
     public static <T> MCRInstanceConfiguration<T> ofName(Class<T> superClass, String name) {
-        return ofName(superClass, MCRInstanceName.of(name), MCRConfigurationBase.getAllPropertiesMap(), Options.NONE);
+        return ofName(superClass, MCRInstanceName.of(name), Options.NONE);
     }
 
     /**
-     * Shorthand for {@link MCRInstanceConfiguration#ofName(Class, MCRInstanceName, Map, Set)} that
-     * creates the name with {@link MCRInstanceName#of(String)} and
-     * uses {@link Options#NONE} as the options.
+     * Shorthand for {@link MCRInstanceConfiguration#ofName(Class, MCRInstanceName, Set)} that
+     * creates the name with {@link MCRInstanceName#of(String)}.
      */
-    public static <T> MCRInstanceConfiguration<T> ofName(Class<T> superClass, String name,
-        Map<String, String> properties) {
-        return ofName(superClass, MCRInstanceName.of(name), properties, Options.NONE);
+    public static <T> MCRInstanceConfiguration<T> ofName(Class<T> superClass, String name, Set<Option> options) {
+        return ofName(superClass, MCRInstanceName.of(name), options);
     }
 
     /**
-     * Shorthand for {@link MCRInstanceConfiguration#ofName(Class, MCRInstanceName, Map, Set)} that
-     * creates the name with {@link MCRInstanceName#of(String)} and
-     * uses {@link MCRConfigurationBase#getAllPropertiesMap()} as the properties.
-     */
-    public static <T> MCRInstanceConfiguration<T> ofName(Class<T> superClass, String name,
-        Set<Option> options) {
-        return ofName(superClass, MCRInstanceName.of(name), MCRConfigurationBase.getAllPropertiesMap(), options);
-    }
-
-    /**
-     * Shorthand for {@link MCRInstanceConfiguration#ofName(Class, MCRInstanceName, Map, Set)} that
-     * creates the name with {@link MCRInstanceName#of(String)} and.
-     */
-    public static <T> MCRInstanceConfiguration<T> ofName(Class<T> superClass, String name,
-        Map<String, String> properties, Set<Option> options) {
-        return ofName(superClass, MCRInstanceName.of(name), properties, options);
-    }
-
-    /**
-     * Creates a new configuration for the given super class and instance name based on the given properties.
+     * Creates a new configuration for the given super class and instance name.
      * <p>
-     * Example: Given an {@link MCRInstanceName} <code>Some.Instance.Name</code> and properties
+     * Example: Given an {@link MCRInstanceName} <code>Some.Instance.Name</code> and
+     * properties
      * <ul>
      *     <li><code>Some.Instance.Name.Class=some.instance.ClassName</code></li>
      *     <li><code>Some.Instance.Name.Key1=Value1</code></li>
@@ -200,7 +161,8 @@ public final class MCRInstanceConfiguration<S> {
      * and {@link MCRInstanceConfiguration#fullProperties()} that are equal to the given properties.
      */
     public static <T> MCRInstanceConfiguration<T> ofName(Class<T> superClass, MCRInstanceName name,
-        Map<String, String> properties, Set<Option> options) {
+        Set<Option> options) {
+        Map<String, String> properties = MCRConfiguration2.getAllPropertiesMap();
         Map<String, String> reducedProperties = reduceProperties(name.canonical(), properties);
         Class<? extends T> valueClass = resolveValueClass(superClass, name, reducedProperties, options);
         return new MCRInstanceConfiguration<>(superClass, valueClass, name, reducedProperties, properties);
