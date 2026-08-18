@@ -36,25 +36,25 @@
         <artifactId>frontend-maven-plugin</artifactId>
         <executions>
           <execution>
-            <id>yarn-install_access-key-manager2</id>
+            <id>yarn-build-access-key-manager</id>
             <goals>
               <goal>yarn</goal>
             </goals>
-            <phase>process-resources</phase>
+            <phase>generate-resources</phase>
             <configuration>
-              <arguments>install ${yarn.install.args}</arguments>
-              <workingDirectory>src/main/vue/access-key-manager2/</workingDirectory>
+              <workingDirectory>${basedir}/../mycore-vue</workingDirectory>
+              <arguments>build:access-key-manager</arguments>
             </configuration>
           </execution>
           <execution>
-            <id>yarn-build_access-key-manager2</id>
+            <id>yarn-lint-access-key-manager</id>
             <goals>
               <goal>yarn</goal>
             </goals>
-            <phase>process-resources</phase>
+            <phase>test</phase>
             <configuration>
-              <arguments>build</arguments>
-              <workingDirectory>src/main/vue/access-key-manager2/</workingDirectory>
+              <workingDirectory>${basedir}/../mycore-vue</workingDirectory>
+              <arguments>lint:access-key-manager</arguments>
             </configuration>
           </execution>
           <execution>
@@ -63,6 +63,13 @@
           </execution>
           <execution>
             <id>yarn-install</id>
+            <phase>none</phase>
+          </execution>
+          <!-- node and yarn come from mycore-vue, which installs them into the shared directory derived from
+               node.version and yarn.version. Installing them here as well would let this module run the shared
+               node_modules under a different node version, should it ever override those properties. -->
+          <execution>
+            <id>install-node-and-yarn</id>
             <phase>none</phase>
           </execution>
         </executions>
@@ -139,6 +146,11 @@
       <groupId>org.jdom</groupId>
       <artifactId>jdom2</artifactId>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mycore</groupId>
+      <artifactId>mycore-vue</artifactId>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
