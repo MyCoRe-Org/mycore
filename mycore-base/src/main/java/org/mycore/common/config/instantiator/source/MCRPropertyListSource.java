@@ -111,9 +111,7 @@ final class MCRPropertyListSource extends MCRSourceBase<List<String>> {
             if (key.startsWith(keyPrefix) && !key.isEmpty()) {
                 int index = key.indexOf('.', keyPrefixLength);
                 if (index == -1) {
-                    if (!value.isEmpty()) {
-                        listProperties.put(key.substring(keyPrefixLength), value);
-                    }
+                    listProperties.put(key.substring(keyPrefixLength), value);
                 }
             }
         });

@@ -116,9 +116,7 @@ final class MCRPropertyMapSource extends MCRSourceBase<Map<String, String>> {
             if (key.startsWith(keyPrefix) && !key.isEmpty()) {
                 int index = key.indexOf('.', keyPrefixLength);
                 if (index == -1) {
-                    if (!value.isEmpty()) {
-                        mapProperties.put(key.substring(keyPrefixLength), value);
-                    }
+                    mapProperties.put(key.substring(keyPrefixLength), value);
                 }
             }
         });
