@@ -1,1 +1,1 @@
-/// <reference types="vite/client" />
+/// <reference path="../../../../../../mycore-vue/env.d.ts" />
