@@ -29,7 +29,7 @@ public class MCRMockCounter implements MCRPIGeneratorUtils.Counter {
     }
 
     @Override
-    public synchronized int getCount(String pattern, String type) {
+    public synchronized int getCount(String type, String pattern) {
         return nextValue++;
     }
 

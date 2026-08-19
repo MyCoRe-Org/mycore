@@ -296,7 +296,7 @@ public class MCRGenericPIGenerator implements MCRPIGenerator<MCRPersistentIdenti
 
             LOGGER.info("Counter pattern is {}", counterPattern);
 
-            final int count = counter.getCount(counterPattern, type);
+            final int count = counter.getCount(type, counterPattern);
             LOGGER.info("Count is {}", count);
             final String pattern = IntStream.range(0, Math.abs(countPrecision)).mapToObj((i) -> "0")
                 .collect(Collectors.joining(""));

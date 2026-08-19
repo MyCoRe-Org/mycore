@@ -91,17 +91,15 @@ public final class MCRPIGeneratorUtils {
         /**
          * Returns the next counter value to be used for a specific type and pattern. The returned value
          * needs to be unique. Returned values should be increasing.
-         *
-         * @param type   the type of persistent identifier.
+         * @param type    the type of persistent identifier.
          * @param pattern a regex pattern which can be used to extract count value in existing identifiers.
          *                The first capturing group captures the count.
          *                Example: <code>[0-9]+-mods-2017-([0-9][0-9][0-9][0-9])-[0-9]</code>
          *                will match <code>31-mods-2017-0003-3</code> and the returned count should be <code>4</code>
          *                (<code>3+1</code>).
-         *
          * @return the next count
          */
-        int getCount(String pattern, String type);
+        int getCount(String type, String pattern);
 
     }
 
@@ -114,7 +112,7 @@ public final class MCRPIGeneratorUtils {
         private static final Map<String, AtomicInteger> PATTERN_COUNT_MAP = new HashMap<>();
 
         @Override
-        public synchronized int getCount(String pattern, String type) {
+        public synchronized int getCount(String type, String pattern) {
             return PATTERN_COUNT_MAP
                 .computeIfAbsent(pattern, p -> readCountFromDatabase(type, p))
                 .getAndIncrement();
