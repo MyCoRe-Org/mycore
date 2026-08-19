@@ -284,7 +284,7 @@ public class MCRGenericPIGenerator implements MCRPIGenerator<MCRPersistentIdenti
         if (resultingPI.contains(PLACE_HOLDER_COUNT)) {
 
             // replace all occurrences of the count placeholder with the count pattern, and quote
-            // all other parts, os they are interpreted as literals in the generated pattern
+            // all other parts, so they are interpreted as literals in the generated pattern
             StringBuilder counterPattern = new StringBuilder();
             String countPattern = getCountPattern(countPrecision);
             int start = 0;
@@ -300,7 +300,7 @@ public class MCRGenericPIGenerator implements MCRPIGenerator<MCRPersistentIdenti
             if (start != resultingPI.length()) {
                 counterPattern.append(Pattern.quote(resultingPI.substring(start)));
             }
-    
+
             if (MCRDNBURN.TYPE.equals(type)) {
                 counterPattern.append("[0-9]");
             }

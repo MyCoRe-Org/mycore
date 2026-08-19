@@ -116,17 +116,17 @@ public final class MCRPIGeneratorUtils {
 
         @Override
         public synchronized int getCount(String type, String pattern) {
-            return this.typePatternCountMap
-                .computeIfAbsent(new Key(type, pattern), k -> readCountFromDatabase(type, k.pattern))
+            return typePatternCountMap
+                .computeIfAbsent(new Key(type, pattern), this::readCountFromDatabase)
                 .getAndIncrement();
         }
 
-        private static AtomicInteger readCountFromDatabase(String type, String countPattern) {
+        private AtomicInteger readCountFromDatabase(Key key) {
 
-            Pattern pattern = Pattern.compile(countPattern);
+            Pattern pattern = Pattern.compile(key.pattern);
             Predicate<String> matching = pattern.asPredicate();
 
-            List<MCRPIRegistrationInfo> list = MCRPIManager.getInstance().getList(type, -1, -1);
+            List<MCRPIRegistrationInfo> list = MCRPIManager.getInstance().getList(key.type, -1, -1);
 
             // extract the number of the PI
             Optional<Integer> highestNumber = list.stream()
