@@ -18,10 +18,9 @@
 
 package org.mycore.pi;
 
+import static org.mycore.pi.util.MCRPIGeneratorUtils.formatCount;
 import static org.mycore.pi.util.MCRPIGeneratorUtils.getCountPattern;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -30,8 +29,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -284,7 +281,7 @@ public class MCRGenericPIGenerator implements MCRPIGenerator<MCRPersistentIdenti
 
     }
 
-    private String applyCount(String resultingPI) {
+    private String applyCount(String resultingPI) throws MCRPersistentIdentifierException {
         String result;
         if (resultingPI.contains(PLACE_HOLDER_COUNT)) {
 
@@ -295,15 +292,10 @@ public class MCRGenericPIGenerator implements MCRPIGenerator<MCRPersistentIdenti
             }
 
             LOGGER.info("Counter pattern is {}", counterPattern);
-
             final int count = counter.getCount(type, counterPattern);
+
             LOGGER.info("Count is {}", count);
-            final String pattern = IntStream.range(0, Math.abs(countPrecision)).mapToObj((i) -> "0")
-                .collect(Collectors.joining(""));
-            DecimalFormat decimalFormat =
-                new DecimalFormat(pattern, DecimalFormatSymbols.getInstance(Locale.ROOT));
-            final String countAsString = countPrecision != -1 ? decimalFormat.format(count) : String.valueOf(count);
-            result = resultingPI.replace(PLACE_HOLDER_COUNT, countAsString);
+            result = resultingPI.replace(PLACE_HOLDER_COUNT, formatCount(count, countPrecision));
         } else {
             result = resultingPI;
         }
