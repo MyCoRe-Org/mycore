@@ -45,7 +45,7 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
  */
 public final class MCRPIGeneratorUtils {
 
-    public static final MCRPIGeneratorUtils.Counter SHARED_COUNTER = new MCRPIGeneratorUtils.CachingDatabaseCounter();
+    public static final Counter SHARED_COUNTER = new CachingDatabaseCounter();
 
     private MCRPIGeneratorUtils() {
     }
@@ -112,12 +112,12 @@ public final class MCRPIGeneratorUtils {
      */
     public static final class CachingDatabaseCounter implements Counter {
 
-        private final Map<String, AtomicInteger> patternCountMap = new HashMap<>();
+        private final Map<Key, AtomicInteger> typePatternCountMap = new HashMap<>();
 
         @Override
         public synchronized int getCount(String type, String pattern) {
-            return this.patternCountMap
-                .computeIfAbsent(pattern, p -> readCountFromDatabase(type, p))
+            return this.typePatternCountMap
+                .computeIfAbsent(new Key(type, pattern), k -> readCountFromDatabase(type, k.pattern))
                 .getAndIncrement();
         }
 
@@ -147,6 +147,9 @@ public final class MCRPIGeneratorUtils {
 
             return new AtomicInteger(highestNumber.orElse(0));
 
+        }
+
+        private record Key(String type, String pattern) {
         }
 
     }
