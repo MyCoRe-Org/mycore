@@ -27,8 +27,6 @@ import org.mycore.pi.util.MCRPIGeneratorUtils;
  */
 public abstract class MCRCountingDNBURNGeneratorBase extends MCRDNBURNGeneratorBase {
 
-    public static final MCRPIGeneratorUtils.Counter DEFAULT_COUNTER = new MCRPIGeneratorUtils.CachingDatabaseCounter();
-
     private final MCRPIGeneratorUtils.Counter counter;
 
     MCRCountingDNBURNGeneratorBase(MCRPIGeneratorUtils.Counter counter, String namespace, String delimiter) {
@@ -41,7 +39,7 @@ public abstract class MCRCountingDNBURNGeneratorBase extends MCRDNBURNGeneratorB
      */
     @Deprecated(forRemoval = true)
     MCRCountingDNBURNGeneratorBase(String namespace) {
-        this(DEFAULT_COUNTER, namespace, "");
+        this(MCRPIGeneratorUtils.SHARED_COUNTER, namespace, "");
     }
 
     /**

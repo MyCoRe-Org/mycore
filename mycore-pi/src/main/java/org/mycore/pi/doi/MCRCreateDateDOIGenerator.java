@@ -61,8 +61,6 @@ import org.mycore.pi.util.MCRPIGeneratorUtils;
 @MCRConfigurationProxy(proxyClass = MCRCreateDateDOIGenerator.Factory.class)
 public class MCRCreateDateDOIGenerator extends MCRDOIGeneratorBase {
 
-    public static final MCRPIGeneratorUtils.Counter DEFAULT_COUNTER = new MCRPIGeneratorUtils.CachingDatabaseCounter();
-
     public static final String DEFAULT_PROPERTY_PREFIX = "MCR.Default.PI.Generator.CreateDate.";
 
     public static final String DATE_FORMAT_KEY = "DateFormat";
@@ -123,8 +121,8 @@ public class MCRCreateDateDOIGenerator extends MCRDOIGeneratorBase {
 
         @Override
         public MCRCreateDateDOIGenerator get() {
-            return new MCRCreateDateDOIGenerator(new MCRDOIParser(), DEFAULT_COUNTER, dateFormat, prefix,
-                Integer.parseInt(countPrecision));
+            return new MCRCreateDateDOIGenerator(new MCRDOIParser(), MCRPIGeneratorUtils.SHARED_COUNTER, dateFormat,
+                prefix, Integer.parseInt(countPrecision));
         }
 
     }

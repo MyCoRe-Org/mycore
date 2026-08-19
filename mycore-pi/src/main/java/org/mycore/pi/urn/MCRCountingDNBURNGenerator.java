@@ -18,6 +18,8 @@
 
 package org.mycore.pi.urn;
 
+import org.mycore.pi.util.MCRPIGeneratorUtils;
+
 /**
  * @deprecated Use {@link MCRCountingDNBURNGeneratorBase} instead.
  */
@@ -25,7 +27,7 @@ package org.mycore.pi.urn;
 public abstract class MCRCountingDNBURNGenerator extends MCRCountingDNBURNGeneratorBase {
 
     MCRCountingDNBURNGenerator(String namespace) {
-        super(DEFAULT_COUNTER, namespace, "");
+        super(MCRPIGeneratorUtils.SHARED_COUNTER, namespace, "");
     }
 
 }

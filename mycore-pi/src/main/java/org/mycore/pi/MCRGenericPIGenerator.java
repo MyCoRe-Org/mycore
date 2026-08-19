@@ -131,8 +131,6 @@ import org.mycore.pi.util.MCRPIGeneratorUtils;
 @MCRConfigurationProxy(proxyClass = MCRGenericPIGenerator.Factory.class)
 public class MCRGenericPIGenerator implements MCRPIGenerator<MCRPersistentIdentifier> {
 
-    public static final MCRPIGeneratorUtils.Counter DEFAULT_COUNTER = new MCRPIGeneratorUtils.CachingDatabaseCounter();
-
     public static final String DEFAULT_PROPERTY_PREFIX = "MCR.Default.PI.Generator.Generic.";
 
     public static final String GENERAL_PATTERN_KEY = "GeneralPattern";
@@ -285,14 +283,28 @@ public class MCRGenericPIGenerator implements MCRPIGenerator<MCRPersistentIdenti
         String result;
         if (resultingPI.contains(PLACE_HOLDER_COUNT)) {
 
-            String counterPattern = resultingPI.replace(PLACE_HOLDER_COUNT, getCountPattern(countPrecision));
-
+            StringBuilder counterPattern = new StringBuilder();
+            String countPattern = getCountPattern(countPrecision);
+            int start = 0;
+            int index = resultingPI.indexOf(PLACE_HOLDER_COUNT);
+            while (index != -1) {
+                if (index != start) {
+                    counterPattern.append(Pattern.quote(resultingPI.substring(start, index)));
+                }
+                counterPattern.append(countPattern);
+                start = index + PLACE_HOLDER_COUNT.length();
+                index = resultingPI.indexOf(PLACE_HOLDER_COUNT, index + 1);
+            }
+            if (start != resultingPI.length()) {
+                counterPattern.append(Pattern.quote(resultingPI.substring(start)));
+            }
+    
             if (MCRDNBURN.TYPE.equals(type)) {
-                counterPattern = counterPattern + "[0-9]";
+                counterPattern.append("[0-9]");
             }
 
             LOGGER.info("Counter pattern is {}", counterPattern);
-            final int count = counter.getCount(type, counterPattern);
+            final int count = counter.getCount(type, counterPattern.toString());
 
             LOGGER.info("Count is {}", count);
             result = resultingPI.replace(PLACE_HOLDER_COUNT, formatCount(count, countPrecision));
@@ -327,7 +339,7 @@ public class MCRGenericPIGenerator implements MCRPIGenerator<MCRPersistentIdenti
 
         @Override
         public MCRGenericPIGenerator get() {
-            return new MCRGenericPIGenerator(DEFAULT_COUNTER, generalPattern, dateFormat,
+            return new MCRGenericPIGenerator(MCRPIGeneratorUtils.SHARED_COUNTER, generalPattern, dateFormat,
                 projectIdMappings, typeIdMappings, Integer.parseInt(countPrecision), type, xPaths);
         }
 

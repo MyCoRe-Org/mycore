@@ -45,6 +45,8 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
  */
 public final class MCRPIGeneratorUtils {
 
+    public static final MCRPIGeneratorUtils.Counter SHARED_COUNTER = new MCRPIGeneratorUtils.CachingDatabaseCounter();
+
     private MCRPIGeneratorUtils() {
     }
 
@@ -96,7 +98,8 @@ public final class MCRPIGeneratorUtils {
          *                The first capturing group captures the count.
          *                Example: <code>[0-9]+-mods-2017-([0-9][0-9][0-9][0-9])-[0-9]</code>
          *                will match <code>31-mods-2017-0003-3</code> and the returned count should be <code>4</code>
-         *                (<code>3+1</code>).
+         *                (<code>3+1</code>). All non-variable parts of the pattern should be protected with
+         *                {@link Pattern#quote(String)}, in order to make pattens comparable.
          * @return the next count
          */
         int getCount(String type, String pattern);
@@ -109,11 +112,11 @@ public final class MCRPIGeneratorUtils {
      */
     public static final class CachingDatabaseCounter implements Counter {
 
-        private static final Map<String, AtomicInteger> PATTERN_COUNT_MAP = new HashMap<>();
+        private final Map<String, AtomicInteger> patternCountMap = new HashMap<>();
 
         @Override
         public synchronized int getCount(String type, String pattern) {
-            return PATTERN_COUNT_MAP
+            return this.patternCountMap
                 .computeIfAbsent(pattern, p -> readCountFromDatabase(type, p))
                 .getAndIncrement();
         }
