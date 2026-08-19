@@ -58,9 +58,6 @@ public class MCRSharedDatabaseCounterTest {
      * do indeed produce different PIs that only differ in the applied count value.
      */
     @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "MCR.DOI.Prefix", string = "10.1234")
-    })
     public void test() throws MCRPersistentIdentifierException {
 
         MCRObject object1 = new MCRObject();

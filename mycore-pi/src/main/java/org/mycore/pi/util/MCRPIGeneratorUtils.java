@@ -99,7 +99,7 @@ public final class MCRPIGeneratorUtils {
          *                Example: <code>[0-9]+-mods-2017-([0-9][0-9][0-9][0-9])-[0-9]</code>
          *                will match <code>31-mods-2017-0003-3</code> and the returned count should be <code>4</code>
          *                (<code>3+1</code>). All non-variable parts of the pattern should be protected with
-         *                {@link Pattern#quote(String)}, in order to make pattens comparable.
+         *                {@link Pattern#quote(String)}, in order to make patterns comparable.
          * @return the next count
          */
         int getCount(String type, String pattern);

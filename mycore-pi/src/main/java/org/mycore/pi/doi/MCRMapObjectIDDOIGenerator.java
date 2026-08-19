@@ -40,7 +40,7 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
  * The following configuration options are available:
  * <ul>
  * <li> The property suffix {@link MCRMapObjectIDDOIGenerator#PREFIX_KEY} can be used to
- * specify the prefix mappings to be used. 
+ * specify the prefix mappings to be used.
  * </ul>
  * Example:
  * <pre><code>
@@ -87,4 +87,5 @@ public class MCRMapObjectIDDOIGenerator extends MCRDOIGeneratorBase {
         }
 
     }
+
 }

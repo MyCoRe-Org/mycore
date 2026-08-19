@@ -48,7 +48,7 @@ import org.mycore.pi.util.MCRFLDateScrambler;
  * [...].Namespace=urn:nbn:de:gbv:xyz
  * [...].Delimiter=-
  * </code></pre>
- * 
+ *
  * @see MCRFLDateScrambler
  */
 @MCRConfigurationProxy(proxyClass = MCRFLURNGenerator.Factory.class)

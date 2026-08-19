@@ -19,6 +19,7 @@
 package org.mycore.pi.urn;
 
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 import org.mycore.pi.util.MCRPIGeneratorUtils;
 
@@ -35,7 +36,7 @@ public abstract class MCRCountingDNBURNGeneratorBase extends MCRDNBURNGeneratorB
     }
 
     /**
-     * @deprecated Use {@link MCRCountingDNBURNGeneratorBase(MCRPIGeneratorUtils.Counter, String, String)} instead.
+     * @deprecated Use {@link #MCRCountingDNBURNGeneratorBase(MCRPIGeneratorUtils.Counter, String, String)} instead.
      */
     @Deprecated(forRemoval = true)
     MCRCountingDNBURNGeneratorBase(String namespace) {
@@ -45,10 +46,12 @@ public abstract class MCRCountingDNBURNGeneratorBase extends MCRDNBURNGeneratorB
     /**
      * Gets the count for a specific pattern and increase the internal counter. If there is no internal counter it will
      * look into the Database and detect the highest count with the pattern.
-     *
-     * @param pattern a regex pattern which will be used to detect the highest count. The first group is the count.
-     *                e.G. [0-9]+-mods-2017-([0-9][0-9][0-9][0-9])-[0-9] will match 31-mods-2017-0003-3 and the returned
-     *                count will be 4 (3+1).
+     * @param pattern a regex pattern which can be used to extract count value in existing identifiers.
+     *                The first capturing group captures the count.
+     *                Example: <code>[0-9]+-mods-2017-([0-9][0-9][0-9][0-9])-[0-9]</code>
+     *                will match <code>31-mods-2017-0003-3</code> and the returned count should be <code>4</code>
+     *                (<code>3+1</code>). All non-variable parts of the pattern should be protected with
+     *                {@link Pattern#quote(String)}, in order to make patterns comparable.
      * @return the next count
      */
     public final synchronized int getCount(String pattern) {
