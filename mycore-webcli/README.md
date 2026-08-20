@@ -43,18 +43,20 @@ The module uses `frontend-maven-plugin` from Maven.
 
 Current frontend build flow:
 
+The app is built with the shared toolchain in [`mycore-vue`](../mycore-vue/README.md), so every step below runs
+`yarn` with `mycore-vue` as working directory. `yarn install` runs there once for all Vue apps, not here.
+
 1. install Node and Yarn through the parent `frontend-maven-plugin` configuration
-2. run `yarn install` in `src/main/vue/webcli`
-3. run `yarn build` in `src/main/vue/webcli`
-4. during Maven `test`, run `yarn test --run`, `yarn lint`, and `yarn typecheck` in `src/main/vue/webcli`
-5. in Maven profile `checks`, run `yarn ci:check` during `test`
-6. in Maven profile `local-testing`, run `yarn test:a11y` during integration testing against a Chromium-based browser; Playwright uses `CHROME_BIN` or `CHROMIUM_BIN` when set and otherwise tries to detect a local installation
+2. run `yarn build:webcli`
+3. during Maven `test`, run `yarn test:webcli`, `yarn lint:webcli`, and `yarn typecheck:webcli`
+4. in Maven profile `checks`, run `yarn ci-check:webcli` during `test`
+5. in Maven profile `local-testing`, run `yarn test-a11y:webcli` during integration testing against a Chromium-based browser; Playwright uses `CHROME_BIN` or `CHROMIUM_BIN` when set and otherwise tries to detect a local installation
 
 Important frontend config:
 
 - Vite `base` is `"./"`
 - Vite output goes directly to [`target/classes/META-INF/resources/modules/webcli/gui/`](target/classes/META-INF/resources/modules/webcli/gui/)
-- Vitest coverage reports go to `target/vitest-coverage` and enforce coverage thresholds in `vite.config.ts`
+- Vitest coverage reports go to `target/vitest-coverage` and enforce coverage thresholds in `vite.config.mts`
 
 ## Frontend/backend contract
 
@@ -84,17 +86,20 @@ Frontend tests now live with the Vue app and run with Vitest. Browser-level acce
 
 Relevant files:
 
-- [`src/main/vue/webcli/package.json`](src/main/vue/webcli/package.json)
-- [`src/main/vue/webcli/vite.config.ts`](src/main/vue/webcli/vite.config.ts)
-- [`src/main/vue/webcli/playwright.config.ts`](src/main/vue/webcli/playwright.config.ts)
+- [`src/main/vue/webcli/vite.config.mts`](src/main/vue/webcli/vite.config.mts) (vitest configuration and coverage thresholds)
 - [`src/main/vue/webcli/tests/a11y/`](src/main/vue/webcli/tests/a11y/)
+- [`../mycore-vue/package.json`](../mycore-vue/package.json) (dependencies and the `*:webcli` scripts)
+- [`../mycore-vue/playwright.webcli.config.mts`](../mycore-vue/playwright.webcli.config.mts)
+- [`../mycore-vue/playwright.webcli.performance.config.mts`](../mycore-vue/playwright.webcli.performance.config.mts)
+- [`src/main/vue/webcli/tests/performance/`](src/main/vue/webcli/tests/performance/)
+- [`../mycore-vue/testing/webcli-stub-server.mjs`](../mycore-vue/testing/webcli-stub-server.mjs)
 
 The MCR-3794 performance probe uses a local HTTP/WebSocket stub that implements the
 Web CLI protocol and can stream either command-queue snapshots or log messages:
 
 ```bash
-cd src/main/vue/webcli
-yarn test:performance
+cd ../mycore-vue
+yarn test-performance:webcli
 ```
 
 The probe reports DOM churn, elapsed time, peak JavaScript heap growth, and retained
