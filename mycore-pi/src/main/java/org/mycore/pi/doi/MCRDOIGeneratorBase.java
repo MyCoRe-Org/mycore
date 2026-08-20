@@ -16,32 +16,29 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.pi.urn;
+package org.mycore.pi.doi;
 
-import org.mycore.common.config.annotation.MCRPostConstruction;
-import org.mycore.common.config.annotation.MCRProperty;
+import java.util.Objects;
+
 import org.mycore.datamodel.metadata.MCRBase;
+import org.mycore.pi.MCRPIGenerator;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
-import org.mycore.pi.util.MCROtherPIValueExtractor;
 
-public class MCROtherPIURNGenerator extends MCRDNBURNGenerator {
+public abstract class MCRDOIGeneratorBase implements MCRPIGenerator<MCRDigitalObjectIdentifier> {
 
-    private MCROtherPIValueExtractor extractor;
+    private final MCRDOIParser parser;
 
-    @MCRProperty(name = "Service")
-    public String service;
-
-    @MCRProperty(name = "Pattern")
-    public String pattern;
-
-    @MCRPostConstruction
-    public void init() {
-        extractor = new MCROtherPIValueExtractor(service, pattern);
+    public MCRDOIGeneratorBase(MCRDOIParser parser) {
+        this.parser = Objects.requireNonNull(parser, "Parser must not be null");
     }
 
     @Override
-    protected String buildNISS(MCRBase mcrObj, String additional) throws MCRPersistentIdentifierException {
-        return extractor.extractValue(mcrObj);
+    public final MCRDigitalObjectIdentifier generate(MCRBase base, String additional)
+        throws MCRPersistentIdentifierException {
+        String doi = buildDOI(base, additional);
+        return parser.parse(doi).orElseThrow(() -> new MCRPersistentIdentifierException(doi + " is not a valid DOI!"));
     }
+
+    protected abstract String buildDOI(MCRBase base, String additional) throws MCRPersistentIdentifierException;
 
 }

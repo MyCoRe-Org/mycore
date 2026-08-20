@@ -16,11 +16,14 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.pi.purl;
+package org.mycore.pi.urn;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
+import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.MCRConfiguration2;
@@ -32,9 +35,12 @@ import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
 @MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.Access.Class", classNameOf = MCRAccessBaseImpl.class),
     @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true"),
 })
-public class MCRIDPURLGeneratorTest {
+public class MCRFLURNGeneratorTest {
+
+    public static final String NAMESPACE = "urn:nbn:de:gbv:xyz";
 
     @Test
     public void generate() throws MCRPersistentIdentifierException {
@@ -43,33 +49,45 @@ public class MCRIDPURLGeneratorTest {
         object.setSchema("http://www.w3.org/2001/XMLSchema");
         object.setId(MCRObjectID.getInstance("my_test_00000123"));
 
-        MCRIDPURLGenerator generator = new MCRIDPURLGenerator("https://purl.example.com/$ID");
+        MCRFLURNGenerator generator = new MCRFLURNGenerator(NAMESPACE, "-");
 
-        String purl = generator.generate(object, "").asString();
+        String urn = generator.generate(object, "").asString();
 
-        assertEquals("https://purl.example.com/my_test_00000123", purl, "");
+        assertTrue(urn.startsWith(NAMESPACE));
+        assertEquals('-', urn.charAt(NAMESPACE.length()));
+        assertEquals('-', urn.charAt(urn.length() - 2));
+
+        String value = urn.substring(NAMESPACE.length() + 1, urn.length() - 2);
+        char checksum = Character.forDigit(new MCRDNBURN("gbv:xyz", "-" + value + "-").calculateChecksum(), 10);
+
+        assertEquals(checksum, urn.charAt(urn.length() - 1));
 
     }
 
     @Test
-    public void generateWithMultipleReplacements() throws MCRPersistentIdentifierException {
+    public void generateMultiple() throws MCRPersistentIdentifierException {
 
         MCRObject object = new MCRObject();
         object.setSchema("http://www.w3.org/2001/XMLSchema");
         object.setId(MCRObjectID.getInstance("my_test_00000123"));
 
-        MCRIDPURLGenerator generator = new MCRIDPURLGenerator("https://purl.example.com/$ID/$ID/XYZ");
+        MCRFLURNGenerator generator = new MCRFLURNGenerator(NAMESPACE, "-");
 
-        String purl = generator.generate(object, "").asString();
+        String urn1 = generator.generate(object, "").asString();
+        String urn2 = generator.generate(object, "").asString();
+        String urn3 = generator.generate(object, "").asString();
 
-        assertEquals("https://purl.example.com/my_test_00000123/my_test_00000123/XYZ", purl, "");
+        assertNotEquals(urn1, urn2);
+        assertNotEquals(urn2, urn3);
+        assertNotEquals(urn3, urn1);
 
     }
 
     @Test
     @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Test.Class", classNameOf = MCRIDPURLGenerator.class),
-        @MCRTestProperty(key = "Test.BaseURLTemplate", string = "https://purl.example.com/$ID")
+        @MCRTestProperty(key = "Test.Class", classNameOf = MCRFLURNGenerator.class),
+        @MCRTestProperty(key = "Test.Namespace", string = NAMESPACE),
+        @MCRTestProperty(key = "Test.Delimiter", string = "-")
     })
     public void configuration() throws MCRPersistentIdentifierException {
 
@@ -81,7 +99,14 @@ public class MCRIDPURLGeneratorTest {
 
         String pi = generator.generate(object, "").asString();
 
-        assertEquals("https://purl.example.com/my_test_00000123", pi, "");
+        assertTrue(pi.startsWith(NAMESPACE));
+        assertEquals('-', pi.charAt(NAMESPACE.length()));
+        assertEquals('-', pi.charAt(pi.length() - 2));
+
+        String value = pi.substring(NAMESPACE.length() + 1, pi.length() - 2);
+        char checksum = Character.forDigit(new MCRDNBURN("gbv:xyz", "-" + value + "-").calculateChecksum(), 10);
+
+        assertEquals(checksum, pi.charAt(pi.length() - 1));
 
     }
 

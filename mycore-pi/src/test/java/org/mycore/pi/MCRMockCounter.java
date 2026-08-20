@@ -18,15 +18,19 @@
 
 package org.mycore.pi;
 
-import org.mycore.datamodel.metadata.MCRBase;
+import org.mycore.pi.util.MCRPIGeneratorUtils;
 
-public class MCRMockIdentifierGenerator implements MCRPIGenerator<MCRMockIdentifier> {
+public class MCRMockCounter implements MCRPIGeneratorUtils.Counter {
+
+    int nextValue;
+
+    public MCRMockCounter(int initialValue) {
+        this.nextValue = initialValue;
+    }
 
     @Override
-    public MCRMockIdentifier generate(MCRBase base, String additional) {
-        return new MCRMockIdentifierParser()
-            .parse(MCRMockIdentifier.MOCK_SCHEME + base.getId() + ":" + additional)
-            .get();
+    public synchronized int getCount(String type, String pattern) {
+        return nextValue++;
     }
 
 }

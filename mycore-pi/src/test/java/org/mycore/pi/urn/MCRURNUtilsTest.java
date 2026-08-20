@@ -53,7 +53,7 @@ public class MCRURNUtilsTest {
 
     @Test()
     public void parseInvalidThrows() {
-        Assertions.assertThrows(DateTimeParseException.class, () ->  {
+        Assertions.assertThrows(DateTimeParseException.class, () -> {
             MCRURNUtils.parseDNBRegisterDate("invalidDate");
         });
     }

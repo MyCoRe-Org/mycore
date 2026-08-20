@@ -18,9 +18,9 @@
 
 package org.mycore.pi.handle;
 
-import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
-
 import java.io.Serial;
+
+import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 public class MCREpicException extends MCRPersistentIdentifierException {
 

@@ -37,7 +37,7 @@ import org.mycore.pi.backend.MCRPI;
  * MCR.PI.Service.RosDokURN.CreationPredicate.1.Service=MCRLocalID
  * ...
  * </code></pre>
- * 
+ *
  * @author Robert Stephan
  *
  */

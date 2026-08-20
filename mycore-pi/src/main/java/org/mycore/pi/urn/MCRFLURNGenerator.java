@@ -18,51 +18,85 @@
 
 package org.mycore.pi.urn;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.Locale;
-import java.util.TimeZone;
+import java.util.Date;
+import java.util.function.Supplier;
 
+import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.datamodel.metadata.MCRBase;
+import org.mycore.pi.MCRPIGenerator;
+import org.mycore.pi.util.MCRFLDateScrambler;
 
 /**
- * Builds a new, unique NISS based on the current date and time expressed
- * in seconds. The resulting NISS is non-speaking, but unique and somewhat
- * optimized for the nbn:de checksum algorithm. Only one NISS per second
- * will be generated.
+ * {@link MCRFLURNGenerator} is a {@link MCRPIGenerator} for {@link MCRDNBURN} identifiers
+ * that generates identifiers using a given namespace and the current date (in seconds) value as the NISS.
+ * <p>
+ * It uses a date scrambling algorithm introduced by <strong>F</strong>rank <strong>L</strong>ützenkirchen.
+ * <p>
+ * Only one suffix per second will be generated.
+ * <p>
+ * The following configuration options are available:
+ * <ul>
+ * <li> The property suffix {@link MCRFLURNGenerator#NAMESPACE_KEY} can be used to
+ * specify the namespace.
+ * <li> The property suffix {@link MCRFLURNGenerator#DELIMITER_KEY} can be used to
+ * specify a delimiter to be placed before and after the NISS (optional, defaults to the empty string).
+ * </ul>
+ * Example:
+ * <pre><code>
+ * [...].Class=org.mycore.pi.urn.MCRFLURNGenerator
+ * [...].Namespace=urn:nbn:de:gbv:xyz
+ * [...].Delimiter=-
+ * </code></pre>
  *
- * @author Frank Lützenkirchen
+ * @see MCRFLDateScrambler
  */
-public class MCRFLURNGenerator extends MCRDNBURNGenerator {
-    private String last;
+@MCRConfigurationProxy(proxyClass = MCRFLURNGenerator.Factory.class)
+public class MCRFLURNGenerator extends MCRDNBURNGeneratorBase {
+
+    public static final String NAMESPACE_KEY = "Namespace";
+
+    public static final String DELIMITER_KEY = "Delimiter";
+
+    private String lastNIss;
+
+    public MCRFLURNGenerator(String namespace, String delimiter) {
+        super(namespace, delimiter);
+    }
 
     @Override
-    protected synchronized String buildNISS(MCRBase mcrObj, String additional) {
-        Calendar now = new GregorianCalendar(TimeZone.getTimeZone("GMT+01:00"), Locale.ENGLISH);
-        int yyy = 2268 - now.get(Calendar.YEAR);
-        int ddd = 500 - now.get(Calendar.DAY_OF_YEAR);
-        int hh = now.get(Calendar.HOUR_OF_DAY);
-        int mm = now.get(Calendar.MINUTE);
-        int ss = now.get(Calendar.SECOND);
-        int sss = 99_999 - (hh * 3600 + mm * 60 + ss);
+    protected synchronized String buildNISS(MCRBase base, String additional) {
 
-        String ddddd = String.valueOf(yyy * 366 + ddd);
+        Date date = new Date((System.currentTimeMillis() / 1000) * 1000);
+        String niss = MCRFLDateScrambler.scrambleDate(date);
 
-        String niss = String.valueOf(ddddd.charAt(4)) + ddddd.charAt(2) + ddddd.charAt(1) + ddddd.charAt(3)
-            + ddddd.charAt(0)
-            + sss;
-
-        if (niss.equals(last)) {
+        if (niss.equals(lastNIss)) {
             try {
                 Thread.sleep(500);
             } catch (InterruptedException ignored) {
             }
-
-            return buildNISS(mcrObj, additional);
-        } else {
-            last = niss;
-            return niss;
+            return buildNISS(base, additional);
         }
+
+        lastNIss = niss;
+
+        return niss;
+
+    }
+
+    public static class Factory implements Supplier<MCRFLURNGenerator> {
+
+        @MCRProperty(name = NAMESPACE_KEY)
+        public String namespace;
+
+        @MCRProperty(name = DELIMITER_KEY, required = false)
+        public String delimiter = "";
+
+        @Override
+        public MCRFLURNGenerator get() {
+            return new MCRFLURNGenerator(namespace, delimiter);
+        }
+
     }
 
 }

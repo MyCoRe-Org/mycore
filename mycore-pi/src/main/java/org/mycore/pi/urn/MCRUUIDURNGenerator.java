@@ -19,26 +19,60 @@
 package org.mycore.pi.urn;
 
 import java.util.UUID;
+import java.util.function.Supplier;
 
+import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.datamodel.metadata.MCRBase;
+import org.mycore.pi.MCRPIGenerator;
 
 /**
- * Builds a new, unique NISS using Java implementation of the UUID
- * specification. java.util.UUID creates 'only' version 4 UUIDs.
- * Version 4 UUIDs are generated from a large random number and do
- * not include the MAC address.
+ * {@link MCRUUIDURNGenerator} is a {@link MCRPIGenerator} for {@link MCRDNBURN} identifiers
+ * that generates identifiers using a given namespace and a {@link UUID} as the NISS.
  * <p>
- * UUID = 8*HEX "-" 4*HEX "-" 4*HEX "-" 4*HEX "-" 12*HEX
- * Example One: 067e6162-3b6f-4ae2-a171-2470b63dff00
- * Example Two: 54947df8-0e9e-4471-a2f9-9af509fb5889
- *
- * @author Kathleen Neumann (kkrebs)
- * @author Sebastian Hofmann
+ * The following configuration options are available:
+ * <ul>
+ * <li> The property suffix {@link MCRUUIDURNGenerator#NAMESPACE_KEY} can be used to
+ * specify the namespace.
+ * <li> The property suffix {@link MCRUUIDURNGenerator#DELIMITER_KEY} can be used to
+ * specify a delimiter to be placed before and after the NISS (optional, defaults to the empty string).
+ * </ul>
+ * Example:
+ * <pre><code>
+ * [...].Class=org.mycore.pi.urn.MCRUUIDURNGenerator
+ * [...].Namespace=urn:nbn:de:gbv:xyz
+ * [...].Delimiter=-
+ * </code></pre>
  */
-public class MCRUUIDURNGenerator extends MCRDNBURNGenerator {
+@MCRConfigurationProxy(proxyClass = MCRUUIDURNGenerator.Factory.class)
+public class MCRUUIDURNGenerator extends MCRDNBURNGeneratorBase {
+
+    public static final String NAMESPACE_KEY = "Namespace";
+
+    public static final String DELIMITER_KEY = "Delimiter";
+
+    public MCRUUIDURNGenerator(String namespace, String delimiter) {
+        super(namespace, delimiter);
+    }
 
     @Override
-    protected String buildNISS(MCRBase mcrObj, String additional) {
+    protected String buildNISS(MCRBase base, String additional) {
         return UUID.randomUUID().toString();
     }
+
+    public static class Factory implements Supplier<MCRUUIDURNGenerator> {
+
+        @MCRProperty(name = NAMESPACE_KEY)
+        public String namespace;
+
+        @MCRProperty(name = DELIMITER_KEY, required = false)
+        public String delimiter = "";
+
+        @Override
+        public MCRUUIDURNGenerator get() {
+            return new MCRUUIDURNGenerator(namespace, delimiter);
+        }
+
+    }
+
 }

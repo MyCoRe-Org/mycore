@@ -19,26 +19,34 @@
 package org.mycore.pi.doi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Map;
+import java.util.Date;
+import java.util.Locale;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.pi.MCRMockCounter;
 import org.mycore.pi.MCRPIGenerator;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
+import org.mycore.test.MCRJPAExtension;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
+@ExtendWith({ MCRJPAExtension.class })
 @MCRTestConfiguration(properties = {
     @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true"),
 })
-public class MCRMapObjectIDDOIGeneratorTest {
+public class MCRCreateDateDOIGeneratorTest {
+
+    public static final String DATE_FORMAT = "yyyyMMdd-HHmmss";
 
     public static final String PREFIX = "10.1234";
 
@@ -49,8 +57,8 @@ public class MCRMapObjectIDDOIGeneratorTest {
         object.setSchema("http://www.w3.org/2001/XMLSchema");
         object.setId(MCRObjectID.getInstance("my_test_00000123"));
 
-        Map<String, String> prefixMap = Map.of("my_test", PREFIX);
-        MCRMapObjectIDDOIGenerator generator = new MCRMapObjectIDDOIGenerator(new MCRDOIParser(), prefixMap);
+        MCRCreateDateDOIGenerator generator = new MCRCreateDateDOIGenerator(
+            new MCRDOIParser(), new MCRMockCounter(42), DATE_FORMAT, PREFIX, 3);
 
         String doi = generator.generate(object, "").asString();
 
@@ -59,49 +67,50 @@ public class MCRMapObjectIDDOIGeneratorTest {
 
         String value = doi.substring(PREFIX.length() + 1);
 
-        assertEquals("123", value);
+        assertTrue(value.startsWith(formatDate(new Date()) + "-"));
+        assertTrue(value.endsWith("-042"));
+
+    }
+
+    private String formatDate(Date date) {
+
+        MCRISO8601Date isoDate = new MCRISO8601Date();
+        isoDate.setDate(date);
+
+        return isoDate.format(DATE_FORMAT, Locale.ROOT);
 
     }
 
     @Test
-    public void generateWithInfix() throws MCRPersistentIdentifierException {
+    public void generateMultiple() throws MCRPersistentIdentifierException {
 
         MCRObject object = new MCRObject();
         object.setSchema("http://www.w3.org/2001/XMLSchema");
         object.setId(MCRObjectID.getInstance("my_test_00000123"));
 
-        Map<String, String> prefixMap = Map.of("my_test", PREFIX + "/xyz-");
-        MCRMapObjectIDDOIGenerator generator = new MCRMapObjectIDDOIGenerator(new MCRDOIParser(), prefixMap);
+        MCRCreateDateDOIGenerator generator = new MCRCreateDateDOIGenerator(
+            new MCRDOIParser(), new MCRMockCounter(42), DATE_FORMAT, PREFIX, -1);
 
-        String doi = generator.generate(object, "").asString();
+        String doi1 = generator.generate(object, "").asString();
+        String doi2 = generator.generate(object, "").asString();
+        String doi3 = generator.generate(object, "").asString();
 
-        assertTrue(doi.startsWith(PREFIX));
-        assertEquals('/', doi.charAt(PREFIX.length()));
+        assertNotEquals(doi1, doi2);
+        assertNotEquals(doi2, doi3);
+        assertNotEquals(doi3, doi1);
 
-        String value = doi.substring(PREFIX.length() + 1);
-
-        assertEquals("xyz-123", value);
-
-    }
-
-    @Test
-    public void missingMapping() {
-
-        MCRObject object = new MCRObject();
-        object.setSchema("http://www.w3.org/2001/XMLSchema");
-        object.setId(MCRObjectID.getInstance("my_test_00000123"));
-
-        Map<String, String> prefixMap = Map.of();
-        MCRMapObjectIDDOIGenerator generator = new MCRMapObjectIDDOIGenerator(new MCRDOIParser(), prefixMap);
-
-        assertThrows(MCRPersistentIdentifierException.class, () -> generator.generate(object, ""));
+        assertTrue(doi1.endsWith("-42"));
+        assertTrue(doi2.endsWith("-43"));
+        assertTrue(doi3.endsWith("-44"));
 
     }
 
     @Test
     @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "Test.Class", classNameOf = MCRMapObjectIDDOIGenerator.class),
-        @MCRTestProperty(key = "Test.Prefix.my_test", string = PREFIX),
+        @MCRTestProperty(key = "Test.Class", classNameOf = MCRCreateDateDOIGenerator.class),
+        @MCRTestProperty(key = "Test.DateFormat", string = DATE_FORMAT),
+        @MCRTestProperty(key = "Test.Prefix", string = PREFIX),
+        @MCRTestProperty(key = "Test.CountPrecision", string = "3"),
     })
     public void configuration() throws MCRPersistentIdentifierException {
 
@@ -118,7 +127,8 @@ public class MCRMapObjectIDDOIGeneratorTest {
 
         String value = pi.substring(PREFIX.length() + 1);
 
-        assertEquals("123", value);
+        assertTrue(value.startsWith(formatDate(new Date()) + "-"));
+        assertTrue(value.endsWith("-000"));
 
     }
 
