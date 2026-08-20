@@ -6,7 +6,6 @@ import org.mycore.datamodel.classifications2.mapping.MCRNoOpClassificationMapper
 import org.mycore.datamodel.metadata.MCRExpandedObject;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
-import org.mycore.datamodel.metadata.MCRObjectURIResolver;
 import org.mycore.test.MCRJPAExtension;
 import org.mycore.test.MyCoReTest;
 
