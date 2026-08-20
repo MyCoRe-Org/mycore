@@ -25,6 +25,7 @@ and the viewer) are not part of this module. They keep their own `package.json`,
 | `tsconfig.json` | shared TypeScript compiler options, extended by the app configs |
 | `env.d.ts` | shared ambient types, referenced by the `env.d.ts` of every app |
 | `eslint.config.mjs` | shared flat eslint config, re-exported by the `eslint.config.mjs` of an app |
+| `eslint.config.prettier.mjs` | the same config plus prettier, for apps that enforce their formatting |
 | `playwright.webcli.config.mts` | playwright setup of the webcli accessibility tests |
 | `playwright.webcli.performance.config.mts` | playwright setup of the webcli performance probe |
 | `testing/` | test servers that need a toolchain dependency, e.g. the webcli websocket stub |
@@ -91,6 +92,9 @@ its `yarn.lock` and its local `node_modules`.
    export { default } from '../../../../../mycore-vue/eslint.config.mjs';
    ```
 
+   An app that enforces its formatting with prettier re-exports `eslint.config.prettier.mjs` instead and keeps its
+   own `prettier.config.mjs`, which prettier picks up from next to the linted sources.
+
    The lint script then runs eslint with the app directory as working directory.
 6. Point the `frontend-maven-plugin` execution of the owning module at this module, see the next section.
 
@@ -131,10 +135,17 @@ only walks up the directory tree of the importing file. Both toolchains have to 
 * TypeScript: the app's `tsconfig.json` maps every package onto the shared `node_modules` via `paths` and
   `typeRoots`, see above.
 
+A `paths` mapping bypasses the `exports` map of a package, so a package that declares subpath exports needs its own
+entry. `@jsr/mycore__js-common` is the one case, all of its subpaths follow the same shape:
+
+```json
+"@jsr/mycore__js-common/*": [
+  "../../../../../mycore-vue/node_modules/@jsr/mycore__js-common/_dist/src/*/index.d.ts"
+]
+```
+
 ## Notes
 
-* The apps are migrated one at a time in separate tickets. A `build:<app>` script only works once the matching
-  `vite.config.mts` exists.
 * Tests, coverage and linting of an app are also driven from here. webcli is the reference:
   `test:webcli`, `test-coverage:webcli`, `lint:webcli`, `typecheck:webcli`, `ci-check:webcli`,
   `test-a11y:webcli` and `test-performance:webcli`. The vitest configuration stays in the app's `vite.config.mts`, its paths are relative to the
@@ -146,7 +157,9 @@ only walks up the directory tree of the importing file. Both toolchains have to 
   builtins and stays in the app.
 * `vue-i18n` is pinned to the exact version `11.4.2`. From `11.4.3` on it requires node 22, while the reactor POM
   pins `node.version` to `v20.19.0`. The pin can be dropped as soon as the node version is raised.
-* `vite-plugin-eslint` (access-key-manager2) is unmaintained and is not part of the shared toolchain. Linting runs
-  as a standalone script.
-* `rollup-plugin-external-globals` (access-key-manager2) is not part of the shared toolchain either. vite 8 bundles
-  with rolldown, so the way that app externalizes bootstrap has to be decided during its migration.
+* `vite-plugin-eslint` (formerly access-key-manager2) is unmaintained and is not part of the shared toolchain.
+  Linting runs as a standalone script instead.
+* `rollup-plugin-external-globals` (formerly access-key-manager2) does not work with rolldown. `bootstrapFromWindow()`
+  from `vite.shared.ts` replaces it: it resolves the `bootstrap` package to the `window.bootstrap` global that the
+  surrounding MyCoRe page provides, so that bootstrap is not shipped a second time inside an app bundle. Apps that
+  only use bootstrap through the global, without importing the package, do not need it.
