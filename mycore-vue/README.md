@@ -23,13 +23,15 @@ and the viewer) are not part of this module. They keep their own `package.json`,
 | `.npmrc` | registry for the `@jsr` scope, required by `@jsr/mycore__js-common` |
 | `vite.shared.ts` | shared vite configuration, see below |
 | `tsconfig.json` | shared TypeScript compiler options, extended by the app configs |
+| `env.d.ts` | shared ambient types, referenced by the `env.d.ts` of every app |
 
 ## Adding an app to the shared toolchain
 
 An app keeps its sources and its build output in its own maven module. It only loses its `package.json`,
 its `yarn.lock` and its local `node_modules`.
 
-1. Add the app dependencies to the `package.json` of this module and add a `build:<app>` script for it.
+1. Add the app dependencies to the `package.json` of this module and add the scripts for it. The texteditor is the
+   reference: `build:<app>`, `build-only:<app>`, `type-check:<app>` and `dev:<app>`.
 2. Replace the app's `vite.config.ts` by a `vite.config.mts` built on the shared configuration:
 
    ```ts
@@ -49,8 +51,35 @@ its `yarn.lock` and its local `node_modules`.
    The `.mts` extension and the explicit `.ts` extension in the import are required: without them vite warns that
    the config cannot be loaded natively, because after the migration there is no `package.json` next to the app
    that declares `"type": "module"`.
-3. Let the app's `tsconfig.json` extend `../../../../../mycore-vue/tsconfig.json`.
-4. Point the `frontend-maven-plugin` execution of the owning module at this module, see the next section.
+3. Reduce the app to a single `tsconfig.json` that extends the shared one and points TypeScript at the shared
+   `node_modules`:
+
+   ```json
+   {
+     "extends": "../../../../../mycore-vue/tsconfig.json",
+     "include": ["env.d.ts", "src/**/*", "src/**/*.vue", "vite.config.mts"],
+     "compilerOptions": {
+       "baseUrl": ".",
+       "typeRoots": ["../../../../../mycore-vue/node_modules/@types"],
+       "paths": {
+         "@/*": ["./src/*"],
+         "*": [
+           "../../../../../mycore-vue/node_modules/@types/*",
+           "../../../../../mycore-vue/node_modules/*"
+         ]
+       }
+     }
+   }
+   ```
+
+   The `@types` entry has to come first, otherwise a package that ships no types of its own, like `prismjs`,
+   resolves to its javascript and TypeScript never looks at its `@types` package.
+4. Let the app's `env.d.ts` reference the shared one, which is the only place where `vite/client` resolves:
+
+   ```ts
+   /// <reference path="../../../../../mycore-vue/env.d.ts" />
+   ```
+5. Point the `frontend-maven-plugin` execution of the owning module at this module, see the next section.
 
 ## Build integration rules
 
@@ -81,9 +110,13 @@ its `yarn.lock` and its local `node_modules`.
 
 ## Module resolution
 
-The app sources live outside this module, so node resolution would never find the shared `node_modules`: it only
-walks up the directory tree of the importing file. `vite.shared.ts` therefore registers a small resolver plugin
-that resolves package imports against `mycore-vue` instead of against the importing app.
+The app sources live outside this module, so the default resolution would never find the shared `node_modules`: it
+only walks up the directory tree of the importing file. Both toolchains have to be told about it:
+
+* vite: `vite.shared.ts` registers a small resolver plugin that resolves package imports against `mycore-vue`
+  instead of against the importing app.
+* TypeScript: the app's `tsconfig.json` maps every package onto the shared `node_modules` via `paths` and
+  `typeRoots`, see above.
 
 ## Notes
 
