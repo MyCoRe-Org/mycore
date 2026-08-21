@@ -96,7 +96,7 @@ import org.mycore.pi.util.MCRPIGeneratorUtils;
  * urn:nbn:de:gbv:$ObjectDate-$ObjectType-$Count
  * urn:nbn:de:gbv:$ObjectDate-$Count
  * urn:nbn:de:gbv:$ObjectType-$Count
- * urn:nbn:de:gbv:$0-$1-$Count
+ * urn:nbn:de:gbv:$1-$2-$Count
  * </code></pre>
  * <p>
  * The following configuration options are available:
@@ -124,12 +124,19 @@ import org.mycore.pi.util.MCRPIGeneratorUtils;
  * Example:
  * <pre><code>
  * [...].Class=org.mycore.pi.MCRGenericPIGenerator
- * [...].GeneralPattern=urn:nbn:de:gbv:$CurrentDate-$1-$2-$ObjectType-$ObjectProject-$ObjectNumber-$Count-
- * [...].DateFormatter.Class=org.mycore.common.date.MCRSimpleDateFormatter
- * [...].DateFormatter.Format=yyyy-MM-dd
+ * [...].GeneralPattern=10.1234/$ObjectType-$ObjectProject-$ObjectDate-$ObjectNumber
+ * [...].DateFormatt=yyyy-MM-dd
  * [...].ObjectProjectMapping.mycore=MyCoRe
  * [...].ObjectTypeMapping.mods=MODS
  * [...].CountPrecision=6
+ * [...].Type=doi
+ * </code></pre>
+ * Example:
+ * <pre><code>
+ * [...].Class=org.mycore.pi.MCRGenericPIGenerator
+ * [...].GeneralPattern=urn:nbn:de:gbv:xyz:$1-$2-$CurrentDate-$Count-
+ * [...].DateFormatter.Class=org.mycore.common.date.MCRSimpleDateFormatter
+ * [...].DateFormatter.Format=yyyy-MM-dd
  * [...].Type=dnbUrn
  * [...].XPath.1=/mycoreobject/metadata//mods:typeOfResource/text()
  * [...].XPath.2=substring-after(/mycoreobject/metadata//mods:genre/@valueURI,'#')
