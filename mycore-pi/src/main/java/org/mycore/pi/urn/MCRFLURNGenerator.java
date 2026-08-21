@@ -58,7 +58,7 @@ public class MCRFLURNGenerator extends MCRDNBURNGeneratorBase {
 
     public static final String DELIMITER_KEY = "Delimiter";
 
-    private String lastNIss;
+    private String lastNiss;
 
     public MCRFLURNGenerator(String namespace, String delimiter) {
         super(namespace, delimiter);
@@ -70,7 +70,7 @@ public class MCRFLURNGenerator extends MCRDNBURNGeneratorBase {
         Date date = new Date((System.currentTimeMillis() / 1000) * 1000);
         String niss = new MCRFLDateScrambler().format(date);
 
-        if (niss.equals(lastNIss)) {
+        if (niss.equals(lastNiss)) {
             try {
                 Thread.sleep(500);
             } catch (InterruptedException ignored) {
@@ -78,7 +78,7 @@ public class MCRFLURNGenerator extends MCRDNBURNGeneratorBase {
             return buildNISS(base, additional);
         }
 
-        lastNIss = niss;
+        lastNiss = niss;
 
         return niss;
 
