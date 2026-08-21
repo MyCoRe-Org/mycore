@@ -58,7 +58,7 @@ public class MCRCreateDateDOIGeneratorTest {
         object.setId(MCRObjectID.getInstance("my_test_00000123"));
 
         MCRCreateDateDOIGenerator generator = new MCRCreateDateDOIGenerator(
-            new MCRDOIParser(), new MCRMockCounter(42), DATE_FORMAT, PREFIX, 3);
+            new MCRMockCounter(42), DATE_FORMAT, PREFIX, 3);
 
         String doi = generator.generate(object, "").asString();
 
@@ -89,7 +89,7 @@ public class MCRCreateDateDOIGeneratorTest {
         object.setId(MCRObjectID.getInstance("my_test_00000123"));
 
         MCRCreateDateDOIGenerator generator = new MCRCreateDateDOIGenerator(
-            new MCRDOIParser(), new MCRMockCounter(42), DATE_FORMAT, PREFIX, -1);
+            new MCRMockCounter(42), DATE_FORMAT, PREFIX, -1);
 
         String doi1 = generator.generate(object, "").asString();
         String doi2 = generator.generate(object, "").asString();
