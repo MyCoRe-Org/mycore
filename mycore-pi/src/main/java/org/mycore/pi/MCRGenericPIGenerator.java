@@ -210,7 +210,7 @@ public class MCRGenericPIGenerator implements MCRPIGenerator<MCRPersistentIdenti
     }
 
     @Override
-    public MCRPersistentIdentifier generate(MCRBase base, String additional)
+    public final MCRPersistentIdentifier generate(MCRBase base, String additional)
         throws MCRPersistentIdentifierException {
 
         String resultingPI = generalPattern;
