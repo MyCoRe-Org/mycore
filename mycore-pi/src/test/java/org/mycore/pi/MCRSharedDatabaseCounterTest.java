@@ -22,16 +22,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
+import org.mycore.common.date.MCRISO8601DateFormatter;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.doi.MCRCreateDateDOIGenerator;
-import org.mycore.pi.doi.MCRDOIParser;
 import org.mycore.pi.doi.MCRDigitalObjectIdentifier;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.pi.util.MCRPIGeneratorUtils;
@@ -65,7 +66,6 @@ public class MCRSharedDatabaseCounterTest {
         object1.setId(MCRObjectID.getInstance("my_test_00000123"));
 
         MCRCreateDateDOIGenerator generator1 = new MCRCreateDateDOIGenerator(
-            new MCRDOIParser(),
             MCRPIGeneratorUtils.SHARED_COUNTER,
             DATE_FORMAT,
             PREFIX,
@@ -80,7 +80,7 @@ public class MCRSharedDatabaseCounterTest {
         MCRGenericPIGenerator generator2 = new MCRGenericPIGenerator(
             MCRPIGeneratorUtils.SHARED_COUNTER,
             PREFIX + "/$ObjectDate-$Count",
-            DATE_FORMAT,
+            new MCRISO8601DateFormatter(DATE_FORMAT, Locale.ENGLISH),
             Map.of(),
             Map.of(),
             3,
