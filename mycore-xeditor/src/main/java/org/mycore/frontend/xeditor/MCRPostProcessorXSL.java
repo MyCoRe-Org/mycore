@@ -20,16 +20,12 @@ package org.mycore.frontend.xeditor;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.Optional;
-
-import javax.xml.transform.TransformerFactory;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.Text;
 import org.jdom2.filter.Filters;
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
@@ -42,12 +38,12 @@ import org.mycore.common.xsl.MCRXSLResourceHelper;
  * that allows execution of XSLT stylesheets after an editor is closed
  * <p>
  * &lt;xed:post-processor class="org.mycore.frontend.xeditor.MCRPostProcessorXSL"
- *      xsl="editor/ir_xeditor2mods.xsl" transformer="saxon" /&gt;
+ *      xsl="editor/ir_xeditor2mods.xsl" /&gt;
  * <p>
  * You can specify with param xsl the stylesheet, which should be processed and
- * you can specify with parm transformer the XSLStylesheetProcessor ('xalan' or 'saxon').
+ * you can select a supported processor with the optional transformer parameter.
  * If no transformer is specified the default transformer will be used
- * (property: MCR.LayoutService.TransformerFactoryClass).
+ * (property: MCR.LayoutService.TransformerFactory).
  */
 public class MCRPostProcessorXSL implements MCRXEditorPostProcessor {
 
@@ -61,20 +57,17 @@ public class MCRPostProcessorXSL implements MCRXEditorPostProcessor {
             return xml.clone();
         }
 
-        Optional<Class<? extends TransformerFactory>> oFactoryClass =
-            switch (transformer) {
-                case "xalan" -> MCRConfiguration2.<TransformerFactory>getClass("SLOWXALAN");
-                case "saxon" -> MCRConfiguration2.<TransformerFactory>getClass("SAXON");
-                case null, default -> Optional.empty();
-            };
-
-        Class<? extends TransformerFactory> factoryClass = oFactoryClass.orElse(null);
+        String factoryId = switch (transformer) {
+            case "xalan" -> "SlowXalan";
+            case "saxon" -> "Saxon";
+            case null, default -> null;
+        };
 
         final String xslFolder = MCRXSLResourceHelper.getXSLFolder();
         MCRContent source = new MCRJDOMContent(xml);
         MCRXSL2XMLTransformer transformer =
-            factoryClass == null ? MCRXSL2XMLTransformer.obtainInstance(xslFolder + "/" + stylesheet)
-                : MCRXSL2XMLTransformer.obtainInstance(factoryClass, xslFolder + "/" + stylesheet);
+            factoryId == null ? MCRXSL2XMLTransformer.obtainInstance(xslFolder + "/" + stylesheet)
+                : MCRXSL2XMLTransformer.obtainInstanceByFactory(factoryId, xslFolder + "/" + stylesheet);
         MCRContent transformed = transformer.transform(source);
         MCRContent normalized = new MCRNormalizeUnicodeTransformer().transform(transformed);
         return normalized.asXML();
