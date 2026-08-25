@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.tools.MCRPNGTools;
@@ -42,8 +43,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 /**
- * @author Thomas Scheffler(yagee)
+ * This servlet use the following properties:<br/>
+ * MCR.baseurl - as default<br/>
+ * MCR.baseurlExternFrontend - for different application URL
  *
+ * @author Thomas Scheffler(yagee)
  */
 public class MCRQRCodeServlet extends MCRContentServlet {
 
@@ -86,7 +90,8 @@ public class MCRQRCodeServlet extends MCRContentServlet {
         int size = Integer.parseInt(matcher.group(1));
         String relativeURL = matcher.group(2);
         String queryString = req.getQueryString();
-        String url = MCRFrontendUtil.getBaseURL() + relativeURL;
+	String baseURL = MCRConfiguration2.getString("MCR.baseurlExternFrontend").orElse(MCRFrontendUtil.getBaseURL());
+        String url = baseURL + relativeURL;
         if (queryString != null) {
             url += '?' + queryString;
         }
