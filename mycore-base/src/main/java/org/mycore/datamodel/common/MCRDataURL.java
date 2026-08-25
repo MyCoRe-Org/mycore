@@ -42,12 +42,11 @@ import java.util.stream.Collectors;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.mycore.common.MCRException;
-import org.mycore.common.content.transformer.MCRXSLTransformer;
+import org.mycore.common.xsl.MCRSAXTransformerFactoryManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -222,8 +221,9 @@ public class MCRDataURL implements Serializable {
             .orElseGet(() -> Optional.of(nodeList).filter(nl -> nl.getLength() == 1).map(nl -> nl.item(0))
                 .orElseThrow(() -> new IllegalArgumentException("Nodelist must have an single root element.")));
 
-        final TransformerFactory transformerFactory = MCRXSLTransformer.createDefaultTransformerFactory();
-        final Transformer transformer = transformerFactory.newTransformer();
+        final Transformer transformer = MCRSAXTransformerFactoryManager
+            .obtainInstance()
+            .newTransformer();
 
         MCRDataURLEncoding enc = encoding != null ? MCRDataURLEncoding.fromValue(encoding) : null;
         String method = "xml";

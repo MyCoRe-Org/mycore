@@ -38,6 +38,7 @@ import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.common.xsl.MCRTransformerFactorySelector;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
@@ -52,6 +53,7 @@ import org.xml.sax.XMLReader;
  * @author Thomas Scheffler (yagee)
  *
  */
+@SuppressWarnings("removal")
 public class MCRXSL2XMLTransformer extends MCRXSLTransformer {
 
     private static final MCRCache<String, MCRXSL2XMLTransformer> INSTANCE_CACHE = new MCRCache<>(100,
@@ -65,27 +67,43 @@ public class MCRXSL2XMLTransformer extends MCRXSLTransformer {
         super(stylesheets);
     }
 
+    /**
+     * @deprecated use a configured factory ID through {@link #obtainInstanceByFactory(String, String...)}
+     */
+    @Deprecated(forRemoval = true)
     public MCRXSL2XMLTransformer(Class<? extends TransformerFactory> factoryClass) {
         super(factoryClass);
     }
 
+    /**
+     * @deprecated use a configured factory ID through {@link #obtainInstanceByFactory(String, String...)}
+     */
+    @Deprecated(forRemoval = true)
     public MCRXSL2XMLTransformer(Class<? extends TransformerFactory> factoryClass, String... stylesheets) {
         super(factoryClass, stylesheets);
     }
 
-    public static MCRXSL2XMLTransformer obtainInstance(String... stylesheets) {
-        return obtainInstance(DEFAULT_FACTORY_CLASS, stylesheets);
+    private MCRXSL2XMLTransformer(String factoryId, String[] stylesheets) {
+        super(stylesheets, factoryId);
     }
 
+    public static MCRXSL2XMLTransformer obtainInstance(String... stylesheets) {
+        return obtainInstanceByFactory(MCRTransformerFactorySelector.getDefaultFactoryId(), stylesheets);
+    }
+
+    public static MCRXSL2XMLTransformer obtainInstanceByFactory(String factoryId, String... stylesheets) {
+        return obtainCachedInstance(INSTANCE_CACHE, factoryId, stylesheets,
+            () -> new MCRXSL2XMLTransformer(factoryId, stylesheets));
+    }
+
+    /**
+     * @deprecated use {@link #obtainInstanceByFactory(String, String...)}
+     */
+    @Deprecated(forRemoval = true)
     public static MCRXSL2XMLTransformer obtainInstance(Class<? extends TransformerFactory> factoryClass,
         String... stylesheets) {
-        String key = stylesheets.length == 1 ? stylesheets[0] : Arrays.toString(stylesheets);
-        MCRXSL2XMLTransformer instance = INSTANCE_CACHE.get(key);
-        if (instance == null) {
-            instance = new MCRXSL2XMLTransformer(factoryClass, stylesheets);
-            INSTANCE_CACHE.put(key, instance);
-        }
-        return instance;
+        return obtainCachedInstance(INSTANCE_CACHE, factoryClass.getName(), stylesheets,
+            () -> new MCRXSL2XMLTransformer(factoryClass, stylesheets));
     }
 
     @Override

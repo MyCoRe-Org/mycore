@@ -22,11 +22,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayDeque;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.Deque;
-import java.util.Optional;
 import java.util.Properties;
+import java.util.function.Supplier;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Result;
@@ -34,10 +33,8 @@ import javax.xml.transform.Templates;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.SAXSource;
-import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 
@@ -49,7 +46,6 @@ import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationBase;
-import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRWrappedContent;
@@ -60,17 +56,17 @@ import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.common.xml.MCRXSLTransformerUtils;
 import org.mycore.common.xsl.MCRErrorListener;
 import org.mycore.common.xsl.MCRParameterCollector;
+import org.mycore.common.xsl.MCRSAXTransformerFactoryManager;
 import org.mycore.common.xsl.MCRTemplatesSource;
-import org.mycore.common.xsl.uriresolver.MCRURIResolver;
+import org.mycore.common.xsl.MCRTransformerFactorySelector;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
 /**
  * Transforms XML content using a static XSL stylesheet. The stylesheet is configured via
  * <code>MCR.ContentTransformer.{ID}.Stylesheet</code>. You may choose your own instance of
- * {@link SAXTransformerFactory} via <code>MCR.ContentTransformer.{ID}.TransformerFactoryClass</code>.
- * The default transformer factory implementation {@link org.apache.xalan.processor.TransformerFactoryImpl}
- * is configured with <code>MCR.LayoutService.TransformerFactoryClass</code>.
+ * transformer factory via <code>MCR.ContentTransformer.{ID}.TransformerFactory</code>.
+ * The default transformer factory ID is configured with <code>MCR.LayoutService.TransformerFactory</code>.
  *
  * @author Frank Lützenkirchen
  */
@@ -78,8 +74,6 @@ import org.xml.sax.XMLReader;
 public class MCRXSLTransformer extends MCRParameterizedTransformer {
 
     private static final int INITIAL_BUFFER_SIZE = 32 * 1024;
-
-    private static final MCRURIResolver URI_RESOLVER = MCRURIResolver.obtainInstance();
 
     private static final MCREntityResolver ENTITY_RESOLVER = MCREntityResolver.getInstance();
 
@@ -91,9 +85,12 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
     private static final long CHECK_PERIOD = MCRConfiguration2.getLong("MCR.LayoutService.LastModifiedCheckPeriod")
         .orElse(60_000L);
 
-    public static final Class<? extends TransformerFactory> DEFAULT_FACTORY_CLASS = MCRConfiguration2
-        .<TransformerFactory>getClass("MCR.LayoutService.TransformerFactoryClass")
-        .orElseGet(TransformerFactory.newInstance()::getClass);
+    /**
+     * @deprecated use {@link MCRTransformerFactorySelector#getDefaultFactoryId()} and a configured factory ID
+     */
+    @Deprecated(forRemoval = true)
+    public static final Class<? extends TransformerFactory> DEFAULT_FACTORY_CLASS = MCRSAXTransformerFactoryManager
+        .obtainInstance().getFactoryClass();
 
     /** The compiled XSL stylesheet */
     protected MCRTemplatesSource[] templateSources;
@@ -104,67 +101,102 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
 
     protected long modifiedChecked;
 
-    protected SAXTransformerFactory tFactory;
+    private MCRSAXTransformerFactoryManager factoryManager;
 
     public MCRXSLTransformer() {
-        this(DEFAULT_FACTORY_CLASS, new String[0]);
+        this(new String[0], MCRTransformerFactorySelector.getDefaultFactoryId());
     }
 
     public MCRXSLTransformer(String... stylesheets) {
-        this(DEFAULT_FACTORY_CLASS, stylesheets);
+        this(stylesheets, MCRTransformerFactorySelector.getDefaultFactoryId());
     }
 
+    /**
+     * @deprecated use a configured factory ID through {@link #obtainInstanceByFactory(String, String...)}
+     */
+    @Deprecated(forRemoval = true)
     public MCRXSLTransformer(Class<? extends TransformerFactory> factoryClass) {
         this(factoryClass, new String[0]);
     }
 
+    /**
+     * @deprecated use a configured factory ID through {@link #obtainInstanceByFactory(String, String...)}
+     */
+    @Deprecated(forRemoval = true)
     public MCRXSLTransformer(Class<? extends TransformerFactory> factoryClass, String... stylesheets) {
-        setTransformerFactory(factoryClass.getName());
+        setTransformerFactory(factoryClass);
+        setStylesheets(stylesheets);
+    }
+
+    protected MCRXSLTransformer(String[] stylesheets, String factoryId) {
+        setTransformerFactory(factoryId);
         setStylesheets(stylesheets);
     }
 
     /**
-     * Sets the class name for {@link TransformerFactory} used by this transformer.
+     * Sets the shared {@link TransformerFactory} implementation used by this transformer.
      * <p>
      * Must be called for thread safety before this instance is shared to other threads.
      */
-    private void setTransformerFactory(String factoryClass) throws TransformerFactoryConfigurationError {
-        TransformerFactory transformerFactory = Optional.ofNullable(factoryClass)
-            .map(c -> TransformerFactory.newInstance(c, MCRClassTools.getClassLoader()))
-            .orElseGet(TransformerFactory::newInstance);
-        LOGGER.debug("Transformerfactory: {}", () -> transformerFactory.getClass().getName());
-        transformerFactory.setURIResolver(URI_RESOLVER);
-        transformerFactory.setErrorListener(new MCRErrorListener());
-        if (transformerFactory.getFeature(SAXSource.FEATURE) && transformerFactory.getFeature(SAXResult.FEATURE)) {
-            this.tFactory = (SAXTransformerFactory) transformerFactory;
-        } else {
-            throw new MCRConfigurationException("Transformer Factory " + transformerFactory.getClass().getName()
-                + " does not implement SAXTransformerFactory");
-        }
+    @SuppressWarnings("removal")
+    private void setTransformerFactory(Class<? extends TransformerFactory> factoryClass) {
+        this.factoryManager = MCRSAXTransformerFactoryManager.obtainInstance(factoryClass);
     }
 
-   public static MCRXSLTransformer obtainInstance(String... stylesheets) {
-        return obtainInstance(DEFAULT_FACTORY_CLASS, stylesheets);
+    private void setTransformerFactory(String factoryId) {
+        this.factoryManager = MCRSAXTransformerFactoryManager.obtainInstance(factoryId);
     }
 
+    public static MCRXSLTransformer obtainInstance(String... stylesheets) {
+        return obtainInstanceByFactory(MCRTransformerFactorySelector.getDefaultFactoryId(), stylesheets);
+    }
+
+    public static MCRXSLTransformer obtainInstanceByFactory(String factoryId, String... stylesheets) {
+        return obtainCachedInstance(INSTANCE_CACHE, factoryId, stylesheets,
+            () -> new MCRXSLTransformer(stylesheets, factoryId));
+    }
+
+    /**
+     * @deprecated use {@link #obtainInstanceByFactory(String, String...)}
+     */
+    @Deprecated(forRemoval = true)
     public static MCRXSLTransformer obtainInstance(Class<? extends TransformerFactory> factoryClass,
         String... stylesheets) {
-        String key = factoryClass.getName() + "_"
-            + (stylesheets.length == 1 ? stylesheets[0] : Arrays.toString(stylesheets));
-        MCRXSLTransformer instance = INSTANCE_CACHE.get(key);
-        if (instance == null) {
-            instance = new MCRXSLTransformer(factoryClass, stylesheets);
-            INSTANCE_CACHE.put(key, instance);
+        return obtainCachedInstance(INSTANCE_CACHE, factoryClass.getName(), stylesheets,
+            () -> new MCRXSLTransformer(factoryClass, stylesheets));
+    }
+
+    protected static <T> T obtainCachedInstance(MCRCache<String, T> cache, String factoryKey, String[] stylesheets,
+        Supplier<T> instanceSupplier) {
+        // NUL cannot occur in factory IDs or stylesheet paths, so every segment boundary remains unambiguous.
+        StringBuilder key = new StringBuilder(factoryKey).append('\0');
+        for (String stylesheet : stylesheets) {
+            key.append(stylesheet).append('\0');
+        }
+        String cacheKey = key.toString();
+        T instance = cache.get(cacheKey);
+        if (instance != null) {
+            return instance;
+        }
+        synchronized (cache) {
+            instance = cache.get(cacheKey);
+            if (instance == null) {
+                instance = instanceSupplier.get();
+                cache.put(cacheKey, instance);
+            }
         }
         return instance;
     }
 
     /**
      * Creates a new {@link TransformerFactory} instance of the configured default implementation
-     * (see <code>MCR.LayoutService.TransformerFactoryClass</code>).
+     * (see <code>MCR.LayoutService.TransformerFactory</code>).
+     *
+     * @deprecated use {@link MCRSAXTransformerFactoryManager#obtainInstance(String)} to reuse the configured provider
      *
      * @return a new transformer factory
      */
+    @Deprecated(forRemoval = true)
     public static TransformerFactory createDefaultTransformerFactory() {
         return TransformerFactory.newInstance(DEFAULT_FACTORY_CLASS.getName(), MCRClassTools.getClassLoader());
     }
@@ -175,8 +207,11 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         String property = "MCR.ContentTransformer." + id + ".Stylesheet";
         String[] stylesheets = MCRConfiguration2.getStringOrThrow(property).split(",");
         setStylesheets(stylesheets);
-        MCRConfiguration2.getString("MCR.ContentTransformer." + id + ".TransformerFactoryClass")
-            .ifPresent(this::setTransformerFactory);
+        String factoryProperty = "MCR.ContentTransformer." + id + ".TransformerFactory";
+        String legacyFactoryProperty = factoryProperty + "Class";
+        String factoryId = MCRTransformerFactorySelector.getFactoryId(factoryProperty, legacyFactoryProperty,
+            factoryManager.getId());
+        setTransformerFactory(factoryId);
     }
 
     public void setStylesheets(String... stylesheets) {
@@ -203,7 +238,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
                         throw new TransformerConfigurationException(
                             "XSLT Stylesheet could not be found: " + templateSources[i].getKey());
                     }
-                    templates[i] = tFactory.newTemplates(source);
+                    templates[i] = factoryManager.newTemplates(source);
                     if (templates[i] == null) {
                         throw new TransformerConfigurationException(
                             "XSLT Stylesheet could not be compiled: " + templateSources[i].getURL());
@@ -334,7 +369,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         Deque<TransformerHandler> xslSteps = new ArrayDeque<>();
         //every transformhandler shares the same ErrorListener instance
         for (Templates template : templates) {
-            TransformerHandler handler = tFactory.newTransformerHandler(template);
+            TransformerHandler handler = factoryManager.newTransformerHandler(template);
             parameterCollector.setParametersTo(handler.getTransformer());
             handler.getTransformer().setErrorListener(new MCRErrorListener());
             if (!xslSteps.isEmpty()) {
