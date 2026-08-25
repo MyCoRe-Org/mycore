@@ -90,7 +90,7 @@ public class MCRQRCodeServlet extends MCRContentServlet {
         int size = Integer.parseInt(matcher.group(1));
         String relativeURL = matcher.group(2);
         String queryString = req.getQueryString();
-	String baseURL = MCRConfiguration2.getString("MCR.baseurlExternFrontend").orElse(MCRFrontendUtil.getBaseURL());
+        String baseURL = MCRConfiguration2.getString("MCR.baseurlExternFrontend").orElse(MCRFrontendUtil.getBaseURL());
         String url = baseURL + relativeURL;
         if (queryString != null) {
             url += '?' + queryString;
