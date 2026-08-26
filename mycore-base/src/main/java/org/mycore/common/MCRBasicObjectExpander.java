@@ -91,6 +91,7 @@ public class MCRBasicObjectExpander implements MCRObjectExpander {
         expandedObject.setId(mcrObject.getId());
         expandedObject.setVersion(mcrObject.getVersion());
         expandedObject.setSchema(mcrObject.getSchema());
+        expandedObject.setLabel(mcrObject.getLabel());
 
         expandClassifications(mcrObject);
 
