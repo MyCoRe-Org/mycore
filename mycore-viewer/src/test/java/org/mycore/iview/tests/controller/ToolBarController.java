@@ -110,7 +110,7 @@ public class ToolBarController extends WebDriverController {
         By selector = By.cssSelector(SELECTBOX_SELECTOR);
         WebElement element = waitAndFindClickableElement(selector);
         waitFor(ExpectedConditions.presenceOfNestedElementLocatedBy(selector,
-            By.xpath("./option[normalize-space(text())=" + quoteXPath(orderLabel) + "]")));
+            By.xpath("./option[normalize-space(text())='" + orderLabel + "']")));
         Select select = new Select(element);
         select.selectByVisibleText(orderLabel);
         awaitImageSelected(orderLabel);
@@ -121,10 +121,6 @@ public class ToolBarController extends WebDriverController {
      */
     public void awaitImageSelected(String orderLabel) {
         waitUntil(orderLabel + " to be selected", () -> isImageSelected(orderLabel));
-    }
-
-    private static String quoteXPath(String value) {
-        return value.contains("'") ? '"' + value + '"' : "'" + value + "'";
     }
 
     /**
