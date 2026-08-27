@@ -134,7 +134,14 @@
   <!-- =============================================================================== -->
 
   <xsl:template match="i18n">
-    <xsl:value-of select="mcri18n:translate(@key)" />
+    <xsl:choose>
+      <xsl:when test="@disable-output-escaping = 'yes'">
+        <xsl:copy-of select="parse-xml-fragment(mcri18n:translate(@key))/node()" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="mcri18n:translate(@key)" />
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <!-- =============================================================================== -->
