@@ -27,6 +27,17 @@ import { Overview } from "./Overview";
 import { AbstractPage } from "../../components/model/AbstractPage";
 import { Animation } from "./Animation";
 
+/**
+ * Name of the function that a page controller publishes on the container of each of its views. It returns the number
+ * of asynchronous operations that still have to complete before that canvas shows its final image.
+ * <p>
+ * The canvas is cleared before every redraw and stays blank while tiles or PDF pages are still loading, so a canvas
+ * that does not change for a while is not necessarily a canvas that is done. This lets a caller - notably the Selenium
+ * integration tests - tell those two states apart instead of guessing with a delay. It is published per element, so
+ * several viewers on one page do not interfere.
+ */
+export const PENDING_RENDER_OPERATIONS = "mcrPendingRenderOperations";
+
 
 export class PageController {
 
@@ -95,7 +106,30 @@ export class PageController {
     this._viewport.rotationProperty.addObserver(updater);
   }
 
+  private _publishRenderState(): void {
+    this._views.forEach(view => {
+      view.container[PENDING_RENDER_OPERATIONS] ??= () => this.pendingRenderOperations();
+    });
+  }
+
+  /**
+   * Counts the work that has to finish before the canvas shows the final image: a redraw that is scheduled but has not
+   * run yet, running animations and the pending loads of every page that is currently inside the viewport. Pages
+   * outside the viewport are not drawn, so their state is irrelevant and would never settle.
+   */
+  public pendingRenderOperations(): number {
+    let pending = this._animations.length + (this._nextRequested ? 1 : 0);
+    if (this._viewport.currentAnimation != null) {
+      pending++;
+    }
+    this._pageArea.getPagesInViewport(this._viewport).forEach(page => {
+      pending += page.pendingRenderOperations();
+    });
+    return pending;
+  }
+
   public update(): void {
+    this._publishRenderState();
     if (!this._nextRequested) {
       this._nextRequested = true;
       if (!this._requestRunning) {

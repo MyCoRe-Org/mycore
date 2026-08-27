@@ -35,11 +35,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.iview.tests.TestProperties;
 import org.mycore.iview.tests.ViewerTestBase;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.OutputType;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.FluentWait;
 
 public class ControllerUtil {
@@ -50,13 +52,21 @@ public class ControllerUtil {
     public static final String SCREENSHOT_FOLDER = TEST_PROPERTIES.getProperty(RESULT_FOLDER) + "/screenshots/";
 
     /**
-     * Number of consecutive identical captures that are required before the rendering is considered settled.
+     * The canvas of a single viewer. Its page controller publishes {@link #PENDING_RENDER_OPERATIONS} on it, so a
+     * second viewer on the same page cannot keep this one from ever looking settled.
      */
-    private static final int STABLE_CAPTURES = 2;
+    private static final By VIEWER_CANVAS = By.cssSelector(".mycoreViewer .mainView");
 
-    private static final Duration STABLE_TIMEOUT = Duration.ofSeconds(10);
+    /**
+     * Name of the function the viewer publishes on {@link #VIEWER_CANVAS}. Defined as
+     * <code>PENDING_RENDER_OPERATIONS</code> by
+     * <code>src/main/typescript/modules/base/widgets/canvas/PageController.ts</code>.
+     */
+    private static final String PENDING_RENDER_OPERATIONS = "mcrPendingRenderOperations";
 
-    private static final Duration STABLE_POLLING_INTERVAL = Duration.ofMillis(100);
+    private static final Duration SETTLE_TIMEOUT = Duration.ofSeconds(10);
+
+    private static final Duration SETTLE_POLLING_INTERVAL = Duration.ofMillis(100);
 
     /**
      * Waits until the Page is fully loaded
@@ -79,7 +89,7 @@ public class ControllerUtil {
                 "Error while taking screenshot! (driver not instanceof TakesScreenshot)");
         }
         try {
-            byte[] imageBytes = awaitSettledRendering(driver, screenshot);
+            byte[] imageBytes = awaitSettledRendering(driver, screenshot, driver.findElement(VIEWER_CANVAS));
             Path pDir = Paths.get(SCREENSHOT_FOLDER);
             Files.createDirectories(pDir);
             Path pFile = pDir.resolve(name + ".png");
@@ -92,26 +102,26 @@ public class ControllerUtil {
     }
 
     /**
-     * Captures the viewport until {@link #STABLE_CAPTURES} consecutive captures are identical and returns the last one.
-     * The canvas of the image viewer paints zooming and image changes as an animation, so a capture taken right after
-     * the triggering click would still show an intermediate frame. Waiting for the pixels to stop changing replaces
-     * the fixed delays this method used to rely on and only costs as much time as the animation really needs.
+     * Captures the viewport once the viewer reports that it has nothing left to paint and returns that capture.
+     * <p>
+     * The canvas is cleared before every redraw and stays blank while image tiles or PDF pages are still loading, and
+     * zooming and page changes are painted as an animation. A capture that does not change therefore does not mean
+     * that the viewer is done - it may just as well be an intermediate blank or a stale frame. So instead of waiting
+     * for a fixed delay this asks the viewer how many render operations are still pending and only accepts a capture
+     * that was taken with nothing pending, twice in a row.
      *
-     * @return the PNG bytes of the settled viewport
+     * @return the PNG bytes of the finished viewport
      */
-    private static byte[] awaitSettledRendering(WebDriver driver, TakesScreenshot screenshot) {
-        Capture capture = new Capture(screenshot);
+    private static byte[] awaitSettledRendering(WebDriver driver, TakesScreenshot screenshot, WebElement canvas) {
+        Capture capture = new Capture((JavascriptExecutor) driver, screenshot, canvas);
         long start = System.nanoTime();
         try {
             return new FluentWait<>(driver)
-                .withTimeout(STABLE_TIMEOUT)
-                .pollingEvery(STABLE_POLLING_INTERVAL)
-                .ignoring(WebDriverException.class)
-                .withMessage("rendering to settle")
+                .withTimeout(SETTLE_TIMEOUT)
+                .pollingEvery(SETTLE_POLLING_INTERVAL)
+                .ignoring(StaleElementReferenceException.class)
+                .withMessage(capture::describeState)
                 .until(ignored -> capture.captureIfSettled());
-        } catch (TimeoutException e) {
-            LOGGER.warn("Rendering did not settle within {}, using last capture.", STABLE_TIMEOUT);
-            return capture.last();
         } finally {
             ViewerTestBase.addWaitTime(Duration.ofNanos(System.nanoTime() - start));
         }
@@ -119,28 +129,66 @@ public class ControllerUtil {
 
     private static final class Capture {
 
+        private final JavascriptExecutor javascript;
+
         private final TakesScreenshot screenshot;
+
+        private final WebElement canvas;
 
         private byte[] last;
 
-        private int identical;
+        private Long pending;
 
-        private Capture(TakesScreenshot screenshot) {
+        private boolean lastWasSettled;
+
+        private int polls;
+
+        private Capture(JavascriptExecutor javascript, TakesScreenshot screenshot, WebElement canvas) {
+            this.javascript = javascript;
             this.screenshot = screenshot;
+            this.canvas = canvas;
+        }
+
+        private String describeState() {
+            return pending == null
+                ? "the viewer to publish '" + PENDING_RENDER_OPERATIONS + "' on its canvas"
+                : "the viewer to finish painting, " + pending + " operation(s) still pending";
         }
 
         /**
-         * @return the current capture once it repeated {@link ControllerUtil#STABLE_CAPTURES} times, else {@code null}
+         * Reads the render state before capturing, so that a redraw scheduled after the read shows up as pending in
+         * the next round instead of being missed.
+         *
+         * @return the current capture if it equals the previous one and both were taken with nothing pending, else
+         *         {@code null}
          */
         private byte[] captureIfSettled() {
+            pending = readPendingRenderOperations();
+            LOGGER.debug("Poll {}: {} render operation(s) pending", ++polls, pending);
+            boolean settled = pending != null && pending == 0;
             byte[] current = screenshot.getScreenshotAs(OutputType.BYTES);
-            identical = Arrays.equals(last, current) ? identical + 1 : 0;
+            boolean done = settled && lastWasSettled && Arrays.equals(last, current);
             last = current;
-            return identical >= STABLE_CAPTURES ? current : null;
+            lastWasSettled = settled;
+            return done ? current : null;
         }
 
-        private byte[] last() {
-            return last;
+        /**
+         * @return the pending render operations of the canvas, or {@code null} while the viewer has not published
+         *         them yet
+         */
+        private Long readPendingRenderOperations() {
+            Object result = javascript.executeScript("const canvas = arguments[0], name = arguments[1];"
+                + "return typeof canvas[name] === 'function' ? canvas[name]() : null;", canvas,
+                PENDING_RENDER_OPERATIONS);
+            if (result == null) {
+                return null;
+            }
+            if (!(result instanceof Number number)) {
+                throw new IllegalStateException(
+                    PENDING_RENDER_OPERATIONS + " returned " + result + " instead of a number");
+            }
+            return number.longValue();
         }
     }
 

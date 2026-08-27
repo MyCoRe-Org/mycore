@@ -35,17 +35,12 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 /**
  * @author Sebastian Röher (basti890)
  *
  */
 public class WebDriverController {
-
-    private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(30);
-
-    private static final Duration DEFAULT_POLLING_INTERVAL = Duration.ofMillis(100);
 
     private WebDriver driver;
 
@@ -74,10 +69,7 @@ public class WebDriverController {
     protected <R> R waitFor(ExpectedCondition<R> condition) {
         long start = System.nanoTime();
         try {
-            if (driver instanceof MCRWebdriverWrapper wrapper) {
-                return wrapper.waitFor(condition);
-            }
-            return new WebDriverWait(driver, DEFAULT_TIMEOUT, DEFAULT_POLLING_INTERVAL).until(condition);
+            return ((MCRWebdriverWrapper) driver).waitFor(condition);
         } finally {
             ViewerTestBase.addWaitTime(Duration.ofNanos(System.nanoTime() - start));
         }

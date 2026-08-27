@@ -86,8 +86,8 @@ public class SideBarController extends WebDriverController {
      * @param offestX
      */
     public void scrollSidbar(WebDriver driver, int offestX) {
-        String xPath = "//div[contains(@class,\"sidebar\")]/div[./div[contains(@class,\"thumbnail\")]]";
-        ScrollUtil.scroll(driver, waitAndFindElement(By.xpath(xPath)), 250);
+        ScrollUtil.scrollByXpath(driver,
+            "//div[contains(@class,\"sidebar\")]/div[./div[contains(@class,\"thumbnail\")]]", 250);
     }
 
     /**

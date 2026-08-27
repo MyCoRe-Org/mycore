@@ -178,6 +178,14 @@ export class PDFPage implements AbstractPage {
 
   }
 
+  /**
+   * A render task of pdf.js is running, or nothing has been rendered yet, so the front buffer the canvas is painted
+   * from does not hold the final image.
+   */
+  public pendingRenderOperations(): number {
+    return this._promiseRunning || this._fbScale === -1 ? 1 : 0;
+  }
+
   private _updateBackBuffer(newScale) {
     const vp = this.pdfPage.getViewport({ scale: newScale * PDFPage.CSS_UNITS, rotation: this._rotation });
     const task = this.pdfPage.render({
