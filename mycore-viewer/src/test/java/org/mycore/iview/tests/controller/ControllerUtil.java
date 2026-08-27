@@ -26,18 +26,21 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Properties;
 
 import javax.imageio.ImageIO;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.MCRException;
 import org.mycore.iview.tests.TestProperties;
 import org.mycore.iview.tests.ViewerTestBase;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.support.ui.FluentWait;
 
 public class ControllerUtil {
 
@@ -45,6 +48,15 @@ public class ControllerUtil {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final Properties TEST_PROPERTIES = TestProperties.getInstance();
     public static final String SCREENSHOT_FOLDER = TEST_PROPERTIES.getProperty(RESULT_FOLDER) + "/screenshots/";
+
+    /**
+     * Number of consecutive identical captures that are required before the rendering is considered settled.
+     */
+    private static final int STABLE_CAPTURES = 2;
+
+    private static final Duration STABLE_TIMEOUT = Duration.ofSeconds(10);
+
+    private static final Duration STABLE_POLLING_INTERVAL = Duration.ofMillis(100);
 
     /**
      * Waits until the Page is fully loaded
@@ -67,9 +79,7 @@ public class ControllerUtil {
                 "Error while taking screenshot! (driver not instanceof TakesScreenshot)");
         }
         try {
-            ViewerTestBase.sleep(1000);
-            ByteArrayInputStream input = new ByteArrayInputStream(screenshot.getScreenshotAs(OutputType.BYTES));
-            byte[] imageBytes = input.readAllBytes();
+            byte[] imageBytes = awaitSettledRendering(driver, screenshot);
             Path pDir = Paths.get(SCREENSHOT_FOLDER);
             Files.createDirectories(pDir);
             Path pFile = pDir.resolve(name + ".png");
@@ -78,10 +88,59 @@ public class ControllerUtil {
         } catch (IOException e) {
             LOGGER.error("Error while taking or saving screenshot", e);
             throw new UnsupportedOperationException("Error while taking or saving screenshot", e);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt(); // Preserve the interrupted status
-            LOGGER.error("Screenshot capture interrupted", e);
-            throw new MCRException("Screenshot capture interrupted", e);
+        }
+    }
+
+    /**
+     * Captures the viewport until {@link #STABLE_CAPTURES} consecutive captures are identical and returns the last one.
+     * The canvas of the image viewer paints zooming and image changes as an animation, so a capture taken right after
+     * the triggering click would still show an intermediate frame. Waiting for the pixels to stop changing replaces
+     * the fixed delays this method used to rely on and only costs as much time as the animation really needs.
+     *
+     * @return the PNG bytes of the settled viewport
+     */
+    private static byte[] awaitSettledRendering(WebDriver driver, TakesScreenshot screenshot) {
+        Capture capture = new Capture(screenshot);
+        long start = System.nanoTime();
+        try {
+            return new FluentWait<>(driver)
+                .withTimeout(STABLE_TIMEOUT)
+                .pollingEvery(STABLE_POLLING_INTERVAL)
+                .ignoring(WebDriverException.class)
+                .withMessage("rendering to settle")
+                .until(ignored -> capture.captureIfSettled());
+        } catch (TimeoutException e) {
+            LOGGER.warn("Rendering did not settle within {}, using last capture.", STABLE_TIMEOUT);
+            return capture.last();
+        } finally {
+            ViewerTestBase.addWaitTime(Duration.ofNanos(System.nanoTime() - start));
+        }
+    }
+
+    private static final class Capture {
+
+        private final TakesScreenshot screenshot;
+
+        private byte[] last;
+
+        private int identical;
+
+        private Capture(TakesScreenshot screenshot) {
+            this.screenshot = screenshot;
+        }
+
+        /**
+         * @return the current capture once it repeated {@link ControllerUtil#STABLE_CAPTURES} times, else {@code null}
+         */
+        private byte[] captureIfSettled() {
+            byte[] current = screenshot.getScreenshotAs(OutputType.BYTES);
+            identical = Arrays.equals(last, current) ? identical + 1 : 0;
+            last = current;
+            return identical >= STABLE_CAPTURES ? current : null;
+        }
+
+        private byte[] last() {
+            return last;
         }
     }
 
