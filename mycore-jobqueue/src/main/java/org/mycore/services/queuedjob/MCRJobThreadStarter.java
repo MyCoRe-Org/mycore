@@ -102,7 +102,7 @@ public class MCRJobThreadStarter implements Runnable, Closeable {
         Duration timeTillReset = config.timeTillReset(action).orElseGet(config::timeTillReset);
 
         jobExecutor = new ActiveCountingThreadPoolExecutor(maxJobThreadCount, workQueue,
-            new JobThreadFactory(getSimpleActionName()), activeThreads);
+            new JobThreadFactory(getSimpleActionName()), activeThreads, listener);
 
         processableCollection = new MCRProcessableDefaultCollection(getName());
         processableCollection.setProperty("activated", activated);
@@ -144,9 +144,7 @@ public class MCRJobThreadStarter implements Runnable, Closeable {
                         break;
                     }
                 }
-                synchronized (listener) {
-                    listener.wait(ONE_MINUTE_IN_MS);
-                }
+                listener.awaitSignal(ONE_MINUTE_IN_MS);
             } catch (PersistenceException e) {
                 LOGGER.warn("We have an database error, sleep and run later.", e);
                 try {
@@ -226,10 +224,8 @@ public class MCRJobThreadStarter implements Runnable, Closeable {
         //signal manager thread to stop now
         running = false;
         //Wake up, Neo!
-        synchronized (listener) {
-            LOGGER.debug("Wake up queue");
-            listener.notifyAll();
-        }
+        LOGGER.debug("Wake up queue");
+        listener.signal();
         runLock.lock();
         try {
             if (processableExecutor != null) {
@@ -308,35 +304,43 @@ public class MCRJobThreadStarter implements Runnable, Closeable {
      */
     private static final class ListenerNotifier implements MCRJobQueueEventListener, MCRJobStatusListener {
 
+        private boolean signalled;
+
+        /**
+         * Wakes up the job manager. A signal that arrives while the manager is scheduling instead of waiting is
+         * remembered, so it is not lost.
+         */
+        synchronized void signal() {
+            signalled = true;
+            notifyAll();
+        }
+
+        synchronized void awaitSignal(long timeoutMillis) throws InterruptedException {
+            if (!signalled) {
+                wait(timeoutMillis);
+            }
+            signalled = false;
+        }
+
         @Override
         public void onJobAdded(MCRJob job) {
             // a job was added to the queue, but the transaction is not yet committed, so we have to wait for it.
-            MCRSessionMgr.getCurrentSession().onCommit(() -> {
-                synchronized (this) {
-                    this.notifyAll();
-                }
-            });
+            MCRSessionMgr.getCurrentSession().onCommit(this::signal);
         }
 
         @Override
         public void onError(MCRJob job, Exception e) {
-            synchronized (this) {
-                this.notifyAll();
-            }
+            signal();
         }
 
         @Override
         public void onSuccess(MCRJob job) {
-            synchronized (this) {
-                this.notifyAll();
-            }
+            signal();
         }
 
         @Override
         public void onProcessing(MCRJob job) {
-            synchronized (this) {
-                this.notifyAll();
-            }
+            signal();
         }
     }
 
@@ -366,18 +370,25 @@ public class MCRJobThreadStarter implements Runnable, Closeable {
 
         private final AtomicInteger activeThreads;
 
+        private final ListenerNotifier jobThreadFreed;
+
         ActiveCountingThreadPoolExecutor(int maxJobThreadCount,
             BlockingQueue<Runnable> workQueue,
             JobThreadFactory jobThreadFactory,
-            AtomicInteger activeThreads) {
+            AtomicInteger activeThreads,
+            ListenerNotifier jobThreadFreed) {
             super(maxJobThreadCount, maxJobThreadCount, 1, TimeUnit.DAYS, workQueue, jobThreadFactory);
             this.activeThreads = activeThreads;
+            this.jobThreadFreed = jobThreadFreed;
         }
 
         @Override
         protected void afterExecute(Runnable r, Throwable t) {
             super.afterExecute(r, t);
             activeThreads.decrementAndGet();
+            // the listeners were notified while this job still occupied its thread, so notify again now that the
+            // thread is actually free, otherwise the manager only notices it after ONE_MINUTE_IN_MS
+            jobThreadFreed.signal();
         }
 
         @Override
