@@ -316,8 +316,11 @@ public class MCRJobThreadStarter implements Runnable, Closeable {
         }
 
         synchronized void awaitSignal(long timeoutMillis) throws InterruptedException {
-            if (!signalled) {
-                wait(timeoutMillis);
+            long deadline = System.currentTimeMillis() + timeoutMillis;
+            long remaining = timeoutMillis;
+            while (!signalled && remaining > 0) {
+                wait(remaining);
+                remaining = deadline - System.currentTimeMillis();
             }
             signalled = false;
         }

@@ -52,7 +52,7 @@ public class MCRJobThreadStarterTest extends MCRJPATestCase {
      * turn a failing run into a passing one, it only widens the window in which the manager is able to notice the
      * freed job thread.
      */
-    private static final long COMPLETION_HOLD_MS = 2000;
+    private static final long COMPLETION_HOLD_MS = 200;
 
     private static final AtomicInteger HANDED_OUT_JOBS = new AtomicInteger();
 
@@ -263,7 +263,7 @@ public class MCRJobThreadStarterTest extends MCRJPATestCase {
     }
 
     /**
-     * Registered via <code>MCR.QueuedJob.MCRTestJobAction.Listeners</code> and therefore called by
+     * Registered via <code>MCR.QueuedJob.MCRTestJobAction1.Listeners</code> and therefore called by
      * {@link MCRJobRunnable} right after the job manager's own listener, on the job thread and still inside
      * {@link MCRJobRunnable#run()}.
      */
@@ -292,7 +292,12 @@ public class MCRJobThreadStarterTest extends MCRJPATestCase {
          * manager has to decide about the pending job while the completed job still occupies its thread.
          */
         private static void holdJobThread() {
-            await(new CountDownLatch(1), COMPLETION_HOLD_MS);
+            try {
+                Thread.sleep(COMPLETION_HOLD_MS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new MCRException(e);
+            }
         }
 
         static void await(CountDownLatch latch, long millis) {
