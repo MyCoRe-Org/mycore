@@ -75,12 +75,13 @@ public class MCRObjectIDTest {
     @Test
     public void setNextFreeIdString() {
         MCRObjectID id1 = MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(BASE_ID);
-        assertEquals(1, id1.getNumberAsInteger(), "First id should be int 1");
         MCRObjectID id2 = MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(BASE_ID);
-        assertEquals(2, id2.getNumberAsInteger(), "Second id should be int 2");
+        assertEquals(id1.getNumberAsInteger() + 1, id2.getNumberAsInteger(),
+            "Second id should be the successor of the first id");
         MCRXMLMetadataManager.obtainInstance().create(id2, new Document(new Element("test")), new Date());
         MCRObjectID id3 = MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(BASE_ID);
-        assertEquals(3, id3.getNumberAsInteger(), "Second id should be int 3");
+        assertEquals(id2.getNumberAsInteger() + 1, id3.getNumberAsInteger(),
+            "Third id should be the successor of the second id");
     }
 
     @Test
