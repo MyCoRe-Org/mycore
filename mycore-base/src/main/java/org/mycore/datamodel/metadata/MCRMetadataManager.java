@@ -852,7 +852,9 @@ public final class MCRMetadataManager {
             return;
         }
 
-        checkUpdatePermission(derivateId);
+        if (!MCRAccessManager.checkDerivateMetadataPermission(derivateId, PERMISSION_WRITE)) {
+            throw MCRAccessException.missingPermission("Update derivate", derivateId.toString(), PERMISSION_WRITE);
+        }
 
         Path fileSourceDirectory = removeSourcePathFromInternals(mcrDerivate);
 
