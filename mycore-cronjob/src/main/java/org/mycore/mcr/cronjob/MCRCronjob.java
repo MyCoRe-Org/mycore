@@ -50,6 +50,8 @@ import com.cronutils.parser.CronParser;
  */
 public abstract class MCRCronjob implements Runnable {
 
+    public static final String DEFAULT_PROPERTY_PREFIX = "MCR.Cronjob.Default";
+
     private MCRAbstractProcessable processable;
 
     private boolean enabled;
@@ -91,7 +93,7 @@ public abstract class MCRCronjob implements Runnable {
      *
      * @param enabled Whether this Cronjob is enabled.
      */
-    @MCRProperty(name = "Enabled", defaultName = "MCR.Cronjob.Default.Enabled")
+    @MCRProperty(name = "Enabled", defaultNamePrefix = DEFAULT_PROPERTY_PREFIX)
     public void setEnabled(String enabled) {
         this.enabled = Boolean.parseBoolean(enabled);
     }
@@ -101,7 +103,7 @@ public abstract class MCRCronjob implements Runnable {
      *
      * @param contexts List of contexts in which this Cronjob is executed.
      */
-    @MCRProperty(name = "Contexts", defaultName = "MCR.Cronjob.Default.Contexts")
+    @MCRProperty(name = "Contexts", defaultNamePrefix = DEFAULT_PROPERTY_PREFIX)
     public void setContexts(String contexts) {
         this.contexts = Arrays.stream(contexts.split(",")).map(Context::valueOf).collect(Collectors.toSet());
     }
@@ -122,7 +124,7 @@ public abstract class MCRCronjob implements Runnable {
      *
      * @param cronType The format type of the {@link #setCron(String)} property.
      */
-    @MCRProperty(name = "CronType", defaultName = "MCR.Cronjob.Default.CronType", order = 1)
+    @MCRProperty(name = "CronType", defaultNamePrefix = DEFAULT_PROPERTY_PREFIX, order = 1)
     public void setCronType(String cronType) {
         this.cronType = CronType.valueOf(cronType);
     }

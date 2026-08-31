@@ -45,6 +45,8 @@ import org.mycore.resource.common.MCRResourceTracer;
 @MCRConfigurationProxy(proxyClass = MCRLibraryResourceFilter.Factory.class)
 public final class MCRLibraryResourceFilter extends MCRUrlPrefixResourceFilterBase {
 
+    public static final String DEFAULT_KEY_PREFIX = MCRResourceFilterBase.DEFAULT_KEY_PREFIX + ".Library";
+
     public MCRLibraryResourceFilter(MCRResourceFilterMode mode) {
         super(mode);
     }
@@ -58,7 +60,7 @@ public final class MCRLibraryResourceFilter extends MCRUrlPrefixResourceFilterBa
 
     public static class Factory implements Supplier<MCRLibraryResourceFilter> {
 
-        @MCRProperty(name = MODE_KEY, defaultName = "MCR.Resource.Filter.Default.Library.Mode")
+        @MCRProperty(name = MODE_KEY, defaultNamePrefix = DEFAULT_KEY_PREFIX)
         public String mode;
 
         @Override

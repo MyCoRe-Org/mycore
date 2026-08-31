@@ -67,8 +67,15 @@ public final class MCRInstantiatorUtils {
     }
 
     public static MCRConfigurationException emptyNameException(MCRTarget target) {
-        return new MCRConfigurationException("The name for target " + targetTypeName(target) + " '" + target.name()
-            + "' in configured class " + target.declaringClass().getName() + " must not be empty");
+        return new MCRConfigurationException("The name for target "
+            + targetTypeName(target) + " '" + target.name() + "' in configured class "
+            + target.declaringClass().getName() + " is empty");
+    }
+
+    public static MCRConfigurationException defaultNameConflictException(MCRTarget target) {
+        return new MCRConfigurationException("The default name prefix for target "
+            + targetTypeName(target) + " '" + target.name() + "' in configured class "
+            + target.declaringClass().getName() + " is combined wit an empty name");
     }
 
     public static MCRConfigurationException incompatibilityException(String property, Class<?> instanceClass,
@@ -86,8 +93,8 @@ public final class MCRInstantiatorUtils {
 
     public static MCRConfigurationException emptyRawException(String property, MCRTarget target,
         String description) {
-        return new MCRConfigurationException(capitalize(description) + ", configured in " + property + "," +
-            " for target " + targetTypeName(target) + " '" + target.name() + "' in configured class "
+        return new MCRConfigurationException(capitalize(description) + ", configured in " + property + ","
+            + " for target " + targetTypeName(target) + " '" + target.name() + "' in configured class "
             + target.declaringClass().getName()
             + " is empty");
     }
