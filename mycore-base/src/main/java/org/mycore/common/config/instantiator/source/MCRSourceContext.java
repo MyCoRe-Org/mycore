@@ -18,12 +18,8 @@
 
 package org.mycore.common.config.instantiator.source;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.instantiator.MCRInstantiatorUtils;
@@ -66,27 +62,8 @@ public final class MCRSourceContext {
         return hints;
     }
 
-    public MCRSourceContext nested(String suffix, String description) {
-        return new MCRSourceContext(target, property + "." + suffix, description, hints);
-    }
-
-    public List<String> orderedKeys(Map<String, ?> map) {
-
-        SortedMap<Integer, String> keyMap = new TreeMap<>();
-        for (String key : map.keySet()) {
-            try {
-                Integer integerValue = Integer.parseInt(key);
-                String alreadyMappedKey = keyMap.put(integerValue, key);
-                if (alreadyMappedKey != null && !alreadyMappedKey.equals(key)) {
-                    throw inconsistentKeysException(key, alreadyMappedKey);
-                }
-            } catch (NumberFormatException exception) {
-                throw nonIntegerKeyException(key, exception);
-            }
-        }
-
-        return new ArrayList<>(keyMap.values());
-
+    public MCRSourceContext nested(String prefix, String description) {
+        return new MCRSourceContext(target, property + "." + prefix, description, hints);
     }
 
     public MCRConfigurationException configurationException(String exceptionMessage) {
@@ -97,12 +74,6 @@ public final class MCRSourceContext {
         return new MCRConfigurationException(exceptionMessage(exceptionMessage), exception);
     }
 
-    public MCRConfigurationException incompatibilityException(
-        Class<?> annotationValueClass, Object instance) {
-        return configurationException("has a class (" + instance.getClass().getName() + "),"
-            + " that is incompatible with the annotated value class (" + annotationValueClass.getName() + ")");
-    }
-
     public MCRConfigurationException missingException() {
         return configurationException("is missing");
     }
@@ -111,17 +82,26 @@ public final class MCRSourceContext {
         return configurationException("is empty");
     }
 
+    public MCRConfigurationException classLoadingException(String className, ClassNotFoundException exception) {
+        return configurationException("has a class (" + className + ") that could not be loaded", exception);
+    }
+
+    public MCRConfigurationException classIncompatibilityException(Class<?> annotatedClass, Class<?> actualClass) {
+        return configurationException("has a class (" + actualClass.getName() + ") that is incompatible "
+            + "with the annotated class (" + annotatedClass.getName() + ")");
+    }
+
     public MCRConfigurationException nonIntegerKeyException(String key, NumberFormatException exception) {
         return configurationException("has element with non-integer key " + key, exception);
     }
 
-    public MCRConfigurationException inconsistentKeysException(String key1, String key2) {
+    public MCRConfigurationException inconsistentIntegerKeysException(String key1, String key2) {
         return configurationException("has element with inconsistent integer keys " + key1 + " and " + key2);
     }
 
     private String exceptionMessage(String exceptionMessage) {
         return MCRInstantiatorUtils.capitalize(description()) + ", configured in " + property()
-            + " (and its sub-properties)," + " for target " + targetTypeName(target) + " '"
+            + " (and sub-properties thereof)," + " for target " + targetTypeName(target) + " '"
             + target.name() + "' in configured class " + targetClassName(target) + " " + exceptionMessage;
     }
 
@@ -137,6 +117,11 @@ public final class MCRSourceContext {
 
     private static String targetClassName(MCRTarget target) {
         return target.declaringClass().getName();
+    }
+
+    @Override
+    public String toString() {
+        return property() + " / " + description();
     }
 
 }

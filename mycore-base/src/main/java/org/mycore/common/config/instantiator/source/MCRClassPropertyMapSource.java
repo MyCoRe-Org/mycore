@@ -18,32 +18,32 @@
 
 package org.mycore.common.config.instantiator.source;
 
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-import org.mycore.common.config.annotation.MCRInstanceList;
+import org.mycore.common.config.annotation.MCRClassPropertyMap;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
 /**
- * A {@link MCRInstanceListSource} is a {@link MCRSource} that interprets a {@link MCRInstanceList}.
+ * A {@link MCRClassPropertyMapSource} is a {@link MCRSource} that interprets a {@link MCRClassPropertyMap}.
  */
-final class MCRInstanceListSource extends MCRValueListSourceBase<Object> {
+final class MCRClassPropertyMapSource extends MCRValueMapSourceBase<Class<?>> {
 
-    private final MCRInstanceList annotation;
+    private final MCRClassPropertyMap annotation;
 
-    MCRInstanceListSource(MCRInstanceList annotation, MCRAnnotationProvider annotationProvider) {
-        super(annotationProvider, new MCRInstanceExtractor(annotation.valueClass()));
+    MCRClassPropertyMapSource(MCRClassPropertyMap annotation, MCRAnnotationProvider annotationProvider) {
+        super(annotationProvider, new MCRClassPropertyExtractor(annotation.valueClass()));
         this.annotation = annotation;
     }
 
     @Override
     public Type type() {
-        return Type.INSTANCE_LIST;
+        return Type.PROPERTY_MAP;
     }
 
     @Override
-    public Class<MCRInstanceList> annotationClass() {
-        return MCRInstanceList.class;
+    public Class<MCRClassPropertyMap> annotationClass() {
+        return MCRClassPropertyMap.class;
     }
 
     @Override
@@ -58,12 +58,12 @@ final class MCRInstanceListSource extends MCRValueListSourceBase<Object> {
 
     @Override
     public Class<?> valueClass() {
-        return List.class;
+        return Map.class;
     }
 
     @Override
     protected String description() {
-        return "instance list";
+        return "class map";
     }
 
     @Override
@@ -73,7 +73,7 @@ final class MCRInstanceListSource extends MCRValueListSourceBase<Object> {
 
     @Override
     protected String defaultName() {
-        return "";
+        return annotation.defaultName();
     }
 
     @Override
@@ -83,12 +83,12 @@ final class MCRInstanceListSource extends MCRValueListSourceBase<Object> {
 
     @Override
     protected boolean absoluteName() {
-        return false;
+        return annotation.absolute();
     }
 
     @Override
     protected boolean supportsShortForm() {
-        return false;
+        return true;
     }
 
     @Override
