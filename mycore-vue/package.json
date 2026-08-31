@@ -19,6 +19,15 @@
     "type-check:jobqueue": "vue-tsc --noEmit -p ../mycore-jobqueue/src/main/vue/jobqueue/tsconfig.json",
     "dev:jobqueue": "vite --config ../mycore-jobqueue/src/main/vue/jobqueue/vite.config.mts",
     "build:webcli": "vite build --config ../mycore-webcli/src/main/vue/webcli/vite.config.mts",
+    "typecheck:webcli": "vue-tsc --noEmit --pretty false -p ../mycore-webcli/src/main/vue/webcli/tsconfig.typecheck.json",
+    "lint:webcli": "cd ../mycore-webcli/src/main/vue/webcli && eslint src tests vite.config.mts",
+    "test:webcli": "vitest --run --config ../mycore-webcli/src/main/vue/webcli/vite.config.mts",
+    "test-coverage:webcli": "vitest --run --coverage --config ../mycore-webcli/src/main/vue/webcli/vite.config.mts",
+    "test-a11y:webcli": "playwright test --config playwright.webcli.config.mts",
+    "test-performance-only:webcli": "playwright test --config playwright.webcli.performance.config.mts",
+    "test-performance:webcli": "run-s build:webcli test-performance-only:webcli",
+    "ci-check:webcli": "run-s lint:webcli typecheck:webcli test-coverage:webcli",
+    "dev:webcli": "vite --config ../mycore-webcli/src/main/vue/webcli/vite.config.mts",
     "build:access-key-manager": "vite build --config ../mycore-acl/src/main/vue/access-key-manager2/vite.config.mts",
     "build:all": "run-s build:texteditor build:processing build:jobqueue build:webcli build:access-key-manager"
   },
@@ -56,6 +65,7 @@
     "vite": "^8.0.0",
     "vitest": "^4.1.0",
     "vue-eslint-parser": "^10.4.0",
-    "vue-tsc": "^3.2.6"
+    "vue-tsc": "^3.2.6",
+    "ws": "^8.18.0"
   }
 }
