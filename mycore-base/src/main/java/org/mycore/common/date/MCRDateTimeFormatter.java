@@ -85,7 +85,6 @@ public final class MCRDateTimeFormatter extends MCRInstantFormatterBase {
 
     @Override
     public String format(Instant instant) {
-
         return formatter.format(instant);
     }
 

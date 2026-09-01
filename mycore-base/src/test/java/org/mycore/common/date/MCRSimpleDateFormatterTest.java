@@ -26,6 +26,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.params.ParameterizedTest;
@@ -61,7 +62,7 @@ public class MCRSimpleDateFormatterTest {
     @MethodSource("provideDates")
     public void formatDate(Date date, String format, String expected) {
 
-        String formattedDate = new MCRSimpleDateFormatter(format).format(date);
+        String formattedDate = new MCRSimpleDateFormatter(format, Locale.ROOT).format(date);
 
         assertEquals(expected, formattedDate);
 
@@ -89,7 +90,7 @@ public class MCRSimpleDateFormatterTest {
     @MethodSource("provideInstants")
     public void formatInstant(Instant instant, String format, String expected) {
 
-        String formattedDate = new MCRSimpleDateFormatter(format).format(instant);
+        String formattedDate = new MCRSimpleDateFormatter(format, Locale.ROOT).format(instant);
 
         assertEquals(expected, formattedDate);
 

@@ -27,13 +27,14 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.function.Supplier;
 
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.datamodel.common.MCRISO8601Date;
 
 /**
  * A {@link MCRISO8601DateFormatter} is a {@link MCRDateFormatter} that uses
- * {@link MCRISO8601Date#format(String, Locale)} to format a date.
+ * {@link MCRISO8601Date#format(String, Locale, String)} to format a date.
  * <p>
  * The following configuration options are available:
  * <ul>
@@ -58,6 +59,12 @@ import org.mycore.datamodel.common.MCRISO8601Date;
 @MCRConfigurationProxy(proxyClass = MCRISO8601DateFormatter.Factory.class)
 public final class MCRISO8601DateFormatter extends MCRDateFormatterBase {
 
+    public static final String FORMAT_KEY = "Format";
+
+    public static final String LOCALE_KEY = "Locale";
+
+    public static final String TIME_ZONE_KEY = "TimeZone";
+
     private final String format;
 
     private final Locale locale;
@@ -65,7 +72,7 @@ public final class MCRISO8601DateFormatter extends MCRDateFormatterBase {
     private final String timeZone;
 
     public MCRISO8601DateFormatter(String format) {
-        this(format, Locale.ROOT, ZoneId.systemDefault());
+        this(format, Locale.getDefault(), ZoneId.systemDefault());
     }
 
     public MCRISO8601DateFormatter(String format, Locale locale) {
@@ -76,6 +83,11 @@ public final class MCRISO8601DateFormatter extends MCRDateFormatterBase {
         this.format = Objects.requireNonNull(format, "Format must not be null");
         this.locale = Objects.requireNonNull(locale, "Locale must not be null");
         this.timeZone = Objects.requireNonNull(zoneId, "Zone ID must not be null").getId();
+        try {
+            format(new Date());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid date format: " + format, e);
+        }
     }
 
     @Override
@@ -84,19 +96,25 @@ public final class MCRISO8601DateFormatter extends MCRDateFormatterBase {
         MCRISO8601Date isoDate = new MCRISO8601Date();
         isoDate.setDate(date);
 
-        return isoDate.format(format, locale, timeZone);
+        String formattedDate = isoDate.format(format, locale, timeZone);
+
+        if (formattedDate == null) {
+            throw new MCRConfigurationException("Failed to convert date " + date + "with format " + format);
+        }
+
+        return formattedDate;
 
     }
 
     public static final class Factory implements Supplier<MCRISO8601DateFormatter> {
 
-        @MCRProperty(name = "Format")
+        @MCRProperty(name = FORMAT_KEY)
         public String format;
 
-        @MCRProperty(name = "Locale", required = false)
+        @MCRProperty(name = LOCALE_KEY, required = false)
         public String locale;
 
-        @MCRProperty(name = "TimeZone", required = false)
+        @MCRProperty(name = TIME_ZONE_KEY, required = false)
         public String timeZone;
 
         @Override

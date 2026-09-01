@@ -125,7 +125,7 @@ import org.mycore.pi.util.MCRPIGeneratorUtils;
  * <pre><code>
  * [...].Class=org.mycore.pi.MCRGenericPIGenerator
  * [...].GeneralPattern=10.1234/$ObjectType-$ObjectProject-$ObjectDate-$ObjectNumber
- * [...].DateFormatt=yyyy-MM-dd
+ * [...].DateFormat=yyyy-MM-dd
  * [...].ObjectProjectMapping.mycore=MyCoRe
  * [...].ObjectTypeMapping.mods=MODS
  * [...].CountPrecision=6

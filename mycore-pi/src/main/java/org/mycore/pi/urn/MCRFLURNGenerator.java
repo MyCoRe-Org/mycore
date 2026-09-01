@@ -58,6 +58,8 @@ public class MCRFLURNGenerator extends MCRDNBURNGeneratorBase {
 
     public static final String DELIMITER_KEY = "Delimiter";
 
+    private static final MCRFLDateScrambler DATE_SCRAMBLER = new MCRFLDateScrambler();
+
     private String lastNiss;
 
     public MCRFLURNGenerator(String namespace, String delimiter) {
@@ -68,7 +70,7 @@ public class MCRFLURNGenerator extends MCRDNBURNGeneratorBase {
     protected synchronized String buildNISS(MCRBase base, String additional) {
 
         Date date = new Date((System.currentTimeMillis() / 1000) * 1000);
-        String niss = new MCRFLDateScrambler().format(date);
+        String niss = DATE_SCRAMBLER.format(date);
 
         if (niss.equals(lastNiss)) {
             try {
