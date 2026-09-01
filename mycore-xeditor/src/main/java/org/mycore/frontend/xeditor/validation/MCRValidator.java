@@ -84,10 +84,6 @@ public abstract class MCRValidator {
             Object node = boundNodes.get(i);
 
             String absPath = MCRXPathBuilder.buildXPath(node);
-            if (results.hasError(absPath)) {
-                continue;
-            }
-
             MCRBinding nodeBinding = new MCRBinding(i + 1, binding);
             if (!isRelevant(nodeBinding)) {
                 continue;
