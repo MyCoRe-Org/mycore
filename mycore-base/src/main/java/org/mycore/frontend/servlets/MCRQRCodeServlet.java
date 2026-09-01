@@ -45,7 +45,7 @@ import jakarta.servlet.http.HttpServletResponse;
 /**
  * This servlet use the following properties:<br/>
  * MCR.baseurl - as default<br/>
- * MCR.baseurlExternFrontend - for different application URL
+ * MCR.Servlet.MCRQRCodeServlet.QRCodeBaseURL - for different application URL
  *
  * @author Thomas Scheffler(yagee)
  */
