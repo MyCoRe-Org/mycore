@@ -22,7 +22,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.jdom2.Element;
@@ -35,6 +37,7 @@ import org.mycore.common.date.MCRMockDateFormatter;
 import org.mycore.common.date.MCRSimpleDateFormatter;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.pi.doi.MCRDigitalObjectIdentifier;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.pi.urn.MCRDNBURN;
@@ -234,6 +237,40 @@ public class MCRGenericPIGeneratorTest {
 
         String piWithoutChecksum = pi.substring(0, pi.length() - 1);
         assertEquals("urn:nbn:de:gbv:xyz:result1-result2-" + MOCK_DATE + "-000-", piWithoutChecksum);
+
+    }
+
+    @Test
+    @MCRTestConfiguration(properties = {
+        @MCRTestProperty(key = "Test.Class", classNameOf = MCRGenericPIGenerator.class),
+        @MCRTestProperty(key = "Test.GeneralPattern", string = "10.1234/$ObjectDate-$ObjectNumber"),
+        @MCRTestProperty(key = "Test.DateFormat", string = DATE_FORMAT),
+        @MCRTestProperty(key = "Test.Type", string = MCRDigitalObjectIdentifier.TYPE)
+    })
+    public void configurationDateFormat() throws MCRPersistentIdentifierException {
+
+        MCRObject object = new MCRObject();
+        object.setSchema("http://www.w3.org/2001/XMLSchema");
+        object.setId(MCRObjectID.getInstance("my_test_00000123"));
+
+        Element testElement = new Element("test1");
+        testElement.setAttribute("class", "MCRMetaXML");
+        testElement.addContent(new Element("test2").setText("result1"));
+        testElement.addContent(new Element("test3").setText("result2"));
+
+        Element metadata = new Element("metadata");
+        metadata.addContent(testElement);
+
+        object.getMetadata().setFromDOM(metadata);
+
+        MCRPIGenerator<?> generator = MCRConfiguration2.getInstanceOfOrThrow(MCRPIGenerator.class, "Test");
+
+        String pi = generator.generate(object, "").asString();
+
+        Date objectDate = object.getService().getDate(MCRObjectService.DATE_TYPE_CREATEDATE);
+        String formattedObjectDate = new MCRSimpleDateFormatter(DATE_FORMAT, Locale.ROOT).format(objectDate);
+
+        assertEquals("10.1234/" + formattedObjectDate + "-00000123", pi);
 
     }
 

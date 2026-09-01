@@ -57,7 +57,8 @@ import de.thetaphi.forbiddenapis.SuppressForbidden;
  * Example:
  * <pre><code>
  * [...].Class=org.mycore.common.date.MCRDateTimeStyler
- * [...].Format=yyyy-MM-dd'T'HH:mm
+ * [...].DateStyle=LONG
+ * [...].TimeStyle=MEDIUM
  * [...].Locale=de_DE
  * [...].TimeZone=Europe/Berlin
  * </code></pre>
@@ -86,7 +87,7 @@ public final class MCRDateTimeStyler extends MCRInstantFormatterBase {
     @SuppressForbidden
     public MCRDateTimeStyler(FormatStyle dateStyle, FormatStyle timeStyle, Locale locale, ZoneId zoneId) {
         Objects.requireNonNull(dateStyle, "Date style must not be null");
-        Objects.requireNonNull(dateStyle, "Time style must not be null");
+        Objects.requireNonNull(timeStyle, "Time style must not be null");
         Objects.requireNonNull(locale, "Locale must not be null");
         Objects.requireNonNull(zoneId, "Zone ID must not be null");
         formatter = DateTimeFormatter.ofLocalizedDateTime(dateStyle, timeStyle).localizedBy(locale).withZone(zoneId);
@@ -94,7 +95,6 @@ public final class MCRDateTimeStyler extends MCRInstantFormatterBase {
 
     @Override
     public String format(Instant instant) {
-
         return formatter.format(instant);
     }
 

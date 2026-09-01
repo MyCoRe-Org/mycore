@@ -55,7 +55,7 @@ import de.thetaphi.forbiddenapis.SuppressForbidden;
  * Example:
  * <pre><code>
  * [...].Class=org.mycore.common.date.MCRDateStyler
- * [...].Format=yyyy-MM-dd'T'HH:mm
+ * [...].DateStyle=LONG
  * [...].Locale=de_DE
  * [...].TimeZone=Europe/Berlin
  * </code></pre>
@@ -89,7 +89,6 @@ public final class MCRDateStyler extends MCRInstantFormatterBase {
 
     @Override
     public String format(Instant instant) {
-
         return formatter.format(instant);
     }
 

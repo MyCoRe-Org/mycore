@@ -65,7 +65,11 @@ public final class MCRSimpleDateFormatter extends MCRDateFormatterBase {
 
     public static final String TIME_ZONE_KEY = "TimeZone";
 
-    private final ThreadLocal<SimpleDateFormat> formatHolder;
+    private final String format;
+
+    private final Locale locale;
+
+    private final TimeZone timeZone;
 
     public MCRSimpleDateFormatter(String format) {
         this(format, Locale.getDefault(), ZoneId.systemDefault());
@@ -76,23 +80,24 @@ public final class MCRSimpleDateFormatter extends MCRDateFormatterBase {
     }
 
     public MCRSimpleDateFormatter(String format, Locale locale, ZoneId zoneId) {
-        Objects.requireNonNull(format, "Format must not be null");
-        Objects.requireNonNull(locale, "Locale must not be null");
-        Objects.requireNonNull(zoneId, "Zone ID must not be null");
-        formatHolder = ThreadLocal.withInitial(getFormatSupplier(format, locale, TimeZone.getTimeZone(zoneId)));
-    }
-
-    private static Supplier<SimpleDateFormat> getFormatSupplier(String format, Locale locale, TimeZone timeZone) {
-        return () -> {
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format, locale);
-            simpleDateFormat.setTimeZone(timeZone);
-            return simpleDateFormat;
-        };
+        this.format = Objects.requireNonNull(format, "Format must not be null");
+        this.locale = Objects.requireNonNull(locale, "Locale must not be null");
+        this.timeZone = TimeZone.getTimeZone(Objects.requireNonNull(zoneId, "Zone ID must not be null"));
+        try {
+            format(new Date());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid date format: " + format, e);
+        }
     }
 
     @Override
     public String format(Date date) {
-        return formatHolder.get().format(date);
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format, locale);
+        simpleDateFormat.setTimeZone(timeZone);
+
+        return simpleDateFormat.format(date);
+
     }
 
     public static final class Factory implements Supplier<MCRSimpleDateFormatter> {

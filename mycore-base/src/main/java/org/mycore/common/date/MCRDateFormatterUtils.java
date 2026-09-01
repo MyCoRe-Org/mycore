@@ -26,22 +26,43 @@ import java.util.Locale;
  */
 public final class MCRDateFormatterUtils {
 
+    public static final String ROOT = "ROOT";
+
+    public static final String DEFAULT = "DEFAULT";
+
     private MCRDateFormatterUtils() {
     }
 
+    /**
+     * Utility function to parse a string representation of {@link Locale}
+     * using {@link Locale#forLanguageTag(String)} and supporting
+     * special values {@link MCRDateFormatterUtils#ROOT} for {@link Locale#ROOT}
+     * as well as {@link MCRDateFormatterUtils#DEFAULT} for {@link Locale#getDefault()}.
+     * <p>
+     * Supports the BCP 47 format (<code>de-DE</code>) and tries to support the
+     * POSIX / IETF format (<code>de_DE</code>) by converting all occurrences
+     * of <code>_</code> into <code>-</code>.
+     */
     public static Locale getLocale(String locale) {
         return switch (locale) {
             case null -> Locale.getDefault();
-            case "ROOT" -> Locale.ROOT;
-            case "DEFAULT" -> Locale.getDefault();
-            case String languageTag -> Locale.forLanguageTag(languageTag);
+            case ROOT -> Locale.ROOT;
+            case DEFAULT -> Locale.getDefault();
+            case String languageTag -> Locale.forLanguageTag(languageTag.replace("_", "-"));
         };
     }
 
+    /**
+     * Utility function to parse a string representation of {@link ZoneId}
+     * using {@link ZoneId#of(String)} and supporting the special value
+     * {@link MCRDateFormatterUtils#DEFAULT} for {@link ZoneId#systemDefault()}.
+     * <p>
+     * Supports the IANA Time Zone Database format (<code>Europe/Berlin</code>).
+     */
     public static ZoneId getTimeZone(String timeZone) {
         return switch (timeZone) {
             case null -> ZoneId.systemDefault();
-            case "DEFAULT" -> ZoneId.systemDefault();
+            case DEFAULT -> ZoneId.systemDefault();
             case String zoneId -> ZoneId.of(zoneId);
         };
     }
