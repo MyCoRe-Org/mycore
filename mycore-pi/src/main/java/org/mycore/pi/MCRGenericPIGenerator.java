@@ -21,7 +21,6 @@ package org.mycore.pi;
 import static org.mycore.pi.util.MCRPIGeneratorUtils.formatCount;
 import static org.mycore.pi.util.MCRPIGeneratorUtils.getCountPattern;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -42,9 +41,12 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRInstance;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.config.annotation.MCRPropertyList;
 import org.mycore.common.config.annotation.MCRPropertyMap;
+import org.mycore.common.date.MCRDateFormatter;
+import org.mycore.common.date.MCRSimpleDateFormatter;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
@@ -59,11 +61,11 @@ import org.mycore.pi.util.MCRPIGeneratorUtils;
  * <ul>
  *   <li>
  *     The replacement marker {@link MCRGenericPIGenerator#PLACE_HOLDER_CURRENT_DATE}
- *     will be replaced with the current date, formatted by the given date format.
+ *     will be replaced with the current date, formatted by the given date formatter.
  *   </li>
  *   <li>
  *     The replacement marker {@link MCRGenericPIGenerator#PLACE_HOLDER_OBJECT_DATE}
- *     will be replaced with the objects creation date, formatted by the given date format.
+ *     will be replaced with the objects creation date, formatted by the given date formatter.
  *   </li>
  *   <li>
  *     The replacement marker {@link MCRGenericPIGenerator#PLACE_HOLDER_OBJECT_PROJECT}
@@ -94,7 +96,7 @@ import org.mycore.pi.util.MCRPIGeneratorUtils;
  * urn:nbn:de:gbv:$ObjectDate-$ObjectType-$Count
  * urn:nbn:de:gbv:$ObjectDate-$Count
  * urn:nbn:de:gbv:$ObjectType-$Count
- * urn:nbn:de:gbv:$0-$1-$Count
+ * urn:nbn:de:gbv:$1-$2-$Count
  * </code></pre>
  * <p>
  * The following configuration options are available:
@@ -102,7 +104,11 @@ import org.mycore.pi.util.MCRPIGeneratorUtils;
  * <li> The property suffix {@link MCRGenericPIGenerator#GENERAL_PATTERN_KEY} can be used to
  * specify the pattern.
  * <li> The property suffix {@link MCRGenericPIGenerator#DATE_FORMAT_KEY} can be used to
- * specify the date format to be used.
+ * specify the date format to be used (unless {@link MCRGenericPIGenerator#DATE_FORMATTER_KEY} is also used;
+ * uses {@link MCRSimpleDateFormatter} with {@link Locale#ROOT}).
+ * <li> The property suffix {@link MCRGenericPIGenerator#DATE_FORMATTER_KEY} can be used to
+ * specify the date formatter to be used (optional, overrides the formatter configured with
+ * {@link MCRGenericPIGenerator#DATE_FORMAT_KEY}).
  * <li> The property suffix {@link MCRGenericPIGenerator#OBJECT_PROJECT_MAPPING_KEY} can be used to
  * specify the project ID mappings to be used.
  * <li> The property suffix {@link MCRGenericPIGenerator#OBJECT_TYPE_MAPPING_KEY} can be used to
@@ -118,11 +124,19 @@ import org.mycore.pi.util.MCRPIGeneratorUtils;
  * Example:
  * <pre><code>
  * [...].Class=org.mycore.pi.MCRGenericPIGenerator
- * [...].GeneralPattern=urn:nbn:de:gbv:$CurrentDate-$1-$2-$ObjectType-$ObjectProject-$ObjectNumber-$Count-
+ * [...].GeneralPattern=10.1234/$ObjectType-$ObjectProject-$ObjectDate-$ObjectNumber
  * [...].DateFormat=yyyy-MM-dd
  * [...].ObjectProjectMapping.mycore=MyCoRe
  * [...].ObjectTypeMapping.mods=MODS
  * [...].CountPrecision=6
+ * [...].Type=doi
+ * </code></pre>
+ * Example:
+ * <pre><code>
+ * [...].Class=org.mycore.pi.MCRGenericPIGenerator
+ * [...].GeneralPattern=urn:nbn:de:gbv:xyz:$1-$2-$CurrentDate-$Count-
+ * [...].DateFormatter.Class=org.mycore.common.date.MCRSimpleDateFormatter
+ * [...].DateFormatter.Format=yyyy-MM-dd
  * [...].Type=dnbUrn
  * [...].XPath.1=/mycoreobject/metadata//mods:typeOfResource/text()
  * [...].XPath.2=substring-after(/mycoreobject/metadata//mods:genre/@valueURI,'#')
@@ -136,6 +150,8 @@ public class MCRGenericPIGenerator implements MCRPIGenerator<MCRPersistentIdenti
     public static final String GENERAL_PATTERN_KEY = "GeneralPattern";
 
     public static final String DATE_FORMAT_KEY = "DateFormat";
+
+    public static final String DATE_FORMATTER_KEY = "DateFormatter";
 
     public static final String OBJECT_PROJECT_MAPPING_KEY = "ObjectProjectMapping";
 
@@ -167,7 +183,7 @@ public class MCRGenericPIGenerator implements MCRPIGenerator<MCRPersistentIdenti
 
     private final String generalPattern;
 
-    private final String dateFormat;
+    private final MCRDateFormatter dateFormatter;
 
     private final Map<String, String> projectIdMappings;
 
@@ -179,12 +195,12 @@ public class MCRGenericPIGenerator implements MCRPIGenerator<MCRPersistentIdenti
 
     private final List<String> xPaths;
 
-    public MCRGenericPIGenerator(MCRPIGeneratorUtils.Counter counter, String generalPattern, String dateFormat,
-        Map<String, String> projectIdMappings, Map<String, String> typeIdMappings,
+    public MCRGenericPIGenerator(MCRPIGeneratorUtils.Counter counter, String generalPattern,
+        MCRDateFormatter dateFormatter, Map<String, String> projectIdMappings, Map<String, String> typeIdMappings,
         int countPrecision, String type, List<String> xPaths) {
         this.counter = Objects.requireNonNull(counter, "Counter must not be null");
         this.generalPattern = Objects.requireNonNull(generalPattern, "General pattern must not be null");
-        this.dateFormat = Objects.requireNonNull(dateFormat, "Date format must not be null");
+        this.dateFormatter = Objects.requireNonNull(dateFormatter, "Date formatter must not be null");
         this.projectIdMappings = Objects.requireNonNull(projectIdMappings, "Project ID mappings must not be null");
         this.typeIdMappings = Objects.requireNonNull(typeIdMappings, "Type ID mappings must not be null");
         this.countPrecision = countPrecision;
@@ -201,13 +217,12 @@ public class MCRGenericPIGenerator implements MCRPIGenerator<MCRPersistentIdenti
     }
 
     @Override
-    public MCRPersistentIdentifier generate(MCRBase base, String additional)
+    public final MCRPersistentIdentifier generate(MCRBase base, String additional)
         throws MCRPersistentIdentifierException {
 
         String resultingPI = generalPattern;
 
         if (resultingPI.contains(PLACE_HOLDER_CURRENT_DATE)) {
-            SimpleDateFormat dateFormatter = new SimpleDateFormat(dateFormat, Locale.ROOT);
             resultingPI = resultingPI.replace(PLACE_HOLDER_CURRENT_DATE, dateFormatter.format(new Date()));
         }
 
@@ -216,7 +231,6 @@ public class MCRGenericPIGenerator implements MCRPIGenerator<MCRPersistentIdenti
             if (objectCreateDate == null) {
                 throw new MCRPersistentIdentifierException("Object " + base.getId() + " doesn't have a create date!");
             }
-            SimpleDateFormat dateFormatter = new SimpleDateFormat(dateFormat, Locale.ROOT);
             resultingPI = resultingPI.replace(PLACE_HOLDER_OBJECT_DATE, dateFormatter.format(objectCreateDate));
         }
 
@@ -324,6 +338,9 @@ public class MCRGenericPIGenerator implements MCRPIGenerator<MCRPersistentIdenti
         @MCRProperty(name = DATE_FORMAT_KEY, defaultName = DEFAULT_PROPERTY_PREFIX + DATE_FORMAT_KEY)
         public String dateFormat;
 
+        @MCRInstance(name = DATE_FORMATTER_KEY, valueClass = MCRDateFormatter.class, required = false)
+        public MCRDateFormatter dateFormatter;
+
         @MCRPropertyMap(name = OBJECT_PROJECT_MAPPING_KEY, required = false)
         public Map<String, String> projectIdMappings;
 
@@ -341,8 +358,12 @@ public class MCRGenericPIGenerator implements MCRPIGenerator<MCRPersistentIdenti
 
         @Override
         public MCRGenericPIGenerator get() {
-            return new MCRGenericPIGenerator(MCRPIGeneratorUtils.SHARED_COUNTER, generalPattern, dateFormat,
+            return new MCRGenericPIGenerator(MCRPIGeneratorUtils.SHARED_COUNTER, generalPattern, getDateFormatter(),
                 projectIdMappings, typeIdMappings, Integer.parseInt(countPrecision), type, xPaths);
+        }
+
+        private MCRDateFormatter getDateFormatter() {
+            return dateFormatter != null ? dateFormatter : new MCRSimpleDateFormatter(dateFormat, Locale.ROOT);
         }
 
     }
