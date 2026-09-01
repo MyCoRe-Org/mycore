@@ -25,6 +25,14 @@ export interface AbstractPage {
   draw(ctx: CanvasRenderingContext2D, rect: Rect, sourceScale, preview?: boolean, infoScale?: number): void;
   refreshCallback: () => void;
   clear(): void;
+
+  /**
+   * Number of asynchronous operations - image loads, render tasks - that still have to complete before this page is
+   * completely painted. As long as this is greater than zero the canvas may show nothing or a partial image, even
+   * though it does not change any more.
+   */
+  pendingRenderOperations(): number;
+
   toString(): string;
 }
 

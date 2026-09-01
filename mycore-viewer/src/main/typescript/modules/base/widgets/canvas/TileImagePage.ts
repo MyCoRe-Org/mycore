@@ -180,6 +180,10 @@ export class TileImagePage implements AbstractPage {
 
   }
 
+  public pendingRenderOperations(): number {
+    return this.vLoadingTiles.keys.length;
+  }
+
   protected abortLoadingTiles() {
     this.vLoadingTiles.forEach((k, v) => {
       delete v.src;
@@ -323,6 +327,8 @@ export class TileImagePage implements AbstractPage {
     };
 
     image.onerror = () => {
+      // a tile that failed is no longer loading, so it must not stay in the map of pending loads
+      this.vLoadingTiles.remove(tilePos);
       errorCallback();
     };
 
