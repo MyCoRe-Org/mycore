@@ -5,11 +5,7 @@ Access keys offer an alternative authorization mechanism. Currently, objects (mo
 
 ### REST API
 
-This module provides a REST API for managing Access Keys. The REST API is currently in a draft state but can be activated as follows:
-
-```bash
-MCR.RestApi.Draft.MCRAccessKey2=true
-```
+This module provides a REST API for managing Access Keys.
 
 #### Permissions
 
