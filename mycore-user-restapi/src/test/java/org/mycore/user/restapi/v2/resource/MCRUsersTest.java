@@ -64,7 +64,7 @@ import jakarta.ws.rs.core.UriInfo;
 
 @MyCoReTest
 @ExtendWith(MockitoExtension.class)
-class MCRUsersTest {
+public class MCRUsersTest {
 
     @Mock
     private MCRUserService userService;

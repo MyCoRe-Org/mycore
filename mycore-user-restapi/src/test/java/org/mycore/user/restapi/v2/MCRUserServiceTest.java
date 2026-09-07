@@ -39,6 +39,7 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mycore.common.MCRException;
+import org.mycore.test.MyCoReTest;
 import org.mycore.user.restapi.exception.MCRUserAlreadyExistsException;
 import org.mycore.user.restapi.exception.MCRUserNoLocalPasswordException;
 import org.mycore.user.restapi.exception.MCRUserNotFoundException;
@@ -57,8 +58,9 @@ import org.mycore.user2.MCRRealmFactory;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 
+@MyCoReTest
 @ExtendWith(MockitoExtension.class)
-class MCRUserServiceTest {
+public class MCRUserServiceTest {
 
     @Mock
     private MCRUserDtoMapper userDtoMapper;
