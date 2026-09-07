@@ -24,6 +24,7 @@ import java.util.function.Function;
 
 import org.mycore.common.MCRException;
 import org.mycore.user.restapi.exception.MCRUserAlreadyExistsException;
+import org.mycore.user.restapi.exception.MCRUserNoLocalPasswordException;
 import org.mycore.user.restapi.exception.MCRUserNotFoundException;
 import org.mycore.user.restapi.exception.MCRUserValidationException;
 import org.mycore.user.restapi.v2.dto.MCRCreateUserRequest;
@@ -31,6 +32,7 @@ import org.mycore.user.restapi.v2.dto.MCRUpdateUserRequest;
 import org.mycore.user.restapi.v2.dto.MCRUserDetail;
 import org.mycore.user.restapi.v2.dto.MCRUserStandard;
 import org.mycore.user.restapi.v2.dto.MCRUserSummary;
+import org.mycore.user2.MCRRealmFactory;
 import org.mycore.user2.MCRRoleManager;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
@@ -167,15 +169,23 @@ public class MCRUserService {
     /**
      * Updates the user with the given ID.
      *
+     * <p>If {@code updateUserRequest} carries a password, this only works for users in the
+     * local realm.
+     *
      * @param userId the ID of the user to update
      * @param updateUserRequest the request containing the updated user data
      * @return the updated user as a detailed view
      * @throws MCRUserNotFoundException if no user with the given ID exists
+     * @throws MCRUserNoLocalPasswordException if a password was given and the user is not in
+     *         the local realm
      * @throws MCRUserValidationException if the updated user data is invalid
      */
     public MCRUserDetail updateUser(String userId, MCRUpdateUserRequest updateUserRequest) {
         validateUpdateRequest(updateUserRequest);
         MCRUser user = getUserOrThrow(userId);
+        if (updateUserRequest.password() != null) {
+            requireLocalRealm(user);
+        }
         MCRUser owner = Optional.ofNullable(updateUserRequest.owner()).map(this::getUserOrThrow).orElse(null);
         MCRUser updated = userDtoMapper.applyUpdate(user, updateUserRequest, owner);
         try {
@@ -213,6 +223,22 @@ public class MCRUserService {
     private MCRUser getUserOrThrow(String userId) {
         return Optional.ofNullable(MCRUserManager.getUser(userId))
             .orElseThrow(() -> new MCRUserNotFoundException(userId));
+    }
+
+    /**
+     * Rejects setting a local password for a user who is not in the local realm.
+     * <p>
+     * {@link #changePassword} itself does not call this method: it does not need to, since
+     * its own password write only runs after that same {@code getHashType() == null} check
+     * already passed.
+     *
+     * @param user the user a password write is being attempted for
+     * @throws MCRUserNoLocalPasswordException if the user is not in the local realm
+     */
+    private static void requireLocalRealm(MCRUser user) {
+        if (!MCRRealmFactory.getLocalRealm().equals(user.getRealm())) {
+            throw new MCRUserNoLocalPasswordException(user.getUserID());
+        }
     }
 
     private static List<MCRUser> getOwns(MCRUser user) {
