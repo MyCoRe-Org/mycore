@@ -18,96 +18,113 @@
 
 package org.mycore.pi.doi;
 
-import java.util.Comparator;
+import static org.mycore.pi.util.MCRPIGeneratorUtils.formatCount;
+import static org.mycore.pi.util.MCRPIGeneratorUtils.getCountPattern;
+import static org.mycore.pi.util.MCRPIGeneratorUtils.getCreateDate;
+
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Predicate;
-import java.util.regex.Matcher;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
-import org.mycore.common.MCRException;
-import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.metadata.MCRBase;
-import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.pi.MCRPIGenerator;
-import org.mycore.pi.MCRPIManager;
-import org.mycore.pi.MCRPIRegistrationInfo;
+import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
+import org.mycore.pi.util.MCRPIGeneratorUtils;
 
-public class MCRCreateDateDOIGenerator extends MCRPIGenerator<MCRDigitalObjectIdentifier> {
+/**
+ * {@link MCRCreateDateDOIGenerator} is a {@link MCRPIGenerator} for {@link MCRDigitalObjectIdentifier} identifiers
+ * that generates identifiers using a given prefix and the current date and a per-date counter for the suffix.
+ * <p>
+ * The following configuration options are available:
+ * <ul>
+ * <li> The property suffix {@link MCRCreateDateDOIGenerator#DATE_FORMAT_KEY} can be used to
+ * specify the date format to be used.
+ * <li> The property suffix {@link MCRCreateDateDOIGenerator#PREFIX_KEY} can be used to
+ * specify the prefix.
+ * <li> The property suffix {@link MCRCreateDateDOIGenerator#COUNT_PRECISION_KEY} can be used to
+ * specify number of digits to be used for the count (optional, defaults to <code>-1</code>,
+ * which uses the natural number of digits).
+ * </ul>
+ * Example:
+ * <pre><code>
+ * [...].Class=org.mycore.pi.doi.MCRCreateDateDOIGenerator
+ * [...].DateFormat=yyyy-MM-dd
+ * [...].Prefix=10.1234
+ * [...].CountPrecision=6
+ * </code></pre>
+ */
+@MCRConfigurationProxy(proxyClass = MCRCreateDateDOIGenerator.Factory.class)
+public class MCRCreateDateDOIGenerator extends MCRDOIGeneratorBase {
 
-    private static final String DATE_PATTERN = "yyyyMMdd-HHmmss";
+    public static final String DEFAULT_PROPERTY_PREFIX = "MCR.Default.PI.Generator.CreateDate.";
 
-    private static final String CREATE_DATE_PLACEHOLDER = "$createDate$";
+    public static final String DATE_FORMAT_KEY = "DateFormat";
 
-    private static final String DATE_REGEXP = CREATE_DATE_PLACEHOLDER + "-([0-9]+)";
+    public static final String PREFIX_KEY = "Prefix";
 
-    private static final Map<String, AtomicInteger> PATTERN_COUNT_MAP = new HashMap<>();
+    public static final String COUNT_PRECISION_KEY = "CountPrecision";
 
-    private final MCRDOIParser mcrdoiParser;
+    private final MCRPIGeneratorUtils.Counter counter;
 
-    private final String prefix = MCRConfiguration2.getStringOrThrow("MCR.DOI.Prefix");
+    private final String dateFormat;
 
-    public MCRCreateDateDOIGenerator() {
-        super();
-        mcrdoiParser = new MCRDOIParser();
+    private final String prefix;
+
+    private final int countPrecision;
+
+    private final String countPattern;
+
+    public MCRCreateDateDOIGenerator(MCRDOIParser parser, MCRPIGeneratorUtils.Counter counter, String dateFormat,
+        String prefix, int countPrecision) {
+        super(parser);
+        this.counter = Objects.requireNonNull(counter, "Counter must not be null");
+        this.dateFormat = Objects.requireNonNull(dateFormat, "Date format must not be null");
+        this.prefix = Objects.requireNonNull(prefix, "Prefix must not be null");
+        this.countPrecision = countPrecision;
+        this.countPattern = getCountPattern(countPrecision);
     }
 
     @Override
-    public MCRDigitalObjectIdentifier generate(MCRBase mcrObj, String additional) {
-        Date createdate = mcrObj.getService().getDate(MCRObjectService.DATE_TYPE_CREATEDATE);
-        if (createdate != null) {
-            MCRISO8601Date mcrdate = new MCRISO8601Date();
-            mcrdate.setDate(createdate);
-            String createDate = mcrdate.format(DATE_PATTERN, Locale.ENGLISH);
-            final int count = getCountForCreateDate(createDate);
-            Optional<MCRDigitalObjectIdentifier> parse = mcrdoiParser.parse(prefix + "/" + createDate + "-" + count);
-            return parse.orElseThrow(() -> new MCRException("Error while parsing default doi!"));
-        } else {
-            throw new MCRPersistenceException("The object " + mcrObj.getId() + " doesn't have a createdate!");
+    protected String buildDOI(MCRBase base, String additional) throws MCRPersistentIdentifierException {
+
+        String prefixWithDate = prefix + "/" + formatDate(getCreateDate(base)) + "-";
+        int count = counter.getCount(MCRDigitalObjectIdentifier.TYPE, Pattern.quote(prefixWithDate) + countPattern);
+
+        return prefixWithDate + formatCount(count, countPrecision);
+
+    }
+
+    private String formatDate(Date date) {
+
+        MCRISO8601Date isoDate = new MCRISO8601Date();
+        isoDate.setDate(date);
+
+        return isoDate.format(dateFormat, Locale.ENGLISH);
+
+    }
+
+    public static class Factory implements Supplier<MCRCreateDateDOIGenerator> {
+
+        @MCRProperty(name = DATE_FORMAT_KEY, defaultName = DEFAULT_PROPERTY_PREFIX + DATE_FORMAT_KEY)
+        public String dateFormat;
+
+        @MCRProperty(name = PREFIX_KEY, defaultName = "MCR.DOI.Prefix")
+        public String prefix;
+
+        @MCRProperty(name = COUNT_PRECISION_KEY, defaultName = DEFAULT_PROPERTY_PREFIX + COUNT_PRECISION_KEY)
+        public String countPrecision = "-1";
+
+        @Override
+        public MCRCreateDateDOIGenerator get() {
+            return new MCRCreateDateDOIGenerator(new MCRDOIParser(), MCRPIGeneratorUtils.SHARED_COUNTER, dateFormat,
+                prefix, Integer.parseInt(countPrecision));
         }
-    }
 
-    private int getCountForCreateDate(String createDate) {
-        return getCount(prefix + "/" + DATE_REGEXP.replace(CREATE_DATE_PLACEHOLDER, createDate));
-    }
-
-    private synchronized int getCount(final String pattern) {
-        AtomicInteger count = PATTERN_COUNT_MAP.computeIfAbsent(pattern, p -> {
-            Pattern regExpPattern = Pattern.compile(p);
-            Predicate<String> matching = regExpPattern.asPredicate();
-
-            List<MCRPIRegistrationInfo> list = MCRPIManager.getInstance()
-                .getList(MCRDigitalObjectIdentifier.TYPE, -1, -1);
-
-            Comparator<Integer> integerComparator = Integer::compareTo;
-            // extract the number of the PI
-            Optional<Integer> highestNumber = list.stream()
-                .map(MCRPIRegistrationInfo::getIdentifier)
-                .filter(matching)
-                .map(pi -> {
-                    // extract the number of the PI
-                    Matcher matcher = regExpPattern.matcher(pi);
-                    if (matcher.find() && matcher.groupCount() == 1) {
-                        String group = matcher.group(1);
-                        return Integer.parseInt(group, 10);
-                    } else {
-                        return null;
-                    }
-                }).filter(Objects::nonNull)
-                .max(integerComparator)
-                .map(n -> n + 1);
-            return new AtomicInteger(highestNumber.orElse(0));
-        });
-
-        return count.getAndIncrement();
     }
 
 }

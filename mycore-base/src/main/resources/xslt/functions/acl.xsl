@@ -18,7 +18,7 @@
   </xsl:function>
 
   <xsl:function name="mcracl:is-current-user-guest-user" as="xs:boolean">
-    <xsl:sequence select="$CurrentUser=(mcrproperty:one('MCR.Users.Guestuser.UserName'),'guest')[1]" />
+    <xsl:sequence select="$CurrentUser=(mcrproperty:get('MCR.Users.Guestuser.UserName'),'guest')[1]" />
   </xsl:function>
 
   <xsl:function name="mcracl:is-current-user-in-role" as="xs:boolean">

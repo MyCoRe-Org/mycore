@@ -33,6 +33,7 @@ import java.util.stream.Stream;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -82,7 +83,7 @@ public final class MCRPIManager {
      */
     void applyConfiguration() {
         Map<String, Class<? extends MCRPIParser<? extends MCRPersistentIdentifier>>> parserMap = new HashMap<>();
-        MCRConfiguration2.getSubPropertiesMap(PARSER_CONFIGURATION)
+        MCRConfigurationBase.getSubpropertiesMap(PARSER_CONFIGURATION)
             .forEach((type, className) -> {
                 try {
                     Class<? extends MCRPIParser<?>> parserClass = MCRClassTools.forName(className);

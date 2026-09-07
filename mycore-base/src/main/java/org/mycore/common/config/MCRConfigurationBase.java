@@ -26,6 +26,7 @@ import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.attribute.FileTime;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -189,6 +190,43 @@ public final class MCRConfigurationBase {
 
     static MCRProperties getResolvedProperties() {
         return resolvedProperties;
+    }
+
+    /**
+     * Returns all configuration properties (provided by {@link MCRConfigurationBase#getResolvedProperties()})
+     * as an unmodifiable map.
+     */
+    public static Map<String, String> getAllPropertiesMap() {
+        return Collections.unmodifiableMap(getResolvedProperties().getAsMap());
+    }
+
+    /**
+     * Returns a sub map of properties where key is transformed.
+     *
+     * <ol>
+     *   <li>if property starts with <code>propertyPrefix</code>, the property is in the result map</li>
+     *   <li>the key of the target map is the name of the property without <code>propertPrefix</code></li>
+     * </ol>
+     * Example for <code>propertyPrefix="MCR.Foo."</code>:
+     * {@snippet lang=Properties :
+     *     MCR.Foo.Bar=Baz
+     *     MCR.Foo.Hello=World
+     *     MCR.Other.Prop=Value
+     * }
+     * will result in
+     * {@snippet lang=Properties :
+     *     Bar=Baz
+     *     Hello=World
+     * }
+     * @param propertyPrefix prefix of the property name
+     * @return a map of the properties as stated above
+     */
+    public static Map<String, String> getSubpropertiesMap(String propertyPrefix) {
+        return getAllPropertiesMap()
+            .entrySet()
+            .stream()
+            .filter(e -> e.getKey().startsWith(propertyPrefix))
+            .collect(Collectors.toMap(e -> e.getKey().substring(propertyPrefix.length()), Map.Entry::getValue));
     }
 
     private static MCRProperties getBaseProperties() {

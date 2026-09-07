@@ -16,27 +16,21 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.datamodel.classifications2;
+package org.mycore.pi;
 
-import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.pi.util.MCRPIGeneratorUtils;
 
-/**
- * @author Thomas Scheffler (yagee)
- *
- * @since 2.0
- * @deprecated Use {@link MCRCategLinkService#obtainInstance()} instead.
- */
-@Deprecated(forRemoval = true)
-public class MCRCategLinkServiceFactory {
+public class MCRMockCounter implements MCRPIGeneratorUtils.Counter {
 
-    /**
-     * Returns an instance of a MCRCategoryDAO implementator.
-     *
-     * @deprecated Use {@link MCRCategLinkService#obtainInstance()} instead.
-     */
-    @Deprecated(forRemoval = true)
-    public static MCRCategLinkService obtainInstance() {
-        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRCategLinkService.class, "MCR.Category.LinkService");
+    int nextValue;
+
+    public MCRMockCounter(int initialValue) {
+        this.nextValue = initialValue;
+    }
+
+    @Override
+    public synchronized int getCount(String type, String pattern) {
+        return nextValue++;
     }
 
 }

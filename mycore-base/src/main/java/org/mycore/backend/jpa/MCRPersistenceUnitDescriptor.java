@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,9 +30,10 @@ import org.hibernate.bytecode.enhance.spi.EnhancementContext;
 import org.hibernate.bytecode.spi.ClassTransformer;
 import org.hibernate.jpa.boot.spi.PersistenceUnitDescriptor;
 import org.mycore.common.MCRClassTools;
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRPostConstruction;
+import org.mycore.common.config.annotation.MCRPostConstruction.Value;
 import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.config.annotation.MCRPropertyList;
 import org.mycore.common.config.annotation.MCRRawProperties;
 
 import jakarta.persistence.PersistenceUnitTransactionType;
@@ -58,15 +58,13 @@ public class MCRPersistenceUnitDescriptor implements PersistenceUnitDescriptor {
 
     private String name;
 
-    @MCRPostConstruction
-    public void initializeName(String property) {
-        this.name = property.substring(MCRPersistenceProvider.JPA_PERSISTENCE_UNIT_PROPERTY_NAME.length())
-            .split("\\.")[0];
+    @MCRPostConstruction(Value.TRAILING_NAME)
+    public void initializeName(String name) {
+        this.name = name;
         LOGGER.info("Initialized persistence unit {}", this.name);
     }
 
-    @MCRProperty(name = "PersistenceProviderClassName", required = false,
-        defaultName = "MCR.JPA.ProviderClassName")
+    @MCRProperty(name = "PersistenceProviderClassName", required = false, defaultName = "MCR.JPA.ProviderClassName")
     public void setPersistenceProviderClassName(String persistenceProviderClassName) {
         this.persistenceProviderClassName = persistenceProviderClassName;
     }
@@ -76,8 +74,7 @@ public class MCRPersistenceUnitDescriptor implements PersistenceUnitDescriptor {
         setUseQuotedIdentifiers(Boolean.parseBoolean(useQuotedIdentifiersString));
     }
 
-    @MCRProperty(name = "ExcludeUnlistedClasses", required = false,
-        defaultName = "MCR.JPA.ExcludeUnlistedClasses")
+    @MCRProperty(name = "ExcludeUnlistedClasses", required = false, defaultName = "MCR.JPA.ExcludeUnlistedClasses")
     public void setExcludeUnlistedClassesString(String excludeUnlistedClassesString) {
         setExcludeUnlistedClasses(Boolean.parseBoolean(excludeUnlistedClassesString));
     }
@@ -135,9 +132,14 @@ public class MCRPersistenceUnitDescriptor implements PersistenceUnitDescriptor {
         this.excludeUnlistedClasses = excludeUnlistedClasses;
     }
 
+    /**
+     * @deprecated Use {@link MCRPersistenceUnitDescriptor#getPersistenceUnitTransactionType()} instead.<br>
+     *             This method will be removed, once it has been removed from
+     *             <code>org.hibernate.orm:hibernate-core</code>.
+     */
     @Override
+    @SuppressWarnings("removal")
     @Deprecated(forRemoval = true)
-    @SuppressWarnings({"deprecation","removal"})
     public jakarta.persistence.spi.PersistenceUnitTransactionType getTransactionType() {
         return switch (transactionType) {
             case JTA -> jakarta.persistence.spi.PersistenceUnitTransactionType.JTA;
@@ -172,12 +174,7 @@ public class MCRPersistenceUnitDescriptor implements PersistenceUnitDescriptor {
         return managedClassNames;
     }
 
-    @MCRProperty(name = "ManagedClassNames", required = false, defaultName = "MCR.JPA.ManagedClassNames")
-    public void setManagedClassNames(String managedClassNames) {
-        Stream<String> classNames = MCRConfiguration2.splitValue(managedClassNames);
-        setManagedClassNames(classNames.filter(className -> !className.isBlank()).toList());
-    }
-
+    @MCRPropertyList(name = "ManagedClassNames", required = false, defaultName = "MCR.JPA.ManagedClassNames")
     public void setManagedClassNames(List<String> managedClassNames) {
         this.managedClassNames = managedClassNames;
     }
@@ -187,12 +184,7 @@ public class MCRPersistenceUnitDescriptor implements PersistenceUnitDescriptor {
         return mappingFileNames;
     }
 
-    @MCRProperty(name = "MappingFileNames", required = false, defaultName = "MCR.JPA.MappingFileNames")
-    public void setMappingFileNames(String mappingFileNames) {
-        Stream<String> fileNames = MCRConfiguration2.splitValue(mappingFileNames);
-        setMappingFileNames(fileNames.filter(fileName -> !fileName.isBlank()).toList());
-    }
-
+    @MCRPropertyList(name = "MappingFileNames", required = false, defaultName = "MCR.JPA.MappingFileNames")
     public void setMappingFileNames(List<String> mappingFileNames) {
         this.mappingFileNames = mappingFileNames;
     }
@@ -217,20 +209,12 @@ public class MCRPersistenceUnitDescriptor implements PersistenceUnitDescriptor {
 
     @Override
     public Properties getProperties() {
-        Properties createdProperties = new Properties();
-        this.properties.keySet()
-            .stream()
-            .filter(key -> key.startsWith(MCR_PERSISTENCE_PROPERTIES_PREFIX))
-            .forEach(key -> {
-                String propertyName = key.substring(MCR_PERSISTENCE_PROPERTIES_PREFIX.length());
-                String propertyKey = this.properties.get(key);
-
-                createdProperties.put(propertyName, propertyKey);
-            });
-        return createdProperties;
+        Properties properties = new Properties();
+        properties.putAll(this.properties);
+        return properties;
     }
 
-    @MCRRawProperties(namePattern = "*", required = false)
+    @MCRRawProperties(namePattern = MCR_PERSISTENCE_PROPERTIES_PREFIX + "*", required = false)
     public void setProperties(Map<String, String> properties) {
         this.properties = properties;
     }

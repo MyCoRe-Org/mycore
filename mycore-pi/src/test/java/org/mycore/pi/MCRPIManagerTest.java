@@ -67,10 +67,6 @@ import org.mycore.test.MyCoReTest;
         + MCRMockMetadataService.TEST_PROPERTY, string = MCRMockMetadataService.TEST_PROPERTY_VALUE),
     @MCRTestProperty(key = "MCR.PI.Generator." + MCRPIManagerTest.MOCK_PID_GENERATOR + ".Class",
         classNameOf = MCRMockIdentifierGenerator.class),
-    @MCRTestProperty(key = "MCR.PI.Generator." + MCRPIManagerTest.MOCK_PID_GENERATOR + "."
-        + MCRMockIdentifierGenerator.TEST_PROPERTY, string = MCRMockIdentifierGenerator.TEST_PROPERTY_VALUE),
-    @MCRTestProperty(key = "MCR.PI.Generator." + MCRPIManagerTest.MOCK_PID_GENERATOR + ".Namespace",
-        string = "frontend-"),
     @MCRTestProperty(key = "MCR.PI.Parsers." + MCRMockIdentifierService.TYPE,
         classNameOf = MCRMockIdentifierParser.class),
     @MCRTestProperty(key = "MCR.QueuedJob.activated", string = "true"),

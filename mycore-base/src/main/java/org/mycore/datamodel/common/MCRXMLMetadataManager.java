@@ -85,20 +85,6 @@ public interface MCRXMLMetadataManager {
      * to perform the metadata operations.
      *
      * @return the XML metadata manager
-     *
-     * @deprecated Use {@link MCRXMLMetadataManager#obtainInstance()} instead
-     */
-    @Deprecated(forRemoval = true)
-    static MCRXMLMetadataManager getInstance() {
-        return obtainInstance();
-    }
-
-    /**
-     * Returns the singleton instance of {@link MCRXMLMetadataManager}. Reads the property
-     * MCR.Metadata.Manager.Class to instantiate the configured XML metadata manager adapter to be used
-     * to perform the metadata operations.
-     *
-     * @return the XML metadata manager
      */
     static MCRXMLMetadataManager obtainInstance() {
         return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRXMLMetadataManager.class, "MCR.Metadata.Manager");

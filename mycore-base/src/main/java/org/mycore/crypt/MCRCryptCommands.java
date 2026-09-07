@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
@@ -50,7 +50,7 @@ public class MCRCryptCommands extends MCRAbstractCommands {
         help = "The command list all chipher configured in mycore.properties",
         order = 10)
     public static void showChipherConfig() {
-        Map<String, String> subProps = MCRConfiguration2.getSubPropertiesMap("MCR.Crypt.Cipher");
+        Map<String, String> subProps = MCRConfigurationBase.getSubpropertiesMap("MCR.Crypt.Cipher");
         LOGGER.info(() -> "Cipher configuration: \n"
             + subProps.entrySet()
                 .stream()

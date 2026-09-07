@@ -18,46 +18,14 @@
 
 package org.mycore.pi.urn;
 
-import java.util.Objects;
+/**
+ * @deprecated Use {@link MCRDNBURNGeneratorBase} instead.
+ */
+@Deprecated(forRemoval = true)
+public abstract class MCRDNBURNGenerator extends MCRDNBURNGeneratorBase {
 
-import org.mycore.datamodel.metadata.MCRBase;
-import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.pi.MCRPIGenerator;
-
-import jakarta.validation.constraints.NotNull;
-
-public abstract class MCRDNBURNGenerator extends MCRPIGenerator<MCRDNBURN> {
-
-    private static final String URN_NBN_DE = "urn:nbn:de:";
-
-    protected abstract String buildNISS(MCRObjectID mcrID, String additional);
-
-    /**
-     * Allows the generation of a URN with a specific Namespace
-     *
-     * @param namespace  the namespace of the generated URN
-     * @param mcrID      the mycore object for which the identifier is generated
-     * @param additional additional information dedicated to the object like a mcrpath
-     * @return a unique persistence identifier
-     */
-    protected MCRDNBURN generate(@NotNull String namespace, MCRObjectID mcrID, String additional) {
-        Objects.requireNonNull(namespace, "Namespace for an URN must not be null!");
-        return new MCRDNBURN(namespace, buildNISS(mcrID, additional));
-    }
-
-    @Override
-    public MCRDNBURN generate(MCRBase mcrObj, String additional) {
-        return generate(getNamespace(), mcrObj.getId(), additional);
-    }
-
-    public String getNamespace() {
-        String namespace = getProperties().get("Namespace").trim();
-
-        if (namespace.startsWith(URN_NBN_DE)) {
-            namespace = namespace.substring(URN_NBN_DE.length());
-        }
-
-        return namespace;
+    public MCRDNBURNGenerator(String namespace) {
+        super(namespace, "");
     }
 
 }

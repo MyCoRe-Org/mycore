@@ -73,7 +73,12 @@ public class MCRIIIFImageUtil {
         return getIIIFURL(impl) + "profile.json";
     }
 
-    public static MCRIIIFImageImpl getImpl(String impl) {
-        return MCRIIIFImageImpl.obtainInstance(impl);
+    /**
+     * @deprecated Use {@link MCRIIIFImageImpl#obtainInstance(String)} instead.
+     */
+    @Deprecated(forRemoval = true)
+    public static MCRIIIFImageImpl getImpl(String implName) {
+        return MCRIIIFImageImpl.obtainInstance(implName);
     }
+
 }

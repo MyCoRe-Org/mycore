@@ -42,7 +42,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
@@ -95,7 +95,7 @@ public class MCRIFS2Commands extends MCRAbstractCommands {
     }
 
     private static String toString(MCRStore store) {
-        final Map<String, String> configMap = MCRConfiguration2.getSubPropertiesMap(
+        final Map<String, String> configMap = MCRConfigurationBase.getSubpropertiesMap(
             "MCR.IFS2.Store." + store.getID() + ".");
         final String config = configMap.entrySet().stream()
             .sorted(Map.Entry.comparingByKey())

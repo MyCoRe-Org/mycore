@@ -23,7 +23,7 @@
         <div id="classificationEditorWrapper"></div>
 
         <script type="text/javascript">
-          window["MCR.classeditor.additionalLanguages"] = &quot;<xsl:value-of select="mcrproperty:one('MCR.classeditor.additionalLanguages')"/>&quot;;
+          window["MCR.classeditor.additionalLanguages"] = &quot;<xsl:value-of select="mcrproperty:get('MCR.classeditor.additionalLanguages')"/>&quot;;
           require(["dojo/ready"], function(ready) {
             ready(function() {
               require([

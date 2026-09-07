@@ -39,7 +39,7 @@ import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.Neo4JNode;
@@ -60,7 +60,7 @@ public class MCRNeo4JParser implements MCRNeo4JMetaParser {
     private static final String FILTER_CLASS_KEY = "BaseParser.Class";
 
     public MCRNeo4JParser() {
-        Map<String, String> propertiesMap = MCRConfiguration2.getSubPropertiesMap(NEO4J_CONFIG_PREFIX + "Parser.");
+        Map<String, String> propertiesMap = MCRConfigurationBase.getSubpropertiesMap(NEO4J_CONFIG_PREFIX + "Parser.");
         parserMap = getMCRNeo4JInstantiatedParserMap(propertiesMap, FILTER_CLASS_KEY);
     }
 

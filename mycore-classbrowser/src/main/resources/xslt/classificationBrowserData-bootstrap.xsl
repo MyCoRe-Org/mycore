@@ -17,9 +17,9 @@
   <xsl:include href="xslInclude:functions" />
 
   <xsl:template match="/classificationBrowserData">
-    <xsl:variable name="folder.closed" select="mcrproperty:one('MCR.classbrowser.folder.closed')" />
-    <xsl:variable name="folder.open" select="mcrproperty:one('MCR.classbrowser.folder.open')" />
-    <xsl:variable name="folder.leaf" select="mcrproperty:one('MCR.classbrowser.folder.leaf')" />
+    <xsl:variable name="folder.closed" select="mcrproperty:get('MCR.classbrowser.folder.closed')" />
+    <xsl:variable name="folder.open" select="mcrproperty:get('MCR.classbrowser.folder.open')" />
+    <xsl:variable name="folder.leaf" select="mcrproperty:get('MCR.classbrowser.folder.leaf')" />
     <xsl:variable name="maxLinks">
       <xsl:value-of select="category[not(@numLinks &lt; following-sibling::category/@numLinks)]/@numLinks" />
     </xsl:variable>

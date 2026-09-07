@@ -35,6 +35,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 
@@ -83,7 +84,7 @@ public class MCRCommandManager {
     /** Read internal and/or external commands */
     protected void initConfiguredCommands(String type) {
         String prefix = "MCR.CLI.Classes." + type;
-        Stream<Map.Entry<String, String>> propsWithPrefix = MCRConfiguration2.getPropertiesMap()
+        Stream<Map.Entry<String, String>> propsWithPrefix = MCRConfigurationBase.getAllPropertiesMap()
             .entrySet()
             .stream()
             .filter(e -> e.getKey().startsWith(prefix));

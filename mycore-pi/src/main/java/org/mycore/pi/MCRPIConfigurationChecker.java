@@ -25,7 +25,7 @@ import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.events.MCRStartupHandler;
 
@@ -56,7 +56,7 @@ public class MCRPIConfigurationChecker implements MCRStartupHandler.AutoExecutab
         LOGGER.info("Check persistent identifier configuration!");
         final List<String> deprecatedPropertyList = DEPRECATED_PROPERTY_PREFIXES
             .stream()
-            .flatMap(propPrefix -> MCRConfiguration2.getPropertiesMap()
+            .flatMap(propPrefix -> MCRConfigurationBase.getAllPropertiesMap()
                 .entrySet()
                 .stream()
                 .filter(p -> p.getKey().startsWith(propPrefix))

@@ -53,6 +53,7 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.MCRXlink;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.metadata.MCRMetaAccessRule;
 import org.mycore.datamodel.metadata.MCRMetaAddress;
@@ -139,7 +140,7 @@ public class MCREditorOutValidator {
         map.put(MCRMetaAccessRule.class.getSimpleName(), getObjectCheckInstance(MCRMetaAccessRule.class));
         map.put(MCRMetaClassification.class.getSimpleName(), new MCRMetaClassificationCheck());
         map.put(MCRMetaHistoryDate.class.getSimpleName(), new MCRMetaHistoryDateCheck());
-        Map<String, String> props = MCRConfiguration2.getPropertiesMap()
+        Map<String, String> props = MCRConfigurationBase.getAllPropertiesMap()
             .entrySet()
             .stream()
             .filter(p -> p.getKey().startsWith(CONFIG_PREFIX + "class."))

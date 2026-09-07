@@ -43,30 +43,6 @@ public final class MCRAccessKeyRestConstants {
      */
     public static final String QUERY_PARAM_REFERENCE = "reference";
 
-    /**
-     * Offset query parameter.
-     *
-     * @deprecated Use {@link org.mycore.restapi.MCRRestConstants#PARAM_OFFSET} instead.
-     */
-    @Deprecated(forRemoval = true)
-    public static final String QUERY_PARAM_OFFSET = "offset";
-
-    /**
-     * Limit query parameter.
-     *
-     * @deprecated Use {@link org.mycore.restapi.MCRRestConstants#PARAM_LIMIT} instead.
-     */
-    @Deprecated(forRemoval = true)
-    public static final String QUERY_PARAM_LIMIT = "limit";
-
-    /**
-     * Header name for total count info.
-     *
-     * @deprecated Use {@link org.mycore.restapi.MCRRestConstants#HEADER_X_TOTAL_COUNT} instead.
-     */
-    @Deprecated(forRemoval = true)
-    public static final String HEADER_TOTAL_COUNT = "X-Total-Count";
-
     private MCRAccessKeyRestConstants() {
 
     }

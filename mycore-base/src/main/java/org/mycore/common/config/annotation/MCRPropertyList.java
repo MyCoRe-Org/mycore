@@ -57,7 +57,6 @@ public @interface MCRPropertyList {
 
     /**
      * @return The name for a default property that should be used as a fallback, if no list values are configured.
-     * A {@link MCRConfigurationException} is thrown if no default property is not configured.
      * The default property must be absolute, e.g. <code>MCR.Foo.Bar</code>.
      */
     String defaultName() default "";

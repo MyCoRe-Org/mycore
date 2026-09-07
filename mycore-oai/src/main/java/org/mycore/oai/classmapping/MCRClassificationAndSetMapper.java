@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.config.MCRConfigurationException;
 
 /**
@@ -48,7 +49,7 @@ public class MCRClassificationAndSetMapper {
      */
     public static String mapClassificationToSet(String prefix, String classid) {
         String propPrefix = prefix + PROP_SETS_PREFIX;
-        return MCRConfiguration2.getPropertiesMap()
+        return MCRConfigurationBase.getAllPropertiesMap()
             .entrySet()
             .stream()
             .filter(p -> p.getKey().startsWith(propPrefix))
@@ -61,7 +62,7 @@ public class MCRClassificationAndSetMapper {
     }
 
     private static String getSetNameFromDeprecatedProperty(String prefix, String classid) {
-        return MCRConfiguration2.getPropertiesMap()
+        return MCRConfigurationBase.getAllPropertiesMap()
             .entrySet()
             .stream()
             .filter(p -> p.getKey().startsWith(prefix + PROP_SUFFIX))

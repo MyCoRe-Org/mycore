@@ -21,6 +21,7 @@ package org.mycore.ocfl.repository;
 import java.io.IOException;
 
 import org.mycore.common.config.annotation.MCRPostConstruction;
+import org.mycore.common.config.annotation.MCRPostConstruction.Value;
 import org.mycore.ocfl.layout.MCRStorageLayoutConfig;
 import org.mycore.ocfl.layout.MCRStorageLayoutExtension;
 
@@ -36,10 +37,10 @@ import jakarta.inject.Singleton;
 public class MCROCFLMCRRepositoryProvider extends MCROCFLLocalRepositoryProvider {
 
     @Override
-    @MCRPostConstruction
-    public void init(String prop) throws IOException {
+    @MCRPostConstruction(Value.TRAILING_NAME)
+    public void init(String id) throws IOException {
         OcflExtensionRegistry.register(MCRStorageLayoutExtension.EXTENSION_NAME, MCRStorageLayoutExtension.class);
-        super.init(prop);
+        super.init(id);
     }
 
     @Override

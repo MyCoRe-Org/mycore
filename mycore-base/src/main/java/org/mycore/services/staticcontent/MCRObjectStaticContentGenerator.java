@@ -34,9 +34,11 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRPostConstruction;
+import org.mycore.common.config.annotation.MCRPostConstruction.Value;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
@@ -97,7 +99,7 @@ public class MCRObjectStaticContentGenerator {
     }
 
     public static List<String> getContentGenerators() {
-        return MCRConfiguration2.getPropertiesMap()
+        return MCRConfigurationBase.getAllPropertiesMap()
             .keySet()
             .stream()
             .filter(k -> k.startsWith(CONFIG_ID_PREFIX))
@@ -191,9 +193,9 @@ public class MCRObjectStaticContentGenerator {
 
         private String configId;
 
-        @MCRPostConstruction
-        public void setConfigId(String property) {
-            this.configId = property.substring(property.lastIndexOf('.') + 1 );
+        @MCRPostConstruction(Value.TRAILING_NAME)
+        public void setConfigId(String configId) {
+            this.configId = configId;
         }
 
         @Override

@@ -48,6 +48,7 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRTransactionManager;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.events.MCRStartupHandler;
 import org.mycore.common.xsl.uriresolver.MCRURIResolver;
@@ -211,7 +212,7 @@ public class MCRCommandLineInterface {
      * @return expanded command
      */
     public static String expandCommand(final String command) {
-        StringSubstitutor strSubstitutor = new StringSubstitutor(MCRConfiguration2.getPropertiesMap());
+        StringSubstitutor strSubstitutor = new StringSubstitutor(MCRConfigurationBase.getAllPropertiesMap());
         String expandedCommand = strSubstitutor.replace(command);
         if (!expandedCommand.equals(command)) {
             output(command + " --> " + expandedCommand);

@@ -146,18 +146,6 @@ public class MCRRestObjects {
 
     public static final String PARAM_AFTER_ID = "after_id";
 
-    /**
-     * @deprecated Use {@link org.mycore.restapi.MCRRestConstants#PARAM_OFFSET} instead.
-     */
-    @Deprecated(forRemoval = true)
-    public static final String PARAM_OFFSET = "offset";
-
-    /**
-     * @deprecated Use {@link org.mycore.restapi.MCRRestConstants#PARAM_LIMIT} instead.
-     */
-    @Deprecated(forRemoval = true)
-    public static final String PARAM_LIMIT = "limit";
-
     public static final String PARAM_TYPE = "type";
 
     public static final String PARAM_PROJECT = "project";
@@ -187,12 +175,6 @@ public class MCRRestObjects {
     public static final String PARAM_SORT_ORDER = "sort_order";
 
     public static final String PARAM_SORT_BY = "sort_by";
-
-    /**
-     * @deprecated Use {@link org.mycore.restapi.MCRRestConstants#HEADER_X_TOTAL_COUNT} instead.
-     */
-    @Deprecated(forRemoval = true)
-    public static final String HEADER_X_TOTAL_COUNT = "X-Total-Count";
 
     public static final List<MCRThumbnailGenerator> THUMBNAIL_GENERATORS = MCRConfiguration2
         .instantiateClasses(MCRThumbnailGenerator.class, "MCR.Media.Thumbnail.Generators")

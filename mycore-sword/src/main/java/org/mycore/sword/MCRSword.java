@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.sword.application.MCRSwordCollectionProvider;
 import org.mycore.sword.application.MCRSwordLifecycleConfiguration;
 
@@ -57,7 +58,7 @@ public class MCRSword {
         workspaceCollectionTable = new ConcurrentHashMap<>();
         LOGGER.info("--- INITIALIZE SWORD SERVER ---");
         final int lengthOfPropertyPrefix = MCRSwordConstants.MCR_SWORD_COLLECTION_PREFIX.length();
-        MCRConfiguration2.getPropertiesMap()
+        MCRConfigurationBase.getAllPropertiesMap()
             .keySet()
             .stream()
             .filter(prop -> prop.startsWith(MCRSwordConstants.MCR_SWORD_COLLECTION_PREFIX))

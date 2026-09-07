@@ -18,21 +18,15 @@
 
 package org.mycore.iiif.presentation.impl;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.iiif.presentation.model.basic.MCRIIIFManifest;
 
 public abstract class MCRIIIFPresentationImpl {
 
     private static final String MCR_IIIF_PRESENTATION_CONFIG_PREFIX = "MCR.IIIFPresentation.";
 
-    private static final Map<String, MCRIIIFPresentationImpl> IMPLHOLDER = new HashMap<>();
+    protected static final String DEFAULT_PROPERTY_PREFIX = "MCR.Default.IIIFPresentation.";
 
     private final String implName;
 
@@ -40,44 +34,19 @@ public abstract class MCRIIIFPresentationImpl {
         this.implName = implName;
     }
 
-    public static synchronized MCRIIIFPresentationImpl obtainInstance(String implNameParameter) {
-        String implName = (implNameParameter == null || implNameParameter.isBlank())
+    public static MCRIIIFPresentationImpl obtainInstance(String implName) {
+
+        String checkedImplName = (implName == null || implName.isBlank())
             ? MCRConfiguration2.getStringOrThrow("MCR.IIIFPresentation.Default")
-            : implNameParameter;
+            : implName;
 
-        if (IMPLHOLDER.containsKey(implName)) {
-            return IMPLHOLDER.get(implName);
-        }
+        String implPropertyName = MCR_IIIF_PRESENTATION_CONFIG_PREFIX + checkedImplName;
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRIIIFPresentationImpl.class, implPropertyName);
 
-        String classPropertyName = MCR_IIIF_PRESENTATION_CONFIG_PREFIX + implName;
-        Class<? extends MCRIIIFPresentationImpl> classObject = MCRConfiguration2.<MCRIIIFPresentationImpl>getClass(
-            classPropertyName)
-            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(classPropertyName));
-
-        try {
-            Constructor<? extends MCRIIIFPresentationImpl> constructor = classObject.getConstructor(String.class);
-            MCRIIIFPresentationImpl presentationImpl = constructor.newInstance(implName);
-            IMPLHOLDER.put(implName, presentationImpl);
-            return presentationImpl;
-        } catch (NoSuchMethodException e) {
-            throw new MCRConfigurationException(
-                "Configurated class (" + classObject.getName() + ") needs a string constructor: " + classPropertyName,
-                e);
-        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
-            throw new MCRException(e);
-        }
     }
 
     public String getImplName() {
         return implName;
-    }
-
-    protected final Map<String, String> getProperties() {
-        return MCRConfiguration2.getSubPropertiesMap(getConfigPrefix());
-    }
-
-    private String getConfigPrefix() {
-        return MCR_IIIF_PRESENTATION_CONFIG_PREFIX + implName + ".";
     }
 
     /**
@@ -94,5 +63,16 @@ public abstract class MCRIIIFPresentationImpl {
     }
 
     public abstract MCRIIIFManifest getManifest(String id);
+
+    public static abstract class FactoryBase {
+
+        public String implName;
+
+        @MCRPostConstruction(MCRPostConstruction.Value.TRAILING_NAME)
+        public void setImplName(String implName) {
+            this.implName = implName;
+        }
+
+    }
 
 }

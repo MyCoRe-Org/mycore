@@ -22,7 +22,9 @@ import java.io.File;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Map;
@@ -106,6 +108,20 @@ public class MCRFrontendUtil {
     /** The IP addresses of trusted web proxies */
     protected static final Set<String> TRUSTED_PROXIES = getTrustedProxies();
 
+    protected static final String LOGIN_PATH;
+
+    static {
+        String loginPath = MCRConfiguration2.getStringOrThrow("MCR.Frontend.LoginPath");
+        if (loginPath.startsWith("/")) {
+            loginPath = loginPath.substring(1);
+        }
+        if (loginPath.contains("?")) {
+            LOGIN_PATH = loginPath + "&url=";
+        } else {
+            LOGIN_PATH = loginPath + "?url=";
+        }
+    }
+
     /** returns the base URL of the mycore system */
     public static String getBaseURL() {
         if (MCRSessionMgr.hasCurrentSession()) {
@@ -117,6 +133,14 @@ public class MCRFrontendUtil {
             }
         }
         return baseUrl;
+    }
+
+    public static String getLoginURL() {
+        return getBaseURL() + LOGIN_PATH;
+    }
+
+    public static String getLoginURL(String redirectionUrl) {
+        return getLoginURL() + URLEncoder.encode(redirectionUrl, StandardCharsets.UTF_8);
     }
 
     public static String getHostIP() {

@@ -87,7 +87,7 @@
           <xsl:otherwise>classificationBrowser</xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
-      <xsl:variable name="loadingImage" select="mcrproperty:one('MCR.Ajax.LoadingImage')"/>
+      <xsl:variable name="loadingImage" select="mcrproperty:get('MCR.Ajax.LoadingImage')"/>
 
       <!-- jQuery -->
       <script type="text/javascript">

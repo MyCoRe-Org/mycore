@@ -28,7 +28,7 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
-import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.Neo4JNode;
 import org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.Neo4JRelation;
@@ -46,7 +46,7 @@ public class MCRNeo4JMetaXMLParser extends MCRNeo4JAbstractDataModelParser {
     private static final String FILTER_CLASS_KEY = "MCRMetaXML.Class";
 
     public MCRNeo4JMetaXMLParser() {
-        Map<String, String> propertiesMap = MCRConfiguration2.getSubPropertiesMap(NEO4J_CONFIG_PREFIX + "Parser.");
+        Map<String, String> propertiesMap = MCRConfigurationBase.getSubpropertiesMap(NEO4J_CONFIG_PREFIX + "Parser.");
         parserMap = getMCRNeo4JInstantiatedParserMap(propertiesMap, FILTER_CLASS_KEY);
     }
 

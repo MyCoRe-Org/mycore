@@ -20,10 +20,10 @@ package org.mycore.pi;
 
 import java.util.Optional;
 
-public class MCRMockIdentifierParser implements MCRPIParser<MCRPersistentIdentifier> {
+public class MCRMockIdentifierParser implements MCRPIParser<MCRMockIdentifier> {
 
     @Override
-    public Optional<MCRPersistentIdentifier> parse(String identifier) {
+    public Optional<MCRMockIdentifier> parse(String identifier) {
         if (!identifier.startsWith(MCRMockIdentifier.MOCK_SCHEME)) {
             return Optional.empty();
         }

@@ -24,7 +24,7 @@ import java.util.Properties;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 
-import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationBase;
 
 public class MCRXSLTransformerUtils {
 
@@ -33,8 +33,8 @@ public class MCRXSLTransformerUtils {
     private static final Map<String, String> METHOD_EXTENSIONS;
 
     static {
-        MIME_TYPE_EXTENSIONS = MCRConfiguration2.getSubPropertiesMap("MCR.XMLUtils.FileExtension.MimeType.");
-        METHOD_EXTENSIONS = MCRConfiguration2.getSubPropertiesMap("MCR.XMLUtils.FileExtension.Method.");
+        MIME_TYPE_EXTENSIONS = MCRConfigurationBase.getSubpropertiesMap("MCR.XMLUtils.FileExtension.MimeType.");
+        METHOD_EXTENSIONS = MCRConfigurationBase.getSubpropertiesMap("MCR.XMLUtils.FileExtension.Method.");
     }
 
     /**

@@ -38,6 +38,7 @@ import org.mycore.pi.MCRPIManager;
 import org.mycore.pi.MCRPIRegistrationInfo;
 import org.mycore.pi.MCRPIUtils;
 import org.mycore.pi.backend.MCRPI;
+import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.pi.urn.MCRDNBURN;
 import org.mycore.test.MCRMetadataExtension;
 import org.mycore.test.MyCoReTest;
@@ -50,8 +51,7 @@ import org.mycore.test.MyCoReTest;
 @MyCoReTest
 @ExtendWith(MCRMetadataExtension.class)
 @MCRTestConfiguration(properties = {
-    @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true"),
-    @MCRTestProperty(key = "MCR.PI.Generator.testGenerator.Namespace", string = "frontend-")
+    @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true")
 })
 public class MCRURNGranularRESTRegistrationTaskTest {
     private static final String countRegistered = "select count(u) from MCRPI u "
@@ -64,10 +64,9 @@ public class MCRURNGranularRESTRegistrationTaskTest {
 
     @Disabled
     @Test
-    public void run()  {
-        MCRPI urn1 = generateMCRPI(randomFilename(), countRegistered);
-        MCREntityManagerProvider.getCurrentEntityManager()
-            .persist(urn1);
+    public void run() throws MCRPersistentIdentifierException {
+        MCRPI urn1 = generateMCRPI(randomFilename(), countRegistered, "frontend-");
+        MCREntityManagerProvider.getCurrentEntityManager().persist(urn1);
 
         assertNull(urn1.getRegistered(), "Registered date should be null.");
 

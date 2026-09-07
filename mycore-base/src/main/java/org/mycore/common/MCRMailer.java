@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -781,21 +780,6 @@ public class MCRMailer extends MCRServlet {
                 return subtype;
             }
 
-            /**
-             * @deprecated use {@link #toString()} instead.
-             */
-            @Deprecated(forRemoval = true)
-            public String value() {
-                return toString().toLowerCase(Locale.ROOT);
-            }
-
-            /**
-             * @deprecated use {@link #valueOf(String)} instead.
-             */
-            @Deprecated(forRemoval = true)
-            public static MessageType fromValue(String value) {
-                return MessageType.valueOf(value.toUpperCase(Locale.ROOT));
-            }
         }
     }
 
