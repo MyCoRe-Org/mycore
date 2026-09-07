@@ -196,7 +196,7 @@ public class MCRUserService {
         } catch (MCRException e) {
             throw new MCRUserValidationException(user.getUserName(), e.getMessage(), e);
         }
-        MCRUser fresh = getUserOrThrow(updated.getUserName());
+        MCRUser fresh = getUserOrThrow(updated.getUserID());
         return userDtoMapper.toDetail(fresh, getOwns(fresh));
     }
 
