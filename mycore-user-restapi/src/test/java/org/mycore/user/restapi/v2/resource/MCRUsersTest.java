@@ -41,6 +41,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mycore.restapi.MCRRestConstants;
 import org.mycore.test.MyCoReTest;
 import org.mycore.user.restapi.exception.MCRUserNoLocalPasswordException;
+import org.mycore.user.restapi.exception.MCRUserValidationException;
 import org.mycore.user.restapi.v2.MCRUserService;
 import org.mycore.user.restapi.v2.dto.MCRCreateUserRequest;
 import org.mycore.user.restapi.v2.dto.MCRSetPasswordRequest;
@@ -101,6 +102,18 @@ class MCRUsersTest {
 
         assertEquals(201, response.getStatus());
         assertTrue(response.getLocation().toString().endsWith("/alice"));
+    }
+
+    @Test
+    void createUserShouldThrowBadRequestWhenValidationFails() {
+        // Was previously untested at the resource layer for any validation failure; the
+        // service layer is mocked here, so the actual reason for the exception is
+        // irrelevant - this only proves createUser() maps MCRUserValidationException to 400.
+        MCRCreateUserRequest dto = buildCreateUserRequest("me");
+        doThrow(new MCRUserValidationException("id 'me' is reserved and cannot be used"))
+            .when(userService).createUser(dto);
+
+        assertThrows(BadRequestException.class, () -> resource.createUser(dto));
     }
 
     @Test
