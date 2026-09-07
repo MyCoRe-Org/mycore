@@ -46,6 +46,7 @@ import org.mycore.user.restapi.exception.MCRUserValidationException;
 import org.mycore.user.restapi.v2.MCRUserObjectMapper;
 import org.mycore.user.restapi.v2.MCRUserService;
 import org.mycore.user.restapi.v2.dto.MCRCreateUserRequest;
+import org.mycore.user.restapi.v2.dto.MCRSetPasswordRequest;
 import org.mycore.user.restapi.v2.dto.MCRUpdateUserRequest;
 import org.mycore.user.restapi.v2.dto.MCRUserDetail;
 import org.mycore.user.restapi.v2.dto.MCRUserStandard;
@@ -469,6 +470,56 @@ public class MCRUsers {
             throw new BadRequestException(e);
         } catch (JsonProcessingException | JsonPatchException e) {
             throw new BadRequestException("Cannot patch user: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Sets the password of an existing user.
+     *
+     * @param userId the ID of the user whose password should be set
+     * @param setPasswordDto the request body containing the new password
+     * @return 204 No Content
+     * @throws NotFoundException if no user with the given ID exists
+     * @throws BadRequestException if the new password is invalid
+     */
+    @Operation(
+        summary = "Sets the password of an existing user",
+        security = @SecurityRequirement(name = PERMISSION_MANAGE_USER),
+        requestBody = @RequestBody(
+            required = true,
+            content = @Content(
+                mediaType = MediaType.APPLICATION_JSON,
+                schema = @Schema(implementation = MCRSetPasswordRequest.class)
+            )
+        ),
+        responses = {
+            @ApiResponse(
+                responseCode = NOT_FOUND,
+                content = @Content(mediaType = MediaType.TEXT_PLAIN),
+                description = DESC_USER_NOT_FOUND
+            ),
+            @ApiResponse(
+                responseCode = BAD_REQUEST,
+                content = @Content(mediaType = MediaType.TEXT_PLAIN),
+                description = DESC_INVALID_BODY_CONTENT
+            ),
+            @ApiResponse(responseCode = NO_CONTENT, description = "Password successfully set"),
+        },
+        tags = TAG_MCR_USER
+    )
+    @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/{" + PARAM_USER_ID + "}/password")
+    @MCRRequireTransaction
+    @MCRRestRequiredPermission(PERMISSION_MANAGE_USER)
+    public Response setUserPassword(@PathParam(PARAM_USER_ID) String userId, MCRSetPasswordRequest setPasswordDto) {
+        try {
+            userService.setPassword(userId, setPasswordDto);
+            return Response.noContent().build();
+        } catch (MCRUserNotFoundException e) {
+            throw new NotFoundException(e);
+        } catch (MCRUserValidationException | MCRUserNoLocalPasswordException e) {
+            throw new BadRequestException(e);
         }
     }
 

@@ -44,6 +44,7 @@ import org.mycore.user.restapi.exception.MCRUserNoLocalPasswordException;
 import org.mycore.user.restapi.exception.MCRUserNotFoundException;
 import org.mycore.user.restapi.exception.MCRUserValidationException;
 import org.mycore.user.restapi.v2.dto.MCRCreateUserRequest;
+import org.mycore.user.restapi.v2.dto.MCRSetPasswordRequest;
 import org.mycore.user.restapi.v2.dto.MCRUpdateUserRequest;
 import org.mycore.user.restapi.v2.dto.MCRUserDetail;
 import org.mycore.user.restapi.v2.dto.MCRUserStandard;
@@ -377,6 +378,83 @@ class MCRUserServiceTest {
             assertThrows(MCRUserValidationException.class, () -> userService.updateUser("alice", request));
 
             mgr.verify(() -> MCRUserManager.updateUser(updated));
+        }
+    }
+
+    @Test
+    void setPasswordShouldSetNewPassword() {
+        MCRUser user = mock(MCRUser.class);
+        MCRRealm localRealm = mock(MCRRealm.class);
+        when(user.getRealm()).thenReturn(localRealm);
+
+        try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class);
+            MockedStatic<MCRRealmFactory> realmFactory = mockStatic(MCRRealmFactory.class)) {
+            realmFactory.when(MCRRealmFactory::getLocalRealm).thenReturn(localRealm);
+            mgr.when(() -> MCRUserManager.getUser("alice")).thenReturn(user);
+
+            userService.setPassword("alice", new MCRSetPasswordRequest("new-secret"));
+
+            mgr.verify(() -> MCRUserManager.setPassword(user, "new-secret"));
+        }
+    }
+
+    @Test
+    void setPasswordShouldThrowNoLocalPasswordWhenUserNotInLocalRealm() {
+        MCRUser user = mock(MCRUser.class);
+        MCRRealm localRealm = mock(MCRRealm.class);
+        MCRRealm externalRealm = mock(MCRRealm.class);
+        when(user.getRealm()).thenReturn(externalRealm);
+        when(user.getUserID()).thenReturn("bob@shibboleth");
+
+        try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class);
+            MockedStatic<MCRRealmFactory> realmFactory = mockStatic(MCRRealmFactory.class)) {
+            realmFactory.when(MCRRealmFactory::getLocalRealm).thenReturn(localRealm);
+            mgr.when(() -> MCRUserManager.getUser("bob@shibboleth")).thenReturn(user);
+
+            assertThrows(MCRUserNoLocalPasswordException.class,
+                () -> userService.setPassword("bob@shibboleth", new MCRSetPasswordRequest("new-secret")));
+
+            mgr.verify(() -> MCRUserManager.setPassword(any(), any()), never());
+        }
+    }
+
+    @Test
+    void setPasswordShouldThrowNotFoundWhenUserMissing() {
+        try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class)) {
+            mgr.when(() -> MCRUserManager.getUser("ghost")).thenReturn(null);
+
+            assertThrows(MCRUserNotFoundException.class,
+                () -> userService.setPassword("ghost", new MCRSetPasswordRequest("new-secret")));
+
+            mgr.verify(() -> MCRUserManager.setPassword(any(), any()), never());
+        }
+    }
+
+    @Test
+    void setPasswordShouldThrowValidationExceptionWhenPasswordBlank() {
+        try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class)) {
+            assertThrows(MCRUserValidationException.class,
+                () -> userService.setPassword("alice", new MCRSetPasswordRequest(" ")));
+
+            mgr.verify(() -> MCRUserManager.getUser(any()), never());
+        }
+    }
+
+    @Test
+    void setPasswordShouldThrowValidationExceptionWhenMCRExceptionOccurs() {
+        MCRUser user = mock(MCRUser.class);
+        MCRRealm localRealm = mock(MCRRealm.class);
+        when(user.getRealm()).thenReturn(localRealm);
+
+        try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class);
+            MockedStatic<MCRRealmFactory> realmFactory = mockStatic(MCRRealmFactory.class)) {
+            realmFactory.when(MCRRealmFactory::getLocalRealm).thenReturn(localRealm);
+            mgr.when(() -> MCRUserManager.getUser("alice")).thenReturn(user);
+            mgr.when(() -> MCRUserManager.setPassword(user, "new-secret"))
+                .thenThrow(new MCRException("not allowed"));
+
+            assertThrows(MCRUserValidationException.class,
+                () -> userService.setPassword("alice", new MCRSetPasswordRequest("new-secret")));
         }
     }
 

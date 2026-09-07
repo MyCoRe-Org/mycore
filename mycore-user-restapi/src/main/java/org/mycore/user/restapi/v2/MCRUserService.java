@@ -28,6 +28,7 @@ import org.mycore.user.restapi.exception.MCRUserNoLocalPasswordException;
 import org.mycore.user.restapi.exception.MCRUserNotFoundException;
 import org.mycore.user.restapi.exception.MCRUserValidationException;
 import org.mycore.user.restapi.v2.dto.MCRCreateUserRequest;
+import org.mycore.user.restapi.v2.dto.MCRSetPasswordRequest;
 import org.mycore.user.restapi.v2.dto.MCRUpdateUserRequest;
 import org.mycore.user.restapi.v2.dto.MCRUserDetail;
 import org.mycore.user.restapi.v2.dto.MCRUserStandard;
@@ -198,6 +199,31 @@ public class MCRUserService {
         }
         MCRUser fresh = getUserOrThrow(updated.getUserID());
         return userDtoMapper.toDetail(fresh, getOwns(fresh));
+    }
+
+    /**
+     * Sets the password of the user with the given ID.
+     *
+     * <p>This only works for users in the local realm. Setting a password for a user
+     * authenticated via an external realm (LDAP, Shibboleth, CAS, ...) would silently do
+     * nothing useful, since that realm's login flow never consults it - and would poison the
+     * signal {@link #changePassword} relies on to detect that exact situation.
+     *
+     * @param userId the ID of the user whose password should be set
+     * @param setPasswordRequest the request containing the new password
+     * @throws MCRUserNotFoundException if no user with the given ID exists
+     * @throws MCRUserNoLocalPasswordException if the user is not in the local realm
+     * @throws MCRUserValidationException if the new password is invalid
+     */
+    public void setPassword(String userId, MCRSetPasswordRequest setPasswordRequest) {
+        validatePassword(setPasswordRequest.newPassword());
+        MCRUser user = getUserOrThrow(userId);
+        requireLocalRealm(user);
+        try {
+            MCRUserManager.setPassword(user, setPasswordRequest.newPassword());
+        } catch (MCRException e) {
+            throw new MCRUserValidationException(userId, e.getMessage(), e);
+        }
     }
 
     /**
