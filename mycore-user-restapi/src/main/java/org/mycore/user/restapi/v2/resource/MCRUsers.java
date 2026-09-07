@@ -40,6 +40,7 @@ import org.mycore.restapi.converter.MCRDetailLevel;
 import org.mycore.restapi.v2.MCRRestSchemaType;
 import org.mycore.restapi.v2.annotation.MCRRestRequiredPermission;
 import org.mycore.user.restapi.exception.MCRUserAlreadyExistsException;
+import org.mycore.user.restapi.exception.MCRUserNoLocalPasswordException;
 import org.mycore.user.restapi.exception.MCRUserNotFoundException;
 import org.mycore.user.restapi.exception.MCRUserValidationException;
 import org.mycore.user.restapi.v2.MCRUserObjectMapper;
@@ -369,7 +370,8 @@ public class MCRUsers {
      * @param updateUserDto the request body containing the updated user data
      * @return 204 No Content
      * @throws NotFoundException if no user with the given ID exists
-     * @throws BadRequestException if the user data is invalid
+     * @throws BadRequestException if the user data is invalid, or a password was given and the
+     *         user is not in the local realm
      */
     @Operation(
         summary = "Updates an existing user by ID",
@@ -407,7 +409,7 @@ public class MCRUsers {
             return Response.noContent().build();
         } catch (MCRUserNotFoundException e) {
             throw new NotFoundException(e);
-        } catch (MCRUserValidationException e) {
+        } catch (MCRUserValidationException | MCRUserNoLocalPasswordException e) {
             throw new BadRequestException(e);
         }
     }

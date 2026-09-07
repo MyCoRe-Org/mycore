@@ -19,9 +19,11 @@
 package org.mycore.user.restapi.v2.resource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -38,6 +40,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mycore.restapi.MCRRestConstants;
 import org.mycore.test.MyCoReTest;
+import org.mycore.user.restapi.exception.MCRUserNoLocalPasswordException;
 import org.mycore.user.restapi.v2.MCRUserService;
 import org.mycore.user.restapi.v2.dto.MCRCreateUserRequest;
 import org.mycore.user.restapi.v2.dto.MCRUpdateUserRequest;
@@ -50,6 +53,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.fge.jsonpatch.JsonPatch;
 
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -190,6 +194,15 @@ class MCRUsersTest {
 
         assertEquals(204, response.getStatus());
         verify(userService).updateUser("alice", dto);
+    }
+
+    @Test
+    void updateUserShouldThrowBadRequestWhenPasswordSetForNonLocalRealmUser() {
+        MCRUpdateUserRequest dto = buildUpdateUserRequest();
+        doThrow(new MCRUserNoLocalPasswordException("bob@shibboleth"))
+            .when(userService).updateUser("bob@shibboleth", dto);
+
+        assertThrows(BadRequestException.class, () -> resource.updateUser("bob@shibboleth", dto));
     }
 
     @Test
