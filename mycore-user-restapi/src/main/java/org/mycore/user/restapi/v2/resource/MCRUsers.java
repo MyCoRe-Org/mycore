@@ -28,7 +28,6 @@ import static org.mycore.restapi.v2.MCRRestStatusCode.OK;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.mycore.frontend.jersey.MCRCacheControl;
@@ -37,6 +36,7 @@ import org.mycore.restapi.annotations.MCRAccessControlExposeHeaders;
 import org.mycore.restapi.annotations.MCRApiDraft;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.mycore.restapi.converter.MCRDetailLevel;
+import org.mycore.restapi.v2.MCRDetailLevelResolver;
 import org.mycore.restapi.v2.MCRRestSchemaType;
 import org.mycore.restapi.v2.annotation.MCRRestRequiredPermission;
 import org.mycore.user.restapi.exception.MCRUserAlreadyExistsException;
@@ -119,10 +119,6 @@ public class MCRUsers {
     private static final String TAG_MCR_USER = "mcr_user";
     private static final String DESC_USER_NOT_FOUND = "User not found";
     private static final String DESC_INVALID_BODY_CONTENT = "Invalid body";
-    private static final String DETAIL_LEVEL_DESCRIPTION =
-        "Controls the level of detail in the response via the detail parameter. "
-            + "Supported values: SUMMARY, NORMAL, DETAILED. "
-            + "Example: application/json; detail=SUMMARY";
 
     @Context
     private UriInfo uriInfo;
@@ -215,8 +211,8 @@ public class MCRUsers {
             @Parameter(
                 name = "Accept",
                 in = ParameterIn.HEADER,
-                description = DETAIL_LEVEL_DESCRIPTION,
-                example = "application/json; detail=SUMMARY",
+                description = MCRDetailLevelResolver.DETAIL_LEVEL_DESCRIPTION,
+                example = MCRDetailLevelResolver.DETAIL_LEVEL_EXAMPLE,
                 schema = @Schema(type = MCRRestSchemaType.STRING)
             )
         },
@@ -251,7 +247,7 @@ public class MCRUsers {
     @MCRRestRequiredPermission(PERMISSION_MANAGE_USER)
     public Response getUser(@PathParam(PARAM_USER_ID) String userId) {
         try {
-            return switch (getDetailLevel()) {
+            return switch (MCRDetailLevelResolver.resolve(request)) {
                 case SUMMARY -> Response.ok(userService.getUserSummary(userId)).build();
                 case DETAILED -> Response.ok(userService.getUserDetail(userId)).build();
                 default -> Response.ok(userService.getUserStandard(userId)).build();
@@ -280,8 +276,8 @@ public class MCRUsers {
             @Parameter(
                 name = "Accept",
                 in = ParameterIn.HEADER,
-                description = DETAIL_LEVEL_DESCRIPTION,
-                example = "application/json; detail=SUMMARY",
+                description = MCRDetailLevelResolver.DETAIL_LEVEL_DESCRIPTION,
+                example = MCRDetailLevelResolver.DETAIL_LEVEL_EXAMPLE,
                 schema = @Schema(type = MCRRestSchemaType.STRING)
             )
         },
@@ -356,7 +352,7 @@ public class MCRUsers {
         MCRUserService.MCRUserFilter filter
             = new MCRUserService.MCRUserFilter(idPattern, realm, namePattern, mailPattern);
 
-        return switch (getDetailLevel()) {
+        return switch (MCRDetailLevelResolver.resolve(request)) {
             case SUMMARY -> pageResponse(userService.listSummary(filter, offset, limit));
             case DETAILED -> pageResponse(userService.listDetail(filter, offset, limit));
             default -> pageResponse(userService.listStandard(filter, offset, limit));
@@ -513,23 +509,6 @@ public class MCRUsers {
         return Response.ok(page.users())
             .header(MCRRestConstants.HEADER_X_TOTAL_COUNT, page.total())
             .build();
-    }
-
-    // TODO move to MCRRestUtils?
-    // TODO case-sensitive?
-    private MCRDetailLevel getDetailLevel() {
-        Optional<String> detailLevelOptional = request.getAcceptableMediaTypes().stream()
-            .flatMap(m -> m.getParameters().entrySet().stream()
-                .filter(e -> MCRDetailLevel.MEDIA_TYPE_PARAMETER.equals(e.getKey()))).map(Map.Entry::getValue)
-            .findFirst();
-        if (detailLevelOptional.isEmpty()) {
-            return MCRDetailLevel.NORMAL;
-        }
-        try {
-            return MCRDetailLevel.valueOf(detailLevelOptional.get());
-        } catch (IllegalArgumentException e) {
-            throw new BadRequestException("Unknown detail level: " + detailLevelOptional.get(), e);
-        }
     }
 
     /**
