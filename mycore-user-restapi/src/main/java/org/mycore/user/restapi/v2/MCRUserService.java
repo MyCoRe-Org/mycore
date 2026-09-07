@@ -27,8 +27,11 @@ import org.mycore.user.restapi.exception.MCRUserAlreadyExistsException;
 import org.mycore.user.restapi.exception.MCRUserNoLocalPasswordException;
 import org.mycore.user.restapi.exception.MCRUserNotFoundException;
 import org.mycore.user.restapi.exception.MCRUserValidationException;
+import org.mycore.user.restapi.exception.MCRUserWrongPasswordException;
+import org.mycore.user.restapi.v2.dto.MCRChangePasswordRequest;
 import org.mycore.user.restapi.v2.dto.MCRCreateUserRequest;
 import org.mycore.user.restapi.v2.dto.MCRSetPasswordRequest;
+import org.mycore.user.restapi.v2.dto.MCRUpdateUserProfileRequest;
 import org.mycore.user.restapi.v2.dto.MCRUpdateUserRequest;
 import org.mycore.user.restapi.v2.dto.MCRUserDetail;
 import org.mycore.user.restapi.v2.dto.MCRUserStandard;
@@ -40,8 +43,8 @@ import org.mycore.user2.MCRUserManager;
 
 /**
  * Service for user management operations in the REST layer.
- *
- * <p>Provides CRUD operations for users and supports different levels of detail
+ * <p>
+ * Provides CRUD operations for users and supports different levels of detail
  * via separate view types ({@link MCRUserStandard}, {@link MCRUserDetail}, {@link MCRUserSummary}).
  */
 public class MCRUserService {
@@ -169,8 +172,8 @@ public class MCRUserService {
 
     /**
      * Updates the user with the given ID.
-     *
-     * <p>If {@code updateUserRequest} carries a password, this only works for users in the
+     * <p>
+     * If {@code updateUserRequest} carries a password, this only works for users in the
      * local realm.
      *
      * @param userId the ID of the user to update
@@ -202,9 +205,33 @@ public class MCRUserService {
     }
 
     /**
-     * Sets the password of the user with the given ID.
+     * Updates the profile of the user with the given ID.
      *
-     * <p>This only works for users in the local realm. Setting a password for a user
+     * @param userId the ID of the user to update
+     * @param updateUserRequest the request containing the updated profile data
+     * @return the updated user as a detailed view
+     * @throws MCRUserNotFoundException if no user with the given ID exists
+     * @throws MCRUserValidationException if the updated data is invalid
+     * @see MCRUpdateUserProfileRequest
+     */
+    public MCRUserDetail updateUser(String userId, MCRUpdateUserProfileRequest updateUserRequest) {
+        validateName(updateUserRequest.name());
+        validateEmail(updateUserRequest.email());
+        MCRUser user = getUserOrThrow(userId);
+        MCRUser updated = userDtoMapper.applyUpdate(user, updateUserRequest);
+        try {
+            MCRUserManager.updateUser(updated);
+        } catch (MCRException e) {
+            throw new MCRUserValidationException(userId, e.getMessage(), e);
+        }
+        MCRUser fresh = getUserOrThrow(updated.getUserID());
+        return userDtoMapper.toDetail(fresh, getOwns(fresh));
+    }
+
+    /**
+     * Sets the password of the user with the given ID.
+     * <p>
+     * This only works for users in the local realm. Setting a password for a user
      * authenticated via an external realm (LDAP, Shibboleth, CAS, ...) would silently do
      * nothing useful, since that realm's login flow never consults it - and would poison the
      * signal {@link #changePassword} relies on to detect that exact situation.
@@ -221,6 +248,36 @@ public class MCRUserService {
         requireLocalRealm(user);
         try {
             MCRUserManager.setPassword(user, setPasswordRequest.newPassword());
+        } catch (MCRException e) {
+            throw new MCRUserValidationException(userId, e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Changes the password of the user with the given ID, verifying the current password first.
+     * <p>
+     * Unlike {@link #setPassword}, this requires proof of the current password rather than
+     * relying on the caller already holding an administrative permission.
+     *
+     * @param userId the ID of the user whose password should be changed
+     * @param changePasswordRequest the request containing the current and new password
+     * @throws MCRUserNotFoundException if no user with the given ID exists
+     * @throws MCRUserNoLocalPasswordException if the user has no locally stored password to
+     *         verify against, e.g. because they are authenticated via an external realm
+     * @throws MCRUserWrongPasswordException if the current password does not match
+     * @throws MCRUserValidationException if the new password is invalid
+     */
+    public void changePassword(String userId, MCRChangePasswordRequest changePasswordRequest) {
+        MCRUser user = getUserOrThrow(userId);
+        if (user.getHashType() == null) {
+            throw new MCRUserNoLocalPasswordException(userId);
+        }
+        if (MCRUserManager.checkPassword(user.getUserName(), changePasswordRequest.oldPassword()) == null) {
+            throw new MCRUserWrongPasswordException(userId);
+        }
+        validatePassword(changePasswordRequest.newPassword());
+        try {
+            MCRUserManager.setPassword(user, changePasswordRequest.newPassword());
         } catch (MCRException e) {
             throw new MCRUserValidationException(userId, e.getMessage(), e);
         }
@@ -296,6 +353,12 @@ public class MCRUserService {
     private static void validatePassword(String password) {
         if (password == null || password.isBlank()) {
             throw new MCRUserValidationException("password is required");
+        }
+    }
+
+    private static void validateName(String name) {
+        if (name == null || name.isBlank()) {
+            throw new MCRUserValidationException("name is required");
         }
     }
 

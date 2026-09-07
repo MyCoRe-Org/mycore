@@ -117,9 +117,9 @@ public class MCRUsers {
     private static final String PARAM_EMAIL = "email";
     private static final String DEFAULT_OFFSET_STR = "0";
     private static final String DEFAULT_LIMIT_STR = "100";
-    private static final String TAG_MCR_USER = "mcr_user";
+    static final String TAG_MCR_USER = "mcr_user";
     private static final String DESC_USER_NOT_FOUND = "User not found";
-    private static final String DESC_INVALID_BODY_CONTENT = "Invalid body";
+    static final String DESC_INVALID_BODY_CONTENT = "Invalid body";
 
     @Context
     private UriInfo uriInfo;
