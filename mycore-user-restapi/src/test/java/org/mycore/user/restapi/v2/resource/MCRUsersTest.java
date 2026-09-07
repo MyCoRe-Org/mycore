@@ -43,6 +43,7 @@ import org.mycore.test.MyCoReTest;
 import org.mycore.user.restapi.exception.MCRUserNoLocalPasswordException;
 import org.mycore.user.restapi.v2.MCRUserService;
 import org.mycore.user.restapi.v2.dto.MCRCreateUserRequest;
+import org.mycore.user.restapi.v2.dto.MCRSetPasswordRequest;
 import org.mycore.user.restapi.v2.dto.MCRUpdateUserRequest;
 import org.mycore.user.restapi.v2.dto.MCRUserDetail;
 import org.mycore.user.restapi.v2.dto.MCRUserStandard;
@@ -230,6 +231,25 @@ class MCRUsersTest {
 
         assertEquals(204, response.getStatus());
         verify(userService).updateUser("alice", state.toUpdateRequest());
+    }
+
+    @Test
+    void setUserPasswordShouldReturn204() {
+        MCRSetPasswordRequest dto = new MCRSetPasswordRequest("new-secret");
+
+        Response response = resource.setUserPassword("alice", dto);
+
+        assertEquals(204, response.getStatus());
+        verify(userService).setPassword("alice", dto);
+    }
+
+    @Test
+    void setUserPasswordShouldThrowBadRequestWhenUserNotInLocalRealm() {
+        MCRSetPasswordRequest dto = new MCRSetPasswordRequest("new-secret");
+        doThrow(new MCRUserNoLocalPasswordException("bob@shibboleth"))
+            .when(userService).setPassword("bob@shibboleth", dto);
+
+        assertThrows(BadRequestException.class, () -> resource.setUserPassword("bob@shibboleth", dto));
     }
 
     @Test
