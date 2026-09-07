@@ -43,8 +43,11 @@ import org.mycore.user.restapi.exception.MCRUserAlreadyExistsException;
 import org.mycore.user.restapi.exception.MCRUserNoLocalPasswordException;
 import org.mycore.user.restapi.exception.MCRUserNotFoundException;
 import org.mycore.user.restapi.exception.MCRUserValidationException;
+import org.mycore.user.restapi.exception.MCRUserWrongPasswordException;
+import org.mycore.user.restapi.v2.dto.MCRChangePasswordRequest;
 import org.mycore.user.restapi.v2.dto.MCRCreateUserRequest;
 import org.mycore.user.restapi.v2.dto.MCRSetPasswordRequest;
+import org.mycore.user.restapi.v2.dto.MCRUpdateUserProfileRequest;
 import org.mycore.user.restapi.v2.dto.MCRUpdateUserRequest;
 import org.mycore.user.restapi.v2.dto.MCRUserDetail;
 import org.mycore.user.restapi.v2.dto.MCRUserStandard;
@@ -382,6 +385,110 @@ class MCRUserServiceTest {
     }
 
     @Test
+    void updateUserWithOwnRequestShouldApplyUpdateAndReturnDetail() {
+        MCRUpdateUserProfileRequest request = new MCRUpdateUserProfileRequest("Alice", "alice@example.com", "hint");
+        MCRUser existing = mock(MCRUser.class);
+        MCRUser updated = mock(MCRUser.class);
+        MCRUserDetail detail = mock(MCRUserDetail.class);
+        List<MCRUser> ownedUsers = List.of();
+
+        try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class)) {
+            mgr.when(() -> MCRUserManager.getUser("alice"))
+                .thenReturn(existing)
+                .thenReturn(updated);
+            when(updated.getUserID()).thenReturn("alice");
+            when(userDtoMapper.applyUpdate(existing, request)).thenReturn(updated);
+            mgr.when(() -> MCRUserManager.listUsers(updated)).thenReturn(ownedUsers);
+            when(userDtoMapper.toDetail(updated, ownedUsers)).thenReturn(detail);
+
+            assertEquals(detail, userService.updateUser("alice", request));
+            mgr.verify(() -> MCRUserManager.updateUser(updated));
+            verify(userDtoMapper).applyUpdate(existing, request);
+        }
+    }
+
+    @Test
+    void updateUserWithOwnRequestShouldRefetchByQualifiedUserIdForNonLocalRealmUser() {
+        // Same regression as updateUserShouldRefetchByQualifiedUserIdForNonLocalRealmUser,
+        // for the self-service overload.
+        MCRUpdateUserProfileRequest request = new MCRUpdateUserProfileRequest("Bob", "bob@example.com", null);
+        MCRUser existing = mock(MCRUser.class);
+        MCRUser updated = mock(MCRUser.class);
+        MCRUserDetail detail = mock(MCRUserDetail.class);
+        List<MCRUser> ownedUsers = List.of();
+
+        when(updated.getUserID()).thenReturn("bob@shibboleth");
+
+        try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class)) {
+            mgr.when(() -> MCRUserManager.getUser("bob@shibboleth"))
+                .thenReturn(existing)
+                .thenReturn(updated);
+            when(userDtoMapper.applyUpdate(existing, request)).thenReturn(updated);
+            mgr.when(() -> MCRUserManager.listUsers(updated)).thenReturn(ownedUsers);
+            when(userDtoMapper.toDetail(updated, ownedUsers)).thenReturn(detail);
+
+            assertEquals(detail, userService.updateUser("bob@shibboleth", request));
+
+            mgr.verify(() -> MCRUserManager.getUser("bob@shibboleth"), times(2));
+            mgr.verify(() -> MCRUserManager.getUser("bob"), never());
+        }
+    }
+
+    @Test
+    void updateUserWithOwnRequestShouldThrowNotFoundWhenUserMissing() {
+        MCRUpdateUserProfileRequest request = new MCRUpdateUserProfileRequest("Ghost", "ghost@example.com", null);
+
+        try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class)) {
+            mgr.when(() -> MCRUserManager.getUser("ghost")).thenReturn(null);
+
+            assertThrows(MCRUserNotFoundException.class, () -> userService.updateUser("ghost", request));
+
+            verifyNoInteractions(userDtoMapper);
+        }
+    }
+
+    @Test
+    void updateUserWithOwnRequestShouldThrowValidationExceptionWhenEmailInvalid() {
+        MCRUpdateUserProfileRequest request = new MCRUpdateUserProfileRequest("Alice", "not-an-email", null);
+
+        try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class)) {
+            assertThrows(MCRUserValidationException.class, () -> userService.updateUser("alice", request));
+
+            mgr.verify(() -> MCRUserManager.getUser(any()), never());
+        }
+    }
+
+    @Test
+    void updateUserWithOwnRequestShouldThrowValidationExceptionWhenNameBlank() {
+        // MCRUpdateUserProfileRequest documents name as required (unlike passwordHint, which
+        // may be null); a blank name must not silently wipe the existing real name.
+        MCRUpdateUserProfileRequest request = new MCRUpdateUserProfileRequest(" ", "alice@example.com", null);
+
+        try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class)) {
+            assertThrows(MCRUserValidationException.class, () -> userService.updateUser("alice", request));
+
+            mgr.verify(() -> MCRUserManager.getUser(any()), never());
+        }
+    }
+
+    @Test
+    void updateUserWithOwnRequestShouldThrowValidationExceptionWhenMCRExceptionOccurs() {
+        MCRUpdateUserProfileRequest request = new MCRUpdateUserProfileRequest("Alice", "alice@example.com", null);
+        MCRUser existing = mock(MCRUser.class);
+        MCRUser updated = mock(MCRUser.class);
+
+        try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class)) {
+            mgr.when(() -> MCRUserManager.getUser("alice")).thenReturn(existing);
+            when(userDtoMapper.applyUpdate(existing, request)).thenReturn(updated);
+            mgr.when(() -> MCRUserManager.updateUser(updated)).thenThrow(new MCRException("bad data"));
+
+            assertThrows(MCRUserValidationException.class, () -> userService.updateUser("alice", request));
+
+            mgr.verify(() -> MCRUserManager.updateUser(updated));
+        }
+    }
+
+    @Test
     void setPasswordShouldSetNewPassword() {
         MCRUser user = mock(MCRUser.class);
         MCRRealm localRealm = mock(MCRRealm.class);
@@ -455,6 +562,65 @@ class MCRUserServiceTest {
 
             assertThrows(MCRUserValidationException.class,
                 () -> userService.setPassword("alice", new MCRSetPasswordRequest("new-secret")));
+        }
+    }
+
+    @Test
+    void changePasswordShouldSucceedWhenOldPasswordCorrect() {
+        MCRUser user = mock(MCRUser.class);
+        when(user.getUserName()).thenReturn("alice");
+        when(user.getHashType()).thenReturn("sha256");
+
+        try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class)) {
+            mgr.when(() -> MCRUserManager.getUser("alice")).thenReturn(user);
+            mgr.when(() -> MCRUserManager.checkPassword("alice", "old-secret")).thenReturn(user);
+
+            userService.changePassword("alice", new MCRChangePasswordRequest("old-secret", "new-secret"));
+
+            mgr.verify(() -> MCRUserManager.setPassword(user, "new-secret"));
+        }
+    }
+
+    @Test
+    void changePasswordShouldThrowWrongPasswordWhenOldPasswordIncorrect() {
+        MCRUser user = mock(MCRUser.class);
+        when(user.getUserName()).thenReturn("alice");
+        when(user.getHashType()).thenReturn("sha256");
+
+        try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class)) {
+            mgr.when(() -> MCRUserManager.getUser("alice")).thenReturn(user);
+            mgr.when(() -> MCRUserManager.checkPassword("alice", "wrong")).thenReturn(null);
+
+            assertThrows(MCRUserWrongPasswordException.class,
+                () -> userService.changePassword("alice", new MCRChangePasswordRequest("wrong", "new-secret")));
+
+            mgr.verify(() -> MCRUserManager.setPassword(any(), any()), never());
+        }
+    }
+
+    @Test
+    void changePasswordShouldThrowNoLocalPasswordWhenUserHasNoLocalPassword() {
+        MCRUser user = mock(MCRUser.class);
+        when(user.getHashType()).thenReturn(null);
+
+        try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class)) {
+            mgr.when(() -> MCRUserManager.getUser("alice")).thenReturn(user);
+
+            assertThrows(MCRUserNoLocalPasswordException.class,
+                () -> userService.changePassword("alice", new MCRChangePasswordRequest("whatever", "new-secret")));
+
+            mgr.verify(() -> MCRUserManager.checkPassword(any(), any()), never());
+            mgr.verify(() -> MCRUserManager.setPassword(any(), any()), never());
+        }
+    }
+
+    @Test
+    void changePasswordShouldThrowNotFoundWhenUserMissing() {
+        try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class)) {
+            mgr.when(() -> MCRUserManager.getUser("ghost")).thenReturn(null);
+
+            assertThrows(MCRUserNotFoundException.class,
+                () -> userService.changePassword("ghost", new MCRChangePasswordRequest("old", "new-secret")));
         }
     }
 
