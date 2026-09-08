@@ -76,15 +76,9 @@ public class MCRPDFAFunctions {
         List<PDFAValidationResult> results = new ArrayList<>();
         Files.walkFileTree(dir, new SimpleFileVisitor<>() {
             @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
                 if (file.getFileName().toString().endsWith(".pdf")) {
-                    try {
-                        results.add(new PDFAValidationResult(dir.relativize(file).toString(),
-                            PDF_A_VALIDATOR.validate(file), null));
-                    } catch (MCRPDFAValidationException e) {
-                        results.add(new PDFAValidationResult(dir.relativize(file).toString(),
-                            null, e));
-                    }
+                    results.add(validate(file, dir.relativize(file).toString()));
                 }
                 return FileVisitResult.CONTINUE;
             }
@@ -95,6 +89,30 @@ public class MCRPDFAFunctions {
             }
         });
         return createXML(objectId, results);
+    }
+
+    /**
+     * Validates a single PDF file and returns its validation report. The returned document has the same
+     * {@code <file>} element as a root that {@link #getResults(Path, String)} returns as a child of
+     * {@code <derivate>}, so both can be presented by the same stylesheets.
+     *
+     * @param file the PDF file to validate
+     * @param name the name of the file as it should appear in the report, usually relative to the derivate root
+     * @return a document with a {@code <file>} root element
+     * @throws ParserConfigurationException If a DocumentBuilder cannot be created.
+     */
+    public static Document getResult(Path file, String name) throws ParserConfigurationException {
+        Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+        document.appendChild(createFileElement(document, validate(file, name)));
+        return document;
+    }
+
+    private static PDFAValidationResult validate(Path file, String name) {
+        try {
+            return new PDFAValidationResult(name, PDF_A_VALIDATOR.validate(file), null);
+        } catch (MCRPDFAValidationException | IOException e) {
+            return new PDFAValidationResult(name, null, e);
+        }
     }
 
     /**
@@ -114,35 +132,32 @@ public class MCRPDFAFunctions {
         document.appendChild(derivateElement);
         if (results != null) {
             for (PDFAValidationResult result : results) {
-                createXMLTag(derivateElement, document, result);
+                derivateElement.appendChild(createFileElement(document, result));
             }
         }
         return document;
     }
 
     /**
-     * Creates an XML tag for a PDF file with its validation results.
+     * Creates the {@code <file>} element for a PDF file with its validation results.
      *
-     * @param derivateElement The parent element to which the file element is added.
-     * @param document        The XML document being constructed.
-     * @param resultEntry     A map entry containing the file name and its validation result.
+     * @param document    The XML document being constructed.
+     * @param resultEntry The file name and its validation result.
+     * @return The "file" XML element.
      */
-    private static void createXMLTag(Element derivateElement, Document document,
-        PDFAValidationResult resultEntry) {
+    private static Element createFileElement(Document document, PDFAValidationResult resultEntry) {
         String fileName = resultEntry.name();
         ValidationResult result = resultEntry.result();
         if (result != null) {
-            Element fileElement = createFileElement(document, fileName, result);
-            derivateElement.appendChild(fileElement);
-        } else {
-            Element fileElement = document.createElement("file");
-            fileElement.setAttribute("name", fileName);
-            derivateElement.appendChild(fileElement);
-            fileElement.setAttribute("flavour", "Validation Error");
-            Element exceptionElements = document.createElement("exceptions");
-            exceptionElements.appendChild(createExceptionElement(document, resultEntry.exception()));
-            fileElement.appendChild(exceptionElements);
+            return createFileElement(document, fileName, result);
         }
+        Element fileElement = document.createElement("file");
+        fileElement.setAttribute("name", fileName);
+        fileElement.setAttribute("flavour", "Validation Error");
+        Element exceptionElements = document.createElement("exceptions");
+        exceptionElements.appendChild(createExceptionElement(document, resultEntry.exception()));
+        fileElement.appendChild(exceptionElements);
+        return fileElement;
     }
 
     /**
