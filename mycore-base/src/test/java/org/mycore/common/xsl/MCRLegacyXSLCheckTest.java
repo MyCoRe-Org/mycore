@@ -55,7 +55,8 @@ public class MCRLegacyXSLCheckTest {
             () -> new MCRLegacyXSLCheck().startUp(null));
 
         assertTrue(exception.getMessage().contains(LAYOUT_PROPERTY + "=Saxon"));
-        assertTrue(exception.getMessage().contains(LAYOUT_PROPERTY + "Class=" + MCRXalanTransformerFactory.class.getName()));
+        assertTrue(
+            exception.getMessage().contains(LAYOUT_PROPERTY + "Class=" + MCRXalanTransformerFactory.class.getName()));
         assertTrue(exception.getMessage().contains("Set '" + LAYOUT_PROPERTY + "' to the intended factory ID"));
         assertTrue(exception.getMessage().contains("remove '" + LAYOUT_PROPERTY + "Class'"));
     }
@@ -71,7 +72,8 @@ public class MCRLegacyXSLCheckTest {
             () -> new MCRLegacyXSLCheck().startUp(null));
 
         assertTrue(exception.getMessage().contains(CONTENT_PROPERTY + "=Saxon"));
-        assertTrue(exception.getMessage().contains(CONTENT_PROPERTY + "Class=" + MCRXalanTransformerFactory.class.getName()));
+        assertTrue(
+            exception.getMessage().contains(CONTENT_PROPERTY + "Class=" + MCRXalanTransformerFactory.class.getName()));
         assertTrue(exception.getMessage().contains(CUSTOM_PROPERTY + "=Custom"));
         assertTrue(exception.getMessage().contains(CUSTOM_PROPERTY + "Class=application.CustomFactory"));
     }
