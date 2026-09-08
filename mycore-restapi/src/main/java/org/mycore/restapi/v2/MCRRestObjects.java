@@ -99,7 +99,6 @@ import org.mycore.frontend.support.MCRObjectLock;
 import org.mycore.media.services.MCRThumbnailGenerator;
 import org.mycore.restapi.MCRRestConstants;
 import org.mycore.restapi.annotations.MCRAccessControlExposeHeaders;
-import org.mycore.restapi.annotations.MCRApiDraft;
 import org.mycore.restapi.annotations.MCRParam;
 import org.mycore.restapi.annotations.MCRParams;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
@@ -814,7 +813,6 @@ public class MCRRestObjects {
             @ApiResponse(responseCode = NOT_FOUND, description = "object is not found"),
         })
     @MCRRequireTransaction
-    @MCRApiDraft("MCRObjectState")
     public Response setState(@PathParam(PARAM_MCRID) MCRObjectID id, String state) {
         //check preconditions
         MCRRestUtils.checkExists(id);
@@ -857,7 +855,6 @@ public class MCRRestObjects {
             @ApiResponse(responseCode = NO_CONTENT, description = "no state is set"),
             @ApiResponse(responseCode = NOT_FOUND, description = "object is not found"),
         })
-    @MCRApiDraft("MCRObjectState")
     public Response getState(@PathParam(PARAM_MCRID) MCRObjectID id) {
         //check preconditions
         MCRRestUtils.checkExists(id);
