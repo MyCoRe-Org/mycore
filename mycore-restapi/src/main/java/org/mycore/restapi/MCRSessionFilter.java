@@ -218,22 +218,34 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
             .getBytes(StandardCharsets.ISO_8859_1);
         String userPwd = new String(Base64.getDecoder().decode(encodedAuth), StandardCharsets.ISO_8859_1);
         if (userPwd.contains(":") && userPwd.length() > 1) {
-            String[] upSplit = userPwd.split(":");
-            String username = upSplit[0];
-            String password = upSplit[1];
+
+            String[] parts = userPwd.split(":", 2);
+            if (parts.length != 2 || parts[0].isEmpty() || parts[1].isEmpty()) {
+                throw getInvalidCredentialsException();
+            }
+            String username = parts[0];
+            String password = parts[1];
+
             return Optional.ofNullable(MCRUserManager.checkPassword(username, password))
                 .map(MCRUserInformation.class::cast)
-                .orElseThrow(() -> {
-                    Map<String, String> attrs = new LinkedHashMap<>();
-                    attrs.put("error", "invalid_login");
-                    attrs.put("error_description", "Wrong login or password.");
-                    return new NotAuthorizedException(Response.status(Response.Status.UNAUTHORIZED)
-                        .header(HttpHeaders.WWW_AUTHENTICATE,
-                            MCRRestAPIUtil.getWWWAuthenticateHeader(null, attrs, app))
-                        .build());
-                });
+                .orElseThrow(this::getInvalidCredentialsException);
         }
-        return null;
+        throw getInvalidCredentialsException();
+    }
+
+    private NotAuthorizedException getInvalidCredentialsException() {
+        Map<String, String> attrs = new LinkedHashMap<>();
+        attrs.put("error", "invalid_login");
+        attrs.put("error_description", "Wrong login or password.");
+
+        return new NotAuthorizedException(
+            Response.status(Response.Status.UNAUTHORIZED)
+                .header(
+                    HttpHeaders.WWW_AUTHENTICATE,
+                    MCRRestAPIUtil.getWWWAuthenticateHeader(null, attrs, app)
+                )
+                .build()
+        );
     }
 
     private MCRUserInformation extractUserFromBearerAuth(ContainerRequestContext requestContext,
