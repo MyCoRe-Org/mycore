@@ -34,12 +34,15 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 /**
  * Stores one PDF/A validation report per PDF file below the slot directory of its derivate.
  * <p>
- * Reports are named after the PDF file they describe, with the file extension replaced by {@code .xml}. The path
- * relative to the derivate root is preserved, so identically named PDF files in different directories do not
- * collide. Stores are separated by {@link MCRObjectID#getBase()} like the IFS2 content stores are, so that numeric
- * derivate IDs of different projects cannot collide either:
+ * Reports are named after the PDF file they describe, with {@code .xml} appended. The path relative to the derivate
+ * root is preserved, so identically named PDF files in different directories do not collide, and appending rather
+ * than replacing the extension keeps the mapping injective: {@code chapter.pdf} and {@code chapter.PDF}, which can
+ * coexist on a case sensitive store, would both claim {@code chapter.xml}.
  * <p>
- * {@code <BaseDir>/<project>/derivate/<slots>/<derivate ID>/<relative path>.xml}
+ * Stores are separated by {@link MCRObjectID#getBase()} like the IFS2 content stores are, so that numeric derivate
+ * IDs of different projects cannot collide either:
+ * <p>
+ * {@code <BaseDir>/<project>/derivate/<slots>/<derivate ID>/<PDF path>.xml}
  * <p>
  * Instances are created reflectively by {@link MCRStoreManager}, use {@link #obtainInstance(MCRObjectID)}.
  */
@@ -110,10 +113,7 @@ public final class MCRPDFAReportStore extends MCRStore {
     }
 
     private static String toReportPath(String path) {
-        String relativePath = path.startsWith("/") ? path.substring(1) : path;
-        int extension = relativePath.lastIndexOf('.');
-        int directory = relativePath.lastIndexOf('/');
-        return (extension > directory ? relativePath.substring(0, extension) : relativePath) + XML_SUFFIX;
+        return (path.startsWith("/") ? path.substring(1) : path) + XML_SUFFIX;
     }
 
     /**

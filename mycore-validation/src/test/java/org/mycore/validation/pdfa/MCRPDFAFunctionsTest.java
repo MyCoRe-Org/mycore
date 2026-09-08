@@ -19,8 +19,10 @@ package org.mycore.validation.pdfa;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 
@@ -46,6 +48,13 @@ public class MCRPDFAFunctionsTest {
         Element failed = (Element) file.getElementsByTagName("failed").item(0);
         assertNotNull(failed.getAttribute("clause"));
         assertNotNull(failed.getAttribute("testNumber"));
+    }
+
+    @Test
+    public void unreadableFilesAreNotReportedAsValidationErrors() {
+        // an I/O failure may be transient, so it must reach the caller instead of being persisted as a result
+        Path missing = Path.of("does-not-exist.pdf");
+        assertThrows(IOException.class, () -> MCRPDFAFunctions.getResult(missing, "does-not-exist.pdf"));
     }
 
     @Test

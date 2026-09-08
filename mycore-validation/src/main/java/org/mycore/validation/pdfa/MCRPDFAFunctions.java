@@ -76,7 +76,7 @@ public class MCRPDFAFunctions {
         List<PDFAValidationResult> results = new ArrayList<>();
         Files.walkFileTree(dir, new SimpleFileVisitor<>() {
             @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                 if (file.getFileName().toString().endsWith(".pdf")) {
                     results.add(validate(file, dir.relativize(file).toString()));
                 }
@@ -96,21 +96,25 @@ public class MCRPDFAFunctions {
      * {@code <file>} element as a root that {@link #getResults(Path, String)} returns as a child of
      * {@code <derivate>}, so both can be presented by the same stylesheets.
      *
+     * A PDF file that cannot be validated is reported as a validation error, because that does not change until
+     * the file itself does. Failures of reading the file are not, so that the caller can try again later.
+     *
      * @param file the PDF file to validate
      * @param name the name of the file as it should appear in the report, usually relative to the derivate root
      * @return a document with a {@code <file>} root element
      * @throws ParserConfigurationException If a DocumentBuilder cannot be created.
+     * @throws IOException                  If the PDF file cannot be read.
      */
-    public static Document getResult(Path file, String name) throws ParserConfigurationException {
+    public static Document getResult(Path file, String name) throws ParserConfigurationException, IOException {
         Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
         document.appendChild(createFileElement(document, validate(file, name)));
         return document;
     }
 
-    private static PDFAValidationResult validate(Path file, String name) {
+    private static PDFAValidationResult validate(Path file, String name) throws IOException {
         try {
             return new PDFAValidationResult(name, PDF_A_VALIDATOR.validate(file), null);
-        } catch (MCRPDFAValidationException | IOException e) {
+        } catch (MCRPDFAValidationException e) {
             return new PDFAValidationResult(name, null, e);
         }
     }

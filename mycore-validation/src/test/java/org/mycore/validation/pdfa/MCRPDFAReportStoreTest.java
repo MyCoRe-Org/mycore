@@ -56,15 +56,21 @@ public class MCRPDFAReportStoreTest extends MCRTestCase {
     public void reportIsNamedAfterItsPdfFile() {
         MCRPDFAReportStore store = obtainStore();
         Path directory = store.getReportDirectory(derivateId());
-        assertEquals("chapter.xml", directory.relativize(store.getReportFile(derivateId(), "chapter.pdf")).toString());
-        assertEquals(Path.of("sub", "chapter.xml"),
+        assertEquals("chapter.pdf.xml",
+            directory.relativize(store.getReportFile(derivateId(), "chapter.pdf")).toString());
+        assertEquals(Path.of("sub", "chapter.pdf.xml"),
             directory.relativize(store.getReportFile(derivateId(), "sub/chapter.pdf")));
-        assertEquals(Path.of("other", "chapter.xml"),
+        assertEquals(Path.of("other", "chapter.pdf.xml"),
             directory.relativize(store.getReportFile(derivateId(), "/other/chapter.pdf")));
-        assertEquals("mcrdata.xml", directory.relativize(store.getReportFile(derivateId(), "mcrdata.pdf")).toString());
-        assertEquals("CHAPTER.xml", directory.relativize(store.getReportFile(derivateId(), "CHAPTER.PDF")).toString());
-        assertEquals("no-extension.xml",
-            directory.relativize(store.getReportFile(derivateId(), "no-extension")).toString());
+        assertEquals("mcrdata.pdf.xml",
+            directory.relativize(store.getReportFile(derivateId(), "mcrdata.pdf")).toString());
+    }
+
+    @Test
+    public void caseVariantsOfThePdfSuffixGetTheirOwnReport() {
+        MCRPDFAReportStore store = obtainStore();
+        assertNotEquals(store.getReportFile(derivateId(), "chapter.pdf"),
+            store.getReportFile(derivateId(), "chapter.PDF"));
     }
 
     @Test
