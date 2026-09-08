@@ -296,10 +296,10 @@
   resolved "https://npm.jsr.io/~/11/@jsr/mycore__js-common/0.0.7.tgz#E1456BC84C85FA0126BABEAB8D36E22B25B5152C"
   integrity sha512-hMIvjf1aGqzNo/B9aFbdfO3C40h7DLbz+4zBfck27ct+ZgJGjMbUgeDPJLqw6T3d5Vx5Je4K2AaLn7qvjmkdJQ==
 
-"@mycore-org/vue-access-key-manager@^0.1.10":
-  version "0.1.12"
-  resolved "https://registry.yarnpkg.com/@mycore-org/vue-access-key-manager/-/vue-access-key-manager-0.1.12.tgz#1af7104d69969d74a3465fe98936e5e8ab2c7389"
-  integrity sha512-MuFqr+XZRNaVq/Tf3T2ch5Lfmbyex3OwU2pTf7WTJGLPpV+YqqluvLHlPkSHxbWzT5G9RDpdZOr7oX2AkUnAFg==
+"@mycore-org/vue-access-key-manager@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@mycore-org/vue-access-key-manager/-/vue-access-key-manager-0.2.0.tgz#08af1ea24e7ad86851dafcad9b7f6d9efc9c9c8b"
+  integrity sha512-eZRo9GThoJglSVlH6IMd5GvcyPwpaTmcbAlxBe93kYdZGlZkqpd4vw46swOzw5v0ss3PUQX7ajE1jrCc2i37nQ==
 
 "@mycore-org/vue-components@^0.1.5":
   version "0.1.7"

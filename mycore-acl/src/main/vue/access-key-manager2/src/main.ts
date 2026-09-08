@@ -8,14 +8,26 @@ import {
   UnauthorizedActionError,
   PermissionError,
 } from '@jsr/mycore__js-common/utils/errors';
+import { AuthStrategy } from '@jsr/mycore__js-common/auth';
+import { createAccessKeyManager } from '@mycore-org/vue-access-key-manager';
+
 if (import.meta.env.DEV) {
   import('bootstrap/dist/css/bootstrap.min.css');
   import('font-awesome/css/font-awesome.min.css');
 }
 import '@mycore-org/vue-access-key-manager/dist/vue-access-key-manager.css';
-import { AppConfigKey, AccessKeyConfigKey } from './keys';
 
 const APP_ID = 'app';
+
+const devAuthStrategy: AuthStrategy | undefined = import.meta.env.DEV
+  ? new (class implements AuthStrategy {
+      async getHeaders(): Promise<Record<string, string>> {
+        return {
+          Authorization: `Basic ${import.meta.env.VITE_APP_API_TOKEN}`,
+        };
+      }
+    })()
+  : undefined;
 
 const setErrorHandler = (app: App): void => {
   app.config.errorHandler = error => {
@@ -52,8 +64,16 @@ const initApp = async () => {
     const app = createApp(ContactManager);
     app.use(i18n);
     app.use(router);
-    app.provide(AppConfigKey, appConfig);
-    app.provide(AccessKeyConfigKey, accessKeyConfig);
+    app.use(
+      createAccessKeyManager({
+        baseUrl: appConfig.baseUrl,
+        authStrategy: devAuthStrategy,
+        accessKeyConfig: {
+          allowedSessionPermissions:
+            accessKeyConfig.allowedAccessKeySessionPermissions,
+        },
+      })
+    );
     setErrorHandler(app);
     app.mount(`#${APP_ID}`);
   } catch (error) {
