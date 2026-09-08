@@ -34,7 +34,7 @@
   </properties>
   <build>
     <plugins>
-      <!-- Remove dependencies left behind by the former app-local Vue toolchain. -->
+      <!-- Remove dependencies left behind by the former Angular/Grunt and app-local Vue toolchains. -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-clean-plugin</artifactId>
@@ -43,6 +43,10 @@
             <id>default-clean</id>
             <configuration>
               <filesets combine.children="append">
+                <fileset>
+                  <directory>${project.basedir}/node_modules</directory>
+                  <followSymlinks>false</followSymlinks>
+                </fileset>
                 <fileset>
                   <directory>${project.basedir}/src/main/vue/webcli/node_modules</directory>
                   <followSymlinks>false</followSymlinks>
