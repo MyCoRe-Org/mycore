@@ -89,10 +89,9 @@ Relevant files:
 - [`src/main/vue/webcli/vite.config.mts`](src/main/vue/webcli/vite.config.mts) (vitest configuration and coverage thresholds)
 - [`src/main/vue/webcli/tests/a11y/`](src/main/vue/webcli/tests/a11y/)
 - [`../mycore-vue/package.json`](../mycore-vue/package.json) (dependencies and the `*:webcli` scripts)
-- [`../mycore-vue/playwright.webcli.config.mts`](../mycore-vue/playwright.webcli.config.mts)
-- [`../mycore-vue/playwright.webcli.performance.config.mts`](../mycore-vue/playwright.webcli.performance.config.mts)
+- [`src/main/vue/webcli/playwright.config.ts`](src/main/vue/webcli/playwright.config.ts)
+- [`src/main/vue/webcli/playwright.performance.config.ts`](src/main/vue/webcli/playwright.performance.config.ts)
 - [`src/main/vue/webcli/tests/performance/`](src/main/vue/webcli/tests/performance/)
-- [`../mycore-vue/testing/webcli-stub-server.mjs`](../mycore-vue/testing/webcli-stub-server.mjs)
 
 The MCR-3794 performance probe uses a local HTTP/WebSocket stub that implements the
 Web CLI protocol and can stream either command-queue snapshots or log messages:

@@ -1,14 +1,15 @@
 import { existsSync } from 'node:fs';
 import { execSync } from 'node:child_process';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
 import { defineConfig } from '@playwright/test';
 
-const port = 4175;
-const toolchainDirectory = path.dirname(fileURLToPath(import.meta.url));
-const appDirectory = path.resolve(toolchainDirectory, '../mycore-webcli/src/main/vue/webcli');
-const artifactsRoot = path.resolve(appDirectory, '../../../../target/playwright-performance');
+// This config has to stay a .ts file. Playwright transpiles it to CommonJS and applies the paths of tsconfig.json,
+// which is what makes @playwright/test resolve against the shared node_modules of mycore-vue. A .mts file would be
+// loaded as a real ES module, and that loader ignores those paths.
+const port = 4174;
+const appDirectory = __dirname;
+const artifactsRoot = path.resolve(appDirectory, '../../../../target/playwright');
 
 function detectChromiumBinary(): string | undefined {
   if (process.env.CHROME_BIN && existsSync(process.env.CHROME_BIN)) {
@@ -46,10 +47,10 @@ function detectChromiumBinary(): string | undefined {
 const chromiumExecutablePath = detectChromiumBinary();
 
 export default defineConfig({
-  testDir: path.join(appDirectory, 'tests/performance'),
+  testDir: path.join(appDirectory, 'tests/a11y'),
   outputDir: path.join(artifactsRoot, 'test-results'),
-  timeout: 120_000,
-  reporter: [['list']],
+  timeout: 30_000,
+  reporter: [['list'], ['html', { open: 'never', outputFolder: path.join(artifactsRoot, 'report') }]],
   use: {
     baseURL: `http://127.0.0.1:${port}`,
     browserName: 'chromium',
@@ -61,8 +62,9 @@ export default defineConfig({
     trace: 'retain-on-failure',
   },
   webServer: {
-    command: 'node ./testing/webcli-stub-server.mjs',
+    command: 'node ./tests/a11y/static-server.mjs',
+    cwd: appDirectory,
     port,
-    reuseExistingServer: false,
+    reuseExistingServer: !process.env.CI,
   },
 });

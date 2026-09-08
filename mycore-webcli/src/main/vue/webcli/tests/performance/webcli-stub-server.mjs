@@ -1,17 +1,24 @@
 import { createReadStream, existsSync } from 'node:fs';
 import { stat } from 'node:fs/promises';
 import http from 'node:http';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import { setTimeout } from 'node:timers';
 import { fileURLToPath, URL } from 'node:url';
 
-import { WebSocketServer } from 'ws';
-
 const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
+const appDirectory = path.resolve(currentDirectory, '../..');
+const toolchainDirectory = path.resolve(appDirectory, '../../../../../mycore-vue');
 const staticRoot = path.resolve(
-  currentDirectory,
-  '../../mycore-webcli/target/classes/META-INF/resources/modules/webcli/gui',
+  appDirectory,
+  '../../../../target/classes/META-INF/resources/modules/webcli/gui',
 );
+
+// playwright starts this file as a plain node process, so neither the transpilation nor the paths of tsconfig.json
+// apply and a bare import of ws would not find the shared node_modules. The require is anchored in the toolchain
+// instead, the same idea as the anchor in vite.shared.ts.
+const toolchainRequire = createRequire(path.join(toolchainDirectory, 'package.json'));
+const { WebSocketServer } = toolchainRequire('ws');
 const port = 4175;
 const webSocketPath = '/ws/mycore-webcli/socket';
 

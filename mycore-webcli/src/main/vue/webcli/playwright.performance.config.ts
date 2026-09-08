@@ -1,14 +1,13 @@
 import { existsSync } from 'node:fs';
 import { execSync } from 'node:child_process';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
 import { defineConfig } from '@playwright/test';
 
-const port = 4174;
-const toolchainDirectory = path.dirname(fileURLToPath(import.meta.url));
-const appDirectory = path.resolve(toolchainDirectory, '../mycore-webcli/src/main/vue/webcli');
-const artifactsRoot = path.resolve(appDirectory, '../../../../target/playwright');
+// see the note on the file extension in playwright.config.ts
+const port = 4175;
+const appDirectory = __dirname;
+const artifactsRoot = path.resolve(appDirectory, '../../../../target/playwright-performance');
 
 function detectChromiumBinary(): string | undefined {
   if (process.env.CHROME_BIN && existsSync(process.env.CHROME_BIN)) {
@@ -46,10 +45,10 @@ function detectChromiumBinary(): string | undefined {
 const chromiumExecutablePath = detectChromiumBinary();
 
 export default defineConfig({
-  testDir: path.join(appDirectory, 'tests/a11y'),
+  testDir: path.join(appDirectory, 'tests/performance'),
   outputDir: path.join(artifactsRoot, 'test-results'),
-  timeout: 30_000,
-  reporter: [['list'], ['html', { open: 'never', outputFolder: path.join(artifactsRoot, 'report') }]],
+  timeout: 120_000,
+  reporter: [['list']],
   use: {
     baseURL: `http://127.0.0.1:${port}`,
     browserName: 'chromium',
@@ -61,9 +60,9 @@ export default defineConfig({
     trace: 'retain-on-failure',
   },
   webServer: {
-    command: 'node ./tests/a11y/static-server.mjs',
+    command: 'node ./tests/performance/webcli-stub-server.mjs',
     cwd: appDirectory,
     port,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: false,
   },
 });
