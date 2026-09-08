@@ -88,7 +88,7 @@ public class MCRUserService {
      */
     public MCRUserDetail createUser(MCRCreateUserRequest createUserRequest) {
         validateCreateRequest(createUserRequest);
-        MCRUser owner = MCRUserManager.getUser(createUserRequest.owner());
+        MCRUser owner = Optional.ofNullable(createUserRequest.owner()).map(this::getUserOrThrow).orElse(null);
         MCRUser user = userDtoMapper.toDomain(createUserRequest, owner);
         try {
             MCRUserManager.createUser(user);
