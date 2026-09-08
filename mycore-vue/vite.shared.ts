@@ -138,6 +138,9 @@ export function defineMCRVueApp(options: MCRVueAppOptions, overrides: UserConfig
     plugins: [sharedToolchainResolver(), vue()],
     resolve: {
       alias: {
+        // plugin-vue deduplicates Vue from the app root, where stale node_modules may remain after a branch switch.
+        // Pin Vue to the shared installation so app code and test-utils use the same runtime.
+        vue: path.resolve(TOOLCHAIN_DIR, 'node_modules/vue'),
         '@': path.resolve(appDir, 'src'),
       },
     },
