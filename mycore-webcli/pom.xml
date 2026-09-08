@@ -34,6 +34,24 @@
   </properties>
   <build>
     <plugins>
+      <!-- Remove dependencies left behind by the former app-local Vue toolchain. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-clean-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-clean</id>
+            <configuration>
+              <filesets combine.children="append">
+                <fileset>
+                  <directory>${project.basedir}/src/main/vue/webcli/node_modules</directory>
+                  <followSymlinks>false</followSymlinks>
+                </fileset>
+              </filesets>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>com.github.eirslett</groupId>
         <artifactId>frontend-maven-plugin</artifactId>
