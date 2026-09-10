@@ -34,6 +34,8 @@ import org.mycore.resource.common.MCRResourceTracer;
  */
 public abstract class MCRResourceFilterBase implements MCRResourceFilter {
 
+    public static final String DEFAULT_KEY_PREFIX = "MCR.Default.Resource.Filter";
+
     @Override
     public final Stream<URL> filter(Stream<URL> resourceUrls, MCRHints hints) {
         return filter(resourceUrls, hints, new MCRNoOpResourceTracer());

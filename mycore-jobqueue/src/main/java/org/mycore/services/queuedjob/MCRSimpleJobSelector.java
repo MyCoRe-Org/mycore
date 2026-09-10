@@ -32,10 +32,8 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import org.mycore.common.MCRClassTools;
-import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.common.config.annotation.MCRClassPropertyList;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
-import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.config.annotation.MCRPropertyList;
 
@@ -76,6 +74,8 @@ import jakarta.persistence.criteria.Root;
  */
 @MCRConfigurationProxy(proxyClass = MCRSimpleJobSelector.Factory.class)
 public final class MCRSimpleJobSelector implements MCRJobSelector {
+
+    public static final String DEFAULT_KEY_PREFIX = "MCR.Default.Job.Selector.Simple";
 
     public static final String ACTIONS_KEY = "Actions";
 
@@ -155,49 +155,30 @@ public final class MCRSimpleJobSelector implements MCRJobSelector {
 
     public static class Factory implements Supplier<MCRSimpleJobSelector> {
 
-        @MCRPropertyList(name = ACTIONS_KEY, defaultName = "MCR.QueuedJob.Selectors.Default.Actions")
-        public List<String> actions;
+        @MCRClassPropertyList(name = ACTIONS_KEY, valueClass = MCRJobAction.class,
+            defaultNamePrefix = DEFAULT_KEY_PREFIX)
+        public List<Class<? extends MCRJobAction>> actions;
 
-        @MCRProperty(name = ACTION_MODE_KEY, defaultName = "MCR.QueuedJob.Selectors.Default.ActionMode")
+        @MCRProperty(name = ACTION_MODE_KEY, defaultNamePrefix = DEFAULT_KEY_PREFIX)
         public String actionMode;
 
-        @MCRPropertyList(name = STATUSES_KEY, defaultName = "MCR.QueuedJob.Selectors.Default.Statuses")
+        @MCRPropertyList(name = STATUSES_KEY, defaultNamePrefix = DEFAULT_KEY_PREFIX)
         public List<String> statuses;
 
-        @MCRProperty(name = STATUS_MODE_KEY, defaultName = "MCR.QueuedJob.Selectors.Default.StatusMode")
+        @MCRProperty(name = STATUS_MODE_KEY, defaultNamePrefix = DEFAULT_KEY_PREFIX)
         public String statusMode;
 
-        @MCRProperty(name = AGE_DAYS_KEY, defaultName = "MCR.QueuedJob.Selectors.Default.AgeDays")
+        @MCRProperty(name = AGE_DAYS_KEY, defaultNamePrefix = DEFAULT_KEY_PREFIX)
         public String ageDays;
-
-        private String property;
-
-        @MCRPostConstruction
-        public void init(String property) {
-            this.property = property;
-        }
 
         @Override
         public MCRSimpleJobSelector get() {
-            Set<Class<? extends MCRJobAction>> actions = getActions();
+            Set<Class<? extends MCRJobAction>> actions = new HashSet<>(this.actions);
             Mode actionMode = Mode.valueOf(this.actionMode);
             Set<MCRJobStatus> statuses = getJobStatuses();
             Mode statusMode = Mode.valueOf(this.statusMode);
             int ageDays = Integer.parseInt(this.ageDays);
             return new MCRSimpleJobSelector(actions, actionMode, statuses, statusMode, ageDays);
-        }
-
-        private Set<Class<? extends MCRJobAction>> getActions() {
-            return this.actions.stream().map(this::toActionJobClass).collect(Collectors.toSet());
-        }
-
-        private Class<? extends MCRJobAction> toActionJobClass(String action) {
-            try {
-                return MCRClassTools.forName(action);
-            } catch (ClassNotFoundException e) {
-                throw new MCRConfigurationException("Missing class (" + action + ") configured in: " +
-                    property + "." + ACTIONS_KEY, e);
-            }
         }
 
         private Set<MCRJobStatus> getJobStatuses() {

@@ -62,6 +62,8 @@ import org.mycore.resource.common.MCRResourceTracer;
 @MCRConfigurationProxy(proxyClass = MCRObservingResourceProvider.Factory.class)
 public class MCRObservingResourceProvider extends MCRResourceProviderBase {
 
+    public static final String DEFAULT_KEY_PREFIX = MCRResourceProviderBase.DEFAULT_KEY_PREFIX + ".Observing";
+
     public static final String PROVIDER_KEY = "Provider";
 
     public static final String OBSERVER_KEY = "Observer";
@@ -139,7 +141,7 @@ public class MCRObservingResourceProvider extends MCRResourceProviderBase {
 
     public static class Factory implements Supplier<MCRObservingResourceProvider> {
 
-        @MCRProperty(name = COVERAGE_KEY, defaultName = "MCR.Resource.Provider.Default.Observing.Coverage")
+        @MCRProperty(name = COVERAGE_KEY, defaultNamePrefix = DEFAULT_KEY_PREFIX)
         public String coverage;
 
         @MCRInstance(name = PROVIDER_KEY, valueClass = MCRResourceProvider.class)

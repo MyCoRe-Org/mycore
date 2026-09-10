@@ -50,6 +50,8 @@ import org.mycore.resource.hint.MCRResourceHintKeys;
 @MCRConfigurationProxy(proxyClass = MCRClasspathDirsResourceProvider.Factory.class)
 public final class MCRClasspathDirsResourceProvider extends MCRFileSystemResourceProviderBase {
 
+    public static final String DEFAULT_KEY_PREFIX = MCRResourceProviderBase.DEFAULT_KEY_PREFIX + ".ClasspathDirs";
+
     public MCRClasspathDirsResourceProvider(String coverage) {
         super(coverage, MCRResourceProviderMode.RESOURCES);
     }
@@ -69,7 +71,7 @@ public final class MCRClasspathDirsResourceProvider extends MCRFileSystemResourc
 
     public static class Factory implements Supplier<MCRClasspathDirsResourceProvider> {
 
-        @MCRProperty(name = COVERAGE_KEY, defaultName = "MCR.Resource.Provider.Default.ClasspathDirs.Coverage")
+        @MCRProperty(name = COVERAGE_KEY, defaultNamePrefix = DEFAULT_KEY_PREFIX)
         public String coverage;
 
         @Override

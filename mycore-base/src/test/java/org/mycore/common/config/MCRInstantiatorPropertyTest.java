@@ -199,7 +199,8 @@ public class MCRInstantiatorPropertyTest {
         Configurable instance = null;
         MCRConfigurationException exception = null;
         try {
-            instance = MCRInstanceConfiguration.ofName(Configurable.class, "Foo").instantiate();
+            instance = MCRInstanceConfiguration.ofName(Configurable.class, "Foo",
+                MCRConfiguration2.getAllPropertiesTree()).instantiate();
         } catch (MCRConfigurationException e) {
             exception = e;
         }
@@ -212,7 +213,7 @@ public class MCRInstantiatorPropertyTest {
             assertNull(instance);
             assertNotNull(exception);
 
-            assertEquals("Default property, configured in MCR.Default.Value (and its sub-properties),"
+            assertEquals("Default property, configured in MCR.Default.Value (and sub-properties thereof),"
                 + " for target field 'value' in configured class " + configuredClass.getName()
                 + " is missing", exception.getMessage());
 
@@ -222,11 +223,11 @@ public class MCRInstantiatorPropertyTest {
             assertNotNull(exception);
 
             if (absolute) {
-                assertEquals("Absolute property, configured in MCR.Value (and its sub-properties),"
+                assertEquals("Absolute property, configured in MCR.Value (and sub-properties thereof),"
                     + " for target field 'value' in configured class " + configuredClass.getName()
                     + " is missing", exception.getMessage());
             } else {
-                assertEquals("Property, configured in Foo.Value (and its sub-properties),"
+                assertEquals("Property, configured in Foo.Value (and sub-properties thereof),"
                     + " for target field 'value' in configured class " + configuredClass.getName()
                     + " is missing", exception.getMessage());
             }
