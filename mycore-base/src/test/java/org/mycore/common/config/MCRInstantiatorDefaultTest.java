@@ -20,7 +20,6 @@ package org.mycore.common.config;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mycore.common.config.instantiator.MCRInstanceConfiguration.ofName;
 
 import java.util.List;
 import java.util.Map;
@@ -32,6 +31,7 @@ import org.mycore.common.config.annotation.MCRInstance;
 import org.mycore.common.config.annotation.MCRInstanceList;
 import org.mycore.common.config.annotation.MCRInstanceMap;
 import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
@@ -52,8 +52,7 @@ public class MCRInstantiatorDefaultTest {
         })
     public void nested() {
 
-        TestClassWithNestedClass instance = ofName(TestClassWithNestedClass.class,
-            "Foo").instantiate();
+        TestClassWithNestedClass instance = ofName(TestClassWithNestedClass.class);
 
         assertNotNull(instance);
         assertNotNull(instance.nested);
@@ -69,8 +68,7 @@ public class MCRInstantiatorDefaultTest {
         })
     public void nestedImplicit() {
 
-        TestClassWithImplicitNestedClass instance = ofName(TestClassWithImplicitNestedClass.class,
-            "Foo").instantiate();
+        TestClassWithImplicitNestedClass instance = ofName(TestClassWithImplicitNestedClass.class);
 
         assertNotNull(instance);
         assertNotNull(instance.nested);
@@ -88,8 +86,7 @@ public class MCRInstantiatorDefaultTest {
         })
     public void nestedNested() {
 
-        TestClassWithNestedNestedClass instance = ofName(TestClassWithNestedNestedClass.class,
-            "Foo").instantiate();
+        TestClassWithNestedNestedClass instance = ofName(TestClassWithNestedNestedClass.class);
 
         assertNotNull(instance);
         assertNotNull(instance.nested);
@@ -108,8 +105,7 @@ public class MCRInstantiatorDefaultTest {
         })
     public void nestedMap() {
 
-        TestClassWithNestedMap instance = ofName(TestClassWithNestedMap.class,
-            "Foo").instantiate();
+        TestClassWithNestedMap instance = ofName(TestClassWithNestedMap.class);
 
         assertNotNull(instance);
         assertNotNull(instance.map);
@@ -136,8 +132,7 @@ public class MCRInstantiatorDefaultTest {
         })
     public void nestedMapImplicit() {
 
-        TestClassWithNestedMapOfImplicitEntries instance = ofName(TestClassWithNestedMapOfImplicitEntries.class,
-            "Foo").instantiate();
+        TestClassWithNestedMapOfImplicitEntries instance = ofName(TestClassWithNestedMapOfImplicitEntries.class);
 
         assertNotNull(instance);
         assertNotNull(instance.map);
@@ -166,8 +161,7 @@ public class MCRInstantiatorDefaultTest {
         })
     public void nestedList() {
 
-        TestClassWithNestedList instance = ofName(TestClassWithNestedList.class,
-            "Foo").instantiate();
+        TestClassWithNestedList instance = ofName(TestClassWithNestedList.class);
 
         assertNotNull(instance);
         assertNotNull(instance.list);
@@ -194,8 +188,7 @@ public class MCRInstantiatorDefaultTest {
         })
     public void nestedListImplicit() {
 
-        TestClassWithNestedListOfImplicitEntries instance = ofName(TestClassWithNestedListOfImplicitEntries.class,
-            "Foo").instantiate();
+        TestClassWithNestedListOfImplicitEntries instance = ofName(TestClassWithNestedListOfImplicitEntries.class);
 
         assertNotNull(instance);
         assertNotNull(instance.list);
@@ -213,6 +206,11 @@ public class MCRInstantiatorDefaultTest {
         assertEquals("Value1", otherEntry.string1);
         assertEquals("Custom2", otherEntry.string2);
 
+    }
+
+    private <S> S ofName(Class<S> superClass) {
+        return MCRInstanceConfiguration.ofName(superClass, "Foo", MCRConfiguration2
+            .getAllPropertiesTree()).instantiate();
     }
 
     public static class NestedClass {

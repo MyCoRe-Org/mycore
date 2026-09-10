@@ -39,6 +39,9 @@ import java.util.stream.Stream;
 
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.common.config.annotation.MCRClassProperty;
+import org.mycore.common.config.annotation.MCRClassPropertyList;
+import org.mycore.common.config.annotation.MCRClassPropertyMap;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRFactory;
 import org.mycore.common.config.annotation.MCRInstance;
@@ -46,6 +49,8 @@ import org.mycore.common.config.annotation.MCRInstanceList;
 import org.mycore.common.config.annotation.MCRInstanceMap;
 import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.config.annotation.MCRPropertyList;
+import org.mycore.common.config.annotation.MCRPropertyMap;
 import org.mycore.common.config.annotation.MCRRawProperties;
 import org.mycore.common.config.instantiator.injectable.MCRFieldInjectable;
 import org.mycore.common.config.instantiator.injectable.MCRInjectable;
@@ -79,7 +84,6 @@ final class MCRInstantiator {
     }
 
     static <S> S instantiate(MCRInstanceConfiguration<S> configuration) throws MCRConfigurationException {
-
         Class<S> superClass = configuration.superClass();
 
         if (configuration.valueClass() == null) {
@@ -94,7 +98,6 @@ final class MCRInstantiator {
         }
 
         return superClass.cast(instance);
-
     }
 
     @SuppressWarnings("unchecked")
@@ -150,10 +153,15 @@ final class MCRInstantiator {
      *     Source implementations exist for all supported annotations:
      *     <ol>
      *       <li>{@link MCRProperty}</li>
-     *       <li>{@link MCRRawProperties}</li>
+     *       <li>{@link MCRPropertyList}</li>
+     *       <li>{@link MCRPropertyMap}</li>
+     *       <li>{@link MCRClassProperty}</li>
+     *       <li>{@link MCRClassPropertyList}</li>
+     *       <li>{@link MCRClassPropertyMap}</li>
      *       <li>{@link MCRInstance}</li>
      *       <li>{@link MCRInstanceMap}</li>
      *       <li>{@link MCRInstanceList}</li>
+     *       <li>{@link MCRRawProperties}</li>
      *       <li>{@link MCRPostConstruction}</li>
      *     </ol>
      *     Targets are:

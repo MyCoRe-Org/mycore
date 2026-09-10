@@ -18,22 +18,24 @@
 
 package org.mycore.restapi.v2;
 
-import java.net.URI;
-import java.util.Collection;
-import java.util.Map;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
+import com.fasterxml.jackson.jakarta.rs.json.JacksonXmlBindJsonProvider;
+import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
+import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
+import io.swagger.v3.oas.integration.OpenApiConfigurationException;
+import io.swagger.v3.oas.integration.SwaggerConfiguration;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.servers.Server;
+import jakarta.ws.rs.ApplicationPath;
+import jakarta.ws.rs.InternalServerErrorException;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
-import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.common.config.annotation.MCRClassProperty;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstanceMap;
 import org.mycore.common.config.annotation.MCRPostConstruction;
-import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.restapi.MCRApiDraftFilter;
 import org.mycore.restapi.MCRContentNegotiationViaExtensionFilter;
@@ -45,18 +47,12 @@ import org.mycore.restapi.MCRRemoveMsgBodyFilter;
 import org.mycore.restapi.converter.MCRWrappedXMLWriter;
 import org.mycore.restapi.v1.MCRRestAPIAuthentication;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonXmlBindJsonProvider;
-
-import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
-import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
-import io.swagger.v3.oas.integration.OpenApiConfigurationException;
-import io.swagger.v3.oas.integration.SwaggerConfiguration;
-import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.info.License;
-import io.swagger.v3.oas.models.servers.Server;
-import jakarta.ws.rs.ApplicationPath;
-import jakarta.ws.rs.InternalServerErrorException;
+import java.net.URI;
+import java.util.Collection;
+import java.util.Map;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @ApplicationPath("/api/v2")
 public class MCRRestV2App extends MCRJerseyRestApp {
@@ -146,11 +142,11 @@ public class MCRRestV2App extends MCRJerseyRestApp {
 
         public static final class Factory implements Supplier<Binding> {
 
-            @MCRProperty(name = "From")
-            public String implementationClass;
+            @MCRClassProperty(name = "From")
+            public Class<?> implementationClass;
 
-            @MCRProperty(name = "To")
-            public String apiClass;
+            @MCRClassProperty(name = "To")
+            public Class<?> apiClass;
 
             private String property;
 
@@ -161,23 +157,12 @@ public class MCRRestV2App extends MCRJerseyRestApp {
 
             @Override
             public Binding get() {
-                Class<?> implementationClass = toClass(this.implementationClass, "From");
-                Class<?> apiClass = toClass(this.apiClass, "To");
                 if (!apiClass.isAssignableFrom(implementationClass)) {
                     throw new IllegalArgumentException("Implementation " + this.implementationClass + " configured in "
                         + property + ".From does not implement/extend " + this.apiClass + " configured in "
                         + property + ".To");
                 }
                 return new Binding(implementationClass, apiClass);
-            }
-
-            private Class<?> toClass(String className, String key) {
-                try {
-                    return MCRClassTools.forName(className);
-                } catch (ClassNotFoundException e) {
-                    throw new MCRConfigurationException("Cannot load class " + className + "configured in "
-                        + property + "." + key, e);
-                }
             }
 
         }
