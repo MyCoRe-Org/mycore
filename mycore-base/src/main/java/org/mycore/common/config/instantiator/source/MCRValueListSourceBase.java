@@ -25,18 +25,15 @@ import java.util.Map;
 
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
-import org.mycore.common.config.annotation.MCRSentinel;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 
 abstract sealed class MCRValueListSourceBase<Value> extends MCRSourceBase<List<Value>> permits
     MCRClassPropertyListSource, MCRPropertyListSource {
 
-    private final MCRSentinel sentinel;
-
     private final MCRValueExtractor<Value> extractor;
 
     MCRValueListSourceBase(MCRAnnotationProvider annotationProvider, MCRValueExtractor<Value> extractor) {
-        this.sentinel = annotationProvider.get(MCRSentinel.class);
+        super(annotationProvider);
         this.extractor = extractor;
     }
 
@@ -61,8 +58,8 @@ abstract sealed class MCRValueListSourceBase<Value> extends MCRSourceBase<List<V
 
         List<String> keyList = context.orderedKeys(listProperties);
         for (String key : keyList) {
-            MCRSourceContext nestedContext = context.nested(key, "property list element");
-            if (!rejectedBySentinel(sentinel, nestedContext, properties, keyPrefix + key + ".")) {
+            MCRSourceContext nestedContext = context.nested(key, context.description() + " element");
+            if (!rejectedBySentinel(nestedContext, properties, keyPrefix + key + ".")) {
                 if (key.charAt(0) == '-') {
                     headPropertyList.add(extractor.toValue(nestedContext, listProperties.get(key)));
                 } else {

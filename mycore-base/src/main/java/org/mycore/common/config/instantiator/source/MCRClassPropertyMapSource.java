@@ -38,7 +38,7 @@ final class MCRClassPropertyMapSource extends MCRValueMapSourceBase<Class<?>> {
 
     @Override
     public Type type() {
-        return Type.PROPERTY_MAP;
+        return Type.CLASS_PROPERTY_MAP;
     }
 
     @Override

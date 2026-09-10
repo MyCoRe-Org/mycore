@@ -30,15 +30,18 @@ class MCRClassPropertyExtractor implements MCRValueExtractor<Class<?>> {
 
     @Override
     public Class<?> toValue(MCRSourceContext context, String value) {
+        Class<?> configuredClass = loadConfiguredClass(context, value);
+        if (!valueClass.isAssignableFrom(configuredClass)) {
+            throw context.incompatibilityException(valueClass, configuredClass);
+        }
+        return configuredClass;
+    }
+
+    private Class<?> loadConfiguredClass(MCRSourceContext context, String value) {
         try {
-            Class<?> configuredClass = MCRClassTools.forName(value);
-            if (!valueClass.isAssignableFrom(configuredClass)) {
-                throw context.incompatibilityException(valueClass, configuredClass);
-            }
-            return configuredClass;
-        } catch (ClassNotFoundException exception) {
-            throw context.configurationException("has a class (" + value
-                + ") that could not be loaded", exception);
+            return MCRClassTools.forName(value);
+        } catch (ClassNotFoundException | LinkageError cause) {
+            throw context.configurationException("has a class (" + value + ") that could not be loaded", cause);
         }
     }
 

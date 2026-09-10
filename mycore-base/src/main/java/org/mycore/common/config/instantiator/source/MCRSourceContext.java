@@ -93,8 +93,8 @@ public final class MCRSourceContext {
         return new MCRConfigurationException(exceptionMessage(exceptionMessage));
     }
 
-    public MCRConfigurationException configurationException(String exceptionMessage, Exception exception) {
-        return new MCRConfigurationException(exceptionMessage(exceptionMessage), exception);
+    public MCRConfigurationException configurationException(String exceptionMessage, Throwable cause) {
+        return new MCRConfigurationException(exceptionMessage(exceptionMessage), cause);
     }
 
     public MCRConfigurationException incompatibilityException(Class<?> annotationValueClass, Class<?> actualClass) {

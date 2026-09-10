@@ -33,6 +33,12 @@ abstract sealed class MCRSourceBase<Result> implements MCRSource permits MCRInst
 
     protected final Logger logger = LogManager.getLogger(getClass());
 
+    private final MCRSentinel sentinel;
+
+    MCRSourceBase(MCRAnnotationProvider annotationProvider) {
+        this.sentinel = annotationProvider.get(MCRSentinel.class);
+    }
+
     @Override
     @SuppressWarnings("PMD.NPathComplexity")
     public final Result get(MCRInstanceConfiguration<?> configuration, MCRTarget target) {
@@ -97,10 +103,9 @@ abstract sealed class MCRSourceBase<Result> implements MCRSource permits MCRInst
 
     protected abstract Result missingResultReplacement();
 
-    protected final Object createInstance(MCRSourceContext context, MCRInstanceConfiguration<?> configuration,
-        MCRSentinel sentinel) {
+    protected final Object createInstance(MCRSourceContext context, MCRInstanceConfiguration<?> configuration) {
 
-        if (rejectedBySentinel(sentinel, context, configuration.properties(), "")) {
+        if (rejectedBySentinel(context, configuration.properties(), "")) {
             return null;
         }
 
@@ -122,7 +127,7 @@ abstract sealed class MCRSourceBase<Result> implements MCRSource permits MCRInst
 
     }
 
-    protected final boolean rejectedBySentinel(MCRSentinel sentinel, MCRSourceContext context,
+    protected final boolean rejectedBySentinel(MCRSourceContext context,
         Map<String, String> properties, String prefix) {
 
         if (sentinel != null) {

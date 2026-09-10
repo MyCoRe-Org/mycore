@@ -37,7 +37,7 @@ final class MCRClassPropertySource extends MCRValueSourceBase<Class<?>> {
 
     @Override
     public Type type() {
-        return Type.PROPERTY;
+        return Type.CLASS_PROPERTY;
     }
 
     @Override
