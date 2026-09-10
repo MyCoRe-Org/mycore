@@ -45,7 +45,6 @@ import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
@@ -69,13 +68,13 @@ import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
-import org.mycore.common.content.transformer.MCRXSLTransformer;
 import org.mycore.common.xml.MCREntityResolver;
 import org.mycore.common.xml.MCRLayoutTransformerFactory;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.common.xml.MCRXSLTransformerUtils;
 import org.mycore.common.xsl.MCRErrorListener;
+import org.mycore.common.xsl.MCRSAXTransformerFactoryManager;
 import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
 import org.mycore.datamodel.common.MCRActiveLinkException;
@@ -970,13 +969,13 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         MCRObjectID mcrId = MCRObjectID.getInstance(objectId);
         Document document = MCRXMLMetadataManager.obtainInstance().retrieveXML(mcrId);
         // do XSL transform
-        TransformerFactory transformerFactory = MCRXSLTransformer.createDefaultTransformerFactory();
-        transformerFactory.setErrorListener(new MCRErrorListener());
-        transformerFactory.setURIResolver(MCRURIResolver.obtainInstance());
         XMLReader xmlReader = MCRXMLParserFactory.getNonValidatingParser().getXMLReader();
         xmlReader.setEntityResolver(MCREntityResolver.getInstance());
         SAXSource styleSource = new SAXSource(xmlReader, style.getInputSource());
-        Transformer transformer = transformerFactory.newTransformer(styleSource);
+        Transformer transformer = MCRSAXTransformerFactoryManager
+            .obtainInstance()
+            .newTransformer(styleSource);
+        transformer.setErrorListener(new MCRErrorListener());
         for (Entry<String, String> property : MCRConfigurationBase.getAllPropertiesMap().entrySet()) {
             transformer.setParameter(property.getKey(), property.getValue());
         }

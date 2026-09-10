@@ -40,7 +40,6 @@ import java.util.concurrent.TimeUnit;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -69,8 +68,8 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRURLContent;
-import org.mycore.common.content.transformer.MCRXSLTransformer;
 import org.mycore.common.xml.MCRXMLFunctions;
+import org.mycore.common.xsl.MCRSAXTransformerFactoryManager;
 import org.mycore.resource.MCRResourceHelper;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Node;
@@ -143,7 +142,7 @@ public class MCRLayoutUtilities {
     /**
      * Verifies a given $webpage-ID (//item/@href) from navigation.xml on read
      * permission, based on ACL-System. To be used by XSL with
-     * Xalan-Java-Extension-Call. $blockerWebpageID can be used as already
+     * a Java extension call. $blockerWebpageID can be used as already
      * verified item with read access. So, only items of the ancestor axis till
      * and exclusive $blockerWebpageID are verified. Use this, if you want to
      * speed up the check
@@ -169,7 +168,7 @@ public class MCRLayoutUtilities {
     /**
      * Verifies a given $webpage-ID (//item/@href) from navigation.xml on read
      * permission, based on ACL-System. To be used by XSL with
-     * Xalan-Java-Extension-Call.
+     * a Java extension call.
      *
      * @param webpageID
      *            any item/@href from navigation.xml
@@ -400,8 +399,9 @@ public class MCRLayoutUtilities {
         if (LOGGER.isDebugEnabled()) {
             try {
                 String encoding = "UTF-8";
-                TransformerFactory tf = MCRXSLTransformer.createDefaultTransformerFactory();
-                Transformer transformer = tf.newTransformer();
+                Transformer transformer = MCRSAXTransformerFactoryManager
+                    .obtainInstance()
+                    .newTransformer();
                 transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
                 transformer.setOutputProperty(OutputKeys.METHOD, "xml");
                 transformer.setOutputProperty(OutputKeys.INDENT, "yes");

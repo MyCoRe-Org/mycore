@@ -35,10 +35,13 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstance;
 import org.mycore.common.config.annotation.MCRInstanceMap;
+import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.content.transformer.MCRXSLTransformer;
 import org.mycore.common.xsl.MCRParameterCollector;
+import org.mycore.common.xsl.MCRSAXTransformerFactoryManager;
+import org.mycore.common.xsl.MCRTransformerFactorySelector;
 import org.mycore.common.xsl.MCRXSLResourceHelper;
 
 /**
@@ -163,7 +166,7 @@ public class MCRXSLStyleURIResolver implements URIResolver {
             String[] stylesheets = augmentStylesheetsPaths(stylesheetPaths.split(","),
                 flavor.xslFolder);
             MCRXSLTransformer transformer =
-                MCRXSLTransformer.obtainInstance(flavor.getTransformerFactory(), stylesheets);
+                MCRXSLTransformer.obtainInstanceByFactory(flavor.getTransformerFactoryId(), stylesheets);
 
             //prepare parameter collector
             MCRParameterCollector parameterCollector = MCRParameterCollector.ofCurrentSession();
@@ -185,11 +188,11 @@ public class MCRXSLStyleURIResolver implements URIResolver {
     }
 
     /**
-     * Represents a named combination of a {@link TransformerFactory} class and an XSL folder.
+     * Represents a named combination of a transformer factory ID and an XSL folder.
      */
     public static class Flavor {
 
-        private Class<? extends TransformerFactory> transformerFactory;
+        private String transformerFactoryId;
 
         private String xslFolder;
 
@@ -197,22 +200,67 @@ public class MCRXSLStyleURIResolver implements URIResolver {
 
         }
 
-        public Flavor(Class<? extends TransformerFactory> transformerFactory, String xslFolder) {
-            this.transformerFactory = transformerFactory;
+        public Flavor(String transformerFactoryId, String xslFolder) {
+            this.transformerFactoryId = transformerFactoryId;
             this.xslFolder = xslFolder;
         }
 
+        /**
+         * @deprecated use {@link #Flavor(String, String)} with a configured factory ID
+         */
+        @Deprecated(forRemoval = true)
+        public Flavor(Class<? extends TransformerFactory> transformerFactory, String xslFolder) {
+            setTransformerFactory(transformerFactory);
+            this.xslFolder = xslFolder;
+        }
+
+        public String getTransformerFactoryId() {
+            return transformerFactoryId;
+        }
+
+        @MCRProperty(name = "TransformerFactory", required = false, order = 1)
+        public void setTransformerFactoryId(String transformerFactoryId) {
+            this.transformerFactoryId = MCRTransformerFactorySelector.getFactoryId(transformerFactoryId);
+        }
+
+        /**
+         * @deprecated use {@link #getTransformerFactoryId()}
+         */
+        @Deprecated(forRemoval = true)
         public Class<? extends TransformerFactory> getTransformerFactory() {
-            return transformerFactory;
+            return MCRSAXTransformerFactoryManager.obtainInstance(transformerFactoryId).getFactoryClass();
         }
 
+        /**
+         * @deprecated use {@link #setTransformerFactoryId(String)}
+         */
+        @Deprecated(forRemoval = true)
+        @SuppressWarnings("removal")
         public void setTransformerFactory(Class<? extends TransformerFactory> transformerFactory) {
-            this.transformerFactory = transformerFactory;
+            this.transformerFactoryId = MCRTransformerFactorySelector.getFactoryId(transformerFactory);
         }
 
-        @MCRInstance(name = "TransformerFactory", valueClass = TransformerFactory.class)
+        /**
+         * @deprecated configure {@code TransformerFactory=<id>} instead of {@code TransformerFactory.Class=<class>}
+         */
+        @Deprecated(forRemoval = true)
         public void setTransformerFactoryInstance(TransformerFactory transformerFactory) {
-            this.transformerFactory = transformerFactory.getClass();
+            LOGGER.warn("Class-based transformer factory configuration is deprecated. Configure and reference a "
+                + "factory ID instead.");
+            setTransformerFactory(transformerFactory.getClass());
+        }
+
+        @MCRPostConstruction
+        public void initialize(String configurationPrefix) {
+            if (transformerFactoryId != null) {
+                return;
+            }
+            String legacyProperty = configurationPrefix + ".TransformerFactory.Class";
+            MCRConfiguration2.<TransformerFactory>getClass(legacyProperty).ifPresent(factoryClass -> {
+                LOGGER.warn("Configuration property '{}' is deprecated. Configure and reference a factory ID "
+                    + "instead.", legacyProperty);
+                setTransformerFactory(factoryClass);
+            });
         }
 
         public String getXslFolder() {
@@ -226,7 +274,7 @@ public class MCRXSLStyleURIResolver implements URIResolver {
 
         @Override
         public String toString() {
-            return "Flavor[transformerFactory=" + transformerFactory + ", xslFolder=" + xslFolder + "]";
+            return "Flavor[transformerFactoryId=" + transformerFactoryId + ", xslFolder=" + xslFolder + "]";
         }
 
     }
@@ -238,7 +286,7 @@ public class MCRXSLStyleURIResolver implements URIResolver {
 
         /**
          * Optional explicit default flavor. If {@code null}, the default flavor is derived
-         * from {@code MCR.LayoutService.TransformerFactoryClass} and
+         * from {@code MCR.LayoutService.TransformerFactory} and
          * {@link MCRXSLResourceHelper#getXSLFolder()}.
          */
         @MCRInstance(name = "DefaultFlavor", valueClass = Flavor.class, required = false)
@@ -257,10 +305,7 @@ public class MCRXSLStyleURIResolver implements URIResolver {
         }
 
         private Flavor getDefaultFlavor() {
-            Class<? extends TransformerFactory> factory =
-                MCRConfiguration2.<TransformerFactory>getClass("MCR.LayoutService.TransformerFactoryClass")
-                    .orElseGet(TransformerFactory.newInstance()::getClass);
-            return new Flavor(factory, MCRXSLResourceHelper.getXSLFolder());
+            return new Flavor(MCRTransformerFactorySelector.getDefaultFactoryId(), MCRXSLResourceHelper.getXSLFolder());
         }
 
     }
