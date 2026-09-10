@@ -79,7 +79,6 @@ final class MCRInstantiator {
     }
 
     static <S> S instantiate(MCRInstanceConfiguration<S> configuration) throws MCRConfigurationException {
-
         Class<S> superClass = configuration.superClass();
 
         if (configuration.valueClass() == null) {
@@ -94,7 +93,6 @@ final class MCRInstantiator {
         }
 
         return superClass.cast(instance);
-
     }
 
     @SuppressWarnings("unchecked")

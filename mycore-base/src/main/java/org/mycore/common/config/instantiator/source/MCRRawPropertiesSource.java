@@ -18,15 +18,18 @@
 
 package org.mycore.common.config.instantiator.source;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.common.config.instantiator.MCRProperTree;
 import org.mycore.common.config.annotation.MCRRawProperties;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.common.config.instantiator.MCRInstantiatorUtils;
 import org.mycore.common.config.instantiator.target.MCRTarget;
+
+import com.google.common.base.Functions;
 
 /**
  * A {@link MCRRawPropertiesSource} is a {@link MCRRawProperties} that interprets a {@link MCRSource}.
@@ -35,15 +38,15 @@ final class MCRRawPropertiesSource implements MCRSource {
 
     private final MCRRawProperties annotation;
 
-    private final String prefix;
+    private final Function<MCRProperTree, MCRProperTree> treeFinder;
 
     MCRRawPropertiesSource(MCRRawProperties annotation) {
         this.annotation = annotation;
         String namePattern = annotation.namePattern();
         if (namePattern.equals("*")) {
-            this.prefix = "";
+            this.treeFinder = Functions.identity();
         } else if (namePattern.endsWith(".*")) {
-            this.prefix = namePattern.substring(0, namePattern.length() - 1);
+            this.treeFinder = tree -> tree.deeplyNested(namePattern.substring(0, namePattern.length() - 2));
         } else {
             throw new MCRConfigurationException("Unsupported name pattern:" + annotation.namePattern());
         }
@@ -77,17 +80,11 @@ final class MCRRawPropertiesSource implements MCRSource {
     @Override
     public Map<String, String> get(MCRInstanceConfiguration<?> configuration, MCRTarget target) {
 
-        Map<String, String> properties =
-            annotation.absolute() ? configuration.fullProperties() : configuration.properties();
+        MCRProperTree properties = annotation.absolute() ? configuration.fullProperties() : configuration.properties();
+        Map<String, String> rawProperties = treeFinder.apply(properties).toProperties();
+        rawProperties.remove(MCRInstanceConfiguration.CLASS_KEY);
 
-        Map<String, String> filteredProperties = new HashMap<>();
-        properties.forEach((key, value) -> {
-            if (key.startsWith(prefix)) {
-                filteredProperties.put(key.substring(prefix.length()), value);
-            }
-        });
-
-        if (filteredProperties.isEmpty() && annotation.required()) {
+        if (rawProperties.isEmpty() && annotation.required()) {
             String property;
             String description;
             if (annotation.absolute()) {
@@ -100,7 +97,7 @@ final class MCRRawPropertiesSource implements MCRSource {
             throw MCRInstantiatorUtils.emptyRawException(property, target, description);
         }
 
-        return filteredProperties;
+        return rawProperties;
 
     }
 

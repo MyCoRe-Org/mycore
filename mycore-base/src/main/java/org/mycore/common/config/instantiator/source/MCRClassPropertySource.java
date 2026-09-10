@@ -18,32 +18,31 @@
 
 package org.mycore.common.config.instantiator.source;
 
-import java.util.List;
 import java.util.Set;
 
-import org.mycore.common.config.annotation.MCRInstanceList;
+import org.mycore.common.config.annotation.MCRClassProperty;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
 /**
- * A {@link MCRInstanceListSource} is a {@link MCRSource} that interprets a {@link MCRInstanceList}.
+ * A {@link MCRClassPropertySource} is a {@link MCRSource} that interprets a {@link MCRClassProperty}.
  */
-final class MCRInstanceListSource extends MCRValueListSourceBase<Object> {
+final class MCRClassPropertySource extends MCRValueSourceBase<Class<?>> {
 
-    private final MCRInstanceList annotation;
+    private final MCRClassProperty annotation;
 
-    MCRInstanceListSource(MCRInstanceList annotation, MCRAnnotationProvider annotationProvider) {
-        super(annotationProvider, new MCRInstanceExtractor(annotation.valueClass()));
+    MCRClassPropertySource(MCRClassProperty annotation, MCRAnnotationProvider annotationProvider) {
+        super(annotationProvider, new MCRClassPropertyExtractor(annotation.valueClass()));
         this.annotation = annotation;
     }
 
     @Override
     public Type type() {
-        return Type.INSTANCE_LIST;
+        return Type.PROPERTY;
     }
 
     @Override
-    public Class<MCRInstanceList> annotationClass() {
-        return MCRInstanceList.class;
+    public Class<MCRClassProperty> annotationClass() {
+        return MCRClassProperty.class;
     }
 
     @Override
@@ -58,12 +57,12 @@ final class MCRInstanceListSource extends MCRValueListSourceBase<Object> {
 
     @Override
     public Class<?> valueClass() {
-        return List.class;
+        return Class.class;
     }
 
     @Override
     protected String description() {
-        return "instance list";
+        return "class";
     }
 
     @Override
@@ -73,22 +72,17 @@ final class MCRInstanceListSource extends MCRValueListSourceBase<Object> {
 
     @Override
     protected String defaultName() {
-        return "";
+        return annotation.defaultName();
     }
 
     @Override
     protected boolean supportsEmptyName() {
-        return true;
+        return false;
     }
 
     @Override
     protected boolean absoluteName() {
-        return false;
-    }
-
-    @Override
-    protected boolean supportsShortForm() {
-        return false;
+        return annotation.absolute();
     }
 
     @Override
