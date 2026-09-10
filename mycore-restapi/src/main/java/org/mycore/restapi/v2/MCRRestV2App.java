@@ -18,19 +18,24 @@
 
 package org.mycore.restapi.v2;
 
-import java.net.URI;
-import java.util.Collection;
-import java.util.Map;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
+import com.fasterxml.jackson.jakarta.rs.json.JacksonXmlBindJsonProvider;
+import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
+import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
+import io.swagger.v3.oas.integration.OpenApiConfigurationException;
+import io.swagger.v3.oas.integration.SwaggerConfiguration;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.servers.Server;
+import jakarta.ws.rs.ApplicationPath;
+import jakarta.ws.rs.InternalServerErrorException;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRClassProperty;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstanceMap;
+import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.restapi.MCRApiDraftFilter;
 import org.mycore.restapi.MCRContentNegotiationViaExtensionFilter;
@@ -42,18 +47,12 @@ import org.mycore.restapi.MCRRemoveMsgBodyFilter;
 import org.mycore.restapi.converter.MCRWrappedXMLWriter;
 import org.mycore.restapi.v1.MCRRestAPIAuthentication;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonXmlBindJsonProvider;
-
-import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
-import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
-import io.swagger.v3.oas.integration.OpenApiConfigurationException;
-import io.swagger.v3.oas.integration.SwaggerConfiguration;
-import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.info.License;
-import io.swagger.v3.oas.models.servers.Server;
-import jakarta.ws.rs.ApplicationPath;
-import jakarta.ws.rs.InternalServerErrorException;
+import java.net.URI;
+import java.util.Collection;
+import java.util.Map;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @ApplicationPath("/api/v2")
 public class MCRRestV2App extends MCRJerseyRestApp {
@@ -149,8 +148,20 @@ public class MCRRestV2App extends MCRJerseyRestApp {
             @MCRClassProperty(name = "To")
             public Class<?> apiClass;
 
+            private String property;
+
+            @MCRPostConstruction
+            public void init(String property) {
+                this.property = property;
+            }
+
             @Override
             public Binding get() {
+                if (!apiClass.isAssignableFrom(implementationClass)) {
+                    throw new IllegalArgumentException("Implementation " + this.implementationClass + " configured in "
+                        + property + ".From does not implement/extend " + this.apiClass + " configured in "
+                        + property + ".To");
+                }
                 return new Binding(implementationClass, apiClass);
             }
 
