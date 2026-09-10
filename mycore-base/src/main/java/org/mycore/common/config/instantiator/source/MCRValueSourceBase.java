@@ -21,18 +21,15 @@ package org.mycore.common.config.instantiator.source;
 import java.util.Map;
 
 import org.mycore.common.config.MCRConfigurationException;
-import org.mycore.common.config.annotation.MCRSentinel;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 
 abstract sealed class MCRValueSourceBase<Value> extends MCRSourceBase<Value> permits MCRClassPropertySource,
     MCRPropertySource {
 
-    private final MCRSentinel sentinel;
-
     private final MCRValueExtractor<Value> extractor;
 
     MCRValueSourceBase(MCRAnnotationProvider annotationProvider, MCRValueExtractor<Value> extractor) {
-        this.sentinel = annotationProvider.get(MCRSentinel.class);
+        super(annotationProvider);
         this.extractor = extractor;
     }
 
@@ -40,7 +37,7 @@ abstract sealed class MCRValueSourceBase<Value> extends MCRSourceBase<Value> per
     protected final Value getResult(MCRSourceContext context, MCRInstanceConfiguration<?> configuration,
         Map<String, String> properties, String prefix) {
 
-        if (rejectedBySentinel(sentinel, context, properties, prefix + ".")) {
+        if (rejectedBySentinel(context, properties, prefix + ".")) {
             return null;
         }
 

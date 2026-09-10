@@ -24,18 +24,15 @@ import java.util.stream.Collectors;
 
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
-import org.mycore.common.config.annotation.MCRSentinel;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 
 abstract sealed class MCRValueMapSourceBase<Value> extends MCRSourceBase<Map<String, Value>> permits
     MCRClassPropertyMapSource, MCRPropertyMapSource {
 
-    private final MCRSentinel sentinel;
-
     private final MCRValueExtractor<Value> extractor;
 
     MCRValueMapSourceBase(MCRAnnotationProvider annotationProvider, MCRValueExtractor<Value> extractor) {
-        this.sentinel = annotationProvider.get(MCRSentinel.class);
+        super(annotationProvider);
         this.extractor = extractor;
     }
 
@@ -64,8 +61,8 @@ abstract sealed class MCRValueMapSourceBase<Value> extends MCRSourceBase<Map<Str
         Map<String, Value> map = new HashMap<>();
 
         for (String key : mapProperties.keySet()) {
-            MCRSourceContext nestedContext = context.nested(key, "property map entry");
-            if (!rejectedBySentinel(sentinel, nestedContext, properties, keyPrefix + key + ".")) {
+            MCRSourceContext nestedContext = context.nested(key, context.description() + " entry");
+            if (!rejectedBySentinel(nestedContext, properties, keyPrefix + key + ".")) {
                 map.put(key, extractor.toValue(nestedContext, mapProperties.get(key)));
             }
         }

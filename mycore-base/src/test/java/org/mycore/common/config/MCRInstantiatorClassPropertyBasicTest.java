@@ -38,6 +38,8 @@ import org.mycore.test.MyCoReTest;
 @MyCoReTest
 public class MCRInstantiatorClassPropertyBasicTest {
 
+    public static final String MISSING_CLASS = "foo.bar.MissingClass";
+
     @Test
     @MCRTestConfiguration(
         properties = {
@@ -74,6 +76,23 @@ public class MCRInstantiatorClassPropertyBasicTest {
     @Test
     @MCRTestConfiguration(
         properties = {
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClass.class),
+            @MCRTestProperty(key = "Foo.Value", string = MISSING_CLASS),
+        })
+    public void missingClassValue() {
+
+        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
+            () -> MCRInstanceConfiguration.ofName(TestClass.class, "Foo").instantiate());
+
+        assertEquals("Class, configured in Foo.Value (and its sub-properties),"
+            + " for target field 'value' in configured class " + TestClass.class.getName()
+            + " has a class (" + MISSING_CLASS + ") that could not be loaded", exception.getMessage());
+
+    }
+
+    @Test
+    @MCRTestConfiguration(
+        properties = {
             @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithMap.class),
             @MCRTestProperty(key = "Foo.Values.foo", classNameOf = FooValue.class),
             @MCRTestProperty(key = "Foo.Values.bar", classNameOf = BarValue.class),
@@ -91,6 +110,43 @@ public class MCRInstantiatorClassPropertyBasicTest {
     @Test
     @MCRTestConfiguration(
         properties = {
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithMap.class),
+            @MCRTestProperty(key = "Foo.Values.foo", classNameOf = FooValue.class),
+            @MCRTestProperty(key = "Foo.Values.bar", classNameOf = IncompatibleValue.class),
+        })
+    public void incompatibleClassValueInMap() {
+
+        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
+            () -> MCRInstanceConfiguration.ofName(TestClass.class, "Foo").instantiate());
+
+        assertEquals("Class map entry, configured in Foo.Values.bar (and its sub-properties),"
+            + " for target field 'values' in configured class " + TestClassWithMap.class.getName()
+            + " has a class (" + IncompatibleValue.class.getName() + ") that is incompatible"
+            + " with the annotated value class (" + Value.class.getName() + ")", exception.getMessage());
+
+    }
+
+    @Test
+    @MCRTestConfiguration(
+        properties = {
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithMap.class),
+            @MCRTestProperty(key = "Foo.Values.foo", classNameOf = FooValue.class),
+            @MCRTestProperty(key = "Foo.Values.bar", string = MISSING_CLASS),
+        })
+    public void missingClassValueInMap() {
+
+        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
+            () -> MCRInstanceConfiguration.ofName(TestClass.class, "Foo").instantiate());
+
+        assertEquals("Class map entry, configured in Foo.Values.bar (and its sub-properties),"
+            + " for target field 'values' in configured class " + TestClassWithMap.class.getName()
+            + " has a class (" + MISSING_CLASS + ") that could not be loaded", exception.getMessage());
+
+    }
+
+    @Test
+    @MCRTestConfiguration(
+        properties = {
             @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithList.class),
             @MCRTestProperty(key = "Foo.Values.10", classNameOf = FooValue.class),
             @MCRTestProperty(key = "Foo.Values.20", classNameOf = BarValue.class),
@@ -102,6 +158,43 @@ public class MCRInstantiatorClassPropertyBasicTest {
         assertNotNull(instance);
         assertEquals(FooValue.class, instance.values.getFirst());
         assertEquals(BarValue.class, instance.values.getLast());
+
+    }
+
+    @Test
+    @MCRTestConfiguration(
+        properties = {
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithList.class),
+            @MCRTestProperty(key = "Foo.Values.10", classNameOf = FooValue.class),
+            @MCRTestProperty(key = "Foo.Values.20", classNameOf = IncompatibleValue.class),
+        })
+    public void incompatibleClassValueInList() {
+
+        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
+            () -> MCRInstanceConfiguration.ofName(TestClass.class, "Foo").instantiate());
+
+        assertEquals("Class list element, configured in Foo.Values.20 (and its sub-properties),"
+            + " for target field 'values' in configured class " + TestClassWithList.class.getName()
+            + " has a class (" + IncompatibleValue.class.getName() + ") that is incompatible"
+            + " with the annotated value class (" + Value.class.getName() + ")", exception.getMessage());
+
+    }
+
+    @Test
+    @MCRTestConfiguration(
+        properties = {
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithList.class),
+            @MCRTestProperty(key = "Foo.Values.10", classNameOf = FooValue.class),
+            @MCRTestProperty(key = "Foo.Values.20", string = MISSING_CLASS),
+        })
+    public void missingClassValueInList() {
+
+        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
+            () -> MCRInstanceConfiguration.ofName(TestClass.class, "Foo").instantiate());
+
+        assertEquals("Class list element, configured in Foo.Values.20 (and its sub-properties),"
+            + " for target field 'values' in configured class " + TestClassWithList.class.getName()
+            + " has a class (" + MISSING_CLASS + ") that could not be loaded", exception.getMessage());
 
     }
 
