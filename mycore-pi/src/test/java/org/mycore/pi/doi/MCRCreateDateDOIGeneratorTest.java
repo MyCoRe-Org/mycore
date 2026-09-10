@@ -46,7 +46,7 @@ import org.mycore.test.MyCoReTest;
 })
 public class MCRCreateDateDOIGeneratorTest {
 
-    public static final String DATE_FORMAT = "yyyyMMdd-HHmmss";
+    public static final String DATE_FORMAT = "yyyyMMdd";
 
     public static final String PREFIX = "10.1234";
 
