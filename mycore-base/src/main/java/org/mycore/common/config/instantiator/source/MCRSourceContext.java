@@ -70,6 +70,12 @@ public final class MCRSourceContext {
         return new MCRSourceContext(target, property + "." + prefix, description, hints);
     }
 
+    public MCRSourceContext withHint(String hint) {
+        List<String> hints = new ArrayList<>(this.hints);
+        hints.add(hint);
+        return new MCRSourceContext(target, property, description, hints);
+    }
+
     public List<String> orderedIntegerKeys(Collection<String> keys) {
 
         SortedMap<Integer, String> keyMap = new TreeMap<>();

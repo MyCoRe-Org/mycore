@@ -69,11 +69,14 @@ abstract sealed class MCRValueListSourceBase<Value> extends MCRSourceBase<List<V
         String shortFormProperty = properties.get("");
         if (supportsShortForm() && shortFormProperty != null) {
             List<Value> shortFormList = new ArrayList<>();
+            int shortFormIndex = 0;
             for (String shortFormValue : parseShortFormList(shortFormProperty)) {
-                Value value = extractor.toValue(context, Map.of("", shortFormValue), fullProperties);
+                MCRSourceContext indexContext = context.withHint("at index " + shortFormIndex);
+                Value value = extractor.toValue(indexContext, Map.of("", shortFormValue), fullProperties);
                 if (value != null) {
                     shortFormList.add(value);
                 }
+                shortFormIndex++;
             }
             list.addAll(negativeKeyCount, shortFormList);
         }
