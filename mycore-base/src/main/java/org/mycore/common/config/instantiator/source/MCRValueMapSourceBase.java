@@ -53,7 +53,8 @@ abstract sealed class MCRValueMapSourceBase<Value> extends MCRSourceBase<Map<Str
         String shortFormProperty = properties.get("");
         if (supportsShortForm() && shortFormProperty != null) {
             parseShortFormMap(shortFormProperty).forEach((key, shortFormValue) -> {
-                Value value = extractor.toValue(context, Map.of("", shortFormValue), fullProperties);
+                MCRSourceContext keyContext = context.withHint("for key " + key);
+                Value value = extractor.toValue(keyContext, Map.of("", shortFormValue), fullProperties);
                 if (value != null) {
                     map.put(key, value);
                 }
