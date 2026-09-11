@@ -149,6 +149,24 @@ public class MCRInstantiatorClassPropertyBasicTest {
     @Test
     @MCRTestConfiguration(
         properties = {
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithMap.class),
+        })
+    public void missingClassValueInShortMap() {
+
+        MCRConfiguration2.set("Foo.Values", "foo:" + FooValue.class.getName() + ",bar:" + MISSING_CLASS);
+
+        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
+            () -> MCRInstanceConfiguration.ofName(TestClass.class, "Foo").instantiate());
+
+        assertEquals("Class map (for key bar), configured in Foo.Values (and sub-properties thereof),"
+            + " for target field 'values' in configured class " + TestClassWithMap.class.getName()
+            + " has a class (" + MISSING_CLASS + ") that could not be loaded", exception.getMessage());
+
+    }
+
+    @Test
+    @MCRTestConfiguration(
+        properties = {
             @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithList.class),
             @MCRTestProperty(key = "Foo.Values.10", classNameOf = FooValue.class),
             @MCRTestProperty(key = "Foo.Values.10.Extra", string = "FOO"),
@@ -197,6 +215,24 @@ public class MCRInstantiatorClassPropertyBasicTest {
             () -> MCRInstanceConfiguration.ofName(TestClass.class, "Foo").instantiate());
 
         assertEquals("Class list element, configured in Foo.Values.20 (and sub-properties thereof),"
+            + " for target field 'values' in configured class " + TestClassWithList.class.getName()
+            + " has a class (" + MISSING_CLASS + ") that could not be loaded", exception.getMessage());
+
+    }
+
+    @Test
+    @MCRTestConfiguration(
+        properties = {
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClassWithList.class),
+        })
+    public void missingClassValueInShortList() {
+
+        MCRConfiguration2.set("Foo.Values", FooValue.class.getName() + "," + MISSING_CLASS);
+
+        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
+            () -> MCRInstanceConfiguration.ofName(TestClass.class, "Foo").instantiate());
+
+        assertEquals("Class list (at index 1), configured in Foo.Values (and sub-properties thereof),"
             + " for target field 'values' in configured class " + TestClassWithList.class.getName()
             + " has a class (" + MISSING_CLASS + ") that could not be loaded", exception.getMessage());
 
