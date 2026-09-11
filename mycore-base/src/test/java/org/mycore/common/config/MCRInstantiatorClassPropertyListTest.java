@@ -35,15 +35,15 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
-import org.mycore.common.config.annotation.MCRPropertyMap;
+import org.mycore.common.config.annotation.MCRClassPropertyList;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.test.MyCoReTest;
 
 /**
- * Tests for the following conditions (for relative properties and for absolute properties):
+ * Tests for the following conditions (for relative properties and for absolute class properties):
  * <ol>
  *   <li>Annotation has <code>required = false</code> or not</li>
- *   <li>Property value (for a single-element map) is not set, set empty in short form,
+ *   <li>Property value (for a single-element list) is not set, set empty in short form,
  *   set non-empty in short form or set non-empty in long form</li>
  *   <li>Annotation has <code>defaultName = "..."</code> or not</li>
  *   <li>Default property value (for a single-element map) is not set, set empty in short form,
@@ -62,70 +62,70 @@ import org.mycore.test.MyCoReTest;
  *     <td style="border: 1px solid;">not set / <code>A=</code></td>
  *     <td style="border: 1px solid;">no</td>
  *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;"><code>{}</code></td>
+ *     <td style="border: 1px solid;"><code>[]</code></td>
  *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;">not set / <code>A=</code></td>
  *     <td style="border: 1px solid;">yes</td>
  *     <td style="border: 1px solid;">not set / <code>X=</code></td>
- *     <td style="border: 1px solid;"><code>{}</code></td>
+ *     <td style="border: 1px solid;"><code>[]</code></td>
  *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;">not set / <code>A=</code></td>
  *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;"><code>X=Y:y,Z:z</code></td>
- *     <td style="border: 1px solid;"><code>{Y=y, Z=z}</code></td>
- *     <td style="border: 1px solid;"><code>{Y=y, Z=z}</code></td>
+ *     <td style="border: 1px solid;"><code>X=y,z</code></td>
+ *     <td style="border: 1px solid;"><code>[y, z]</code></td>
+ *     <td style="border: 1px solid;"><code>[y, z]</code></td>
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;">not set / <code>A=</code></td>
  *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;"><code>X.Y=y</code>, <code>X.Z=z</code></td>
- *     <td style="border: 1px solid;"><code>{Y=y, Z=z}</code></td>
- *     <td style="border: 1px solid;"><code>{Y=y, Z=z}</code></td>
+ *     <td style="border: 1px solid;"><code>X.1=y</code>, <code>X.2=z</code></td>
+ *     <td style="border: 1px solid;"><code>[y, z]</code></td>
+ *     <td style="border: 1px solid;"><code>[y, z]</code></td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;"><code>A=B:b,C:c</code></td>
+ *     <td style="border: 1px solid;"><code>A=b,c</code></td>
  *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;"><code>{B=b, C=c}</code></td>
- *     <td style="border: 1px solid;"><code>{B=b, C=c}</code></td>
+ *     <td style="border: 1px solid;"><code>[b, c]</code></td>
+ *     <td style="border: 1px solid;"><code>[b, c]</code></td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;"><code>A.B=b</code>, <code>A.C=c</code></td>
+ *     <td style="border: 1px solid;"><code>A.1=b</code>, <code>A.2=c</code></td>
  *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;"><code>{B=b, C=c}</code></td>
- *     <td style="border: 1px solid;"><code>{B=b, C=c}</code></td>
+ *     <td style="border: 1px solid;"><code>[b, c]</code></td>
+ *     <td style="border: 1px solid;"><code>[b, c]</code></td>
  *   </tr>
  * </table>
  */
 @MyCoReTest
-public class MCRInstantiatorPropertyMapTest {
+public class MCRInstantiatorClassPropertyListTest {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     public static final String CONFIGURED_CLASS_PROPERTY = "Foo.Class";
 
-    public static final String MAP_PROPERTY = "Foo.Map";
+    public static final String LIST_PROPERTY = "Foo.List";
 
-    public static final String MAP_PROPERTY_NON_EMPTY = "Foo.Map.nonEmpty";
+    public static final String LIST_PROPERTY_1 = "Foo.List.1";
 
-    public static final String MAP_PROPERTY_EMPTY = "Foo.Map.empty";
+    public static final String LIST_PROPERTY_2 = "Foo.List.2";
 
-    public static final String ABSOLUTE_MAP_PROPERTY = "MCR.Map";
+    public static final String ABSOLUTE_LIST_PROPERTY = "MCR.List";
 
-    public static final String ABSOLUTE_MAP_PROPERTY_NON_EMPTY = "MCR.Map.nonEmpty";
+    public static final String ABSOLUTE_LIST_PROPERTY_1 = "MCR.List.1";
 
-    public static final String ABSOLUTE_MAP_PROPERTY_EMPTY = "MCR.Map.empty";
+    public static final String ABSOLUTE_LIST_PROPERTY_2 = "MCR.List.2";
 
-    public static final String DEFAULT_MAP_PROPERTY = "MCR.Default.Map";
+    public static final String DEFAULT_LIST_PROPERTY = "MCR.Default.List";
 
-    public static final String DEFAULT_MAP_PROPERTY_NON_EMPTY = "MCR.Default.Map.nonEmpty";
+    public static final String DEFAULT_LIST_PROPERTY_1 = "MCR.Default.List.1";
 
-    public static final String DEFAULT_MAP_PROPERTY_EMPTY = "MCR.Default.Map.empty";
+    public static final String DEFAULT_LIST_PROPERTY_2 = "MCR.Default.List.2";
 
     private static Stream<Arguments> provideAllParameterCombinations() {
         List<Arguments> argumentsList = new ArrayList<>();
@@ -151,12 +151,12 @@ public class MCRInstantiatorPropertyMapTest {
     @ParameterizedTest
     @MethodSource("provideAllParameterCombinations")
     @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = MAP_PROPERTY, empty = true),
-        @MCRTestProperty(key = MAP_PROPERTY_NON_EMPTY, empty = true),
-        @MCRTestProperty(key = MAP_PROPERTY_EMPTY, empty = true),
-        @MCRTestProperty(key = DEFAULT_MAP_PROPERTY, empty = true),
-        @MCRTestProperty(key = DEFAULT_MAP_PROPERTY_NON_EMPTY, empty = true),
-        @MCRTestProperty(key = DEFAULT_MAP_PROPERTY_EMPTY, empty = true)
+        @MCRTestProperty(key = LIST_PROPERTY, empty = true),
+        @MCRTestProperty(key = LIST_PROPERTY_1, empty = true),
+        @MCRTestProperty(key = LIST_PROPERTY_2, empty = true),
+        @MCRTestProperty(key = DEFAULT_LIST_PROPERTY, empty = true),
+        @MCRTestProperty(key = DEFAULT_LIST_PROPERTY_1, empty = true),
+        @MCRTestProperty(key = DEFAULT_LIST_PROPERTY_2, empty = true)
     })
     void test(boolean absolute, boolean required, ValueProperty valueProperty, boolean defaultValue,
         DefaultProperty defaultProperty) {
@@ -206,28 +206,28 @@ public class MCRInstantiatorPropertyMapTest {
 
         // set class property for nested instance
         // empty strings are default via @MCRTestProperty above, may need to overwrite
-        String mapKey = absolute ? ABSOLUTE_MAP_PROPERTY : MAP_PROPERTY;
-        String mapPropertyNonEmptyKey = absolute ? ABSOLUTE_MAP_PROPERTY_NON_EMPTY : MAP_PROPERTY_NON_EMPTY;
-        String mapPropertyEmptyKey = absolute ? ABSOLUTE_MAP_PROPERTY_EMPTY : MAP_PROPERTY_EMPTY;
+        String listKey = absolute ? ABSOLUTE_LIST_PROPERTY : LIST_PROPERTY;
+        String listProperty1Key = absolute ? ABSOLUTE_LIST_PROPERTY_1 : LIST_PROPERTY_1;
+        String listProperty2Key = absolute ? ABSOLUTE_LIST_PROPERTY_2 : LIST_PROPERTY_2;
         switch (valueProperty) {
             case NOT_SET -> {
-                MCRConfiguration2.set(mapKey, (String) null);
-                MCRConfiguration2.set(mapPropertyNonEmptyKey, (String) null);
-                MCRConfiguration2.set(mapPropertyEmptyKey, (String) null);
+                MCRConfiguration2.set(listKey, (String) null);
+                MCRConfiguration2.set(listProperty1Key, (String) null);
+                MCRConfiguration2.set(listProperty2Key, (String) null);
             }
             case SET_EMPTY -> {
-                MCRConfiguration2.set(mapKey, "");
-                MCRConfiguration2.set(mapPropertyNonEmptyKey, (String) null);
-                MCRConfiguration2.set(mapPropertyEmptyKey, (String) null);
+                MCRConfiguration2.set(listKey, "");
+                MCRConfiguration2.set(listProperty1Key, (String) null);
+                MCRConfiguration2.set(listProperty2Key, (String) null);
             }
             case SET_SHORT_FORM -> {
-                MCRConfiguration2.set(mapKey, "nonEmpty:Value,empty:");
-                MCRConfiguration2.set(mapPropertyNonEmptyKey, (String) null);
-                MCRConfiguration2.set(mapPropertyEmptyKey, (String) null);
+                MCRConfiguration2.set(listKey, Value.class.getName() + ",");
+                MCRConfiguration2.set(listProperty1Key, (String) null);
+                MCRConfiguration2.set(listProperty2Key, (String) null);
             }
             case SET_LONG_FORM -> {
-                MCRConfiguration2.set(mapKey, (String) null);
-                MCRConfiguration2.set(mapPropertyNonEmptyKey, "Value");
+                MCRConfiguration2.set(listKey, (String) null);
+                MCRConfiguration2.set(listProperty1Key, Value.class.getName());
             }
         }
 
@@ -235,23 +235,23 @@ public class MCRInstantiatorPropertyMapTest {
         // empty string is default via @MCRTestProperty above, may need to overwrite
         switch (defaultProperty) {
             case NOT_SET -> {
-                MCRConfiguration2.set(DEFAULT_MAP_PROPERTY, (String) null);
-                MCRConfiguration2.set(DEFAULT_MAP_PROPERTY_NON_EMPTY, (String) null);
-                MCRConfiguration2.set(DEFAULT_MAP_PROPERTY_EMPTY, (String) null);
+                MCRConfiguration2.set(DEFAULT_LIST_PROPERTY, (String) null);
+                MCRConfiguration2.set(DEFAULT_LIST_PROPERTY_1, (String) null);
+                MCRConfiguration2.set(DEFAULT_LIST_PROPERTY_2, (String) null);
             }
             case SET_EMPTY -> {
-                MCRConfiguration2.set(DEFAULT_MAP_PROPERTY, "");
-                MCRConfiguration2.set(DEFAULT_MAP_PROPERTY_NON_EMPTY, (String) null);
-                MCRConfiguration2.set(DEFAULT_MAP_PROPERTY_EMPTY, (String) null);
+                MCRConfiguration2.set(DEFAULT_LIST_PROPERTY, "");
+                MCRConfiguration2.set(DEFAULT_LIST_PROPERTY_1, (String) null);
+                MCRConfiguration2.set(DEFAULT_LIST_PROPERTY_2, (String) null);
             }
             case SET_SHORT_FORM -> {
-                MCRConfiguration2.set(DEFAULT_MAP_PROPERTY, "nonEmpty:DefaultValue,empty:");
-                MCRConfiguration2.set(DEFAULT_MAP_PROPERTY_NON_EMPTY, (String) null);
-                MCRConfiguration2.set(DEFAULT_MAP_PROPERTY_EMPTY, (String) null);
+                MCRConfiguration2.set(DEFAULT_LIST_PROPERTY, DefaultValue.class.getName() + ",");
+                MCRConfiguration2.set(DEFAULT_LIST_PROPERTY_1, (String) null);
+                MCRConfiguration2.set(DEFAULT_LIST_PROPERTY_2, (String) null);
             }
             case SET_LONG_FORM -> {
-                MCRConfiguration2.set(DEFAULT_MAP_PROPERTY, (String) null);
-                MCRConfiguration2.set(DEFAULT_MAP_PROPERTY_NON_EMPTY, "DefaultValue");
+                MCRConfiguration2.set(DEFAULT_LIST_PROPERTY, (String) null);
+                MCRConfiguration2.set(DEFAULT_LIST_PROPERTY_1, DefaultValue.class.getName());
             }
         }
 
@@ -259,12 +259,12 @@ public class MCRInstantiatorPropertyMapTest {
         LOGGER.info("CONFIGURATION PROPERTIES");
         Map<String, String> propertiesMap = MCRConfigurationBase.getAllPropertiesMap();
         LOGGER.info("{}={}", CONFIGURED_CLASS_PROPERTY, get(propertiesMap, CONFIGURED_CLASS_PROPERTY));
-        LOGGER.info("{}={}", mapKey, get(propertiesMap, MAP_PROPERTY));
-        LOGGER.info("{}={}", mapPropertyNonEmptyKey, get(propertiesMap, MAP_PROPERTY_NON_EMPTY));
-        LOGGER.info("{}={}", mapPropertyEmptyKey, get(propertiesMap, MAP_PROPERTY_EMPTY));
-        LOGGER.info("{}={}", DEFAULT_MAP_PROPERTY, get(propertiesMap, DEFAULT_MAP_PROPERTY));
-        LOGGER.info("{}={}", DEFAULT_MAP_PROPERTY_NON_EMPTY, get(propertiesMap, DEFAULT_MAP_PROPERTY_NON_EMPTY));
-        LOGGER.info("{}={}", DEFAULT_MAP_PROPERTY_EMPTY, get(propertiesMap, DEFAULT_MAP_PROPERTY_EMPTY));
+        LOGGER.info("{}={}", listKey, get(propertiesMap, LIST_PROPERTY));
+        LOGGER.info("{}={}", listProperty1Key, get(propertiesMap, LIST_PROPERTY_1));
+        LOGGER.info("{}={}", listProperty2Key, get(propertiesMap, LIST_PROPERTY_2));
+        LOGGER.info("{}={}", DEFAULT_LIST_PROPERTY, get(propertiesMap, DEFAULT_LIST_PROPERTY));
+        LOGGER.info("{}={}", DEFAULT_LIST_PROPERTY_1, get(propertiesMap, DEFAULT_LIST_PROPERTY_1));
+        LOGGER.info("{}={}", DEFAULT_LIST_PROPERTY_2, get(propertiesMap, DEFAULT_LIST_PROPERTY_2));
 
         // perform instantiation of configured class
         Configurable instance = null;
@@ -283,8 +283,8 @@ public class MCRInstantiatorPropertyMapTest {
             assertNull(instance);
             assertNotNull(exception);
 
-            assertEquals("Default property map, configured in MCR.Default.Map (and sub-properties thereof),"
-                + " for target field 'map' in configured class " + configuredClass.getName()
+            assertEquals("Default class list, configured in MCR.Default.List (and sub-properties thereof),"
+                + " for target field 'list' in configured class " + configuredClass.getName()
                 + " is empty", exception.getMessage());
 
         } else if (required && emptyResultExpected) {
@@ -293,12 +293,12 @@ public class MCRInstantiatorPropertyMapTest {
             assertNotNull(exception);
 
             if (absolute) {
-                assertEquals("Absolute property map, configured in MCR.Map (and sub-properties thereof),"
-                    + " for target field 'map' in configured class " + configuredClass.getName()
+                assertEquals("Absolute class list, configured in MCR.List (and sub-properties thereof),"
+                    + " for target field 'list' in configured class " + configuredClass.getName()
                     + " is empty", exception.getMessage());
             } else {
-                assertEquals("Property map, configured in Foo.Map (and sub-properties thereof),"
-                    + " for target field 'map' in configured class " + configuredClass.getName()
+                assertEquals("Class list, configured in Foo.List (and sub-properties thereof),"
+                    + " for target field 'list' in configured class " + configuredClass.getName()
                     + " is empty", exception.getMessage());
             }
 
@@ -307,7 +307,7 @@ public class MCRInstantiatorPropertyMapTest {
             assertNull(exception);
             assertNotNull(instance);
 
-            Map<String, String> list = instance.map();
+            List<Class<?>> list = instance.list();
             assertNotNull(list);
 
             if (emptyResultExpected) {
@@ -317,13 +317,13 @@ public class MCRInstantiatorPropertyMapTest {
             } else {
 
                 assertEquals(1, list.size());
-                String value = list.get("nonEmpty");
+                Class<?> value = list.getFirst();
                 assertNotNull(value);
 
                 if (valueProperty.set()) {
-                    assertEquals("Value", value);
+                    assertEquals(Value.class, value);
                 } else {
-                    assertEquals("DefaultValue", value);
+                    assertEquals(DefaultValue.class, value);
                 }
 
             }
@@ -371,103 +371,111 @@ public class MCRInstantiatorPropertyMapTest {
 
     public interface Configurable {
 
-        Map<String, String> map();
+        List<Class<?>> list();
 
     }
 
     public static class RelativeNotRequiredDefaultNotSet implements Configurable {
 
-        @MCRPropertyMap(name = "Map", required = false)
-        public Map<String, String> map;
+        @MCRClassPropertyList(name = "List", required = false)
+        public List<Class<?>> list;
 
         @Override
-        public Map<String, String> map() {
-            return map;
+        public List<Class<?>> list() {
+            return list;
         }
 
     }
 
     public static class RelativeNotRequiredDefaultSet implements Configurable {
 
-        @MCRPropertyMap(name = "Map", required = false, defaultName = "MCR.Default.Map")
-        public Map<String, String> map;
+        @MCRClassPropertyList(name = "List", required = false, defaultName = "MCR.Default.List")
+        public List<Class<?>> list;
 
         @Override
-        public Map<String, String> map() {
-            return map;
+        public List<Class<?>> list() {
+            return list;
         }
 
     }
 
     public static class RelativeRequiredDefaultNotSet implements Configurable {
 
-        @MCRPropertyMap(name = "Map")
-        public Map<String, String> map;
+        @MCRClassPropertyList(name = "List")
+        public List<Class<?>> list;
 
         @Override
-        public Map<String, String> map() {
-            return map;
+        public List<Class<?>> list() {
+            return list;
         }
 
     }
 
     public static class RelativeRequiredDefaultSet implements Configurable {
 
-        @MCRPropertyMap(name = "Map", defaultName = "MCR.Default.Map")
-        public Map<String, String> map;
+        @MCRClassPropertyList(name = "List", defaultName = "MCR.Default.List")
+        public List<Class<?>> list;
 
         @Override
-        public Map<String, String> map() {
-            return map;
+        public List<Class<?>> list() {
+            return list;
         }
 
     }
 
     public static class AbsoluteNotRequiredDefaultNotSet implements Configurable {
 
-        @MCRPropertyMap(name = "MCR.Map", absolute = true, required = false)
-        public Map<String, String> map;
+        @MCRClassPropertyList(name = "MCR.List", absolute = true, required = false)
+        public List<Class<?>> list;
 
         @Override
-        public Map<String, String> map() {
-            return map;
+        public List<Class<?>> list() {
+            return list;
         }
 
     }
 
     public static class AbsoluteNotRequiredDefaultSet implements Configurable {
 
-        @MCRPropertyMap(name = "MCR.Map", absolute = true, required = false, defaultName = "MCR.Default.Map")
-        public Map<String, String> map;
+        @MCRClassPropertyList(name = "MCR.List", absolute = true, required = false, defaultName = "MCR.Default.List")
+        public List<Class<?>> list;
 
         @Override
-        public Map<String, String> map() {
-            return map;
+        public List<Class<?>> list() {
+            return list;
         }
 
     }
 
     public static class AbsoluteRequiredDefaultNotSet implements Configurable {
 
-        @MCRPropertyMap(name = "MCR.Map", absolute = true)
-        public Map<String, String> map;
+        @MCRClassPropertyList(name = "MCR.List", absolute = true)
+        public List<Class<?>> list;
 
         @Override
-        public Map<String, String> map() {
-            return map;
+        public List<Class<?>> list() {
+            return list;
         }
 
     }
 
     public static class AbsoluteRequiredDefaultSet implements Configurable {
 
-        @MCRPropertyMap(name = "MCR.Map", absolute = true, defaultName = "MCR.Default.Map")
-        public Map<String, String> map;
+        @MCRClassPropertyList(name = "MCR.List", absolute = true, defaultName = "MCR.Default.List")
+        public List<Class<?>> list;
 
         @Override
-        public Map<String, String> map() {
-            return map;
+        public List<Class<?>> list() {
+            return list;
         }
+
+    }
+
+    public static final class Value {
+
+    }
+
+    public static final class DefaultValue {
 
     }
 

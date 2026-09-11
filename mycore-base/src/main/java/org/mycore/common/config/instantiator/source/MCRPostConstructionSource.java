@@ -36,11 +36,6 @@ final class MCRPostConstructionSource implements MCRSource {
     }
 
     @Override
-    public Type type() {
-        return Type.POST_CONSTRUCTION;
-    }
-
-    @Override
     public Class<MCRPostConstruction> annotationClass() {
         return MCRPostConstruction.class;
     }
