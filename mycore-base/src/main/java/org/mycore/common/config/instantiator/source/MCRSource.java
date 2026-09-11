@@ -23,6 +23,8 @@ import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
@@ -48,7 +50,9 @@ import org.mycore.common.config.instantiator.target.MCRTarget;
  */
 public sealed interface MCRSource permits MCRSourceBase, MCRPostConstructionSource, MCRRawPropertiesSource {
 
-    Type type();
+    default Type type() {
+        return Type.fromAnnotation(annotationClass());
+    }
 
     Class<? extends Annotation> annotationClass();
 
@@ -106,6 +110,14 @@ public sealed interface MCRSource permits MCRSourceBase, MCRPostConstructionSour
             Group.POST_CONSTRUCTION,
             new Mapper<>(MCRPostConstruction.class, MCRPostConstructionSource::new));
 
+        private static final Map<Class<? extends Annotation>, Type> TYPES_BY_ANNOTATION = new HashMap<>();
+
+        static {
+            for (Type type : values()) {
+                TYPES_BY_ANNOTATION.put(type.mapper.annotationClass, type);
+            }
+        }
+
         private final Group group;
 
         private final Mapper<? extends Annotation> mapper;
@@ -113,6 +125,14 @@ public sealed interface MCRSource permits MCRSourceBase, MCRPostConstructionSour
         Type(Group group, Mapper<? extends Annotation> mapper) {
             this.group = group;
             this.mapper = mapper;
+        }
+
+        public static Type fromAnnotation(Class<? extends Annotation> annotationClass) {
+            Type type = TYPES_BY_ANNOTATION.get(annotationClass);
+            if (type == null) {
+                throw new IllegalArgumentException("Unknown annotation class " + annotationClass);
+            }
+            return type;
         }
 
         public int order() {

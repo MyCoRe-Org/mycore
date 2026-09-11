@@ -37,11 +37,6 @@ final class MCRClassPropertyListSource extends MCRValueListSourceBase<Class<?>> 
     }
 
     @Override
-    public Type type() {
-        return Type.CLASS_PROPERTY_LIST;
-    }
-
-    @Override
     public Class<MCRClassPropertyList> annotationClass() {
         return MCRClassPropertyList.class;
     }
