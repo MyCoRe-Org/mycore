@@ -50,11 +50,6 @@ final class MCRRawPropertiesSource implements MCRSource {
     }
 
     @Override
-    public Type type() {
-        return Type.RAW_PROPERTIES;
-    }
-
-    @Override
     public Class<MCRRawProperties> annotationClass() {
         return MCRRawProperties.class;
     }

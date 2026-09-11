@@ -93,13 +93,12 @@ public final class MCRSourceContext {
         return new MCRConfigurationException(exceptionMessage(exceptionMessage));
     }
 
-    public MCRConfigurationException configurationException(String exceptionMessage, Exception exception) {
-        return new MCRConfigurationException(exceptionMessage(exceptionMessage), exception);
+    public MCRConfigurationException configurationException(String exceptionMessage, Throwable cause) {
+        return new MCRConfigurationException(exceptionMessage(exceptionMessage), cause);
     }
 
-    public MCRConfigurationException incompatibilityException(
-        Class<?> annotationValueClass, Object instance) {
-        return configurationException("has a class (" + instance.getClass().getName() + "),"
+    public MCRConfigurationException incompatibilityException(Class<?> annotationValueClass, Class<?> actualClass) {
+        return configurationException("has a class (" + actualClass.getName() + ")"
             + " that is incompatible with the annotated value class (" + annotationValueClass.getName() + ")");
     }
 
