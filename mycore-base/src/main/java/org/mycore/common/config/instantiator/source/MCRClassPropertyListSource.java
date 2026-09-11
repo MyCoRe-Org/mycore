@@ -32,7 +32,7 @@ final class MCRClassPropertyListSource extends MCRValueListSourceBase<Class<?>> 
     private final MCRClassPropertyList annotation;
 
     MCRClassPropertyListSource(MCRClassPropertyList annotation, MCRAnnotationProvider annotationProvider) {
-        super(annotationProvider, new MCRClassPropertyExtractor(annotation.valueClass()));
+        super(annotationProvider, new MCRClassPropertyExtractor(annotation.superClass()));
         this.annotation = annotation;
     }
 

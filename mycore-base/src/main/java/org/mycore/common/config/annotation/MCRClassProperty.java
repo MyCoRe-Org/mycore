@@ -38,14 +38,14 @@ import org.mycore.common.config.MCRConfigurationException;
 public @interface MCRClassProperty {
 
     /**
-     * @return The name of property containing the string value.
+     * @return The name of property containing the {@link Class} value.
      */
     String name();
 
     /**
-     * @return The class or a superclass of the configured class.
+     * @return The class or a superclass of the class represented by the {@link Class} value.
      */
-    Class<?> valueClass() default Object.class;
+    Class<?> superClass() default Object.class;
 
     /**
      * @return true if the property specified by {@link MCRClassProperty#name()} has to be present in the properties.
