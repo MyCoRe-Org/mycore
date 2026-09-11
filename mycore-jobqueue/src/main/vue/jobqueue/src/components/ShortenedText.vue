@@ -37,7 +37,7 @@
 </template>
 <script setup lang="ts">
 
-import {computed, defineProps, reactive} from 'vue'
+import {computed, reactive} from 'vue'
 
 const props = defineProps({
   text: {
