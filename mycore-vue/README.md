@@ -24,6 +24,7 @@ and the viewer) are not part of this module. They keep their own `package.json`,
 | `vite.shared.ts` | shared vite configuration, see below |
 | `tsconfig.json` | shared TypeScript compiler options, extended by the app configs |
 | `env.d.ts` | shared ambient types, referenced by the `env.d.ts` of every app |
+| `eslint.config.mjs` | shared flat eslint config, re-exported by the `eslint.config.mjs` of an app |
 
 ## Adding an app to the shared toolchain
 
@@ -80,7 +81,15 @@ its `yarn.lock` and its local `node_modules`.
    ```ts
    /// <reference path="../../../../../mycore-vue/env.d.ts" />
    ```
-5. Point the `frontend-maven-plugin` execution of the owning module at this module, see the next section.
+5. If the app is linted, let its `eslint.config.mjs` re-export the shared one, so that the plugin imports resolve
+   against the shared `node_modules` while the file patterns stay relative to the app:
+
+   ```js
+   export { default } from '../../../../../mycore-vue/eslint.config.mjs';
+   ```
+
+   The lint script then runs eslint with the app directory as working directory.
+6. Point the `frontend-maven-plugin` execution of the owning module at this module, see the next section.
 
 ## Build integration rules
 
@@ -123,6 +132,17 @@ only walks up the directory tree of the importing file. Both toolchains have to 
 
 * The apps are migrated one at a time in separate tickets. A `build:<app>` script only works once the matching
   `vite.config.mts` exists.
+* Tests, coverage and linting of an app are also driven from here. webcli is the reference:
+  `test:webcli`, `test-coverage:webcli`, `lint:webcli`, `typecheck:webcli`, `ci-check:webcli`,
+  `test-a11y:webcli` and `test-performance:webcli`. The vitest configuration stays in the app's `vite.config.mts`, its paths are relative to the
+  app root, which `defineMCRVueApp` sets.
+* The playwright configuration stays with the app it tests, and it has to keep the extension `.ts`. Playwright
+  transpiles a `.ts` config to CommonJS and applies the `paths` of the app's `tsconfig.json`, which is what makes
+  `@playwright/test` resolve against the shared node_modules. A `.mts` config is loaded as a real ES module, and
+  that loader ignores those `paths` and fails with `ERR_MODULE_NOT_FOUND`. The same applies to the test files.
+* A test server that playwright starts as a plain node process gets neither the transpilation nor the `paths`.
+  The webcli websocket stub therefore pulls `ws` through a `createRequire` anchored in this module, the same
+  idea as the anchor in `vite.shared.ts`. The a11y static server only uses node builtins and needs nothing.
 * `vue-i18n` is pinned to the exact version `11.4.2`. From `11.4.3` on it requires node 22, while the reactor POM
   pins `node.version` to `v20.19.0`. The pin can be dropped as soon as the node version is raised.
 * `vite-plugin-eslint` (access-key-manager2) is unmaintained and is not part of the shared toolchain. Linting runs
