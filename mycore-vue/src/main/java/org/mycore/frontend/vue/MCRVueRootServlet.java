@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.mycore.webtools.vue;
+package org.mycore.frontend.vue;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -75,7 +75,7 @@ import jakarta.servlet.http.HttpServletResponse;
  *
  * &lt;servlet&gt;
  *   &lt;servlet-name&gt;MCRVueRootServlet&lt;/servlet-name&gt;
- *   &lt;servlet-class&gt;org.mycore.webtools.vue.MCRVueRootServlet&lt;/servlet-class&gt;
+ *   &lt;servlet-class&gt;org.mycore.frontend.vue.MCRVueRootServlet&lt;/servlet-class&gt;
  *   &lt;init-param&gt;
  *   &lt;param-name&gt;heading&lt;/param-name&gt;
  *   &lt;param-value&gt;webtools.texteditor.heading&lt;/param-value&gt;
@@ -209,7 +209,7 @@ public class MCRVueRootServlet extends MCRContentServlet {
             String mainParam = headingI18nKey == null ? req.getServletPath() : MCRTranslation.translate(headingI18nKey);
             resp.sendError(
                 HttpServletResponse.SC_FORBIDDEN,
-                getErrorI18N("component.webtools.error", "accessDenied", mainParam, currentSession.getUserInformation()
+                getErrorI18N("component.vue.error", "accessDenied", mainParam, currentSession.getUserInformation()
                     .getUserID(), currentSession.getCurrentIP()));
             return null;
         }

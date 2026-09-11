@@ -12,7 +12,7 @@
 
   <servlet>
     <servlet-name>MCRVueRootServlet</servlet-name>
-    <servlet-class>org.mycore.webtools.vue.MCRVueRootServlet</servlet-class>
+    <servlet-class>org.mycore.frontend.vue.MCRVueRootServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>MCRVueRootServlet</servlet-name>
