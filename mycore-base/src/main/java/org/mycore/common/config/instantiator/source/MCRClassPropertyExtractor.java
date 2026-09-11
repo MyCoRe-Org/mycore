@@ -20,19 +20,23 @@ package org.mycore.common.config.instantiator.source;
 
 import org.mycore.common.MCRClassTools;
 
+/**
+ * A {@link MCRClassPropertyExtractor} is a {@link MCRPropertyExtractor} that uses
+ * {@link MCRClassTools#forName(String)} to extract {@link Class} values.
+ */
 class MCRClassPropertyExtractor implements MCRValueExtractor<Class<?>> {
 
-    private final Class<?> valueClass;
+    private final Class<?> superClass;
 
-    MCRClassPropertyExtractor(Class<?> valueClass) {
-        this.valueClass = valueClass;
+    MCRClassPropertyExtractor(Class<?> superClass) {
+        this.superClass = superClass;
     }
 
     @Override
     public Class<?> toValue(MCRSourceContext context, String value) {
         Class<?> configuredClass = loadConfiguredClass(context, value);
-        if (!valueClass.isAssignableFrom(configuredClass)) {
-            throw context.incompatibilityException(valueClass, configuredClass);
+        if (!superClass.isAssignableFrom(configuredClass)) {
+            throw context.incompatibilityException(superClass, configuredClass);
         }
         return configuredClass;
     }

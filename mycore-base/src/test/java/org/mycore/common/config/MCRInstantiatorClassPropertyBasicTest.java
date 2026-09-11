@@ -200,21 +200,21 @@ public class MCRInstantiatorClassPropertyBasicTest {
 
     public static class TestClass {
 
-        @MCRClassProperty(name = "Value", valueClass = Value.class)
+        @MCRClassProperty(name = "Value", superClass = Value.class)
         public Class<? extends Value> value;
 
     }
 
     public static class TestClassWithMap {
 
-        @MCRClassPropertyMap(name = "Values", valueClass = Value.class)
+        @MCRClassPropertyMap(name = "Values", superClass = Value.class)
         public Map<String, Class<? extends Value>> values;
 
     }
 
     public static class TestClassWithList {
 
-        @MCRClassPropertyList(name = "Values", valueClass = Value.class)
+        @MCRClassPropertyList(name = "Values", superClass = Value.class)
         public List<Class<? extends Value>> values;
 
     }

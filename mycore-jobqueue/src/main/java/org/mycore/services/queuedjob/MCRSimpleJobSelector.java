@@ -153,7 +153,7 @@ public final class MCRSimpleJobSelector implements MCRJobSelector {
 
     public static class Factory implements Supplier<MCRSimpleJobSelector> {
 
-        @MCRClassPropertyList(name = ACTIONS_KEY, valueClass = MCRJobAction.class,
+        @MCRClassPropertyList(name = ACTIONS_KEY, superClass = MCRJobAction.class,
             defaultName = "MCR.QueuedJob.Selectors.Default.Actions")
         public List<Class<? extends MCRJobAction>> actions;
 

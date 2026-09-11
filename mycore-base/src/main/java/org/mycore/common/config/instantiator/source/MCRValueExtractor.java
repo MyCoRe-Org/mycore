@@ -18,6 +18,11 @@
 
 package org.mycore.common.config.instantiator.source;
 
+/**
+ * A {@link MCRValueExtractor} extracts a value (of a specific type) from a configured string value.
+ *
+ * @param <Value> the type of value to be extracted.
+ */
 interface MCRValueExtractor<Value> {
 
     Value toValue(MCRSourceContext context, String value);

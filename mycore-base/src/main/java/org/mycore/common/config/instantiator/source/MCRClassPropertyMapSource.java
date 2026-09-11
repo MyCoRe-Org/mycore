@@ -32,7 +32,7 @@ final class MCRClassPropertyMapSource extends MCRValueMapSourceBase<Class<?>> {
     private final MCRClassPropertyMap annotation;
 
     MCRClassPropertyMapSource(MCRClassPropertyMap annotation, MCRAnnotationProvider annotationProvider) {
-        super(annotationProvider, new MCRClassPropertyExtractor(annotation.valueClass()));
+        super(annotationProvider, new MCRClassPropertyExtractor(annotation.superClass()));
         this.annotation = annotation;
     }
 

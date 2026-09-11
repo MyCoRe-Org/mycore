@@ -18,6 +18,10 @@
 
 package org.mycore.common.config.instantiator.source;
 
+/**
+ * A {@link MCRClassPropertyExtractor} is a {@link MCRPropertyExtractor} that extracts
+ * {@link String} values.
+ */
 class MCRPropertyExtractor implements MCRValueExtractor<String> {
 
     @Override

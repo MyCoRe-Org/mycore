@@ -43,9 +43,9 @@ public @interface MCRClassPropertyMap {
     String name() default "";
 
     /**
-     * @return The class or a superclass of the configured class.
+     * @return The class or a superclass of the class represented by the {@link Class} values.
      */
-    Class<?> valueClass() default Object.class;
+    Class<?> superClass() default Object.class;
 
     /**
      * @return true if the at least one sub-property of the property specified by {@link MCRClassPropertyMap#name()}
