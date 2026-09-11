@@ -37,11 +37,6 @@ final class MCRPropertyMapSource extends MCRValueMapSourceBase<String> {
     }
 
     @Override
-    public Type type() {
-        return Type.PROPERTY_MAP;
-    }
-
-    @Override
     public Class<MCRPropertyMap> annotationClass() {
         return MCRPropertyMap.class;
     }

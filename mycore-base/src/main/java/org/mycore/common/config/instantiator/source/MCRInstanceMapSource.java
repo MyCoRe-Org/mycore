@@ -40,11 +40,6 @@ final class MCRInstanceMapSource extends MCRSourceBase<Map<String, Object>> {
     }
 
     @Override
-    public Type type() {
-        return Type.INSTANCE_MAP;
-    }
-
-    @Override
     public Class<MCRInstanceMap> annotationClass() {
         return MCRInstanceMap.class;
     }

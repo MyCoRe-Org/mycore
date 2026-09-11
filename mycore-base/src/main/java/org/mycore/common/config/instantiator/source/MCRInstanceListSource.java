@@ -41,11 +41,6 @@ final class MCRInstanceListSource extends MCRSourceBase<List<Object>> {
     }
 
     @Override
-    public Type type() {
-        return Type.INSTANCE_LIST;
-    }
-
-    @Override
     public Class<MCRInstanceList> annotationClass() {
         return MCRInstanceList.class;
     }
