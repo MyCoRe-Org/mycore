@@ -1,0 +1,52 @@
+{
+  "name": "mycore-vue",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Shared Vue/Vite/TypeScript toolchain for all MyCoRe Vue applications",
+  "license": "GPL-3.0-or-later",
+  "scripts": {
+    "build:texteditor": "vite build --config ../mycore-webtools/src/main/vue/texteditor/vite.config.mts",
+    "build:processing": "vite build --config ../mycore-webtools/src/main/vue/processing/vite.config.mts",
+    "build:jobqueue": "vite build --config ../mycore-jobqueue/src/main/vue/jobqueue/vite.config.mts",
+    "build:webcli": "vite build --config ../mycore-webcli/src/main/vue/webcli/vite.config.mts",
+    "build:access-key-manager": "vite build --config ../mycore-acl/src/main/vue/access-key-manager2/vite.config.mts",
+    "build:all": "run-s build:texteditor build:processing build:jobqueue build:webcli build:access-key-manager"
+  },
+  "dependencies": {
+    "@jsr/mycore__js-common": "^0.0.7",
+    "@mycore-org/vue-access-key-manager": "^0.1.10",
+    "@mycore-org/vue-components": "^0.1.5",
+    "bootstrap": "^5.3.3",
+    "font-awesome": "^4.7.0",
+    "prismjs": "^1.30.0",
+    "vue": "^3.5.25",
+    "vue-i18n": "11.4.2",
+    "vue-prism-editor": "^2.0.0-alpha.2",
+    "vue-router": "^4.6.3"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.54.2",
+    "@popperjs/core": "^2.11.8",
+    "@types/bootstrap": "^5.2.10",
+    "@types/node": "^20.19.25",
+    "@types/prismjs": "^1.26.6",
+    "@vitejs/plugin-vue": "^6.0.4",
+    "@vitest/coverage-v8": "^4.1.0",
+    "@vue/test-utils": "^2.4.6",
+    "@vue/tsconfig": "^0.8.1",
+    "eslint": "^10.1.0",
+    "eslint-plugin-vue": "^10.8.0",
+    "globals": "^17.4.0",
+    "jsdom": "^28.1.0",
+    "npm-run-all2": "^7.0.2",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.57.1",
+    "vite": "^8.0.0",
+    "vitest": "^4.1.0",
+    "vue-eslint-parser": "^10.4.0",
+    "vue-tsc": "^3.2.6"
+  }
+}

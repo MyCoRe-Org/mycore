@@ -54,7 +54,7 @@
             <phase>generate-resources</phase>
             <configuration>
               <workingDirectory>${basedir}/src/main/vue/webcli</workingDirectory>
-              <arguments>install</arguments>
+              <arguments>install ${yarn.install.args}</arguments>
             </configuration>
           </execution>
           <execution>
@@ -144,7 +144,7 @@
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
-      <artifactId>mycore-webtools</artifactId>
+      <artifactId>mycore-vue</artifactId>
       <scope>runtime</scope>
     </dependency>
     <dependency>
