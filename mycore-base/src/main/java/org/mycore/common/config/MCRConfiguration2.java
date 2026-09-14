@@ -18,6 +18,8 @@
 
 package org.mycore.common.config;
 
+import static org.mycore.common.config.instantiator.MCRInstanceConfiguration.CLASS_SUFFIX;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -46,8 +48,6 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 
 import jakarta.inject.Singleton;
-
-import static org.mycore.common.config.instantiator.MCRInstanceConfiguration.CLASS_SUFFIX;
 
 /**
  * Provides methods to manage and read all configuration properties from the MyCoRe configuration files.
@@ -522,8 +522,8 @@ public class MCRConfiguration2 {
     private static <T> Class<? extends T> getClassObject(String classname) {
         try {
             return MCRClassTools.forName(classname.trim());
-        } catch (ClassNotFoundException ex) {
-            throw new MCRConfigurationException("Could not load class.", ex);
+        } catch (ClassNotFoundException | LinkageError cause) {
+            throw new MCRConfigurationException("Failed to load class (" + classname + ")", cause);
         }
     }
 

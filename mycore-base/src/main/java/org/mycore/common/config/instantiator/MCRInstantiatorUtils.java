@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-import org.mycore.common.MCRClassTools;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.instantiator.source.MCRSource;
 import org.mycore.common.config.instantiator.target.MCRTarget;
@@ -35,15 +34,6 @@ import org.mycore.common.config.instantiator.target.MCRTarget;
 public final class MCRInstantiatorUtils {
 
     private MCRInstantiatorUtils() {
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T> Class<T> getClass(String property, String className) {
-        try {
-            return (Class<T>) MCRClassTools.forName(className);
-        } catch (ClassNotFoundException e) {
-            throw new MCRConfigurationException("Missing class (" + className + ") configured in: " + property, e);
-        }
     }
 
     public static String methodNames(List<Method> methods) {
