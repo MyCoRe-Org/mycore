@@ -99,7 +99,7 @@ public final class MCRSourceContext {
 
     public MCRConfigurationException incompatibilityException(Class<?> annotationValueClass, Class<?> actualClass) {
         return configurationException("has a class (" + actualClass.getName() + ")"
-            + " that is incompatible with the annotated value class (" + annotationValueClass.getName() + ")");
+            + " that is incompatible with the annotated class (" + annotationValueClass.getName() + ")");
     }
 
     public MCRConfigurationException missingException() {

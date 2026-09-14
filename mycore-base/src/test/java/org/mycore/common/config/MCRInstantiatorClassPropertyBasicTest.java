@@ -69,7 +69,7 @@ public class MCRInstantiatorClassPropertyBasicTest {
         assertEquals("Class, configured in Foo.Value (and its sub-properties),"
             + " for target field 'value' in configured class " + TestClass.class.getName()
             + " has a class (" + IncompatibleValue.class.getName() + ") that is incompatible"
-            + " with the annotated value class (" + Value.class.getName() + ")", exception.getMessage());
+            + " with the annotated class (" + Value.class.getName() + ")", exception.getMessage());
 
     }
 
@@ -122,7 +122,7 @@ public class MCRInstantiatorClassPropertyBasicTest {
         assertEquals("Class map entry, configured in Foo.Values.bar (and its sub-properties),"
             + " for target field 'values' in configured class " + TestClassWithMap.class.getName()
             + " has a class (" + IncompatibleValue.class.getName() + ") that is incompatible"
-            + " with the annotated value class (" + Value.class.getName() + ")", exception.getMessage());
+            + " with the annotated class (" + Value.class.getName() + ")", exception.getMessage());
 
     }
 
@@ -176,7 +176,7 @@ public class MCRInstantiatorClassPropertyBasicTest {
         assertEquals("Class list element, configured in Foo.Values.20 (and its sub-properties),"
             + " for target field 'values' in configured class " + TestClassWithList.class.getName()
             + " has a class (" + IncompatibleValue.class.getName() + ") that is incompatible"
-            + " with the annotated value class (" + Value.class.getName() + ")", exception.getMessage());
+            + " with the annotated class (" + Value.class.getName() + ")", exception.getMessage());
 
     }
 

@@ -19,10 +19,10 @@
 package org.mycore.common.config.instantiator.source;
 
 /**
- * A {@link MCRClassPropertyExtractor} is a {@link MCRPropertyExtractor} that extracts
+ * A {@link MCRPropertyExtractor} is a {@link MCRValueExtractor} that extracts
  * {@link String} values.
  */
-class MCRPropertyExtractor implements MCRValueExtractor<String> {
+final class MCRPropertyExtractor implements MCRValueExtractor<String> {
 
     @Override
     public String toValue(MCRSourceContext context, String value) {

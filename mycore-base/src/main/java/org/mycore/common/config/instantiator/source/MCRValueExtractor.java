@@ -23,7 +23,7 @@ package org.mycore.common.config.instantiator.source;
  *
  * @param <Value> the type of value to be extracted.
  */
-interface MCRValueExtractor<Value> {
+sealed interface MCRValueExtractor<Value> permits MCRClassPropertyExtractor, MCRPropertyExtractor {
 
     Value toValue(MCRSourceContext context, String value);
 

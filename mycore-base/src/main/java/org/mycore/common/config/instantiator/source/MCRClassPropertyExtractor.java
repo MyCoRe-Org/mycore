@@ -21,10 +21,10 @@ package org.mycore.common.config.instantiator.source;
 import org.mycore.common.MCRClassTools;
 
 /**
- * A {@link MCRClassPropertyExtractor} is a {@link MCRPropertyExtractor} that uses
+ * A {@link MCRClassPropertyExtractor} is a {@link MCRValueExtractor} that uses
  * {@link MCRClassTools#forName(String)} to extract {@link Class} values.
  */
-class MCRClassPropertyExtractor implements MCRValueExtractor<Class<?>> {
+final class MCRClassPropertyExtractor implements MCRValueExtractor<Class<?>> {
 
     private final Class<?> superClass;
 

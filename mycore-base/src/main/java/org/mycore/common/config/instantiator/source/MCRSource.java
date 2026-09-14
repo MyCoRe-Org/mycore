@@ -162,7 +162,7 @@ public sealed interface MCRSource permits MCRSourceBase, MCRPostConstructionSour
             }
 
             private Optional<MCRSource> toSource(MCRAnnotationProvider annotationProvider) {
-                return Optional.ofNullable(annotationProvider.get(annotationClass()))
+                return Optional.ofNullable(annotationProvider.get(annotationClass))
                     .map(annotation -> factory.apply(annotation, annotationProvider));
             }
 
