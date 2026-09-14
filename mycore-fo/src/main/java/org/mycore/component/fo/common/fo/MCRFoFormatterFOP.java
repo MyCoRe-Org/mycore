@@ -35,8 +35,6 @@ import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.sax.SAXResult;
 
 import org.apache.fop.apps.EnvironmentalProfileFactory;
@@ -54,13 +52,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.xmlgraphics.io.Resource;
 import org.apache.xmlgraphics.io.ResourceResolver;
-import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRSourceContent;
-import org.mycore.common.xsl.MCRErrorListener;
-import org.mycore.common.xsl.uriresolver.MCRURIResolver;
+import org.mycore.common.xsl.MCRSAXTransformerFactoryManager;
+import org.mycore.common.xsl.MCRTransformerFactorySelector;
 import org.mycore.resource.MCRResourceHelper;
 
 /**
@@ -73,7 +70,13 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    private static final String FACTORY_PROPERTY = "MCR.LayoutService.FoFormatter.TransformerFactory";
+
+    private static final String LEGACY_FACTORY_PROPERTY = "MCR.LayoutService.FoFormatter.transformerFactoryImpl";
+
     private FopFactory fopFactory;
+
+    private MCRSAXTransformerFactoryManager factoryManager;
 
     final ResourceResolver resolver = new ResourceResolver() {
         @Override
@@ -141,17 +144,13 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
             }
         }
         fopFactory = fopFactoryBuilder.build();
-        getTransformerFactory();
+        factoryManager = getTransformerFactoryManager();
     }
 
-    private static TransformerFactory getTransformerFactory() throws TransformerFactoryConfigurationError {
-        TransformerFactory transformerFactory = MCRConfiguration2
-            .getString("MCR.LayoutService.FoFormatter.transformerFactoryImpl")
-            .map(impl -> TransformerFactory.newInstance(impl, MCRClassTools.getClassLoader()))
-            .orElseGet(TransformerFactory::newInstance);
-        transformerFactory.setURIResolver(MCRURIResolver.obtainInstance());
-        transformerFactory.setErrorListener(new MCRErrorListener());
-        return transformerFactory;
+    private static MCRSAXTransformerFactoryManager getTransformerFactoryManager() {
+        String factoryId = MCRTransformerFactorySelector.getFactoryId(FACTORY_PROPERTY, LEGACY_FACTORY_PROPERTY,
+            MCRTransformerFactorySelector.getDefaultFactoryId());
+        return MCRSAXTransformerFactoryManager.obtainInstance(factoryId);
     }
 
     @Override
@@ -164,7 +163,7 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
             final Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, userAgent, out);
             final Source src = input.getSource();
             final Result res = new SAXResult(fop.getDefaultHandler());
-            Transformer transformer = getTransformerFactory().newTransformer();
+            Transformer transformer = factoryManager.newTransformer();
             transformer.transform(src, res);
         } catch (FOPException e) {
             throw new TransformerException(e);
