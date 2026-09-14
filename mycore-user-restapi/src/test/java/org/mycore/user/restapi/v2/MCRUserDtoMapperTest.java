@@ -35,6 +35,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.test.MCRJPAExtension;
 import org.mycore.test.MyCoReTest;
 import org.mycore.user.restapi.v2.dto.MCRCreateUserRequest;
+import org.mycore.user.restapi.v2.dto.MCRUpdateUserProfileRequest;
 import org.mycore.user.restapi.v2.dto.MCRUpdateUserRequest;
 import org.mycore.user.restapi.v2.dto.MCRUserDetail;
 import org.mycore.user.restapi.v2.dto.MCRUserStandard;
@@ -249,6 +250,51 @@ public class MCRUserDtoMapperTest {
         assertEquals(1, result.getAttributes().size());
         assertNotNull(result.getUserAttribute("new"));
         assertNull(result.getUserAttribute("old"));
+    }
+
+    @Test
+    void applyUpdateWithOwnRequestShouldUpdateProfileFields() {
+        MCRUser user = buildUser("john");
+
+        MCRUpdateUserProfileRequest request = new MCRUpdateUserProfileRequest("John Doe", "john@example.com", "hint");
+
+        MCRUser result = mapper.applyUpdate(user, request);
+
+        assertEquals("John Doe", result.getRealName());
+        assertEquals("john@example.com", result.getEMail());
+        assertEquals("hint", result.getHint());
+    }
+
+    @Test
+    void applyUpdateWithOwnRequestShouldNotTouchRoles() {
+        MCRUser user = buildUser("john");
+        user.assignRole("editor");
+
+        MCRUpdateUserProfileRequest request = new MCRUpdateUserProfileRequest("John Doe", null, null);
+
+        MCRUser result = mapper.applyUpdate(user, request);
+
+        assertEquals(1, result.getSystemRoleIDs().size());
+        assertTrue(result.getSystemRoleIDs().contains("editor"));
+    }
+
+    @Test
+    void applyUpdateWithOwnRequestShouldNotTouchAttributesLockStateValidUntilOrOwner() {
+        MCRUser owner = buildUser("admin");
+        MCRUser user = buildUser("john");
+        user.setUserAttribute("foo", "bar");
+        user.setLocked(true);
+        user.setValidUntil(Date.from(Instant.parse("2099-01-01T00:00:00Z")));
+        user.setOwner(owner);
+
+        MCRUpdateUserProfileRequest request = new MCRUpdateUserProfileRequest("John Doe", null, null);
+
+        MCRUser result = mapper.applyUpdate(user, request);
+
+        assertEquals("bar", result.getUserAttribute("foo"));
+        assertTrue(result.isLocked());
+        assertNotNull(result.getValidUntil());
+        assertEquals("admin", result.getOwner().getUserID());
     }
 
     private MCRUser buildUser(String userId) {
