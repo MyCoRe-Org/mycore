@@ -34,6 +34,24 @@
   </properties>
   <build>
     <plugins>
+      <!-- Remove dependencies left behind by the former app-local Vue toolchain. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-clean-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-clean</id>
+            <configuration>
+              <filesets combine.children="append">
+                <fileset>
+                  <directory>${project.basedir}/src/main/vue/texteditor/node_modules</directory>
+                  <followSymlinks>false</followSymlinks>
+                </fileset>
+              </filesets>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>com.github.eirslett</groupId>
         <artifactId>frontend-maven-plugin</artifactId>
@@ -79,17 +97,7 @@
               <arguments>build</arguments>
             </configuration>
           </execution>
-          <execution>
-            <id>yarn-install-texteditor</id>
-            <goals>
-              <goal>yarn</goal>
-            </goals>
-            <phase>generate-resources</phase>
-            <configuration>
-              <workingDirectory>${basedir}/src/main/vue/texteditor</workingDirectory>
-              <arguments>install ${yarn.install.args}</arguments>
-            </configuration>
-          </execution>
+          <!-- the texteditor uses the shared toolchain in mycore-vue, which already ran yarn install -->
           <execution>
             <id>yarn-build-texteditor</id>
             <goals>
@@ -97,8 +105,8 @@
             </goals>
             <phase>generate-resources</phase>
             <configuration>
-              <workingDirectory>${basedir}/src/main/vue/texteditor</workingDirectory>
-              <arguments>build</arguments>
+              <workingDirectory>${basedir}/../mycore-vue</workingDirectory>
+              <arguments>build:texteditor</arguments>
             </configuration>
           </execution>
           <execution>

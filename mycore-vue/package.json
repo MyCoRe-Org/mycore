@@ -6,7 +6,10 @@
   "description": "Shared Vue/Vite/TypeScript toolchain for all MyCoRe Vue applications",
   "license": "GPL-3.0-or-later",
   "scripts": {
-    "build:texteditor": "vite build --config ../mycore-webtools/src/main/vue/texteditor/vite.config.mts",
+    "build:texteditor": "run-s type-check:texteditor build-only:texteditor",
+    "build-only:texteditor": "vite build --config ../mycore-webtools/src/main/vue/texteditor/vite.config.mts",
+    "type-check:texteditor": "vue-tsc --noEmit -p ../mycore-webtools/src/main/vue/texteditor/tsconfig.json",
+    "dev:texteditor": "vite --config ../mycore-webtools/src/main/vue/texteditor/vite.config.mts",
     "build:processing": "vite build --config ../mycore-webtools/src/main/vue/processing/vite.config.mts",
     "build:jobqueue": "vite build --config ../mycore-jobqueue/src/main/vue/jobqueue/vite.config.mts",
     "build:webcli": "vite build --config ../mycore-webcli/src/main/vue/webcli/vite.config.mts",
