@@ -1,7 +1,19 @@
 {
-  "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ]
+  "extends": "../../../../../mycore-vue/tsconfig.json",
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue", "vite.config.mts"],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "typeRoots": ["../../../../../mycore-vue/node_modules/@types"],
+    "paths": {
+      "*": [
+        "../../../../../mycore-vue/node_modules/@types/*",
+        "../../../../../mycore-vue/node_modules/*"
+      ]
+    },
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true
+  }
 }

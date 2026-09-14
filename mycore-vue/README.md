@@ -46,7 +46,8 @@ its `yarn.lock` and its local `node_modules`.
 
    `resourcePath` is the path below `target/classes/META-INF/resources` and has to match the `url-pattern` the app
    is bound to in the `web-fragment.xml` of the owning module. App specific settings are passed as a second
-   argument and are merged on top of the shared defaults.
+   argument and are merged on top of the shared defaults. vite 8 bundles with rolldown, so bundler settings go
+   below `build.rolldownOptions`, not below the deprecated `build.rollupOptions`.
 
    The `.mts` extension and the explicit `.ts` extension in the import are required: without them vite warns that
    the config cannot be loaded natively, because after the migration there is no `package.json` next to the app
