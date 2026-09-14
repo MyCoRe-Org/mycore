@@ -1,17 +1,23 @@
 {
-  "extends": "@vue/tsconfig/tsconfig.dom.json",
+  "extends": "../../../../../mycore-vue/tsconfig.json",
   "compilerOptions": {
-    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
-    "paths": {
-      "@/*": ["./src/*"]
-    },
-    "strict": true,
     "verbatimModuleSyntax": false,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
-    "typeRoots": ["node_modules/@types", "src/types"]
+    "baseUrl": ".",
+    "typeRoots": ["../../../../../mycore-vue/node_modules/@types", "src/types"],
+    "paths": {
+      "@/*": ["./src/*"],
+      "@jsr/mycore__js-common/*": [
+        "../../../../../mycore-vue/node_modules/@jsr/mycore__js-common/_dist/src/*/index.d.ts"
+      ],
+      "*": [
+        "../../../../../mycore-vue/node_modules/@types/*",
+        "../../../../../mycore-vue/node_modules/*"
+      ]
+    }
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue", "vite.config.mts"]
 }

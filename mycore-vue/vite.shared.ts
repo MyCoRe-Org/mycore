@@ -93,6 +93,47 @@ function sharedToolchainResolver(): Plugin {
   };
 }
 
+/** Module specifier of the bootstrap package. */
+const BOOTSTRAP_MODULE = 'bootstrap';
+
+/** Virtual module that reads the bootstrap components off the global object. */
+const BOOTSTRAP_GLOBAL_MODULE = '\0mycore:bootstrap-global';
+
+/** The complete export surface of bootstrap 5. Named exports have to be known statically to the bundler. */
+const BOOTSTRAP_EXPORTS = ['Alert', 'Button', 'Carousel', 'Collapse', 'Dropdown', 'Modal', 'Offcanvas', 'Popover',
+  'ScrollSpy', 'Tab', 'Toast', 'Tooltip'];
+
+/**
+ * Resolves imports of the bootstrap package to the <code>window.bootstrap</code> global, which the surrounding
+ * MyCoRe page provides, so that bootstrap is not shipped a second time inside an app bundle. Imports of individual
+ * files, like the bootstrap stylesheet, are left alone.
+ *
+ * This replaces rollup-plugin-external-globals, which does not work with the rolldown bundler of vite 8.
+ *
+ * Only applied to builds. The dev server has no MyCoRe page around the app and therefore no global to read, so
+ * <code>yarn dev:&lt;app&gt;</code> uses the bootstrap package from the shared node_modules instead.
+ */
+export function bootstrapFromWindow(): Plugin {
+  return {
+    name: 'mycore:bootstrap-from-window',
+    enforce: 'pre',
+    apply: 'build',
+    resolveId(source) {
+      return source === BOOTSTRAP_MODULE ? BOOTSTRAP_GLOBAL_MODULE : null;
+    },
+    load(id) {
+      if (id !== BOOTSTRAP_GLOBAL_MODULE) {
+        return null;
+      }
+      return [
+        'const bootstrap = window.bootstrap;',
+        `export const { ${BOOTSTRAP_EXPORTS.join(', ')} } = bootstrap;`,
+        'export default bootstrap;',
+      ].join('\n');
+    },
+  };
+}
+
 export interface MCRVueAppOptions {
   /**
    * Location of the app's own vite config, always passed as `import.meta.url`. Everything else is derived from it,
