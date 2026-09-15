@@ -29,9 +29,15 @@ import org.mycore.common.config.instantiator.MCRInstantiatorUtils;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
 abstract sealed class MCRSourceBase<Result> implements MCRSource permits MCRInstanceListSource, MCRInstanceMapSource,
-    MCRInstanceSource, MCRPropertyListSource, MCRPropertyMapSource, MCRPropertySource {
+    MCRInstanceSource, MCRValueListSourceBase, MCRValueMapSourceBase, MCRValueSourceBase {
 
     protected final Logger logger = LogManager.getLogger(getClass());
+
+    private final MCRSentinel sentinel;
+
+    MCRSourceBase(MCRAnnotationProvider annotationProvider) {
+        this.sentinel = annotationProvider.get(MCRSentinel.class);
+    }
 
     @Override
     @SuppressWarnings("PMD.NPathComplexity")
@@ -97,10 +103,9 @@ abstract sealed class MCRSourceBase<Result> implements MCRSource permits MCRInst
 
     protected abstract Result missingResultReplacement();
 
-    protected final Object createInstance(MCRSourceContext context, MCRInstanceConfiguration<?> configuration,
-        MCRSentinel sentinel) {
+    protected final Object createInstance(MCRSourceContext context, MCRInstanceConfiguration<?> configuration) {
 
-        if (rejectedBySentinel(sentinel, context, configuration.properties(), "")) {
+        if (rejectedBySentinel(context, configuration.properties(), "")) {
             return null;
         }
 
@@ -115,14 +120,14 @@ abstract sealed class MCRSourceBase<Result> implements MCRSource permits MCRInst
         Object instance = configuration.instantiate();
 
         if (!configuration.valueClass().isAssignableFrom(instance.getClass())) {
-            throw context.incompatibilityException(configuration.valueClass(), instance);
+            throw context.incompatibilityException(configuration.valueClass(), instance.getClass());
         }
 
         return instance;
 
     }
 
-    protected final boolean rejectedBySentinel(MCRSentinel sentinel, MCRSourceContext context,
+    protected final boolean rejectedBySentinel(MCRSourceContext context,
         Map<String, String> properties, String prefix) {
 
         if (sentinel != null) {

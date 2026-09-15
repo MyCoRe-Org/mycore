@@ -91,8 +91,8 @@ public final class MCRInstanceConfiguration<S> {
         try {
             Class<? extends S> valueClass = MCRClassTools.forName(className);
             return ofClass(superClass, valueClass, prefix);
-        } catch (ClassNotFoundException e) {
-            throw new MCRException("Failed to load class " + className, e);
+        } catch (ClassNotFoundException | LinkageError cause) {
+            throw new MCRException("Failed to load class (" + className + ")", cause);
         }
     }
 
@@ -173,14 +173,11 @@ public final class MCRInstanceConfiguration<S> {
 
         String className = properties.get("Class");
         if (className != null) {
-            if (className.isBlank()) {
-                return null;
-            }
             try {
                 return MCRClassTools.forName(className);
-            } catch (ClassNotFoundException e) {
-                throw new MCRConfigurationException("Missing class (" + className + ")" +
-                    " configured in: " + name.actual(), e);
+            } catch (ClassNotFoundException | LinkageError cause) {
+                throw new MCRConfigurationException("Failed to load class (" + className + ") configured in "
+                    + name.actual(), cause);
             }
         }
 

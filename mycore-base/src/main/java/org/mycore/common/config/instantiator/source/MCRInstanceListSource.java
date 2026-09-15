@@ -25,7 +25,6 @@ import java.util.Set;
 
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRInstanceList;
-import org.mycore.common.config.annotation.MCRSentinel;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
@@ -36,16 +35,9 @@ final class MCRInstanceListSource extends MCRSourceBase<List<Object>> {
 
     private final MCRInstanceList annotation;
 
-    private final MCRSentinel sentinel;
-
     MCRInstanceListSource(MCRInstanceList annotation, MCRAnnotationProvider annotationProvider) {
+        super(annotationProvider);
         this.annotation = annotation;
-        this.sentinel = annotationProvider.get(MCRSentinel.class);
-    }
-
-    @Override
-    public Type type() {
-        return Type.INSTANCE_LIST;
     }
 
     @Override
@@ -112,7 +104,7 @@ final class MCRInstanceListSource extends MCRSourceBase<List<Object>> {
 
             MCRSourceContext nestedContext = context.nested(key, "instance list element");
             MCRInstanceConfiguration<?> nestedConfiguration = nestedConfigurationMap.get(key);
-            Object instance = createInstance(nestedContext, nestedConfiguration, sentinel);
+            Object instance = createInstance(nestedContext, nestedConfiguration);
 
             if (instance != null) {
                 instanceList.add(instance);

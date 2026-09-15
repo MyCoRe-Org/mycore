@@ -24,7 +24,6 @@ import java.util.Set;
 
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRInstanceMap;
-import org.mycore.common.config.annotation.MCRSentinel;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
@@ -35,16 +34,9 @@ final class MCRInstanceMapSource extends MCRSourceBase<Map<String, Object>> {
 
     private final MCRInstanceMap annotation;
 
-    private final MCRSentinel sentinel;
-
     MCRInstanceMapSource(MCRInstanceMap annotation, MCRAnnotationProvider annotationProvider) {
+        super(annotationProvider);
         this.annotation = annotation;
-        this.sentinel = annotationProvider.get(MCRSentinel.class);
-    }
-
-    @Override
-    public Type type() {
-        return Type.INSTANCE_MAP;
     }
 
     @Override
@@ -110,7 +102,7 @@ final class MCRInstanceMapSource extends MCRSourceBase<Map<String, Object>> {
 
             MCRSourceContext nestedContext = context.nested(key, "instance map entry");
             MCRInstanceConfiguration<?> nestedConfiguration = nestedConfigurationMap.get(key);
-            Object instance = createInstance(nestedContext, nestedConfiguration, sentinel);
+            Object instance = createInstance(nestedContext, nestedConfiguration);
 
             if (instance != null) {
                 instanceMap.put(key, instance);
