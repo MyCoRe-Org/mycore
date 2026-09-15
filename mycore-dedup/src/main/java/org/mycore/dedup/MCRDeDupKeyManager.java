@@ -25,7 +25,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -224,15 +223,18 @@ public class MCRDeDupKeyManager {
      * <p>
      * Criterion values are truncated to {@link MCRDeDupKey#MAX_VALUE_LENGTH} characters before
      * matching, exactly as in {@link #storeKeys(MCRObjectID, Set)}.
+     * <p>
+     * No-duplicate markings are not taken into account here, as the criteria are not bound to a
+     * specific object: all objects sharing a criterion are returned.
      *
      * @param criteria the criteria to match, may be empty
      * @return matching objects mapped to the criteria they share
      */
     public Map<MCRObjectID, Set<MCRDeDupCriterion>> findDuplicates(Set<MCRDeDupCriterion> criteria) {
-        List<MCRDeDupCriterion> truncated = new ArrayList<>(truncate(criteria));
-        if (truncated.isEmpty()) {
+        if (criteria.isEmpty()) {
             return Map.of();
         }
+        List<MCRDeDupCriterion> truncated = new ArrayList<>(truncate(criteria));
 
         StringBuilder query = new StringBuilder("SELECT k.objectId, k.type, k.value FROM MCRDeDupKey k WHERE ");
         for (int i = 0; i < truncated.size(); i++) {
@@ -266,6 +268,10 @@ public class MCRDeDupKeyManager {
      * Instead of a self-join over the whole key table this loads only the keys that actually have a
      * matching partner (via an {@code EXISTS} semi-join) and groups them in memory, which avoids the
      * combinatorial blow-up of a plain self-join.
+     * <p>
+     * As the query orders the keys by criterion, all objects sharing one criterion form one
+     * consecutive block of rows. Each block is read as a whole and then expanded into the pairs of
+     * its members.
      *
      * @return the possible duplicate pairs, one entry per pair and matching criterion
      */
@@ -282,26 +288,53 @@ public class MCRDeDupKeyManager {
         Set<ObjectIdPair> noDuplicatePairs = loadNoDuplicatePairs(em);
         List<MCRPossibleDuplicate> result = new ArrayList<>();
 
-        int index = 0;
-        while (index < rows.size()) {
-            String type = (String) rows.get(index)[1];
-            String value = (String) rows.get(index)[2];
-            List<String> members = new ArrayList<>();
-            while (index < rows.size() && Objects.equals(rows.get(index)[1], type)
-                && Objects.equals(rows.get(index)[2], value)) {
-                members.add((String) rows.get(index)[0]);
-                index++;
-            }
-            MCRDeDupCriterion criterion = new MCRDeDupCriterion(type, value);
-            for (int a = 0; a < members.size(); a++) {
-                for (int b = a + 1; b < members.size(); b++) {
-                    if (!noDuplicatePairs.contains(ObjectIdPair.of(members.get(a), members.get(b)))) {
-                        result.add(MCRPossibleDuplicate.of(members.get(a), members.get(b), criterion));
-                    }
+        int blockStart = 0;
+        while (blockStart < rows.size()) {
+            MCRDeDupCriterion criterion = toCriterion(rows.get(blockStart));
+            int blockEnd = findEndOfCriterionBlock(rows, blockStart, criterion);
+            List<String> currentCriterionMembers = rows.subList(blockStart, blockEnd).stream()
+                .map(row -> (String) row[0])
+                .toList();
+            addPairs(result, currentCriterionMembers, criterion, noDuplicatePairs);
+            blockStart = blockEnd;
+        }
+        return result;
+    }
+
+    /**
+     * Returns the index of the first row after {@code blockStart} that no longer belongs to the given
+     * criterion, i.e. the exclusive end of the block of rows sharing that criterion.
+     */
+    private static int findEndOfCriterionBlock(List<Object[]> rows, int blockStart, MCRDeDupCriterion criterion) {
+        int index = blockStart;
+        while (index < rows.size() && toCriterion(rows.get(index)).equals(criterion)) {
+            index++;
+        }
+        return index;
+    }
+
+    /**
+     * Adds one entry for each pair of the given objects to the result, leaving out the pairs that are
+     * marked as no-duplicates of each other.
+     */
+    private static void addPairs(List<MCRPossibleDuplicate> result, List<String> objectIds,
+        MCRDeDupCriterion criterion, Set<ObjectIdPair> noDuplicatePairs) {
+        for (int a = 0; a < objectIds.size(); a++) {
+            for (int b = a + 1; b < objectIds.size(); b++) {
+                String objectIdA = objectIds.get(a);
+                String objectIdB = objectIds.get(b);
+                if (!noDuplicatePairs.contains(ObjectIdPair.of(objectIdA, objectIdB))) {
+                    result.add(MCRPossibleDuplicate.of(objectIdA, objectIdB, criterion));
                 }
             }
         }
-        return result;
+    }
+
+    /**
+     * Converts a result row of {@code objectId, type, value} into the criterion it carries.
+     */
+    private static MCRDeDupCriterion toCriterion(Object[] row) {
+        return new MCRDeDupCriterion((String) row[1], (String) row[2]);
     }
 
     private Set<ObjectIdPair> loadNoDuplicatePairs(EntityManager em) {

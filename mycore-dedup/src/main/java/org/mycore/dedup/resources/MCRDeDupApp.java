@@ -21,15 +21,24 @@ package org.mycore.dedup.resources;
 import org.apache.logging.log4j.LogManager;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.restapi.MCRJerseyRestApp;
+import org.mycore.restapi.v2.MCRExceptionMapper;
 
 import jakarta.ws.rs.ApplicationPath;
 
 /**
  * Standalone JAX-RS application that exposes the deduplication query API under {@code /api/dedup}.
  * The JAX-RS resource packages are configured via {@code MCR.DeDup.API.Resource.Packages}.
+ * <p>
+ * Failures are turned into a machine readable error document by the registered
+ * {@link MCRExceptionMapper}, so that clients get the same error format as the REST API.
  */
 @ApplicationPath("/api/dedup")
 public class MCRDeDupApp extends MCRJerseyRestApp {
+
+    public MCRDeDupApp() {
+        super();
+        register(MCRExceptionMapper.class);
+    }
 
     @Override
     protected void initAppName() {
