@@ -33,7 +33,11 @@
     "type-check:access-key-manager": "vue-tsc --noEmit -p ../mycore-acl/src/main/vue/access-key-manager2/tsconfig.json",
     "lint:access-key-manager": "cd ../mycore-acl/src/main/vue/access-key-manager2 && eslint src vite.config.mts",
     "dev:access-key-manager": "vite --config ../mycore-acl/src/main/vue/access-key-manager2/vite.config.mts",
-    "build:all": "run-s build:texteditor build:processing build:jobqueue build:webcli build:access-key-manager"
+    "build:dedup": "run-s type-check:dedup build-only:dedup",
+    "build-only:dedup": "vite build --config ../mycore-dedup-gui/src/main/vue/dedup/vite.config.mts",
+    "type-check:dedup": "vue-tsc --noEmit -p ../mycore-dedup-gui/src/main/vue/dedup/tsconfig.json",
+    "dev:dedup": "vite --config ../mycore-dedup-gui/src/main/vue/dedup/vite.config.mts",
+    "build:all": "run-s build:texteditor build:processing build:jobqueue build:webcli build:access-key-manager build:dedup"
   },
   "dependencies": {
     "@jsr/mycore__js-common": "^0.0.7",

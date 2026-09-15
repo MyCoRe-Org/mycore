@@ -1,11 +1,15 @@
 {
-  "files": [],
-  "references": [
-    {
-      "path": "./tsconfig.node.json"
-    },
-    {
-      "path": "./tsconfig.app.json"
+  "extends": "../../../../../mycore-vue/tsconfig.json",
+  "include": ["env.d.ts", "src/**/*", "src/**/*.vue", "vite.config.mts"],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "typeRoots": ["../../../../../mycore-vue/node_modules/@types"],
+    "paths": {
+      "@/*": ["./src/*"],
+      "*": [
+        "../../../../../mycore-vue/node_modules/@types/*",
+        "../../../../../mycore-vue/node_modules/*"
+      ]
     }
-  ]
+  }
 }

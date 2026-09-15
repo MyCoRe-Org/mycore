@@ -12,7 +12,7 @@
 
   <servlet>
     <servlet-name>MCRDeDupVueServlet</servlet-name>
-    <servlet-class>org.mycore.webtools.vue.MCRVueRootServlet</servlet-class>
+    <servlet-class>org.mycore.frontend.vue.MCRVueRootServlet</servlet-class>
     <init-param>
       <param-name>heading</param-name>
       <param-value>dedup.gui.title</param-value>
