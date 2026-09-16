@@ -28,7 +28,6 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -39,7 +38,7 @@ import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRUsageException;
-import org.mycore.common.content.transformer.MCRXSLTransformer;
+import org.mycore.common.xsl.MCRSAXTransformerFactoryManager;
 import org.mycore.common.xsl.MCRXSLResourceHelper;
 import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
@@ -199,9 +198,9 @@ public class MCRCommandUtils {
 
         try {
             if (element != null) {
-                TransformerFactory transformerFactory = MCRXSLTransformer.createDefaultTransformerFactory();
-                transformerFactory.setURIResolver(MCRURIResolver.obtainInstance());
-                transformer = transformerFactory.newTransformer(new JDOMSource(element));
+                transformer = MCRSAXTransformerFactoryManager
+                    .obtainInstance()
+                    .newTransformer(new JDOMSource(element));
                 cache.put(style, transformer);
                 LOGGER.info("Loaded transformer from resource {} for style {}.", xslFilePath, style);
                 return transformer;
