@@ -235,7 +235,7 @@ public class MCRInstantiatorImplicitListTest {
             assertNull(instance);
             assertNotNull(exception);
 
-            assertEquals("Instance list, configured in Foo.Nested (and its sub-properties)," +
+            assertEquals("Instance list, configured in Foo.Nested (and sub-properties thereof)," +
                 " for target field 'nestedList' in configured class " + configuredClass.getName()
                 + " is empty", exception.getMessage());
 

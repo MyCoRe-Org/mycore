@@ -212,7 +212,7 @@ public class MCRInstantiatorClassPropertyTest {
             assertNull(instance);
             assertNotNull(exception);
 
-            assertEquals("Default class, configured in MCR.Default.Value (and its sub-properties),"
+            assertEquals("Default class, configured in MCR.Default.Value (and sub-properties thereof),"
                 + " for target field 'value' in configured class " + configuredClass.getName()
                 + " is missing", exception.getMessage());
 
@@ -222,11 +222,11 @@ public class MCRInstantiatorClassPropertyTest {
             assertNotNull(exception);
 
             if (absolute) {
-                assertEquals("Absolute class, configured in MCR.Value (and its sub-properties),"
+                assertEquals("Absolute class, configured in MCR.Value (and sub-properties thereof),"
                     + " for target field 'value' in configured class " + configuredClass.getName()
                     + " is missing", exception.getMessage());
             } else {
-                assertEquals("Class, configured in Foo.Value (and its sub-properties),"
+                assertEquals("Class, configured in Foo.Value (and sub-properties thereof),"
                     + " for target field 'value' in configured class " + configuredClass.getName()
                     + " is missing", exception.getMessage());
             }
