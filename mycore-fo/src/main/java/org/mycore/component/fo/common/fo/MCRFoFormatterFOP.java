@@ -56,7 +56,7 @@ import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRSourceContent;
-import org.mycore.common.xsl.MCRSAXTransformerFactoryManager;
+import org.mycore.common.xsl.MCRTransformerFactoryManager;
 import org.mycore.common.xsl.MCRTransformerFactorySelector;
 import org.mycore.resource.MCRResourceHelper;
 
@@ -76,7 +76,7 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
 
     private FopFactory fopFactory;
 
-    private MCRSAXTransformerFactoryManager factoryManager;
+    private MCRTransformerFactoryManager factoryManager;
 
     final ResourceResolver resolver = new ResourceResolver() {
         @Override
@@ -147,10 +147,10 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
         factoryManager = getTransformerFactoryManager();
     }
 
-    private static MCRSAXTransformerFactoryManager getTransformerFactoryManager() {
+    private static MCRTransformerFactoryManager getTransformerFactoryManager() {
         String factoryId = MCRTransformerFactorySelector.getFactoryId(FACTORY_PROPERTY, LEGACY_FACTORY_PROPERTY,
             MCRTransformerFactorySelector.getDefaultFactoryId());
-        return MCRSAXTransformerFactoryManager.obtainInstance(factoryId);
+        return MCRTransformerFactoryManager.obtainInstance(factoryId);
     }
 
     @Override

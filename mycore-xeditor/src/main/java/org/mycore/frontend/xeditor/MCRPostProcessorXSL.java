@@ -58,8 +58,8 @@ public class MCRPostProcessorXSL implements MCRXEditorPostProcessor {
         }
 
         String factoryId = switch (transformer) {
-            case "xalan" -> "SlowXalan";
-            case "saxon" -> "Saxon";
+            case "xalan" -> "slowXalan";
+            case "saxon" -> "saxon";
             case null, default -> null;
         };
 

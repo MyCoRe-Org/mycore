@@ -21,6 +21,7 @@ package org.mycore.common.xsl;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -37,11 +38,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.URIResolver;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
@@ -52,7 +55,7 @@ import org.mycore.test.MyCoReTest;
 import org.xml.sax.helpers.AttributesImpl;
 
 @MyCoReTest
-public class MCRSAXTransformerFactoryManagerTest {
+public class MCRTransformerFactoryManagerTest {
 
     private static final String STYLESHEET = """
         <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
@@ -70,12 +73,12 @@ public class MCRSAXTransformerFactoryManagerTest {
 
     @Test
     public void sameProviderUsesSameHolder() {
-        MCRSAXTransformerFactoryManager saxon =
-            MCRSAXTransformerFactoryManager.obtainInstance("Saxon");
-        MCRSAXTransformerFactoryManager sameSaxon =
-            MCRSAXTransformerFactoryManager.obtainInstance("Saxon");
-        MCRSAXTransformerFactoryManager xalan =
-            MCRSAXTransformerFactoryManager.obtainInstance("Xalan");
+        MCRTransformerFactoryManager saxon =
+            MCRTransformerFactoryManager.obtainInstance("saxon");
+        MCRTransformerFactoryManager sameSaxon =
+            MCRTransformerFactoryManager.obtainInstance("saxon");
+        MCRTransformerFactoryManager xalan =
+            MCRTransformerFactoryManager.obtainInstance("xalan");
 
         assertSame(saxon, sameSaxon);
         assertNotSame(saxon, xalan);
@@ -84,29 +87,29 @@ public class MCRSAXTransformerFactoryManagerTest {
     @Test
     @SuppressWarnings("removal")
     public void prefersExactFactoryClassForLegacyLookup() {
-        MCRSAXTransformerFactoryManager slowXalan = MCRSAXTransformerFactoryManager.obtainInstance("SlowXalan");
+        MCRTransformerFactoryManager slowXalan = MCRTransformerFactoryManager.obtainInstance("slowXalan");
 
-        assertSame(slowXalan, MCRSAXTransformerFactoryManager
+        assertSame(slowXalan, MCRTransformerFactoryManager
             .obtainInstance(org.apache.xalan.processor.TransformerFactoryImpl.class));
     }
 
     @Test
     @SuppressWarnings("removal")
     public void sharesUnregisteredLegacyFactoryClass() {
-        MCRSAXTransformerFactoryManager first =
-            MCRSAXTransformerFactoryManager.obtainInstance(UnregisteredTransformerFactory.class);
-        MCRSAXTransformerFactoryManager second =
-            MCRSAXTransformerFactoryManager.obtainInstance(UnregisteredTransformerFactory.class);
+        MCRTransformerFactoryManager first =
+            MCRTransformerFactoryManager.obtainInstance(UnregisteredTransformerFactory.class);
+        MCRTransformerFactoryManager second =
+            MCRTransformerFactoryManager.obtainInstance(UnregisteredTransformerFactory.class);
 
         assertSame(first, second);
         assertEquals(UnregisteredTransformerFactory.class, first.getFactoryClass());
-        assertTrue(first.isAccessSerialized());
+        assertFalse(first.supportsConcurrency());
     }
 
     @Test
     public void keepsNamespaceParameterSupportInSlowXalan() throws TransformerConfigurationException {
-        Templates slowXalan = compile("SlowXalan", NAMESPACE_PARAMETER_STYLESHEET);
-        Templates optimizedXalan = compile("Xalan", NAMESPACE_PARAMETER_STYLESHEET);
+        Templates slowXalan = compile("slowXalan", NAMESPACE_PARAMETER_STYLESHEET);
+        Templates optimizedXalan = compile("xalan", NAMESPACE_PARAMETER_STYLESHEET);
         String parameterName = "{urn:test}value";
 
         assertDoesNotThrow(() -> slowXalan.newTransformer().setParameter(parameterName, "supported"));
@@ -126,8 +129,9 @@ public class MCRSAXTransformerFactoryManagerTest {
         BlockingTransformerFactory factory = new BlockingTransformerFactory(templates, compileEntered,
             releaseCompile, handlerCallEntered);
 
-        MCRSAXTransformerFactoryManager sharedFactory =
-            new MCRSAXTransformerFactoryManager("Blocking", factory, true, () -> null);
+        MCRTransformerFactoryManager sharedFactory = new MCRTransformerFactoryManager(
+            "Blocking", factory, false, () -> null);
+
         ExecutorService executor = Executors.newFixedThreadPool(2);
         try {
             Future<Templates> compile = executor.submit(() -> sharedFactory.newTemplates(source));
@@ -162,8 +166,9 @@ public class MCRSAXTransformerFactoryManagerTest {
         BlockingTransformerFactory factory = new BlockingTransformerFactory(templates, compileEntered,
             releaseCompile, handlerCallEntered);
 
-        MCRSAXTransformerFactoryManager sharedFactory =
-            new MCRSAXTransformerFactoryManager("Concurrent", factory, false, () -> null);
+        MCRTransformerFactoryManager sharedFactory = new MCRTransformerFactoryManager(
+            "Concurrent", factory, true, () -> null);
+
         ExecutorService executor = Executors.newFixedThreadPool(2);
         try {
             Future<Templates> compile = executor.submit(() -> sharedFactory.newTemplates(source));
@@ -184,22 +189,25 @@ public class MCRSAXTransformerFactoryManagerTest {
 
     @Test
     public void transformsConcurrentlyWithSaxonAndXalan() throws Exception {
-        assertConcurrentTransformations("Saxon");
-        assertConcurrentTransformations("Xalan");
+        assertConcurrentTransformations("saxon");
+        assertConcurrentTransformations("xalan");
     }
 
     @Test
     public void reportsRecursiveInitialization() {
-        AtomicReference<MCRSAXTransformerFactoryManager> manager = new AtomicReference<>();
-        manager.set(new MCRSAXTransformerFactoryManager("Recursive", new MCRXalanTransformerFactory(), false,
-            () -> {
-                try {
-                    manager.get().newTransformer();
-                } catch (TransformerConfigurationException e) {
-                    throw new AssertionError(e);
-                }
-                return null;
-            }));
+
+        AtomicReference<MCRTransformerFactoryManager> manager = new AtomicReference<>();
+        Supplier<URIResolver> recursingUriResolverSupplier = () -> {
+            try {
+                manager.get().newTransformer();
+            } catch (TransformerConfigurationException e) {
+                throw new AssertionError(e);
+            }
+            return null;
+        };
+
+        manager.set(new MCRTransformerFactoryManager(
+            "Recursive", new MCRXalanTransformerFactory(), true, recursingUriResolverSupplier));
 
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
             () -> manager.get().newTransformer());
@@ -217,7 +225,7 @@ public class MCRSAXTransformerFactoryManagerTest {
     }
 
     private void assertConcurrentTransformations(String factoryId) throws Exception {
-        MCRSAXTransformerFactoryManager sharedFactory = MCRSAXTransformerFactoryManager.obtainInstance(factoryId);
+        MCRTransformerFactoryManager sharedFactory = MCRTransformerFactoryManager.obtainInstance(factoryId);
         Templates templates = sharedFactory.newTemplates(new StreamSource(new StringReader(STYLESHEET)));
         ExecutorService executor = Executors.newFixedThreadPool(8);
         try {
@@ -234,11 +242,11 @@ public class MCRSAXTransformerFactoryManagerTest {
     }
 
     private Templates compile(String factoryId, String stylesheet) throws TransformerConfigurationException {
-        return MCRSAXTransformerFactoryManager.obtainInstance(factoryId)
+        return MCRTransformerFactoryManager.obtainInstance(factoryId)
             .newTemplates(new StreamSource(new StringReader(stylesheet)));
     }
 
-    private String transform(MCRSAXTransformerFactoryManager sharedFactory, Templates templates) throws Exception {
+    private String transform(MCRTransformerFactoryManager sharedFactory, Templates templates) throws Exception {
         TransformerHandler handler = sharedFactory.newTransformerHandler(templates);
         StringWriter result = new StringWriter();
         handler.setResult(new StreamResult(result));

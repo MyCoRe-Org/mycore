@@ -19,7 +19,6 @@
 package org.mycore.common.xsl;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -27,11 +26,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Map;
-import java.util.function.Consumer;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.sax.SAXTransformerFactory;
 
 import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRTestConfiguration;
@@ -39,74 +37,55 @@ import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.xsl.MCRTransformerFactoryManagerRegistry.Entry;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
-public class MCRTransformerFactoryRegistryTest {
+public class MCRTransformerFactoryManagerRegistryTest {
 
     private static final String TEST_PREFIX = "MCR.Test.TransformerFactory";
 
     @Test
     @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = TEST_PREFIX + ".Configured.Class", classNameOf = ConfigurableFactory.class),
-        @MCRTestProperty(
-            key = TEST_PREFIX + ".Configured.Configuration.Class",
-            classNameOf = TestConfiguration.class),
-        @MCRTestProperty(key = TEST_PREFIX + ".Configured.Configuration.Enabled", string = "true"),
-        @MCRTestProperty(key = TEST_PREFIX + ".Concurrent.Class", classNameOf = MCRXalanTransformerFactory.class),
-        @MCRTestProperty(key = TEST_PREFIX + ".Concurrent.SerializeAccess", string = "false")
+        @MCRTestProperty(key = TEST_PREFIX + ".Configured.Factory.Class", classNameOf = ConfigurableFactory.class),
+        @MCRTestProperty(key = TEST_PREFIX + ".Configured.Initializers.10.Class", classNameOf = TestInitalizer.class),
+        @MCRTestProperty(key = TEST_PREFIX + ".Configured.Initializers.10.Enabled", string = "true"),
+        @MCRTestProperty(key = TEST_PREFIX + ".Concurrent.Factory.Class",
+            classNameOf = MCRXalanTransformerFactory.class),
+        @MCRTestProperty(key = TEST_PREFIX + ".Concurrent.SupportsConcurrency", string = "true")
     })
-    public void createsAndConfiguresFactoryMapFromProperties() throws TransformerConfigurationException {
-        MCRTransformerFactoryRegistry registry = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRTransformerFactoryRegistry.class, TEST_PREFIX);
+    public void createsAndInitializesFactoryMapFromProperties() throws TransformerConfigurationException {
+        MCRTransformerFactoryManagerRegistry registry = MCRConfiguration2.getInstanceOfOrThrow(
+            MCRTransformerFactoryManagerRegistry.class, TEST_PREFIX);
 
         assertNotNull(registry.get("Configured").newTransformer());
-        assertTrue(registry.get("Configured").isAccessSerialized());
-        assertFalse(registry.get("Concurrent").isAccessSerialized());
+        assertFalse(registry.get("Configured").supportsConcurrency());
+        assertTrue(registry.get("Concurrent").supportsConcurrency());
         assertThrows(MCRConfigurationException.class, () -> registry.get("Missing"));
     }
 
     @Test
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = TEST_PREFIX + ".Failing.Class", classNameOf = MCRXalanTransformerFactory.class),
-        @MCRTestProperty(
-            key = TEST_PREFIX + ".Failing.Configuration.Class",
-            classNameOf = FailingConfiguration.class)
-    })
-    public void preservesFailuresFromFactoryConfigurationConsumer() {
-        MCRTransformerFactoryRegistry registry = new MCRTransformerFactoryRegistry();
-        registry.setConfiguredFactories(Map.of("Failing", new MCRXalanTransformerFactory()));
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
-            () -> registry.initialize(TEST_PREFIX));
-
-        assertTrue(exception.getMessage().contains("Could not configure transformer factory"));
-        assertInstanceOf(ClassCastException.class, exception.getCause());
-    }
-
-    @Test
     public void resolvesLegacyClassToUniqueConfiguredSubclass() {
-        MCRTransformerFactoryRegistry registry = new MCRTransformerFactoryRegistry();
-        registry.setConfiguredFactories(Map.of("Custom", new ConfigurableFactory()));
-        registry.initialize(TEST_PREFIX);
+        MCRTransformerFactoryManagerRegistry registry = new MCRTransformerFactoryManagerRegistry(Map.of(
+            "Custom", new Entry(new ConfigurableFactory(), false)));
 
         assertSame(registry.get("Custom"), registry.get(MCRXalanTransformerFactory.class));
     }
 
     @Test
     public void sharesLegacyFallbackForAmbiguousConfiguredClass() {
-        MCRTransformerFactoryRegistry registry = new MCRTransformerFactoryRegistry();
-        registry.setConfiguredFactories(Map.of(
-            "First", new MCRXalanTransformerFactory(),
-            "Second", new MCRXalanTransformerFactory()));
-        registry.initialize(TEST_PREFIX);
 
-        MCRSAXTransformerFactoryManager legacy = registry.get(MCRXalanTransformerFactory.class);
+        MCRTransformerFactoryManagerRegistry registry = new MCRTransformerFactoryManagerRegistry(Map.of(
+            "First", new Entry(new MCRXalanTransformerFactory(), false),
+            "Second", new Entry(new MCRXalanTransformerFactory(), false)));
+
+        MCRTransformerFactoryManager legacy = registry.get(MCRXalanTransformerFactory.class);
 
         assertNotSame(registry.get("First"), legacy);
         assertNotSame(registry.get("Second"), legacy);
         assertSame(legacy, registry.get(MCRXalanTransformerFactory.class));
         assertSame(legacy, registry.get(legacy.getId()));
-        assertTrue(legacy.isAccessSerialized());
+        assertFalse(legacy.supportsConcurrency());
     }
 
     public static final class ConfigurableFactory extends MCRXalanTransformerFactory {
@@ -123,7 +102,7 @@ public class MCRTransformerFactoryRegistryTest {
 
     }
 
-    public static final class TestConfiguration implements Consumer<TransformerFactory> {
+    public static final class TestInitalizer implements MCRTransformerFactoryManagerRegistry.Initializer {
 
         private boolean enabled;
 
@@ -133,16 +112,16 @@ public class MCRTransformerFactoryRegistryTest {
         }
 
         @Override
-        public void accept(TransformerFactory factory) {
+        public void initialize(SAXTransformerFactory factory) {
             ((ConfigurableFactory) factory).configured = enabled;
         }
 
     }
 
-    public static final class FailingConfiguration implements Consumer<TransformerFactory> {
+    public static final class FailingConfiguration implements MCRTransformerFactoryManagerRegistry.Initializer {
 
         @Override
-        public void accept(TransformerFactory factory) {
+        public void initialize(SAXTransformerFactory factory) {
             throw new ClassCastException("Failure inside the configuration consumer");
         }
 

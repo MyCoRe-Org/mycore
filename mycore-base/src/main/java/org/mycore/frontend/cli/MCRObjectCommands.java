@@ -74,7 +74,7 @@ import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.common.xml.MCRXSLTransformerUtils;
 import org.mycore.common.xsl.MCRErrorListener;
-import org.mycore.common.xsl.MCRSAXTransformerFactoryManager;
+import org.mycore.common.xsl.MCRTransformerFactoryManager;
 import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
 import org.mycore.datamodel.common.MCRActiveLinkException;
@@ -972,7 +972,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         XMLReader xmlReader = MCRXMLParserFactory.getNonValidatingParser().getXMLReader();
         xmlReader.setEntityResolver(MCREntityResolver.getInstance());
         SAXSource styleSource = new SAXSource(xmlReader, style.getInputSource());
-        Transformer transformer = MCRSAXTransformerFactoryManager
+        Transformer transformer = MCRTransformerFactoryManager
             .obtainInstance()
             .newTransformer(styleSource);
         transformer.setErrorListener(new MCRErrorListener());

@@ -54,7 +54,7 @@ public class MCRLegacyXSLCheckTest {
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
             () -> new MCRLegacyXSLCheck().startUp(null));
 
-        assertTrue(exception.getMessage().contains(LAYOUT_PROPERTY + "=Saxon"));
+        assertTrue(exception.getMessage().contains(LAYOUT_PROPERTY + "=saxon"));
         assertTrue(
             exception.getMessage().contains(LAYOUT_PROPERTY + "Class=" + MCRXalanTransformerFactory.class.getName()));
         assertTrue(exception.getMessage().contains("Set '" + LAYOUT_PROPERTY + "' to the intended factory ID"));
@@ -71,7 +71,7 @@ public class MCRLegacyXSLCheckTest {
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
             () -> new MCRLegacyXSLCheck().startUp(null));
 
-        assertTrue(exception.getMessage().contains(CONTENT_PROPERTY + "=Saxon"));
+        assertTrue(exception.getMessage().contains(CONTENT_PROPERTY + "=saxon"));
         assertTrue(
             exception.getMessage().contains(CONTENT_PROPERTY + "Class=" + MCRXalanTransformerFactory.class.getName()));
         assertTrue(exception.getMessage().contains(CUSTOM_PROPERTY + "=Custom"));
@@ -86,8 +86,8 @@ public class MCRLegacyXSLCheckTest {
     })
     public void acceptsLegacyOnlyPropertiesAndPreservesFactorySelection() {
         assertDoesNotThrow(() -> new MCRLegacyXSLCheck().startUp(null));
-        assertEquals("Xalan", MCRTransformerFactorySelector.getDefaultFactoryId());
-        assertEquals("SlowXalan", MCRTransformerFactorySelector.getFactoryId(CUSTOM_PROPERTY,
+        assertEquals("xalan", MCRTransformerFactorySelector.getDefaultFactoryId());
+        assertEquals("slowXalan", MCRTransformerFactorySelector.getFactoryId(CUSTOM_PROPERTY,
             CUSTOM_PROPERTY + "Class", "Saxon"));
     }
 

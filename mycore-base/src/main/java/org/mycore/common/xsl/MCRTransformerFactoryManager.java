@@ -45,7 +45,7 @@ import org.mycore.common.xsl.uriresolver.MCRURIResolver;
  * providers that require it, while the returned {@link Templates}, {@link Transformer}, and
  * {@link TransformerHandler} instances can follow their individual JAXP lifecycle rules.
  */
-public final class MCRSAXTransformerFactoryManager {
+public final class MCRTransformerFactoryManager {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -53,7 +53,7 @@ public final class MCRSAXTransformerFactoryManager {
 
     private final SAXTransformerFactory factory;
 
-    private final boolean serializeAccess;
+    private final boolean supportsConcurrency;
 
     private final Supplier<URIResolver> uriResolverSupplier;
 
@@ -65,21 +65,15 @@ public final class MCRSAXTransformerFactoryManager {
 
     private boolean initializing;
 
-    MCRSAXTransformerFactoryManager(String id, TransformerFactory factory, boolean serializeAccess) {
-        this(id, factory, serializeAccess, MCRURIResolver::obtainInstance);
+    MCRTransformerFactoryManager(String id, SAXTransformerFactory factory, boolean supportsConcurrency) {
+        this(id, factory, supportsConcurrency, MCRURIResolver::obtainInstance);
     }
 
-    MCRSAXTransformerFactoryManager(String id, TransformerFactory factory, boolean serializeAccess,
-        Supplier<URIResolver> uriResolverSupplier) {
+    MCRTransformerFactoryManager(String id, SAXTransformerFactory factory, boolean supportsConcurrency,
+                                 Supplier<URIResolver> uriResolverSupplier) {
         this.id = Objects.requireNonNull(id);
-        Objects.requireNonNull(factory);
-        if (factory instanceof SAXTransformerFactory saxTransformerFactory) {
-            this.factory = saxTransformerFactory;
-        } else {
-            throw new MCRConfigurationException("Transformer Factory " + factory.getClass().getName()
-                + " does not implement SAXTransformerFactory");
-        }
-        this.serializeAccess = serializeAccess;
+        this.factory = Objects.requireNonNull(factory);
+        this.supportsConcurrency = supportsConcurrency;
         this.uriResolverSupplier = Objects.requireNonNull(uriResolverSupplier);
     }
 
@@ -88,7 +82,7 @@ public final class MCRSAXTransformerFactoryManager {
      *
      * @return shared manager selected by {@link MCRTransformerFactorySelector#getDefaultFactoryId()}
      */
-    public static MCRSAXTransformerFactoryManager obtainInstance() {
+    public static MCRTransformerFactoryManager obtainInstance() {
         return obtainInstance(MCRTransformerFactorySelector.getDefaultFactoryId());
     }
 
@@ -98,8 +92,8 @@ public final class MCRSAXTransformerFactoryManager {
      * @param id configured factory ID
      * @return shared manager for this ID
      */
-    public static MCRSAXTransformerFactoryManager obtainInstance(String id) {
-        return LazyInstanceHolder.REGISTRY.get(id);
+    public static MCRTransformerFactoryManager obtainInstance(String id) {
+        return LazyRegistryHolder.REGISTRY.get(id);
     }
 
     /**
@@ -108,9 +102,8 @@ public final class MCRSAXTransformerFactoryManager {
      * @deprecated use {@link #obtainInstance(String)} with a configured factory ID
      */
     @Deprecated(forRemoval = true)
-    public static MCRSAXTransformerFactoryManager obtainInstance(
-        Class<? extends TransformerFactory> factoryClass) {
-        return LazyInstanceHolder.REGISTRY.get(factoryClass);
+    public static MCRTransformerFactoryManager obtainInstance(Class<? extends TransformerFactory> factoryClass) {
+        return LazyRegistryHolder.REGISTRY.get(factoryClass);
     }
 
     /**
@@ -150,13 +143,13 @@ public final class MCRSAXTransformerFactoryManager {
         return withFactoryAccess(factory::newTransformer);
     }
 
-    boolean isAccessSerialized() {
-        return serializeAccess;
+    boolean supportsConcurrency() {
+        return supportsConcurrency;
     }
 
     private <T> T withFactoryAccess(FactoryOperation<T> operation) throws TransformerConfigurationException {
         initialize();
-        if (!serializeAccess) {
+        if (supportsConcurrency) {
             return operation.execute();
         }
         synchronized (factoryMonitor) {
@@ -199,11 +192,11 @@ public final class MCRSAXTransformerFactoryManager {
 
     }
 
-    private static final class LazyInstanceHolder {
+    private static final class LazyRegistryHolder {
 
-        private static final MCRTransformerFactoryRegistry REGISTRY = MCRConfiguration2
-            .getSingleInstanceOfOrThrow(MCRTransformerFactoryRegistry.class,
-                MCRTransformerFactoryRegistry.CONFIGURATION_PREFIX);
+        private static final MCRTransformerFactoryManagerRegistry REGISTRY = MCRConfiguration2
+            .getSingleInstanceOfOrThrow(MCRTransformerFactoryManagerRegistry.class,
+                MCRTransformerFactoryManagerRegistry.CONFIGURATION_PREFIX);
 
     }
 

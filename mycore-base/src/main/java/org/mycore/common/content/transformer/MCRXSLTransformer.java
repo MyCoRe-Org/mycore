@@ -56,7 +56,7 @@ import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.common.xml.MCRXSLTransformerUtils;
 import org.mycore.common.xsl.MCRErrorListener;
 import org.mycore.common.xsl.MCRParameterCollector;
-import org.mycore.common.xsl.MCRSAXTransformerFactoryManager;
+import org.mycore.common.xsl.MCRTransformerFactoryManager;
 import org.mycore.common.xsl.MCRTemplatesSource;
 import org.mycore.common.xsl.MCRTransformerFactorySelector;
 import org.xml.sax.SAXException;
@@ -89,7 +89,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
      * @deprecated use {@link MCRTransformerFactorySelector#getDefaultFactoryId()} and a configured factory ID
      */
     @Deprecated(forRemoval = true)
-    public static final Class<? extends TransformerFactory> DEFAULT_FACTORY_CLASS = MCRSAXTransformerFactoryManager
+    public static final Class<? extends TransformerFactory> DEFAULT_FACTORY_CLASS = MCRTransformerFactoryManager
         .obtainInstance().getFactoryClass();
 
     /** The compiled XSL stylesheet */
@@ -101,7 +101,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
 
     protected long modifiedChecked;
 
-    private MCRSAXTransformerFactoryManager factoryManager;
+    private MCRTransformerFactoryManager factoryManager;
 
     public MCRXSLTransformer() {
         this(new String[0], MCRTransformerFactorySelector.getDefaultFactoryId());
@@ -140,11 +140,11 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
      */
     @SuppressWarnings("removal")
     private void setTransformerFactory(Class<? extends TransformerFactory> factoryClass) {
-        this.factoryManager = MCRSAXTransformerFactoryManager.obtainInstance(factoryClass);
+        this.factoryManager = MCRTransformerFactoryManager.obtainInstance(factoryClass);
     }
 
     private void setTransformerFactory(String factoryId) {
-        this.factoryManager = MCRSAXTransformerFactoryManager.obtainInstance(factoryId);
+        this.factoryManager = MCRTransformerFactoryManager.obtainInstance(factoryId);
     }
 
     public static MCRXSLTransformer obtainInstance(String... stylesheets) {
@@ -192,7 +192,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
      * Creates a new {@link TransformerFactory} instance of the configured default implementation
      * (see <code>MCR.LayoutService.TransformerFactory</code>).
      *
-     * @deprecated use {@link MCRSAXTransformerFactoryManager#obtainInstance(String)} to reuse the configured provider
+     * @deprecated use {@link MCRTransformerFactoryManager#obtainInstance(String)} to reuse the configured provider
      *
      * @return a new transformer factory
      */

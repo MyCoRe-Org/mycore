@@ -39,7 +39,7 @@ import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRJDOMContent;
-import org.mycore.common.xsl.MCRSAXTransformerFactoryManager;
+import org.mycore.common.xsl.MCRTransformerFactoryManager;
 import org.mycore.common.xsl.MCRXalanTransformerFactory;
 import org.mycore.common.xsl.MCRTransformerFactorySelector;
 import org.mycore.common.xsl.uriresolver.MCRXSLStyleURIResolver.Flavor;
@@ -70,7 +70,7 @@ public class MCRXSLTransformerTest {
 
         assertEquals(List.of("Configuration property '" + TRANSFORMER_PREFIX
             + ".TransformerFactoryClass' is deprecated. Replace it with '" + TRANSFORMER_PREFIX
-            + ".TransformerFactory=SlowXalan'."), warnings);
+            + ".TransformerFactory=slowXalan'."), warnings);
     }
 
     @Test
@@ -82,27 +82,27 @@ public class MCRXSLTransformerTest {
     public void supportsLegacyLayoutAndFoFactoryProperties() {
         List<String> warnings = collectWarnings(() -> {
             String defaultFactoryId = MCRTransformerFactorySelector.getDefaultFactoryId();
-            assertEquals("SlowXalan", defaultFactoryId);
-            assertEquals("SlowXalan", MCRTransformerFactorySelector.getFactoryId(FO_FACTORY_PROPERTY,
+            assertEquals("slowXalan", defaultFactoryId);
+            assertEquals("slowXalan", MCRTransformerFactorySelector.getFactoryId(FO_FACTORY_PROPERTY,
                 LEGACY_FO_FACTORY_PROPERTY, defaultFactoryId));
         });
 
         assertEquals(List.of(
             "Configuration property 'MCR.LayoutService.TransformerFactoryClass' is deprecated. Replace it with "
-                + "'MCR.LayoutService.TransformerFactory=SlowXalan'.",
+                + "'MCR.LayoutService.TransformerFactory=slowXalan'.",
             "Configuration property 'MCR.LayoutService.FoFormatter.transformerFactoryImpl' is deprecated. Replace "
-                + "it with 'MCR.LayoutService.FoFormatter.TransformerFactory=SlowXalan'."),
+                + "it with 'MCR.LayoutService.FoFormatter.TransformerFactory=slowXalan'."),
             warnings);
     }
 
     @Test
     @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = LAYOUT_FACTORY_PROPERTY, string = "Xalan")
+        @MCRTestProperty(key = LAYOUT_FACTORY_PROPERTY, string = "xalan")
     })
     public void resolvesDefaultFactoryIdAtCallTime() {
-        assertEquals("Xalan", MCRTransformerFactorySelector.getDefaultFactoryId());
-        assertSame(MCRSAXTransformerFactoryManager.obtainInstance("Xalan"),
-            MCRSAXTransformerFactoryManager.obtainInstance());
+        assertEquals("xalan", MCRTransformerFactorySelector.getDefaultFactoryId());
+        assertSame(MCRTransformerFactoryManager.obtainInstance("xalan"),
+            MCRTransformerFactoryManager.obtainInstance());
     }
 
     @Test
@@ -112,7 +112,7 @@ public class MCRXSLTransformerTest {
     })
     public void rejectsMissingDefaultFactoryConfiguration() {
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
-            MCRSAXTransformerFactoryManager::obtainInstance);
+            MCRTransformerFactoryManager::obtainInstance);
 
         assertTrue(exception.getMessage().contains(LAYOUT_FACTORY_PROPERTY));
     }
@@ -137,8 +137,8 @@ public class MCRXSLTransformerTest {
         String stylesheet = "xsl/reflection.xsl";
         MCRJDOMContent source = new MCRJDOMContent(new Element("root"));
 
-        MCRXSL2XMLTransformer saxon = MCRXSL2XMLTransformer.obtainInstanceByFactory("Saxon", stylesheet);
-        MCRXSL2XMLTransformer xalan = MCRXSL2XMLTransformer.obtainInstanceByFactory("Xalan", stylesheet);
+        MCRXSL2XMLTransformer saxon = MCRXSL2XMLTransformer.obtainInstanceByFactory("saxon", stylesheet);
+        MCRXSL2XMLTransformer xalan = MCRXSL2XMLTransformer.obtainInstanceByFactory("xalan", stylesheet);
 
         assertEquals("Saxonica", saxon.transform(source).asXML().getRootElement().getAttributeValue("vendor"));
         assertEquals("Apache Software Foundation",
@@ -147,7 +147,7 @@ public class MCRXSLTransformerTest {
 
     @Test
     public void cacheKeySeparatesFactoryAndStylesheetSegments() {
-        MCRXSLTransformer.obtainInstanceByFactory("Saxon", "collision_A_B");
+        MCRXSLTransformer.obtainInstanceByFactory("saxon", "collision_A_B");
 
         assertThrows(MCRConfigurationException.class,
             () -> MCRXSLTransformer.obtainInstanceByFactory("Saxon_collision_A", "B"));

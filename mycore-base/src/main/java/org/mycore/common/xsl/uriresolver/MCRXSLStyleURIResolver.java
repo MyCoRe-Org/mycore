@@ -40,7 +40,7 @@ import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.content.transformer.MCRXSLTransformer;
 import org.mycore.common.xsl.MCRParameterCollector;
-import org.mycore.common.xsl.MCRSAXTransformerFactoryManager;
+import org.mycore.common.xsl.MCRTransformerFactoryManager;
 import org.mycore.common.xsl.MCRTransformerFactorySelector;
 import org.mycore.common.xsl.MCRXSLResourceHelper;
 
@@ -228,7 +228,7 @@ public class MCRXSLStyleURIResolver implements URIResolver {
          */
         @Deprecated(forRemoval = true)
         public Class<? extends TransformerFactory> getTransformerFactory() {
-            return MCRSAXTransformerFactoryManager.obtainInstance(transformerFactoryId).getFactoryClass();
+            return MCRTransformerFactoryManager.obtainInstance(transformerFactoryId).getFactoryClass();
         }
 
         /**

@@ -22,15 +22,18 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-import java.util.function.Consumer;
+import java.util.Objects;
+import java.util.function.Supplier;
 
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.sax.SAXTransformerFactory;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 
 /**
@@ -39,29 +42,23 @@ import org.mycore.common.config.annotation.MCRProperty;
  * This class has no compile-time dependency on the provider. A relative file is resolved against the MyCoRe
  * configuration directory. If that directory is disabled, it is resolved against the current working directory.
  */
-public final class MCRSaxonTransformerFactoryConfiguration implements Consumer<TransformerFactory> {
+@MCRConfigurationProxy(proxyClass = MCRSaxonConfigurationFileInitializer.Factory.class)
+public final class MCRSaxonConfigurationFileInitializer implements MCRTransformerFactoryManagerRegistry.Initializer {
 
-    static final String CONFIGURATION_FILE_ATTRIBUTE = "http://saxon.sf.net/feature/configuration-file";
+    public static final String CONFIGURATION_FILE_KEY = "ConfigurationFile";
+
+    public static final String CONFIGURATION_FILE_ATTRIBUTE = "http://saxon.sf.net/feature/configuration-file";
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private String file;
+    private final String configurationFile;
 
-    /**
-     * Sets the optional provider configuration file.
-     *
-     * @param file absolute path or path relative to the MyCoRe configuration directory
-     */
-    @MCRProperty(name = "File", required = false)
-    public void setFile(String file) {
-        this.file = file;
+    public MCRSaxonConfigurationFileInitializer(String configurationFile) {
+        this.configurationFile = Objects.requireNonNull(configurationFile);
     }
 
     @Override
-    public void accept(TransformerFactory factory) {
-        if (file == null) {
-            return;
-        }
+    public void initialize(SAXTransformerFactory factory) {
         Path configurationFile = resolveConfigurationFile();
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("Configuring Saxon TransformerFactory {} with {}", factory.getClass().getName(),
@@ -78,7 +75,7 @@ public final class MCRSaxonTransformerFactoryConfiguration implements Consumer<T
     private Path resolveConfigurationFile() {
         final Path configuredPath;
         try {
-            configuredPath = Path.of(file);
+            configuredPath = Path.of(configurationFile);
         } catch (InvalidPathException e) {
             throw configurationException("is not a valid path", e);
         }
@@ -102,6 +99,18 @@ public final class MCRSaxonTransformerFactoryConfiguration implements Consumer<T
         return cause == null
             ? new MCRConfigurationException(fullMessage)
             : new MCRConfigurationException(fullMessage, cause);
+    }
+
+    public static class Factory implements Supplier<MCRSaxonConfigurationFileInitializer> {
+
+        @MCRProperty(name = CONFIGURATION_FILE_KEY)
+        public String configurationFile;
+
+        @Override
+        public MCRSaxonConfigurationFileInitializer get() {
+            return new MCRSaxonConfigurationFileInitializer(configurationFile);
+        }
+
     }
 
 }

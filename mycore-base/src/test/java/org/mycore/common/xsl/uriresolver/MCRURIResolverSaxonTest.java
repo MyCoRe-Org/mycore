@@ -31,7 +31,7 @@ import org.mycore.test.MyCoReTest;
 @MyCoReTest
 @MCRTestConfiguration(properties = {
     @MCRTestProperty(key = "MCR.Layout.Transformer.Factory.XSLFolder", string = "xslt-test"),
-    @MCRTestProperty(key = "MCR.LayoutService.TransformerFactory", string = "Saxon")
+    @MCRTestProperty(key = "MCR.LayoutService.TransformerFactory", string = "saxon")
 })
 public class MCRURIResolverSaxonTest {
 

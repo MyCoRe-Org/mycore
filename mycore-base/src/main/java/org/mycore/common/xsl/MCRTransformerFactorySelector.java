@@ -83,7 +83,7 @@ public final class MCRTransformerFactorySelector {
             if (TransformerFactory.class.isAssignableFrom(factoryClass)) {
                 LOGGER.warn("Transformer factory class value '{}' is deprecated. Configure and reference a factory "
                     + "ID instead.", factoryIdOrClassName);
-                return MCRLegacyTransformerFactorySupport
+                return MCRLegacyTransformerFactoryManagerProvider
                     .getFactoryId(factoryClass.asSubclass(TransformerFactory.class));
             }
         } catch (ClassNotFoundException e) {
@@ -97,17 +97,17 @@ public final class MCRTransformerFactorySelector {
      */
     @Deprecated(forRemoval = true)
     public static String getFactoryId(Class<? extends TransformerFactory> factoryClass) {
-        return MCRLegacyTransformerFactorySupport.getFactoryId(factoryClass);
+        return MCRLegacyTransformerFactoryManagerProvider.getFactoryId(factoryClass);
     }
 
     private static String migrateLegacyProperty(String property, String legacyProperty,
         Class<? extends TransformerFactory> factoryClass) {
-        String factoryId = MCRLegacyTransformerFactorySupport.getFactoryId(factoryClass);
-        if (MCRLegacyTransformerFactorySupport.isLegacyFactoryId(factoryId)) {
+        String factoryId = MCRLegacyTransformerFactoryManagerProvider.getFactoryId(factoryClass);
+        if (MCRLegacyTransformerFactoryManagerProvider.isLegacyFactoryId(factoryId)) {
             String factoryClassName = factoryClass.getName();
             LOGGER.warn("Configuration property '{}' is deprecated. Register {} below '{}' and replace the property "
                 + "with a factory ID.", legacyProperty, factoryClassName,
-                MCRTransformerFactoryRegistry.CONFIGURATION_PREFIX);
+                MCRTransformerFactoryManagerRegistry.CONFIGURATION_PREFIX);
         } else {
             LOGGER.warn("Configuration property '{}' is deprecated. Replace it with '{}={}'.", legacyProperty,
                 property, factoryId);
