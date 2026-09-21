@@ -29,7 +29,6 @@ import static org.mycore.restapi.v2.MCRRestStatusCode.NO_CONTENT;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -152,16 +151,8 @@ public class MCRRestClassifications {
     public Response getClassification(@PathParam(PARAM_CLASSID) String classId,
         @PathParam(PARAM_CATEGID) String categId) {
 
-        MCRDetailLevel detailLevel = request.getAcceptableMediaTypes()
-            .stream()
-            .flatMap(m -> m.getParameters().entrySet().stream()
-                .filter(e -> MCRDetailLevel.MEDIA_TYPE_PARAMETER.equals(e.getKey())))
-            .map(Map.Entry::getValue)
-            .findFirst()
-            .map(MCRDetailLevel::valueOf).orElse(MCRDetailLevel.NORMAL);
-
         MCRCategoryID categoryID = new MCRCategoryID(classId, categId);
-        return switch (detailLevel) {
+        return switch (MCRDetailLevelResolver.resolve(request)) {
             case DETAILED -> getClassification(classId, dao -> dao.getRootCategory(categoryID, -1));
             case SUMMARY -> getClassification(classId, dao -> dao.getCategory(categoryID, 0));
             //normal is also default case
