@@ -44,10 +44,11 @@ import org.mycore.pi.MCRPersistentIdentifier;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.pi.util.MCROtherPIValueExtractor;
 import org.mycore.test.MCRJPAExtension;
+import org.mycore.test.MCRMetadataExtension;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
-@ExtendWith({ MCRJPAExtension.class })
+@ExtendWith({ MCRJPAExtension.class, MCRMetadataExtension.class })
 @MCRTestConfiguration(properties = {
     @MCRTestProperty(key = "MCR.Access.Class", classNameOf = MCRAccessBaseImpl.class),
     @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true"),
