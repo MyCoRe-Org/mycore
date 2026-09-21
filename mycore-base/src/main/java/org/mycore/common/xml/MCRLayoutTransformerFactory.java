@@ -30,7 +30,6 @@ import java.util.stream.Collectors;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -42,6 +41,7 @@ import org.mycore.common.content.transformer.MCRContentTransformerFactory;
 import org.mycore.common.content.transformer.MCRIdentityTransformer;
 import org.mycore.common.content.transformer.MCRTransformerPipe;
 import org.mycore.common.content.transformer.MCRXSLTransformer;
+import org.mycore.common.xsl.MCRTransformerFactorySelector;
 import org.mycore.common.xsl.MCRXSLResourceHelper;
 import org.xml.sax.SAXException;
 
@@ -103,10 +103,7 @@ public class MCRLayoutTransformerFactory {
         if (!MCRConfiguration2.getBoolean("MCR.LayoutTransformerFactory.SuggestProperties").get()) {
             return;
         }
-        Class<? extends TransformerFactory> transformerClass = MCRConfiguration2
-            .<TransformerFactory>getClass("MCR.LayoutService.TransformerFactoryClass")
-            .orElseGet(TransformerFactory.newInstance()::getClass);
-        String classAlias = getTransformerClassValue(transformerClass);
+        String transformerFactory = MCRTransformerFactorySelector.getDefaultFactoryId();
         StringBuilder properties = new StringBuilder();
         properties.append("# Configuration for transformer ").append(idStripped).append('\n');
         String cfgPrefix = "MCR.ContentTransformer.";
@@ -118,8 +115,8 @@ public class MCRLayoutTransformerFactory {
                 .append('\n');
             properties.append(cfgPrefix)
                     .append(idStripped)
-                    .append(".TransformerFactoryClass=")
-                    .append(classAlias)
+                    .append(".TransformerFactory=")
+                    .append(transformerFactory)
                     .append('\n');
             properties.append(cfgPrefix)
                 .append(idStripped)
@@ -134,8 +131,8 @@ public class MCRLayoutTransformerFactory {
                 .append('\n');
             properties.append(cfgPrefix)
                 .append(idStripped)
-                .append(".TransformerFactoryClass=")
-                .append(classAlias)
+                .append(".TransformerFactory=")
+                .append(transformerFactory)
                 .append('\n');
             properties.append(cfgPrefix)
                 .append(idStripped)
@@ -157,8 +154,8 @@ public class MCRLayoutTransformerFactory {
                     .append('\n');
                 properties.append(cfgPrefix)
                     .append(thisTransformerId)
-                    .append(".TransformerFactoryClass=")
-                    .append(classAlias)
+                    .append(".TransformerFactory=")
+                    .append(transformerFactory)
                     .append('\n');
                 properties.append(cfgPrefix)
                     .append(thisTransformerId)
@@ -176,16 +173,6 @@ public class MCRLayoutTransformerFactory {
     private String getTransformerId(String stylesheet) {
         String withoutExtension = stylesheet.replaceAll("\\.xsl$", "");
         return "tmp_" + withoutExtension.replaceAll("[^a-zA-Z0-9]", "_");
-    }
-
-    private String getTransformerClassValue(Class<? extends TransformerFactory> transformerClass) {
-        if (Objects.equals(transformerClass.getName(), MCRConfiguration2.getStringOrThrow("SAXON"))) {
-            return "%SAXON%";
-        } else if (Objects.equals(transformerClass.getName(), MCRConfiguration2.getStringOrThrow("XALAN"))) {
-            return "%XALAN%";
-        } else {
-            return transformerClass.getName();
-        }
     }
 
     protected String[] getStylesheets(String id, String stylesheet)

@@ -31,7 +31,7 @@ import org.mycore.test.MyCoReTest;
 @MyCoReTest
 @MCRTestConfiguration(properties = {
     @MCRTestProperty(key = "MCR.Layout.Transformer.Factory.XSLFolder", string = "xsl-test"),
-    @MCRTestProperty(key = "MCR.LayoutService.TransformerFactoryClass", string = "%XALAN%")
+    @MCRTestProperty(key = "MCR.LayoutService.TransformerFactory", string = "Xalan")
 })
 public class MCRURIResolverXalanTest {
 
