@@ -47,6 +47,10 @@
       <artifactId>jakarta.ws.rs-api</artifactId>
     </dependency>
     <dependency>
+      <groupId>net.bramp.ffmpeg</groupId>
+      <artifactId>ffmpeg</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-api</artifactId>
     </dependency>
