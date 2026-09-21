@@ -48,7 +48,7 @@ final class MCRInstanceExtractor implements MCRValueExtractor<Object> {
 
         if (!configuration.instantiatable()) {
             if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("[CLEAN-UP] Ignoring {}, configured in {} (and its sub-properties), " +
+                LOGGER.info("[CLEAN-UP] Ignoring {}, configured in {} (and sub-properties thereof), " +
                     "because {}.Class is missing or empty)", context.description(), context.property(),
                     context.property());
             }

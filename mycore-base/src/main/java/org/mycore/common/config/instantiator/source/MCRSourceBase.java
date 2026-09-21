@@ -167,7 +167,7 @@ abstract sealed class MCRSourceBase<Result> implements MCRSource permits MCRValu
             }
             if (sentinelValue == sentinel.rejectionValue()) {
                 if (logger.isInfoEnabled()) {
-                    logger.info("[SENTINEL] Ignoring {}, configured in {} (and its sub-properties), " +
+                    logger.info("[SENTINEL] Ignoring {}, configured in {} (and sub-properties thereof), " +
                         "because {}.{} has value {}", context.description(), context.property(),
                         context.property(), sentinel.name(), sentinel.rejectionValue());
                 }

@@ -124,7 +124,7 @@ public final class MCRSourceContext {
 
     private String exceptionMessage(String exceptionMessage) {
         return MCRInstantiatorUtils.capitalize(description()) + ", configured in " + property()
-            + " (and its sub-properties)," + " for target " + targetTypeName(target) + " '"
+            + " (and sub-properties thereof)," + " for target " + targetTypeName(target) + " '"
             + target.name() + "' in configured class " + targetClassName(target) + " " + exceptionMessage;
     }
 
