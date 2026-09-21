@@ -270,7 +270,8 @@ public class MCRInstantiatorClassPropertyMapTest {
         Configurable instance = null;
         MCRConfigurationException exception = null;
         try {
-            instance = MCRInstanceConfiguration.ofName(Configurable.class, "Foo").instantiate();
+            instance = MCRInstanceConfiguration.ofName(Configurable.class, "Foo",
+                MCRConfiguration2.getAllPropertiesTree()).instantiate();
         } catch (MCRConfigurationException e) {
             exception = e;
         }
@@ -283,7 +284,7 @@ public class MCRInstantiatorClassPropertyMapTest {
             assertNull(instance);
             assertNotNull(exception);
 
-            assertEquals("Default class map, configured in MCR.Default.Map (and its sub-properties),"
+            assertEquals("Default class map, configured in MCR.Default.Map (and sub-properties thereof),"
                 + " for target field 'map' in configured class " + configuredClass.getName()
                 + " is empty", exception.getMessage());
 
@@ -293,11 +294,11 @@ public class MCRInstantiatorClassPropertyMapTest {
             assertNotNull(exception);
 
             if (absolute) {
-                assertEquals("Absolute class map, configured in MCR.Map (and its sub-properties),"
+                assertEquals("Absolute class map, configured in MCR.Map (and sub-properties thereof),"
                     + " for target field 'map' in configured class " + configuredClass.getName()
                     + " is empty", exception.getMessage());
             } else {
-                assertEquals("Class map, configured in Foo.Map (and its sub-properties),"
+                assertEquals("Class map, configured in Foo.Map (and sub-properties thereof),"
                     + " for target field 'map' in configured class " + configuredClass.getName()
                     + " is empty", exception.getMessage());
             }

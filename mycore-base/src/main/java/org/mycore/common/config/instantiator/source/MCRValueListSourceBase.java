@@ -19,16 +19,26 @@
 package org.mycore.common.config.instantiator.source;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
-import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
+import org.mycore.common.config.annotation.MCRSentinel;
+import org.mycore.common.config.instantiator.MCRProperTree;
 
+/**
+ * A {@link MCRValueListSourceBase} is a base implementation of {@link MCRSource} that
+ * obtains a {@link List} of values for annotation based injection from properties.
+ * It provides support for {@link MCRSentinel} for each list element and
+ * uses a {@link MCRValueExtractor} to obtain each list element value from the corresponding nested properties.
+ *
+ * @param <Value> the type of injected map values.
+ */
 abstract sealed class MCRValueListSourceBase<Value> extends MCRSourceBase<List<Value>> permits
-    MCRClassPropertyListSource, MCRPropertyListSource {
+    MCRClassPropertyListSource, MCRInstanceListSource, MCRPropertyListSource {
 
     private final MCRValueExtractor<Value> extractor;
 
@@ -38,53 +48,66 @@ abstract sealed class MCRValueListSourceBase<Value> extends MCRSourceBase<List<V
     }
 
     @Override
-    protected final List<Value> getResult(MCRSourceContext context, MCRInstanceConfiguration<?> configuration,
-        Map<String, String> properties, String prefix) {
+    protected final List<Value> getResult(MCRSourceContext context, MCRProperTree properties,
+        MCRProperTree fullProperties) {
 
-        Map<String, String> listProperties = new HashMap<>();
-        String keyPrefix = prefix.isEmpty() ? prefix : prefix + ".";
-        int keyPrefixLength = keyPrefix.length();
-        properties.forEach((key, value) -> {
-            if (key.startsWith(keyPrefix) && !key.isEmpty()) {
-                int index = key.indexOf('.', keyPrefixLength);
-                if (index == -1) {
-                    listProperties.put(key.substring(keyPrefixLength), value);
-                }
-            }
-        });
+        List<Value> list = new ArrayList<>();
 
-        List<Value> headPropertyList = new ArrayList<>(0);
-        List<Value> tailPropertyList = new ArrayList<>(listProperties.size());
-
-        List<String> keyList = context.orderedKeys(listProperties);
-        for (String key : keyList) {
-            MCRSourceContext nestedContext = context.nested(key, context.description() + " element");
-            if (!rejectedBySentinel(nestedContext, properties, keyPrefix + key + ".")) {
-                if (key.charAt(0) == '-') {
-                    headPropertyList.add(extractor.toValue(nestedContext, listProperties.get(key)));
-                } else {
-                    tailPropertyList.add(extractor.toValue(nestedContext, listProperties.get(key)));
+        int negativeKeyCount = 0;
+        String elementDescription = context.description() + " element";
+        for (String key : orderedKeys(context, properties.keys())) {
+            MCRSourceContext nestedContext = context.nested(key, elementDescription);
+            MCRProperTree nestedProperties = properties.nested(key);
+            if (!rejectedBySentinel(nestedContext, nestedProperties)) {
+                Value value = extractor.toValue(nestedContext, nestedProperties, fullProperties);
+                if (value != null) {
+                    if (key.charAt(0) == '-') {
+                        negativeKeyCount++;
+                    }
+                    list.add(value);
                 }
             }
         }
 
-        List<Value> shortFormList = new ArrayList<>();
-        String shortFormProperty = properties.get(prefix);
-        if (shortFormProperty != null) {
+        String shortFormProperty = properties.value();
+        if (supportsShortForm() && shortFormProperty != null) {
+            List<Value> shortFormList = new ArrayList<>();
+            int shortFormIndex = 0;
             for (String shortFormValue : parseShortFormList(shortFormProperty)) {
-                shortFormList.add(extractor.toValue(context, shortFormValue));
+                MCRSourceContext indexContext = context.withHint("at index " + shortFormIndex);
+                Value value = extractor.toValue(indexContext, MCRProperTree.of(shortFormValue), fullProperties);
+                if (value != null) {
+                    shortFormList.add(value);
+                }
+                shortFormIndex++;
             }
+            list.addAll(negativeKeyCount, shortFormList);
         }
-
-        int totalSize = headPropertyList.size() + shortFormList.size() + tailPropertyList.size();
-        List<Value> list = new ArrayList<>(totalSize);
-        list.addAll(headPropertyList);
-        list.addAll(shortFormList);
-        list.addAll(tailPropertyList);
 
         return list;
 
     }
+
+    public List<String> orderedKeys(MCRSourceContext context, Stream<String> keys) {
+
+        SortedMap<Integer, String> keyMap = new TreeMap<>();
+        keys.forEach(key -> {
+            try {
+                Integer integerValue = Integer.parseInt(key);
+                String alreadyMappedKey = keyMap.put(integerValue, key);
+                if (alreadyMappedKey != null && !alreadyMappedKey.equals(key)) {
+                    throw context.inconsistentIntegerKeysException(key, alreadyMappedKey);
+                }
+            } catch (NumberFormatException exception) {
+                throw context.nonIntegerKeyException(key, exception);
+            }
+        });
+
+        return new ArrayList<>(keyMap.values());
+
+    }
+
+    protected abstract boolean supportsShortForm();
 
     private List<String> parseShortFormList(String value) {
         return MCRConfiguration2.splitValue(value).toList();

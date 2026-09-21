@@ -18,13 +18,16 @@
 
 package org.mycore.common.config.instantiator.source;
 
+import org.mycore.common.config.instantiator.MCRProperTree;
+
 /**
  * A {@link MCRValueExtractor} extracts a value (of a specific type) from a configured string value.
  *
  * @param <Value> the type of value to be extracted.
  */
-sealed interface MCRValueExtractor<Value> permits MCRClassPropertyExtractor, MCRPropertyExtractor {
+sealed interface MCRValueExtractor<Value> permits MCRClassPropertyExtractor, MCRInstanceExtractor,
+    MCRPropertyExtractor {
 
-    Value toValue(MCRSourceContext context, String value);
+    Value toValue(MCRSourceContext context, MCRProperTree properties, MCRProperTree fullProperties);
 
 }

@@ -270,7 +270,8 @@ public class MCRInstantiatorPropertyListTest {
         Configurable instance = null;
         MCRConfigurationException exception = null;
         try {
-            instance = MCRInstanceConfiguration.ofName(Configurable.class, "Foo").instantiate();
+            instance = MCRInstanceConfiguration.ofName(Configurable.class, "Foo",
+                MCRConfiguration2.getAllPropertiesTree()).instantiate();
         } catch (MCRConfigurationException e) {
             exception = e;
         }
@@ -283,7 +284,7 @@ public class MCRInstantiatorPropertyListTest {
             assertNull(instance);
             assertNotNull(exception);
 
-            assertEquals("Default property list, configured in MCR.Default.List (and its sub-properties),"
+            assertEquals("Default property list, configured in MCR.Default.List (and sub-properties thereof),"
                 + " for target field 'list' in configured class " + configuredClass.getName()
                 + " is empty", exception.getMessage());
 
@@ -293,11 +294,11 @@ public class MCRInstantiatorPropertyListTest {
             assertNotNull(exception);
 
             if (absolute) {
-                assertEquals("Absolute property list, configured in MCR.List (and its sub-properties),"
+                assertEquals("Absolute property list, configured in MCR.List (and sub-properties thereof),"
                     + " for target field 'list' in configured class " + configuredClass.getName()
                     + " is empty", exception.getMessage());
             } else {
-                assertEquals("Property list, configured in Foo.List (and its sub-properties),"
+                assertEquals("Property list, configured in Foo.List (and sub-properties thereof),"
                     + " for target field 'list' in configured class " + configuredClass.getName()
                     + " is empty", exception.getMessage());
             }

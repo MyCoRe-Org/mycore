@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mycore.common.config.instantiator.MCRInstanceConfiguration.ofName;
 
 import java.util.List;
 import java.util.Map;
@@ -49,8 +48,7 @@ public class MCRInstantiatorCollectionTest {
         })
     public void map() {
 
-        TestClassWithMap instance = ofName(TestClassWithMap.class,
-            "Foo").instantiate();
+        TestClassWithMap instance = ofName(TestClassWithMap.class);
 
         assertNotNull(instance);
         assertNotNull(instance.map);
@@ -73,8 +71,7 @@ public class MCRInstantiatorCollectionTest {
         })
     public void mapNotPresent() {
 
-        assertThrows(MCRConfigurationException.class,
-            () -> MCRInstanceConfiguration.ofName(Object.class, "Foo").instantiate());
+        assertThrows(MCRConfigurationException.class, () -> ofName(Object.class));
 
     }
 
@@ -87,8 +84,7 @@ public class MCRInstantiatorCollectionTest {
         })
     public void optionalMap() {
 
-        TestClassWithOptionalMap instance = ofName(TestClassWithOptionalMap.class,
-            "Foo").instantiate();
+        TestClassWithOptionalMap instance = ofName(TestClassWithOptionalMap.class);
 
         assertNotNull(instance);
         assertNotNull(instance.map);
@@ -111,8 +107,7 @@ public class MCRInstantiatorCollectionTest {
         })
     public void optionalMapNotPresent() {
 
-        TestClassWithOptionalMap instance = ofName(TestClassWithOptionalMap.class,
-            "Foo").instantiate();
+        TestClassWithOptionalMap instance = ofName(TestClassWithOptionalMap.class);
 
         assertNotNull(instance);
         assertNotNull(instance.map);
@@ -132,8 +127,7 @@ public class MCRInstantiatorCollectionTest {
         })
     public void mapWithSentinel() {
 
-        TestClassWithMapWithSentinel instance = ofName(TestClassWithMapWithSentinel.class,
-            "Foo").instantiate();
+        TestClassWithMapWithSentinel instance = ofName(TestClassWithMapWithSentinel.class);
 
         assertNotNull(instance);
         assertNotNull(instance.map);
@@ -156,8 +150,7 @@ public class MCRInstantiatorCollectionTest {
         })
     public void mapWithPrefix() {
 
-        TestClassWithMapsWithPrefix instance = ofName(TestClassWithMapsWithPrefix.class,
-            "Foo").instantiate();
+        TestClassWithMapsWithPrefix instance = ofName(TestClassWithMapsWithPrefix.class);
 
         assertNotNull(instance);
         assertNotNull(instance.map1);
@@ -183,8 +176,7 @@ public class MCRInstantiatorCollectionTest {
         })
     public void shortFormMapWithPrefix() {
 
-        TestClassWithMapWithPrefix instance = ofName(TestClassWithMapWithPrefix.class,
-            "Foo").instantiate();
+        TestClassWithMapWithPrefix instance = ofName(TestClassWithMapWithPrefix.class);
 
         assertNotNull(instance);
         assertNotNull(instance.map);
@@ -210,8 +202,7 @@ public class MCRInstantiatorCollectionTest {
         })
     public void mixedFormMapWithPrefix() {
 
-        TestClassWithMapWithPrefix instance = ofName(TestClassWithMapWithPrefix.class,
-            "Foo").instantiate();
+        TestClassWithMapWithPrefix instance = ofName(TestClassWithMapWithPrefix.class);
 
         assertNotNull(instance);
         assertNotNull(instance.map);
@@ -242,8 +233,7 @@ public class MCRInstantiatorCollectionTest {
         })
     public void shortFormMapWithoutPrefix() {
 
-        TestClassWithMapWithoutPrefix instance = ofName(TestClassWithMapWithoutPrefix.class, "Foo.Class",
-            Options.IMPLICIT).instantiate();
+        TestClassWithMapWithoutPrefix instance = ofClassName(TestClassWithMapWithoutPrefix.class);
 
         assertNotNull(instance);
         assertNotNull(instance.map);
@@ -269,8 +259,7 @@ public class MCRInstantiatorCollectionTest {
         })
     public void mapWithEmptyMapValues() {
 
-        TestClassWithMapWithPrefix instance = ofName(TestClassWithMapWithPrefix.class,
-            "Foo").instantiate();
+        TestClassWithMapWithPrefix instance = ofName(TestClassWithMapWithPrefix.class);
 
         assertNotNull(instance);
         assertNotNull(instance.map);
@@ -298,8 +287,7 @@ public class MCRInstantiatorCollectionTest {
         })
     public void mapWithPrefixAndSentinel() {
 
-        TestClassWithMapWithPrefixAndSentinel instance = ofName(TestClassWithMapWithPrefixAndSentinel.class,
-            "Foo").instantiate();
+        TestClassWithMapWithPrefixAndSentinel instance = ofName(TestClassWithMapWithPrefixAndSentinel.class);
 
         assertNotNull(instance);
         assertNotNull(instance.map);
@@ -322,8 +310,7 @@ public class MCRInstantiatorCollectionTest {
         })
     public void list() {
 
-        TestClassWithList instance = ofName(TestClassWithList.class,
-            "Foo").instantiate();
+        TestClassWithList instance = ofName(TestClassWithList.class);
 
         assertNotNull(instance);
         assertNotNull(instance.list);
@@ -346,8 +333,7 @@ public class MCRInstantiatorCollectionTest {
         })
     public void listNotPresent() {
 
-        assertThrows(MCRConfigurationException.class,
-            () -> MCRInstanceConfiguration.ofName(Object.class, "Foo").instantiate());
+        assertThrows(MCRConfigurationException.class, () -> ofName(Object.class));
 
     }
 
@@ -360,8 +346,7 @@ public class MCRInstantiatorCollectionTest {
         })
     public void optionalList() {
 
-        TestClassWithOptionalList instance = ofName(TestClassWithOptionalList.class,
-            "Foo").instantiate();
+        TestClassWithOptionalList instance = ofName(TestClassWithOptionalList.class);
 
         assertNotNull(instance);
         assertNotNull(instance.list);
@@ -384,8 +369,7 @@ public class MCRInstantiatorCollectionTest {
         })
     public void optionalListNotPresent() {
 
-        TestClassWithOptionalList instance = ofName(TestClassWithOptionalList.class,
-            "Foo").instantiate();
+        TestClassWithOptionalList instance = ofName(TestClassWithOptionalList.class);
 
         assertNotNull(instance);
         assertNotNull(instance.list);
@@ -406,8 +390,7 @@ public class MCRInstantiatorCollectionTest {
         })
     public void listWithSentinel() {
 
-        TestClassWithListAndSentinel instance = ofName(TestClassWithListAndSentinel.class,
-            "Foo").instantiate();
+        TestClassWithListAndSentinel instance = ofName(TestClassWithListAndSentinel.class);
 
         assertNotNull(instance);
         assertNotNull(instance.list);
@@ -427,8 +410,7 @@ public class MCRInstantiatorCollectionTest {
         })
     public void listWithPrefix() {
 
-        TestClassWithListsWithPrefix instance = ofName(TestClassWithListsWithPrefix.class,
-            "Foo").instantiate();
+        TestClassWithListsWithPrefix instance = ofName(TestClassWithListsWithPrefix.class);
 
         assertNotNull(instance);
         assertNotNull(instance.list1);
@@ -454,8 +436,7 @@ public class MCRInstantiatorCollectionTest {
         })
     public void shortFormListWithPrefix() {
 
-        TestClassWithListWithPrefix instance = ofName(TestClassWithListWithPrefix.class,
-            "Foo").instantiate();
+        TestClassWithListWithPrefix instance = ofName(TestClassWithListWithPrefix.class);
 
         assertNotNull(instance);
         assertNotNull(instance.list);
@@ -481,8 +462,7 @@ public class MCRInstantiatorCollectionTest {
         })
     public void mixedFormListWithPrefix() {
 
-        TestClassWithListWithPrefix instance = ofName(TestClassWithListWithPrefix.class,
-            "Foo").instantiate();
+        TestClassWithListWithPrefix instance = ofName(TestClassWithListWithPrefix.class);
 
         assertNotNull(instance);
         assertNotNull(instance.list);
@@ -513,8 +493,7 @@ public class MCRInstantiatorCollectionTest {
         })
     public void shortFormListWithoutPrefix() {
 
-        TestClassWithListWithoutPrefix instance = ofName(TestClassWithListWithoutPrefix.class, "Foo.Class",
-            Options.IMPLICIT).instantiate();
+        TestClassWithListWithoutPrefix instance = ofClassName(TestClassWithListWithoutPrefix.class);
 
         assertNotNull(instance);
         assertNotNull(instance.list);
@@ -540,8 +519,7 @@ public class MCRInstantiatorCollectionTest {
         })
     public void listWithEmptyValues() {
 
-        TestClassWithListWithPrefix instance = ofName(TestClassWithListWithPrefix.class,
-            "Foo").instantiate();
+        TestClassWithListWithPrefix instance = ofName(TestClassWithListWithPrefix.class);
 
         assertNotNull(instance);
         assertNotNull(instance.list);
@@ -569,8 +547,7 @@ public class MCRInstantiatorCollectionTest {
         })
     public void listWithPrefixAndSentinel() {
 
-        TestClassWithListWithPrefixAndSentinel instance = ofName(TestClassWithListWithPrefixAndSentinel.class,
-            "Foo").instantiate();
+        TestClassWithListWithPrefixAndSentinel instance = ofName(TestClassWithListWithPrefixAndSentinel.class);
 
         assertNotNull(instance);
         assertNotNull(instance.list);
@@ -579,6 +556,16 @@ public class MCRInstantiatorCollectionTest {
         assertEquals("Value23", instance.list.get(0));
         assertEquals("Value42", instance.list.get(1));
 
+    }
+
+    private <S> S ofName(Class<S> superClass) {
+        return MCRInstanceConfiguration.ofName(superClass, "Foo", MCRConfiguration2
+            .getAllPropertiesTree()).instantiate();
+    }
+
+    private <S> S ofClassName(Class<S> superClass) {
+        return MCRInstanceConfiguration.ofName(superClass, "Foo.Class", MCRConfiguration2
+            .getAllPropertiesTree(), Options.IMPLICIT).instantiate();
     }
 
     public static class TestClassWithMap {
