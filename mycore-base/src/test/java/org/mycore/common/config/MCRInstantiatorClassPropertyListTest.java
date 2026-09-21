@@ -283,7 +283,7 @@ public class MCRInstantiatorClassPropertyListTest {
             assertNull(instance);
             assertNotNull(exception);
 
-            assertEquals("Default class list, configured in MCR.Default.List (and its sub-properties),"
+            assertEquals("Default class list, configured in MCR.Default.List (and sub-properties thereof),"
                 + " for target field 'list' in configured class " + configuredClass.getName()
                 + " is empty", exception.getMessage());
 
@@ -293,11 +293,11 @@ public class MCRInstantiatorClassPropertyListTest {
             assertNotNull(exception);
 
             if (absolute) {
-                assertEquals("Absolute class list, configured in MCR.List (and its sub-properties),"
+                assertEquals("Absolute class list, configured in MCR.List (and sub-properties thereof),"
                     + " for target field 'list' in configured class " + configuredClass.getName()
                     + " is empty", exception.getMessage());
             } else {
-                assertEquals("Class list, configured in Foo.List (and its sub-properties),"
+                assertEquals("Class list, configured in Foo.List (and sub-properties thereof),"
                     + " for target field 'list' in configured class " + configuredClass.getName()
                     + " is empty", exception.getMessage());
             }

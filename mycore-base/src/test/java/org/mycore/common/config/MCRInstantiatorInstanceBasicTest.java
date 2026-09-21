@@ -64,7 +64,7 @@ public class MCRInstantiatorInstanceBasicTest {
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
             () -> MCRInstanceConfiguration.ofName(TestClass.class, "Foo").instantiate());
 
-        assertEquals("Instance, configured in Foo.Value (and its sub-properties),"
+        assertEquals("Instance, configured in Foo.Value (and sub-properties thereof),"
             + " for target field 'value' in configured class " + TestClass.class.getName()
             + " has a class (" + IncompatibleValue.class.getName() + ") that is incompatible"
             + " with the annotated class (" + Value.class.getName() + ")", exception.getMessage());
