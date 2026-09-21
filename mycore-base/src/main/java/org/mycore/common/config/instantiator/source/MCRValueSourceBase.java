@@ -21,6 +21,7 @@ package org.mycore.common.config.instantiator.source;
 import java.util.Map;
 
 import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.common.config.annotation.MCRSentinel;
 
 /**
  * A {@link MCRValueSourceBase} is a base implementation of {@link MCRSource} that

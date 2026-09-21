@@ -35,10 +35,10 @@ import org.mycore.common.config.instantiator.target.MCRTarget;
  * A {@link MCRSourceBase} is a base implementation of {@link MCRSource} that
  * handles basic aspects for obtaining a value for annotation based injection from properties, i.e.
  * <ul>
- *   <li>whether annotation name are allowed</li>
+ *   <li>whether empty annotation name are allowed</li>
  *   <li>whether the annotation name is absolute or not,</li>
  *   <li>whether falling back to a default value is necessary, if no value is configured</li>
- *   <li>whether an exception is thrown id no value and no default value is configured.</li>
+ *   <li>whether an exception is thrown if no value and no default value is configured.</li>
  * </ul>
  *
  * @param <Result> the type of injected value.
@@ -71,7 +71,7 @@ abstract sealed class MCRSourceBase<Result> implements MCRSource permits MCRValu
         if (absoluteName()) {
             context = new MCRSourceContext(target, name, "absolute " + description());
             result = getResult(context, reduceProperties(fullProperties, name), fullProperties);
-        } else if (supportsEmptyName() && name.isEmpty()) {
+        } else if (name.isEmpty()) {
             context = new MCRSourceContext(target, configuration.name().canonical(), description());
             result = getResult(context, configuration.properties(), fullProperties);
         } else {

@@ -53,14 +53,14 @@ abstract sealed class MCRValueListSourceBase<Value> extends MCRSourceBase<List<V
         int negativeKeyCount = 0;
         String elementDescription = context.description() + " element";
         for (String key : context.orderedIntegerKeys(nextNestedKeys(properties))) {
-            if (key.charAt(0) == '-') {
-                negativeKeyCount++;
-            }
             MCRSourceContext nestedContext = context.nested(key, elementDescription);
-            Map<String, String> nestesProperties = reduceProperties(properties, key);
-            if (!rejectedBySentinel(nestedContext, nestesProperties)) {
-                Value value = extractor.toValue(nestedContext, nestesProperties, fullProperties);
+            Map<String, String> nestedProperties = reduceProperties(properties, key);
+            if (!rejectedBySentinel(nestedContext, nestedProperties)) {
+                Value value = extractor.toValue(nestedContext, nestedProperties, fullProperties);
                 if (value != null) {
+                    if (key.charAt(0) == '-') {
+                        negativeKeyCount++;
+                    }
                     list.add(value);
                 }
             }
