@@ -30,8 +30,8 @@ final class MCRClassPropertyExtractor implements MCRValueExtractor<Class<?>> {
 
     private final Class<?> superClass;
 
-    MCRClassPropertyExtractor(Class<?> valueClass) {
-        this.superClass = valueClass;
+    MCRClassPropertyExtractor(Class<?> superClass) {
+        this.superClass = superClass;
     }
 
     @Override

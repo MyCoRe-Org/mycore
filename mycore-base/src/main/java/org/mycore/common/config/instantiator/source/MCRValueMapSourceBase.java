@@ -64,9 +64,9 @@ abstract sealed class MCRValueMapSourceBase<Value> extends MCRSourceBase<Map<Str
         String entryDescription = context.description() + " entry";
         for (String key : nextNestedKeys(properties)) {
             MCRSourceContext nestedContext = context.nested(key, entryDescription);
-            Map<String, String> nestesProperties = reduceProperties(properties, key);
-            if (!rejectedBySentinel(nestedContext, nestesProperties)) {
-                Value value = extractor.toValue(nestedContext, nestesProperties, fullProperties);
+            Map<String, String> nestedProperties = reduceProperties(properties, key);
+            if (!rejectedBySentinel(nestedContext, nestedProperties)) {
+                Value value = extractor.toValue(nestedContext, nestedProperties, fullProperties);
                 if (value != null) {
                     map.put(key, value);
                 }
