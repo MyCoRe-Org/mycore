@@ -55,7 +55,7 @@ import org.mycore.test.MyCoReTest;
 import org.xml.sax.helpers.AttributesImpl;
 
 @MyCoReTest
-public class MCRTransformerFactoryManagerTest {
+public class MCRTransformerFactoryTest {
 
     private static final String STYLESHEET = """
         <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
@@ -73,12 +73,10 @@ public class MCRTransformerFactoryManagerTest {
 
     @Test
     public void sameProviderUsesSameHolder() {
-        MCRTransformerFactoryManager saxon =
-            MCRTransformerFactoryManager.obtainInstance("saxon");
-        MCRTransformerFactoryManager sameSaxon =
-            MCRTransformerFactoryManager.obtainInstance("saxon");
-        MCRTransformerFactoryManager xalan =
-            MCRTransformerFactoryManager.obtainInstance("xalan");
+        MCRTransformerFactoryRegistry registry = MCRTransformerFactoryRegistry.obtainInstance();
+        MCRTransformerFactory saxon = registry.getSharedFactory("saxon");
+        MCRTransformerFactory sameSaxon = registry.getSharedFactory("saxon");
+        MCRTransformerFactory xalan = registry.getSharedFactory("xalan");
 
         assertSame(saxon, sameSaxon);
         assertNotSame(saxon, xalan);
@@ -87,19 +85,18 @@ public class MCRTransformerFactoryManagerTest {
     @Test
     @SuppressWarnings("removal")
     public void prefersExactFactoryClassForLegacyLookup() {
-        MCRTransformerFactoryManager slowXalan = MCRTransformerFactoryManager.obtainInstance("slowXalan");
+        MCRTransformerFactoryRegistry registry = MCRTransformerFactoryRegistry.obtainInstance();
+        MCRTransformerFactory slowXalan = registry.getSharedFactory("slowXalan");
 
-        assertSame(slowXalan, MCRTransformerFactoryManager
-            .obtainInstance(org.apache.xalan.processor.TransformerFactoryImpl.class));
+        assertSame(slowXalan, registry.getFactory(org.apache.xalan.processor.TransformerFactoryImpl.class));
     }
 
     @Test
     @SuppressWarnings("removal")
     public void sharesUnregisteredLegacyFactoryClass() {
-        MCRTransformerFactoryManager first =
-            MCRTransformerFactoryManager.obtainInstance(UnregisteredTransformerFactory.class);
-        MCRTransformerFactoryManager second =
-            MCRTransformerFactoryManager.obtainInstance(UnregisteredTransformerFactory.class);
+        MCRTransformerFactoryRegistry registry = MCRTransformerFactoryRegistry.obtainInstance();
+        MCRTransformerFactory first =registry.getFactory(UnregisteredTransformerFactory.class);
+        MCRTransformerFactory second =registry.getFactory(UnregisteredTransformerFactory.class);
 
         assertSame(first, second);
         assertEquals(UnregisteredTransformerFactory.class, first.getFactoryClass());
@@ -129,7 +126,7 @@ public class MCRTransformerFactoryManagerTest {
         BlockingTransformerFactory factory = new BlockingTransformerFactory(templates, compileEntered,
             releaseCompile, handlerCallEntered);
 
-        MCRTransformerFactoryManager sharedFactory = new MCRTransformerFactoryManager(
+        MCRTransformerFactory sharedFactory = new MCRTransformerFactory(
             "Blocking", factory, false, () -> null);
 
         ExecutorService executor = Executors.newFixedThreadPool(2);
@@ -166,7 +163,7 @@ public class MCRTransformerFactoryManagerTest {
         BlockingTransformerFactory factory = new BlockingTransformerFactory(templates, compileEntered,
             releaseCompile, handlerCallEntered);
 
-        MCRTransformerFactoryManager sharedFactory = new MCRTransformerFactoryManager(
+        MCRTransformerFactory sharedFactory = new MCRTransformerFactory(
             "Concurrent", factory, true, () -> null);
 
         ExecutorService executor = Executors.newFixedThreadPool(2);
@@ -196,7 +193,7 @@ public class MCRTransformerFactoryManagerTest {
     @Test
     public void reportsRecursiveInitialization() {
 
-        AtomicReference<MCRTransformerFactoryManager> manager = new AtomicReference<>();
+        AtomicReference<MCRTransformerFactory> manager = new AtomicReference<>();
         Supplier<URIResolver> recursingUriResolverSupplier = () -> {
             try {
                 manager.get().newTransformer();
@@ -206,7 +203,7 @@ public class MCRTransformerFactoryManagerTest {
             return null;
         };
 
-        manager.set(new MCRTransformerFactoryManager(
+        manager.set(new MCRTransformerFactory(
             "Recursive", new MCRXalanTransformerFactory(), true, recursingUriResolverSupplier));
 
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
@@ -225,7 +222,8 @@ public class MCRTransformerFactoryManagerTest {
     }
 
     private void assertConcurrentTransformations(String factoryId) throws Exception {
-        MCRTransformerFactoryManager sharedFactory = MCRTransformerFactoryManager.obtainInstance(factoryId);
+        MCRTransformerFactoryRegistry registry = MCRTransformerFactoryRegistry.obtainInstance();
+        MCRTransformerFactory sharedFactory = registry.getSharedFactory(factoryId);
         Templates templates = sharedFactory.newTemplates(new StreamSource(new StringReader(STYLESHEET)));
         ExecutorService executor = Executors.newFixedThreadPool(8);
         try {
@@ -242,11 +240,11 @@ public class MCRTransformerFactoryManagerTest {
     }
 
     private Templates compile(String factoryId, String stylesheet) throws TransformerConfigurationException {
-        return MCRTransformerFactoryManager.obtainInstance(factoryId)
+        return MCRTransformerFactoryRegistry.obtainInstance().getSharedFactory(factoryId)
             .newTemplates(new StreamSource(new StringReader(stylesheet)));
     }
 
-    private String transform(MCRTransformerFactoryManager sharedFactory, Templates templates) throws Exception {
+    private String transform(MCRTransformerFactory sharedFactory, Templates templates) throws Exception {
         TransformerHandler handler = sharedFactory.newTransformerHandler(templates);
         StringWriter result = new StringWriter();
         handler.setResult(new StreamResult(result));

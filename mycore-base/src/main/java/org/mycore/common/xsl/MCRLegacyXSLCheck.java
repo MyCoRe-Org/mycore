@@ -60,7 +60,7 @@ public class MCRLegacyXSLCheck implements AutoExecutable {
         if (!conflicts.isEmpty()) {
             throw new MCRConfigurationException("Conflicting legacy XSL transformer factory properties. "
                 + "Migrate the following settings before starting the application:\n\n" + conflicts
-                + "\n\nFactory IDs are configured below '" + MCRTransformerFactoryManagerRegistry.CONFIGURATION_PREFIX
+                + "\n\nFactory IDs are configured below '" + MCRTransformerFactoryRegistry.REGISTRY_PROPERTY
                 + ".<ID>.Class'. Choose the ID matching the intended implementation; "
                 + "do not simply rename a class-valued property.");
         }

@@ -74,7 +74,7 @@ import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.common.xml.MCRXSLTransformerUtils;
 import org.mycore.common.xsl.MCRErrorListener;
-import org.mycore.common.xsl.MCRTransformerFactoryManager;
+import org.mycore.common.xsl.MCRTransformerFactory;
 import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
 import org.mycore.datamodel.common.MCRActiveLinkException;
@@ -802,7 +802,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         }
         File xmlOutput = new File(dir, nid + "." + extension);
         if (consumer != null) {
-            try(OutputStream fileOutputStream = Files.newOutputStream(xmlOutput.toPath())) {
+            try (OutputStream fileOutputStream = Files.newOutputStream(xmlOutput.toPath())) {
                 consumer.accept(content, fileOutputStream);
             } catch (UncheckedIOException ignoredUnchecked) {
                 throw ignoredUnchecked.getCause();
@@ -972,9 +972,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         XMLReader xmlReader = MCRXMLParserFactory.getNonValidatingParser().getXMLReader();
         xmlReader.setEntityResolver(MCREntityResolver.getInstance());
         SAXSource styleSource = new SAXSource(xmlReader, style.getInputSource());
-        Transformer transformer = MCRTransformerFactoryManager
-            .obtainInstance()
-            .newTransformer(styleSource);
+        Transformer transformer = MCRTransformerFactory.getSharedFactory().newTransformer(styleSource);
         transformer.setErrorListener(new MCRErrorListener());
         for (Entry<String, String> property : MCRConfigurationBase.getAllPropertiesMap().entrySet()) {
             transformer.setParameter(property.getKey(), property.getValue());

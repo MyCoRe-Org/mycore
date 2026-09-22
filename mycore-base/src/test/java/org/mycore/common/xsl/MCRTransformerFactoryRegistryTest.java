@@ -37,11 +37,11 @@ import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRProperty;
-import org.mycore.common.xsl.MCRTransformerFactoryManagerRegistry.Entry;
+import org.mycore.common.xsl.MCRTransformerFactoryRegistry.Entry;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
-public class MCRTransformerFactoryManagerRegistryTest {
+public class MCRTransformerFactoryRegistryTest {
 
     private static final String TEST_PREFIX = "MCR.Test.TransformerFactory";
 
@@ -55,36 +55,38 @@ public class MCRTransformerFactoryManagerRegistryTest {
         @MCRTestProperty(key = TEST_PREFIX + ".Concurrent.SupportsConcurrency", string = "true")
     })
     public void createsAndInitializesFactoryMapFromProperties() throws TransformerConfigurationException {
-        MCRTransformerFactoryManagerRegistry registry = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRTransformerFactoryManagerRegistry.class, TEST_PREFIX);
+        MCRTransformerFactoryRegistry registry = MCRConfiguration2.getInstanceOfOrThrow(
+            MCRTransformerFactoryRegistry.class, TEST_PREFIX);
 
-        assertNotNull(registry.get("Configured").newTransformer());
-        assertFalse(registry.get("Configured").supportsConcurrency());
-        assertTrue(registry.get("Concurrent").supportsConcurrency());
-        assertThrows(MCRConfigurationException.class, () -> registry.get("Missing"));
+        assertNotNull(registry.getSharedFactory("Configured").newTransformer());
+        assertFalse(registry.getSharedFactory("Configured").supportsConcurrency());
+        assertTrue(registry.getSharedFactory("Concurrent").supportsConcurrency());
+        assertThrows(MCRConfigurationException.class, () -> registry.getSharedFactory("Missing"));
     }
 
     @Test
+    @SuppressWarnings("removal")
     public void resolvesLegacyClassToUniqueConfiguredSubclass() {
-        MCRTransformerFactoryManagerRegistry registry = new MCRTransformerFactoryManagerRegistry(Map.of(
+        MCRTransformerFactoryRegistry registry = new MCRTransformerFactoryRegistry(Map.of(
             "Custom", new Entry(new ConfigurableFactory(), false)));
 
-        assertSame(registry.get("Custom"), registry.get(MCRXalanTransformerFactory.class));
+        assertSame(registry.getSharedFactory("Custom"), registry.getFactory(MCRXalanTransformerFactory.class));
     }
 
     @Test
+    @SuppressWarnings("removal")
     public void sharesLegacyFallbackForAmbiguousConfiguredClass() {
 
-        MCRTransformerFactoryManagerRegistry registry = new MCRTransformerFactoryManagerRegistry(Map.of(
+        MCRTransformerFactoryRegistry registry = new MCRTransformerFactoryRegistry(Map.of(
             "First", new Entry(new MCRXalanTransformerFactory(), false),
             "Second", new Entry(new MCRXalanTransformerFactory(), false)));
 
-        MCRTransformerFactoryManager legacy = registry.get(MCRXalanTransformerFactory.class);
+        MCRTransformerFactory legacy = registry.getFactory(MCRXalanTransformerFactory.class);
 
-        assertNotSame(registry.get("First"), legacy);
-        assertNotSame(registry.get("Second"), legacy);
-        assertSame(legacy, registry.get(MCRXalanTransformerFactory.class));
-        assertSame(legacy, registry.get(legacy.getId()));
+        assertNotSame(registry.getSharedFactory("First"), legacy);
+        assertNotSame(registry.getSharedFactory("Second"), legacy);
+        assertSame(legacy, registry.getFactory(MCRXalanTransformerFactory.class));
+        assertSame(legacy, registry.getSharedFactory(legacy.getId()));
         assertFalse(legacy.supportsConcurrency());
     }
 
@@ -102,7 +104,7 @@ public class MCRTransformerFactoryManagerRegistryTest {
 
     }
 
-    public static final class TestInitalizer implements MCRTransformerFactoryManagerRegistry.Initializer {
+    public static final class TestInitalizer implements MCRTransformerFactoryRegistry.Initializer {
 
         private boolean enabled;
 
@@ -118,7 +120,7 @@ public class MCRTransformerFactoryManagerRegistryTest {
 
     }
 
-    public static final class FailingConfiguration implements MCRTransformerFactoryManagerRegistry.Initializer {
+    public static final class FailingConfiguration implements MCRTransformerFactoryRegistry.Initializer {
 
         @Override
         public void initialize(SAXTransformerFactory factory) {

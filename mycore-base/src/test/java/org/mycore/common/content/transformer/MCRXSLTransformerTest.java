@@ -39,7 +39,7 @@ import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRJDOMContent;
-import org.mycore.common.xsl.MCRTransformerFactoryManager;
+import org.mycore.common.xsl.MCRTransformerFactoryRegistry;
 import org.mycore.common.xsl.MCRXalanTransformerFactory;
 import org.mycore.common.xsl.MCRTransformerFactorySelector;
 import org.mycore.common.xsl.uriresolver.MCRXSLStyleURIResolver.Flavor;
@@ -100,9 +100,9 @@ public class MCRXSLTransformerTest {
         @MCRTestProperty(key = LAYOUT_FACTORY_PROPERTY, string = "xalan")
     })
     public void resolvesDefaultFactoryIdAtCallTime() {
+        MCRTransformerFactoryRegistry registry = MCRTransformerFactoryRegistry.obtainInstance();
         assertEquals("xalan", MCRTransformerFactorySelector.getDefaultFactoryId());
-        assertSame(MCRTransformerFactoryManager.obtainInstance("xalan"),
-            MCRTransformerFactoryManager.obtainInstance());
+        assertSame(registry.getSharedFactory("xalan"), registry.getSharedFactory());
     }
 
     @Test
@@ -112,7 +112,7 @@ public class MCRXSLTransformerTest {
     })
     public void rejectsMissingDefaultFactoryConfiguration() {
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
-            MCRTransformerFactoryManager::obtainInstance);
+            () -> MCRTransformerFactoryRegistry.obtainInstance().getSharedFactory());
 
         assertTrue(exception.getMessage().contains(LAYOUT_FACTORY_PROPERTY));
     }

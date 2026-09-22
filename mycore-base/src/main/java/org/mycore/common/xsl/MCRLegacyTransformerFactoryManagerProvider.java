@@ -49,18 +49,18 @@ final class MCRLegacyTransformerFactoryManagerProvider {
     private static final ConcurrentMap<String, Class<? extends TransformerFactory>> LEGACY_FACTORY_CLASSES =
         new ConcurrentHashMap<>();
 
-    private final ConcurrentMap<String, MCRTransformerFactoryManager> factories = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, MCRTransformerFactory> factories = new ConcurrentHashMap<>();
 
     /**
      * Returns the shared legacy factory, or {@code null} if the ID has not been registered for a class.
      */
-    MCRTransformerFactoryManager get(String id) {
+    MCRTransformerFactory get(String id) {
         Class<? extends TransformerFactory> factoryClass = LEGACY_FACTORY_CLASSES.get(id);
         return factoryClass == null ? null : factories.computeIfAbsent(id, _ -> createLegacyFactory(id, factoryClass));
     }
 
     static String getFactoryId(Class<? extends TransformerFactory> factoryClass,
-        Map<String, MCRTransformerFactoryManager> configuredManagers) {
+        Map<String, MCRTransformerFactory> configuredManagers) {
         Map<String, Class<? extends TransformerFactory>> factoryClasses = new HashMap<>();
         configuredManagers.forEach((id, factory) -> factoryClasses.put(id, factory.getFactoryClass()));
         return resolveFactoryId(factoryClasses, factoryClass);
@@ -71,7 +71,7 @@ final class MCRLegacyTransformerFactoryManagerProvider {
      * This keeps legacy-property migration out of the registry's construction path.
      */
     static String getFactoryId(Class<? extends TransformerFactory> factoryClass) {
-        String propertyPrefix = MCRTransformerFactoryManagerRegistry.CONFIGURATION_PREFIX + ".";
+        String propertyPrefix = MCRTransformerFactoryRegistry.REGISTRY_PROPERTY + ".";
         Map<String, Class<? extends TransformerFactory>> factoryClasses = new HashMap<>();
         MCRConfiguration2.getSubpropertiesMap(propertyPrefix).keySet().stream()
             .filter(key -> key.endsWith(CLASS_PROPERTY_SUFFIX))
@@ -113,12 +113,12 @@ final class MCRLegacyTransformerFactoryManagerProvider {
         return factoryId.startsWith(LEGACY_FACTORY_ID_PREFIX);
     }
 
-    private MCRTransformerFactoryManager createLegacyFactory(String id,
-                                                             Class<? extends TransformerFactory> factoryClass) {
+    private MCRTransformerFactory createLegacyFactory(String id,
+                                                      Class<? extends TransformerFactory> factoryClass) {
         TransformerFactory factory = TransformerFactory.newInstance(factoryClass.getName(),
             MCRClassTools.getClassLoader());
         if (factory instanceof SAXTransformerFactory saxTransformerFactory) {
-            return new MCRTransformerFactoryManager(id, saxTransformerFactory, false);
+            return new MCRTransformerFactory(id, saxTransformerFactory, false);
         } else {
             throw new MCRConfigurationException("Transformer Factory " + factory.getClass().getName()
                 + " does not implement SAXTransformerFactory");

@@ -41,8 +41,8 @@ public class MCRTemplatesCompiler {
     private static final Logger LOGGER = LogManager.getLogger();
 
     /** The shared transformer factory used to compile templates. */
-    private static final MCRTransformerFactoryManager FACTORY =
-        MCRTransformerFactoryManager.obtainInstance("xalan");
+    private static final MCRTransformerFactory FACTORY =
+        MCRTransformerFactory.getSharedFactory("xalan");
 
     /** Compiles the given XSL source code */
     public static Templates compileTemplates(MCRTemplatesSource ts) {

@@ -28,6 +28,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.sax.SAXTransformerFactory;
 
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstance;
@@ -45,10 +46,10 @@ import org.mycore.common.config.annotation.MCRSentinel;
  * {@code MCR.TransformerRegistry.{id}.SupportsConcurrency=false} for thread-safe providers.
  * A factory ID is one property-name segment and therefore must not contain a dot.
  */
-@MCRConfigurationProxy(proxyClass = MCRTransformerFactoryManagerRegistry.Factory.class)
-public final class MCRTransformerFactoryManagerRegistry {
+@MCRConfigurationProxy(proxyClass = MCRTransformerFactoryRegistry.Factory.class)
+public final class MCRTransformerFactoryRegistry {
 
-    public static final String CONFIGURATION_PREFIX = "MCR.TransformerRegistry";
+    public static final String REGISTRY_PROPERTY = "MCR.TransformerRegistry";
 
     public static final String DEFAULT_PROPERTY_PREFIX = "MCR.Default.TransformerRegistry.";
 
@@ -58,26 +59,43 @@ public final class MCRTransformerFactoryManagerRegistry {
 
     private static final String INITIALIZERS_KEY = "Initializers";
 
-    private final Map<String, MCRTransformerFactoryManager> managers;
+    private final Map<String, MCRTransformerFactory> managers;
 
     private final MCRLegacyTransformerFactoryManagerProvider legacyFactoryProvider =
         new MCRLegacyTransformerFactoryManagerProvider();
 
-    public MCRTransformerFactoryManagerRegistry(Map<String, Entry> entries) {
+    public MCRTransformerFactoryRegistry(Map<String, Entry> entries) {
         managers = new HashMap<>();
         entries.forEach((id, entry) -> {
-            managers.put(id, new MCRTransformerFactoryManager(id, entry.factory(), entry.supportsConcurrency()));
+            managers.put(id, new MCRTransformerFactory(id, entry.factory(), entry.supportsConcurrency()));
         });
+    }
+
+    public static MCRTransformerFactoryRegistry obtainInstance() {
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRTransformerFactoryRegistry.class, REGISTRY_PROPERTY);
+    }
+
+    public static MCRTransformerFactoryRegistry createInstance() {
+        return MCRConfiguration2.getInstanceOfOrThrow(MCRTransformerFactoryRegistry.class, REGISTRY_PROPERTY);
+    }
+
+    /**
+     * Returns the shared factory for the default selected at call time.
+     *
+     * @return shared factory selected by {@link MCRTransformerFactorySelector#getDefaultFactoryId()}
+     */
+    public MCRTransformerFactory getSharedFactory() {
+        return getSharedFactory(MCRTransformerFactorySelector.getDefaultFactoryId());
     }
 
     /**
      * Returns the shared factory with the supplied ID.
      *
      * @param id configured factory ID
-     * @return shared factory
+     * @return shared factory for this ID
      */
-    public MCRTransformerFactoryManager get(String id) {
-        MCRTransformerFactoryManager factory = managers.get(id);
+    public MCRTransformerFactory getSharedFactory(String id) {
+        MCRTransformerFactory factory = managers.get(id);
         if (factory == null) {
             factory = legacyFactoryProvider.get(id);
         }
@@ -89,21 +107,24 @@ public final class MCRTransformerFactoryManagerRegistry {
     }
 
     /**
-     * Resolves a legacy class to a configured or internal legacy factory.
+     * Returns the uniquely configured factory with the supplied implementation class.
+     *
+     * @deprecated use {@link #getSharedFactory(String)} with a configured factory ID
      */
-    MCRTransformerFactoryManager get(Class<? extends TransformerFactory> factoryClass) {
-        return get(MCRLegacyTransformerFactoryManagerProvider.getFactoryId(factoryClass, managers));
+    @Deprecated(forRemoval = true)
+    public MCRTransformerFactory getFactory(Class<? extends TransformerFactory> factoryClass) {
+        return getSharedFactory(MCRLegacyTransformerFactoryManagerProvider.getFactoryId(factoryClass, managers));
     }
 
-    public static class Factory implements Supplier<MCRTransformerFactoryManagerRegistry> {
+    public static class Factory implements Supplier<MCRTransformerFactoryRegistry> {
 
         @MCRSentinel
         @MCRInstanceMap(valueClass = Entry.class, required = false)
         public Map<String, Entry> entries;
 
         @Override
-        public MCRTransformerFactoryManagerRegistry get() {
-            return new MCRTransformerFactoryManagerRegistry(entries);
+        public MCRTransformerFactoryRegistry get() {
+            return new MCRTransformerFactoryRegistry(entries);
         }
 
     }

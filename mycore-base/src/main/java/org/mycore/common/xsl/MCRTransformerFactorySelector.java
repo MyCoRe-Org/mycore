@@ -107,7 +107,7 @@ public final class MCRTransformerFactorySelector {
             String factoryClassName = factoryClass.getName();
             LOGGER.warn("Configuration property '{}' is deprecated. Register {} below '{}' and replace the property "
                 + "with a factory ID.", legacyProperty, factoryClassName,
-                MCRTransformerFactoryManagerRegistry.CONFIGURATION_PREFIX);
+                MCRTransformerFactoryRegistry.REGISTRY_PROPERTY);
         } else {
             LOGGER.warn("Configuration property '{}' is deprecated. Replace it with '{}={}'.", legacyProperty,
                 property, factoryId);

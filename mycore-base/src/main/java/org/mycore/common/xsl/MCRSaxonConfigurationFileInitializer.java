@@ -43,7 +43,7 @@ import org.mycore.common.config.annotation.MCRProperty;
  * configuration directory. If that directory is disabled, it is resolved against the current working directory.
  */
 @MCRConfigurationProxy(proxyClass = MCRSaxonConfigurationFileInitializer.Factory.class)
-public final class MCRSaxonConfigurationFileInitializer implements MCRTransformerFactoryManagerRegistry.Initializer {
+public final class MCRSaxonConfigurationFileInitializer implements MCRTransformerFactoryRegistry.Initializer {
 
     public static final String CONFIGURATION_FILE_KEY = "ConfigurationFile";
 

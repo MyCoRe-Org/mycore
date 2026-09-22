@@ -34,7 +34,6 @@ import javax.xml.transform.sax.TransformerHandler;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 
@@ -45,7 +44,7 @@ import org.mycore.common.xsl.uriresolver.MCRURIResolver;
  * providers that require it, while the returned {@link Templates}, {@link Transformer}, and
  * {@link TransformerHandler} instances can follow their individual JAXP lifecycle rules.
  */
-public final class MCRTransformerFactoryManager {
+public final class MCRTransformerFactory {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -65,12 +64,12 @@ public final class MCRTransformerFactoryManager {
 
     private boolean initializing;
 
-    MCRTransformerFactoryManager(String id, SAXTransformerFactory factory, boolean supportsConcurrency) {
+    MCRTransformerFactory(String id, SAXTransformerFactory factory, boolean supportsConcurrency) {
         this(id, factory, supportsConcurrency, MCRURIResolver::obtainInstance);
     }
 
-    MCRTransformerFactoryManager(String id, SAXTransformerFactory factory, boolean supportsConcurrency,
-                                 Supplier<URIResolver> uriResolverSupplier) {
+    MCRTransformerFactory(String id, SAXTransformerFactory factory, boolean supportsConcurrency,
+        Supplier<URIResolver> uriResolverSupplier) {
         this.id = Objects.requireNonNull(id);
         this.factory = Objects.requireNonNull(factory);
         this.supportsConcurrency = supportsConcurrency;
@@ -78,32 +77,33 @@ public final class MCRTransformerFactoryManager {
     }
 
     /**
-     * Returns the shared factory manager for the default selected at call time.
+     * Returns the shared factory for the default selected at call time.
      *
-     * @return shared manager selected by {@link MCRTransformerFactorySelector#getDefaultFactoryId()}
+     * @return shared factory selected by {@link MCRTransformerFactorySelector#getDefaultFactoryId()}
      */
-    public static MCRTransformerFactoryManager obtainInstance() {
-        return obtainInstance(MCRTransformerFactorySelector.getDefaultFactoryId());
+    public static MCRTransformerFactory getSharedFactory() {
+        return MCRTransformerFactoryRegistry.obtainInstance().getSharedFactory();
     }
 
     /**
-     * Returns the shared, fully configured factory manager with the supplied ID.
+     * Returns the shared factory with the supplied ID.
      *
      * @param id configured factory ID
-     * @return shared manager for this ID
+     * @return shared factory for this ID
      */
-    public static MCRTransformerFactoryManager obtainInstance(String id) {
-        return LazyRegistryHolder.REGISTRY.get(id);
+    public static MCRTransformerFactory getSharedFactory(String id) {
+        return MCRTransformerFactoryRegistry.obtainInstance().getSharedFactory(id);
     }
 
     /**
      * Returns the uniquely configured factory with the supplied implementation class.
      *
-     * @deprecated use {@link #obtainInstance(String)} with a configured factory ID
+     * @deprecated use {@link #getSharedFactory(String)} with a configured factory ID
      */
     @Deprecated(forRemoval = true)
-    public static MCRTransformerFactoryManager obtainInstance(Class<? extends TransformerFactory> factoryClass) {
-        return LazyRegistryHolder.REGISTRY.get(factoryClass);
+    @SuppressWarnings("removal")
+    public static MCRTransformerFactory getFactory(Class<? extends TransformerFactory> factoryClass) {
+        return MCRTransformerFactoryRegistry.obtainInstance().getFactory(factoryClass);
     }
 
     /**
@@ -189,14 +189,6 @@ public final class MCRTransformerFactoryManager {
     private interface FactoryOperation<T> {
 
         T execute() throws TransformerConfigurationException;
-
-    }
-
-    private static final class LazyRegistryHolder {
-
-        private static final MCRTransformerFactoryManagerRegistry REGISTRY = MCRConfiguration2
-            .getSingleInstanceOfOrThrow(MCRTransformerFactoryManagerRegistry.class,
-                MCRTransformerFactoryManagerRegistry.CONFIGURATION_PREFIX);
 
     }
 
