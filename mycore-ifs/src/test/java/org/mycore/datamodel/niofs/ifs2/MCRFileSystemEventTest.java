@@ -46,6 +46,7 @@ import org.apache.logging.log4j.LogManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
@@ -57,6 +58,7 @@ import org.mycore.common.events.MCRPathEventHelper;
 import org.mycore.datamodel.ifs2.MCRStoreManager;
 import org.mycore.datamodel.niofs.MCRAbstractFileSystem;
 import org.mycore.datamodel.niofs.MCRPath;
+import org.mycore.test.MCRMetadataExtension;
 import org.mycore.test.MyCoReTest;
 
 @MCRTestConfiguration(
@@ -64,6 +66,7 @@ import org.mycore.test.MyCoReTest;
         @MCRTestProperty(key = "MCR.Metadata.Type.derivate", string = "true")
     })
 @MyCoReTest
+@ExtendWith(MCRMetadataExtension.class)
 public class MCRFileSystemEventTest {
 
     private EventRegister register;
