@@ -7,12 +7,14 @@ import org.mycore.datamodel.metadata.MCRExpandedObject;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.test.MCRJPAExtension;
+import org.mycore.test.MCRMetadataExtension;
 import org.mycore.test.MyCoReTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @MyCoReTest
 @ExtendWith(MCRJPAExtension.class)
+@ExtendWith(MCRMetadataExtension.class)
 @MCRTestConfiguration(properties = {
     @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true"),
     @MCRTestProperty(key = "MCR.Metadata.Type.junit", string = "true")

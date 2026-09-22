@@ -42,6 +42,10 @@ import org.tmatesoft.svn.core.internal.wc.SVNFileUtil;
  * <p>
  * Sets the following properties in the class properties:
  * <dl>
+ * <dt><code>MCR.Metadata.Manager.Class</code></dt>
+ * <dd>the metadata manager configured in mycore.properties, replacing the
+ * {@link MCRAlwaysFailingXMLMetadataManager} that {@link MCRTestExtension} configures by default. A test that
+ * names a manager of its own in {@link org.mycore.common.MCRTestProperty} keeps it.</dd>
  * <dt><code>MCR.Metadata.Store.BaseDir</code></dt><dd>Path to the metadata store base directory</dd>
  * <dt><code>MCR.Metadata.Store.SVNBase</code></dt><dd>URI of the SVN base directory</dd>
  * </dl>
@@ -70,8 +74,21 @@ public class MCRMetadataExtension implements Extension, BeforeAllCallback, Befor
 
         // Set up properties in class properties
         Map<String, String> classProperties = MCRTestExtension.getClassProperties(context);
+        enableConfiguredMetadataManager(context, classProperties);
         classProperties.put("MCR.Metadata.Store.BaseDir", storeBaseDir.toAbsolutePath().toString());
         classProperties.put("MCR.Metadata.Store.SVNBase", svnBaseDir.toUri().toString());
+    }
+
+    /**
+     * Undoes the {@link MCRAlwaysFailingXMLMetadataManager} that {@link MCRTestExtension} configures by default,
+     * by restoring the metadata manager of mycore.properties.
+     * <p>
+     * A manager that the test names in an {@link org.mycore.common.MCRTestProperty} still wins, because
+     * {@link MCRTestExtension} applies the annotated properties after those contributed by an extension.
+     */
+    private void enableConfiguredMetadataManager(ExtensionContext context, Map<String, String> classProperties) {
+        classProperties.put(MCRTestExtension.METADATA_MANAGER_CLASS_PROPERTY,
+            MCRTestExtension.getConfiguredMetadataManager(context));
     }
 
     @Override
