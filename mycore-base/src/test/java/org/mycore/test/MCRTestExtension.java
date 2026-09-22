@@ -69,12 +69,6 @@ public class MCRTestExtension implements Extension, BeforeEachCallback, AfterEac
 
     public static final String CLASS_PROPERTIES_MAP_PROPERTY = "classProperties";
 
-    /**
-     * The property naming the {@link org.mycore.datamodel.common.MCRXMLMetadataManager} implementation. Tests get
-     * {@link MCRAlwaysFailingXMLMetadataManager} unless an extension or the test itself configures something else.
-     */
-    public static final String METADATA_MANAGER_CLASS_PROPERTY = "MCR.Metadata.Manager.Class";
-
     private static final String INITIALIZED_PROPERTY = "initialized";
     private static final String PROPERTIES_MAP_PROPERTY = "properties";
     private static final String PROPERTIES_LOADED_PROPERTY = "propertiesLoaded";
@@ -90,42 +84,13 @@ public class MCRTestExtension implements Extension, BeforeEachCallback, AfterEac
 
     private final Map<String, String> mycoreProperties;
 
-    /**
-     * The metadata manager of mycore.properties, which {@link #disableMetadataStoreByDefault()} replaces.
-     * <p>
-     * Static, so that {@link MCRMetadataExtension} can read it without depending on which instance of this
-     * extension belongs to its test class. The value is derived from the configuration of the module under test
-     * and is therefore the same for every test class of a JVM fork.
-     */
-    private static volatile String configuredMetadataManager;
-
     MCRTestExtension() throws IOException {
         testFolder = createTempDirectory();
         MCRTestExtensionConfigurationHelper.initializeTestEnvironment(testFolder);
         configurationLoader = MCRTestExtensionConfigurationHelper.getConfigurationLoader();
         LOGGER.debug(() -> testFolder);
         mycoreProperties = new HashMap<>(configurationLoader.load());
-        configuredMetadataManager = disableMetadataStoreByDefault();
-    }
-
-    /**
-     * Points {@link #METADATA_MANAGER_CLASS_PROPERTY} at {@link MCRAlwaysFailingXMLMetadataManager}, so that a test
-     * that uses the metadata store without an extension that sets one up fails instead of working on state shared
-     * with every other test of the same fork.
-     * <p>
-     * Whichever manager mycore.properties names is replaced, so this does not have to know which one MyCoRe
-     * configures by default, nor which one a module configures for its own tests. An extension that sets up a
-     * metadata store puts it back with {@link #enableConfiguredMetadataManager(ExtensionContext)}.
-     *
-     * @return the metadata manager configured in mycore.properties, or null if none is configured
-     */
-    private String disableMetadataStoreByDefault() {
-        String configuredManager = mycoreProperties.get(METADATA_MANAGER_CLASS_PROPERTY);
-        if (configuredManager == null) {
-            return null;
-        }
-        mycoreProperties.put(METADATA_MANAGER_CLASS_PROPERTY, MCRAlwaysFailingXMLMetadataManager.class.getName());
-        return configuredManager.trim();
+        MCRTestExtensionConfigurationHelper.disableMetadataStore(mycoreProperties);
     }
 
     /**
@@ -139,33 +104,10 @@ public class MCRTestExtension implements Extension, BeforeEachCallback, AfterEac
      * @param context the current extension context
      */
     public static void enableConfiguredMetadataManager(ExtensionContext context) {
-        getClassProperties(context).put(METADATA_MANAGER_CLASS_PROPERTY, getConfiguredMetadataManager());
+        getClassProperties(context).put(MCRTestHelper.METADATA_MANAGER_CLASS_PROPERTY,
+            MCRTestExtensionConfigurationHelper.getConfiguredMetadataManager());
     }
 
-    /**
-     * Returns the {@link org.mycore.datamodel.common.MCRXMLMetadataManager} that mycore.properties configures, as
-     * opposed to the {@link MCRAlwaysFailingXMLMetadataManager} that tests get by default.
-     *
-     * @return the fully qualified class name of the configured metadata manager
-     */
-    public static String getConfiguredMetadataManager() {
-        String configuredManager = configuredMetadataManager;
-        if (configuredManager == null) {
-            throw new IllegalStateException("The configured metadata manager is unknown, because no "
-                + MCRTestExtension.class.getSimpleName() + " has been instantiated. Annotate the test with @"
-                + MyCoReTest.class.getSimpleName() + ".");
-        }
-        return configuredManager;
-    }
-
-    /**
-     * Prepares property that are defined by the test class.
-     * If a extensions wants to add properties to the configuration, it should use the
-     * {@link #getClassProperties(ExtensionContext)} method to get the properties map.
-     * <p>
-     * The properties are finally collected in the {@link #beforeEach(ExtensionContext)} method.
-     * Class-level properties a cached between the test methods.
-     */
     /**
      * Fails unless this extension has already set up the configuration for the current test class.
      * <p>
@@ -186,6 +128,14 @@ public class MCRTestExtension implements Extension, BeforeEachCallback, AfterEac
         }
     }
 
+    /**
+     * Prepares property that are defined by the test class.
+     * If a extensions wants to add properties to the configuration, it should use the
+     * {@link #getClassProperties(ExtensionContext)} method to get the properties map.
+     * <p>
+     * The properties are finally collected in the {@link #beforeEach(ExtensionContext)} method.
+     * Class-level properties a cached between the test methods.
+     */
     @Override
     public void beforeAll(ExtensionContext context) throws Exception {
         context.getStore(NAMESPACE).put(INITIALIZED_PROPERTY, Boolean.TRUE);

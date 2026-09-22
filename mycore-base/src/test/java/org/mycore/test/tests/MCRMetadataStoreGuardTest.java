@@ -36,7 +36,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.test.MCRAlwaysFailingXMLMetadataManager;
 import org.mycore.test.MCRJPAExtension;
 import org.mycore.test.MCRMetadataExtension;
-import org.mycore.test.MCRTestExtension;
+import org.mycore.test.MCRTestHelper;
 import org.mycore.test.MyCoReTest;
 
 /**
@@ -78,7 +78,7 @@ public class MCRMetadataStoreGuardTest {
      */
     @Nested
     @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = MCRTestExtension.METADATA_MANAGER_CLASS_PROPERTY,
+        @MCRTestProperty(key = MCRTestHelper.METADATA_MANAGER_CLASS_PROPERTY,
             classNameOf = MarkerMetadataManager.class)
     })
     class WithAnnotatedManagerAndNoExtension {
@@ -102,7 +102,7 @@ public class MCRMetadataStoreGuardTest {
 
         @Test
         public void testExtensionRestoresTheConfiguredManager() {
-            assertEquals(MCRConfiguration2.getStringOrThrow(MCRTestExtension.METADATA_MANAGER_CLASS_PROPERTY),
+            assertEquals(MCRConfiguration2.getStringOrThrow(MCRTestHelper.METADATA_MANAGER_CLASS_PROPERTY),
                 MCRXMLMetadataManager.obtainInstance().getClass().getName(),
                 "The extension must restore the configured manager rather than one of its own choosing");
         }
@@ -115,7 +115,7 @@ public class MCRMetadataStoreGuardTest {
     @ExtendWith(MCRJPAExtension.class)
     @ExtendWith(MCRMetadataExtension.class)
     @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = MCRTestExtension.METADATA_MANAGER_CLASS_PROPERTY,
+        @MCRTestProperty(key = MCRTestHelper.METADATA_MANAGER_CLASS_PROPERTY,
             classNameOf = MarkerMetadataManager.class)
     })
     class WithAnnotatedManagerAndExtension {
@@ -128,7 +128,7 @@ public class MCRMetadataStoreGuardTest {
 
         @Test
         @MCRTestConfiguration(properties = {
-            @MCRTestProperty(key = MCRTestExtension.METADATA_MANAGER_CLASS_PROPERTY,
+            @MCRTestProperty(key = MCRTestHelper.METADATA_MANAGER_CLASS_PROPERTY,
                 classNameOf = MCRDefaultXMLMetadataManager.class)
         })
         public void testAnnotationOnTheMethodWinsOverTheOneOnTheClass() {
