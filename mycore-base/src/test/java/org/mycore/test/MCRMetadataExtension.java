@@ -60,6 +60,7 @@ public class MCRMetadataExtension implements Extension, BeforeAllCallback, Befor
 
     @Override
     public void beforeAll(ExtensionContext context) throws Exception {
+        MCRTestExtension.requireInitialized(context, MCRMetadataExtension.class);
         Path baseDirPath = MCRTestExtensionConfigurationHelper.getBaseDir();
         if (!baseDirPath.toFile().isDirectory()) {
             Files.createDirectories(baseDirPath);
@@ -74,21 +75,9 @@ public class MCRMetadataExtension implements Extension, BeforeAllCallback, Befor
 
         // Set up properties in class properties
         Map<String, String> classProperties = MCRTestExtension.getClassProperties(context);
-        enableConfiguredMetadataManager(context, classProperties);
+        MCRTestExtension.enableConfiguredMetadataManager(context);
         classProperties.put("MCR.Metadata.Store.BaseDir", storeBaseDir.toAbsolutePath().toString());
         classProperties.put("MCR.Metadata.Store.SVNBase", svnBaseDir.toUri().toString());
-    }
-
-    /**
-     * Undoes the {@link MCRAlwaysFailingXMLMetadataManager} that {@link MCRTestExtension} configures by default,
-     * by restoring the metadata manager of mycore.properties.
-     * <p>
-     * A manager that the test names in an {@link org.mycore.common.MCRTestProperty} still wins, because
-     * {@link MCRTestExtension} applies the annotated properties after those contributed by an extension.
-     */
-    private void enableConfiguredMetadataManager(ExtensionContext context, Map<String, String> classProperties) {
-        classProperties.put(MCRTestExtension.METADATA_MANAGER_CLASS_PROPERTY,
-            MCRTestExtension.getConfiguredMetadataManager(context));
     }
 
     @Override
