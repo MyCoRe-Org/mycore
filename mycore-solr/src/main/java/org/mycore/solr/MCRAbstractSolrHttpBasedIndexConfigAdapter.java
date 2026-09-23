@@ -123,7 +123,7 @@ public abstract class MCRAbstractSolrHttpBasedIndexConfigAdapter<T extends MCRSo
         return useHttp11;
     }
 
-    @MCRProperty(name = "UseHttp11", required = false)
+    @MCRProperty(name = "UseHttp11", defaultName = MCRSolrUtils.USE_HTTP_1_1_PROPERTY, required = false)
     public void setUseHttp11(String useHttp11) {
         this.useHttp11 = useHttp11;
     }
