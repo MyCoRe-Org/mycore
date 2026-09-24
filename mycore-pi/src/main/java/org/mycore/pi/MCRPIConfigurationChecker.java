@@ -73,7 +73,7 @@ public class MCRPIConfigurationChecker implements MCRStartupHandler.AutoExecutab
         final MCRPIServiceManager serviceManager = MCRPIServiceManager.getInstance();
         serviceManager.getServiceList().forEach(service -> {
             LOGGER.info(() -> "Check service: " + service.getServiceID());
-            service.checkConfiguration();
+            service.checkConfiguration(servletContext != null ? MCRPIService.Context.WEBAPP : MCRPIService.Context.CLI);
         });
 
     }

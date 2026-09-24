@@ -182,15 +182,17 @@ public class MCRDOIService extends MCRDOIBaseService {
     }
 
     @Override
-    protected void checkConfiguration() throws MCRConfigurationException {
-        super.checkConfiguration();
+    protected void checkConfiguration(Context context) throws MCRConfigurationException {
+        super.checkConfiguration(context);
         this.initCommonProperties();
         init();
 
-        try {
-            getDataciteClient().getDOIList();
-        } catch (MCRPersistentIdentifierException e) {
-            LOGGER.error("Error while checking Datacite credentials!", e);
+        if (context == Context.WEBAPP) {
+            try {
+                getDataciteClient().getDOIList();
+            } catch (MCRPersistentIdentifierException e) {
+                LOGGER.error("Error while checking Datacite credentials!", e);
+            }
         }
     }
 
