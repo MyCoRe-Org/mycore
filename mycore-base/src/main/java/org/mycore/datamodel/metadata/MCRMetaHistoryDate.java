@@ -469,8 +469,8 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
             throw new MCRException(getSubTag() + ": von,bis or calendar are null");
         }
         if (ibis < ivon) {
-            Calendar swp = (Calendar) von.clone();
-            setVonDate((Calendar) bis.clone());
+            Calendar swp = von.clone();
+            setVonDate(bis.clone());
             setBisDate(swp);
         }
     }
@@ -482,8 +482,8 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
 
         clone.texts = this.texts.stream().map(MCRMetaHistoryDateText::clone)
             .collect(Collectors.toCollection(ArrayList::new));
-        clone.bis = (Calendar) this.bis.clone();
-        clone.von = (Calendar) this.von.clone();
+        clone.bis = this.bis.clone();
+        clone.von = this.von.clone();
         clone.ibis = this.ibis;
         clone.ivon = this.ivon;
         clone.calendar = this.calendar;
