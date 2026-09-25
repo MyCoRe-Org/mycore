@@ -28,6 +28,7 @@ import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyPartialUpdateDto;
 import org.mycore.mcr.acl.accesskey.restapi.v2.access.MCRAccessKeyRestAccessCheckStrategy;
 import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyService;
 import org.mycore.restapi.MCRRestConstants;
+import org.mycore.restapi.annotations.MCRAccessControlExposeHeaders;
 import org.mycore.restapi.annotations.MCRApiDraft;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.mycore.restapi.v2.MCRRestSchemaType;
@@ -217,6 +218,7 @@ public class MCRAccessKeyRestResource {
     })
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
+    @MCRAccessControlExposeHeaders({ HttpHeaders.LOCATION })
     @MCRRequireTransaction
     @MCRRestRequiredPermission(MCRAccessKeyRestConstants.PERMISSION_MANAGE_ACCESS_KEY)
     @MCRRestAccessCheck(strategy = MCRAccessKeyRestAccessCheckStrategy.class)
