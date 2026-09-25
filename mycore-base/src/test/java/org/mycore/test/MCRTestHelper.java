@@ -35,6 +35,15 @@ import org.apache.logging.log4j.Logger;
  */
 public class MCRTestHelper {
 
+    /**
+     * The property naming the {@link org.mycore.datamodel.common.MCRXMLMetadataManager} implementation. Tests get
+     * {@link MCRAlwaysFailingXMLMetadataManager} unless an extension such as {@link MCRMetadataExtension} or the
+     * test itself configures something else. A test may name a manager of its own in an
+     * {@link org.mycore.common.MCRTestProperty} under this key, which takes precedence over what any extension
+     * contributes.
+     */
+    public static final String METADATA_MANAGER_CLASS_PROPERTY = "MCR.Metadata.Manager.Class";
+
     private static final Logger LOGGER = LogManager.getLogger();
 
     /**

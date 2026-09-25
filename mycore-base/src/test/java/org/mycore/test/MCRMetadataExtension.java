@@ -42,6 +42,10 @@ import org.tmatesoft.svn.core.internal.wc.SVNFileUtil;
  * <p>
  * Sets the following properties in the class properties:
  * <dl>
+ * <dt><code>MCR.Metadata.Manager.Class</code></dt>
+ * <dd>the metadata manager configured in mycore.properties, replacing the
+ * {@link MCRAlwaysFailingXMLMetadataManager} that {@link MCRTestExtension} configures by default. A test that
+ * names a manager of its own in {@link org.mycore.common.MCRTestProperty} keeps it.</dd>
  * <dt><code>MCR.Metadata.Store.BaseDir</code></dt><dd>Path to the metadata store base directory</dd>
  * <dt><code>MCR.Metadata.Store.SVNBase</code></dt><dd>URI of the SVN base directory</dd>
  * </dl>
@@ -56,6 +60,7 @@ public class MCRMetadataExtension implements Extension, BeforeAllCallback, Befor
 
     @Override
     public void beforeAll(ExtensionContext context) throws Exception {
+        MCRTestExtension.requireInitialized(context, MCRMetadataExtension.class);
         Path baseDirPath = MCRTestExtensionConfigurationHelper.getBaseDir();
         if (!baseDirPath.toFile().isDirectory()) {
             Files.createDirectories(baseDirPath);
@@ -70,6 +75,7 @@ public class MCRMetadataExtension implements Extension, BeforeAllCallback, Befor
 
         // Set up properties in class properties
         Map<String, String> classProperties = MCRTestExtension.getClassProperties(context);
+        MCRTestExtension.enableConfiguredMetadataManager(context);
         classProperties.put("MCR.Metadata.Store.BaseDir", storeBaseDir.toAbsolutePath().toString());
         classProperties.put("MCR.Metadata.Store.SVNBase", svnBaseDir.toUri().toString());
     }
