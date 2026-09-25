@@ -184,7 +184,7 @@ public class MCRBCryptStrategy extends MCRPasswordCheckStrategyBase {
     private byte[] getHash(int cost, byte[] salt, String password) {
 
         byte[] bytes = (password + '\0').getBytes(StandardCharsets.UTF_8);
-        byte[] fullHash = BCrypt.generate(bytes, salt, cost);
+        byte[] fullHash = BCrypt.generate(bytes, salt, cost, false);
         assert fullHash.length == 24;
 
         byte[] hash = new byte[23];
