@@ -29,12 +29,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.MessageFormat;
+import java.time.Duration;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.imageio.IIOImage;
@@ -84,7 +84,7 @@ public class MCRThumbnailServlet extends MCRServlet {
     private int thumbnailSize = MCRImage.getTileSize();
 
     private static LoadingCache<String, Long> modifiedCache = CacheBuilder.newBuilder().maximumSize(5000)
-        .expireAfterWrite(MCRTileServlet.MAX_AGE, TimeUnit.SECONDS).weakKeys().build(new CacheLoader<>() {
+        .expireAfterWrite(Duration.ofSeconds(MCRTileServlet.MAX_AGE)).weakKeys().build(new CacheLoader<>() {
             @Override
             public Long load(String id) {
                 ThumnailInfo thumbnailInfo = getThumbnailInfo(id);

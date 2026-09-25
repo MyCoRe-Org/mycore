@@ -28,6 +28,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,7 +36,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -112,7 +112,7 @@ public class MCRLayoutUtilities {
     private static Map<String, Element> itemStore = new HashMap<>();
 
     private static final LoadingCache<String, DocumentHolder> NAV_DOCUMENT_CACHE = CacheBuilder.newBuilder()
-        .refreshAfterWrite(STANDARD_CACHE_SECONDS, TimeUnit.SECONDS).build(new CacheLoader<>() {
+        .refreshAfterWrite(Duration.ofSeconds(STANDARD_CACHE_SECONDS)).build(new CacheLoader<>() {
 
             Executor executor = Executors.newSingleThreadExecutor(r -> new Thread(r, "navigation.xml refresh"));
 
