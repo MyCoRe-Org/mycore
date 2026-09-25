@@ -52,6 +52,14 @@ public class MCRTestExtensionConfigurationHelper {
     public static final String MCR_HOME_PROPERTY = "MCR.Home";
     public static final String MCR_APP_NAME_PROPERTY = "MCR.AppName";
 
+    /**
+     * The metadata manager of mycore.properties, which {@link #disableMetadataStore(Map)} replaces.
+     * <p>
+     * It is derived from the configuration of the module under test and is therefore the same for every test
+     * class of a JVM fork.
+     */
+    private static volatile String configuredMetadataManager;
+
     static void initializeTestEnvironment(Path junitFolder) throws IOException {
         if (junitFolder == null) {
             throw new IllegalArgumentException("junitFolder must not be null");
@@ -191,6 +199,44 @@ public class MCRTestExtensionConfigurationHelper {
     static String detectCurrentComponentName() {
         String userDir = System.getProperty("user.dir");
         return Paths.get(userDir).getFileName().toString();
+    }
+
+    /**
+     * Points {@link MCRTestHelper#METADATA_MANAGER_CLASS_PROPERTY} at
+     * {@link MCRAlwaysFailingXMLMetadataManager}, so that a test which uses the metadata store without an
+     * extension that sets one up fails instead of working on state shared with every other test of the same fork.
+     * <p>
+     * Whichever manager mycore.properties names is replaced, so this does not have to know which one MyCoRe
+     * configures by default, nor which one a module configures for its own tests. An extension that sets up a
+     * metadata store puts it back with
+     * {@link MCRTestExtension#enableConfiguredMetadataManager(ExtensionContext)}.
+     *
+     * @param properties the properties loaded from mycore.properties, modified in place
+     */
+    static void disableMetadataStore(Map<String, String> properties) {
+        String configuredManager = properties.get(MCRTestHelper.METADATA_MANAGER_CLASS_PROPERTY);
+        if (configuredManager == null) {
+            return;
+        }
+        properties.put(MCRTestHelper.METADATA_MANAGER_CLASS_PROPERTY,
+            MCRAlwaysFailingXMLMetadataManager.class.getName());
+        configuredMetadataManager = configuredManager.trim();
+    }
+
+    /**
+     * Returns the {@link org.mycore.datamodel.common.MCRXMLMetadataManager} that mycore.properties configures, as
+     * opposed to the {@link MCRAlwaysFailingXMLMetadataManager} that tests get by default.
+     *
+     * @return the fully qualified class name of the configured metadata manager
+     */
+    static String getConfiguredMetadataManager() {
+        String configuredManager = configuredMetadataManager;
+        if (configuredManager == null) {
+            throw new IllegalStateException("The configured metadata manager is unknown, because no "
+                + MCRTestExtension.class.getSimpleName() + " has been instantiated. Annotate the test with @"
+                + MyCoReTest.class.getSimpleName() + ".");
+        }
+        return configuredManager;
     }
 
     public static Path getBaseDir() {

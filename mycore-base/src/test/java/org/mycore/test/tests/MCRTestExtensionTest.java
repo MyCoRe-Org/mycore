@@ -25,8 +25,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import java.util.Map;
+
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.BeforeAllCallback;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.Extension;
+import org.junit.jupiter.api.extension.ExtensionContext;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.MCRConfiguration2;
@@ -141,6 +147,61 @@ public class MCRTestExtensionTest {
         public void testClassPropertyOverwrite() {
             assertEquals("foo", MCRConfiguration2.getStringOrThrow("bar"));
         }
+    }
+
+    /**
+     * Pins down the precedence of configuration properties: what the test itself declares wins over what an
+     * extension contributed, no matter whether the test declares it on the class or on the method.
+     */
+    @Nested
+    @ExtendWith(PropertyContributingExtension.class)
+    @MCRTestConfiguration(
+        properties = {
+            @MCRTestProperty(key = PropertyContributingExtension.CONTESTED_KEY, string = "fromClassAnnotation")
+        })
+    class PropertyPrecedence {
+
+        @Test
+        public void testExtensionPropertyIsApplied() {
+            assertEquals("fromExtension",
+                MCRConfiguration2.getStringOrThrow(PropertyContributingExtension.UNCONTESTED_KEY));
+        }
+
+        @Test
+        public void testClassAnnotationWinsOverExtension() {
+            assertEquals("fromClassAnnotation",
+                MCRConfiguration2.getStringOrThrow(PropertyContributingExtension.CONTESTED_KEY));
+        }
+
+        @Test
+        @MCRTestConfiguration(
+            properties = {
+                @MCRTestProperty(key = PropertyContributingExtension.CONTESTED_KEY, string = "fromMethodAnnotation")
+            })
+        public void testMethodAnnotationWinsOverExtension() {
+            assertEquals("fromMethodAnnotation",
+                MCRConfiguration2.getStringOrThrow(PropertyContributingExtension.CONTESTED_KEY));
+        }
+
+    }
+
+    /**
+     * Contributes properties the way a real extension does, one of them under a key that the test class also
+     * declares.
+     */
+    public static class PropertyContributingExtension implements Extension, BeforeAllCallback {
+
+        static final String CONTESTED_KEY = "junit.precedence.contested";
+
+        static final String UNCONTESTED_KEY = "junit.precedence.uncontested";
+
+        @Override
+        public void beforeAll(ExtensionContext context) {
+            Map<String, String> classProperties = MCRTestExtension.getClassProperties(context);
+            classProperties.put(CONTESTED_KEY, "fromExtension");
+            classProperties.put(UNCONTESTED_KEY, "fromExtension");
+        }
+
     }
 
     public static class SayHello {

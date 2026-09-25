@@ -153,14 +153,15 @@ public final class MCRSimpleJobSelector implements MCRJobSelector {
 
     public static class Factory implements Supplier<MCRSimpleJobSelector> {
 
-        @MCRClassPropertyList(name = ACTIONS_KEY, superClass = MCRJobAction.class,
+        @MCRClassPropertyList(name = ACTIONS_KEY, superClass = MCRJobAction.class, required = false,
             defaultName = "MCR.QueuedJob.Selectors.Default.Actions")
         public List<Class<? extends MCRJobAction>> actions;
 
         @MCRProperty(name = ACTION_MODE_KEY, defaultName = "MCR.QueuedJob.Selectors.Default.ActionMode")
         public String actionMode;
 
-        @MCRPropertyList(name = STATUSES_KEY, defaultName = "MCR.QueuedJob.Selectors.Default.Statuses")
+        @MCRPropertyList(name = STATUSES_KEY, required = false,
+            defaultName = "MCR.QueuedJob.Selectors.Default.Statuses")
         public List<String> statuses;
 
         @MCRProperty(name = STATUS_MODE_KEY, defaultName = "MCR.QueuedJob.Selectors.Default.StatusMode")

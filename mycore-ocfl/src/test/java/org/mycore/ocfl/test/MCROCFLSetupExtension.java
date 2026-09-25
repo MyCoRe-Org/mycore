@@ -30,6 +30,7 @@ import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.mycore.common.MCRTransactionManager;
@@ -47,6 +48,7 @@ import org.mycore.ocfl.repository.MCROCFLRepositoryBuilder;
 import org.mycore.ocfl.repository.MCROCFLRepositoryProvider;
 import org.mycore.ocfl.util.MCROCFLDeleteUtils;
 import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
+import org.mycore.test.MCRTestExtension;
 
 /**
  * JUnit 5 extension that sets up and tears down an {@code MCROCFLRepository} before and after each test.
@@ -66,11 +68,22 @@ import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
  *   <li>{@code MCROCFLRepository repository}</li>
  * </ul>
  */
-public class MCROCFLSetupExtension implements BeforeEachCallback, AfterEachCallback {
+public class MCROCFLSetupExtension implements BeforeAllCallback, BeforeEachCallback, AfterEachCallback {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static MCROCFLRepository repository;
+
+    /**
+     * Enables the metadata manager that this module configures for its tests. {@code MCRTestExtension} disables
+     * the metadata store by default, so that a test which uses it without an extension setting it up fails
+     * rather than leaving state behind for unrelated test classes.
+     */
+    @Override
+    public void beforeAll(ExtensionContext context) {
+        MCRTestExtension.requireInitialized(context, MCROCFLSetupExtension.class);
+        MCRTestExtension.enableConfiguredMetadataManager(context);
+    }
 
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {

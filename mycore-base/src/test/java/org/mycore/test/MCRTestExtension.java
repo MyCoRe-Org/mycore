@@ -43,11 +43,33 @@ import org.mycore.common.config.MCRConfigurationLoader;
  * This extension provides a temporary folder for each test and loads the configuration properties from the
  * {@link MCRConfigurationLoader}.
  * </p>
+ * <p>
+ * Configuration properties are applied in this order, each overriding the previous one:
+ * </p>
+ * <ol>
+ * <li>mycore.properties</li>
+ * <li>properties contributed by other extensions through {@link #getClassProperties(ExtensionContext)}</li>
+ * <li>{@link org.mycore.common.MCRTestProperty} of the test class and its enclosing and super classes</li>
+ * <li>{@link org.mycore.common.MCRTestProperty} of the test method</li>
+ * </ol>
+ * <p>
+ * What a test declares therefore always wins over what an extension contributed, so that a test can opt out of
+ * any part of the setup an extension has chosen for it.
+ * </p>
+ * <p>
+ * Subsystems that a test can only use safely when a dedicated extension has set them up are configured to fail
+ * instead of silently working on shared state. Currently this is the metadata store, which defaults to
+ * {@link MCRAlwaysFailingXMLMetadataManager} until {@link MCRMetadataExtension} replaces it. A test that needs
+ * such a subsystem declares its extension; one that does not gets a clear error rather than side effects on
+ * unrelated test classes.
+ * </p>
  */
 public class MCRTestExtension implements Extension, BeforeEachCallback, AfterEachCallback, BeforeAllCallback,
     AfterAllCallback {
 
     public static final String CLASS_PROPERTIES_MAP_PROPERTY = "classProperties";
+
+    private static final String INITIALIZED_PROPERTY = "initialized";
     private static final String PROPERTIES_MAP_PROPERTY = "properties";
     private static final String PROPERTIES_LOADED_PROPERTY = "propertiesLoaded";
     private static final String FIRST_EACH_CALLBACK_PROPERTY = "firstEachCallback";
@@ -68,6 +90,42 @@ public class MCRTestExtension implements Extension, BeforeEachCallback, AfterEac
         configurationLoader = MCRTestExtensionConfigurationHelper.getConfigurationLoader();
         LOGGER.debug(() -> testFolder);
         mycoreProperties = new HashMap<>(configurationLoader.load());
+        MCRTestExtensionConfigurationHelper.disableMetadataStore(mycoreProperties);
+    }
+
+    /**
+     * Puts the metadata manager of mycore.properties back in place of the
+     * {@link MCRAlwaysFailingXMLMetadataManager} that tests get by default. An extension that sets up a metadata
+     * store calls this, so that the test it serves can use one.
+     * <p>
+     * A manager that the test names in an {@link org.mycore.common.MCRTestProperty} still wins, because the
+     * annotated properties are applied after those contributed by an extension.
+     *
+     * @param context the current extension context
+     */
+    public static void enableConfiguredMetadataManager(ExtensionContext context) {
+        getClassProperties(context).put(MCRTestHelper.METADATA_MANAGER_CLASS_PROPERTY,
+            MCRTestExtensionConfigurationHelper.getConfiguredMetadataManager());
+    }
+
+    /**
+     * Fails unless this extension has already set up the configuration for the current test class.
+     * <p>
+     * Every MyCoRe extension builds on that configuration, in its {@code beforeAll} as well as in its
+     * {@code beforeEach}. Since JUnit calls the extensions in declaration order, {@link MyCoReTest} has to come
+     * first. An extension that would otherwise fail somewhere deep inside MyCoRe calls this to say so plainly.
+     *
+     * @param context the current extension context
+     * @param extension the extension that requires the configuration, for the error message
+     */
+    public static void requireInitialized(ExtensionContext context, Class<? extends Extension> extension) {
+        if (!Boolean.TRUE.equals(context.getStore(NAMESPACE).get(INITIALIZED_PROPERTY, Boolean.class))) {
+            throw new IllegalStateException(context.getRequiredTestClass().getName() + " uses @ExtendWith("
+                + extension.getSimpleName() + ".class), which builds on the configuration that "
+                + MCRTestExtension.class.getSimpleName() + " sets up. Annotate the test class with @"
+                + MyCoReTest.class.getSimpleName() + " and declare it before @ExtendWith("
+                + extension.getSimpleName() + ".class), because JUnit calls the extensions in declaration order.");
+        }
     }
 
     /**
@@ -80,10 +138,12 @@ public class MCRTestExtension implements Extension, BeforeEachCallback, AfterEac
      */
     @Override
     public void beforeAll(ExtensionContext context) throws Exception {
+        context.getStore(NAMESPACE).put(INITIALIZED_PROPERTY, Boolean.TRUE);
         Map<String, String> configProperties = getConfigProperties(context);
+        Map<String, String> annotatedProperties = MCRTestExtensionConfigurationHelper.getAnnotatedProperties(context);
         configProperties.clear(); //clear properties from previous test classes
         configProperties.putAll(mycoreProperties);
-        configProperties.putAll(MCRTestExtensionConfigurationHelper.getAnnotatedProperties(context));
+        configProperties.putAll(annotatedProperties);
         context.getStore(ExtensionContext.Namespace.create(context.getRequiredTestClass()))
             .put(FIRST_EACH_CALLBACK_PROPERTY, (Runnable) () -> {
                 //collect properties defined by beforeAll of other extensions, see JPATestExtension
@@ -95,6 +155,8 @@ public class MCRTestExtension implements Extension, BeforeEachCallback, AfterEac
                     .reduce((a, b) -> a + "\n" + b)
                     .orElse(""));
                 configProperties.putAll(classProperties);
+                //what the test class itself declares wins over what an extension contributed
+                configProperties.putAll(annotatedProperties);
             });
         MCRConfigurationBase.initialize(configurationLoader.loadDeprecated(), mycoreProperties, true);
     }
@@ -182,8 +244,11 @@ public class MCRTestExtension implements Extension, BeforeEachCallback, AfterEac
         if (context.getTestMethod().isPresent()) {
             throw new IllegalStateException("This method should only be called for class-level extensions.");
         }
+        // Keyed by test class: JUnit resolves a store key through the ancestor contexts, so a shared key would
+        // hand a @Nested class the properties that an extension contributed for one of its siblings.
+        String key = CLASS_PROPERTIES_MAP_PROPERTY + '/' + context.getRequiredTestClass().getName();
         return context.getStore(NAMESPACE)
-            .computeIfAbsent(MCRTestExtension.CLASS_PROPERTIES_MAP_PROPERTY, k -> {
+            .computeIfAbsent(key, k -> {
                 LOGGER.debug("Creating empty extension properties");
                 return new HashMap<>();
             }, Map.class);
