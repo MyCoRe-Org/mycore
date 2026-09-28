@@ -53,6 +53,8 @@ import org.mycore.resource.filter.MCRWebappLibraryResourceFilter;
 @MCRConfigurationProxy(proxyClass = MCRWebappLibraryResourceProvider.Factory.class)
 public final class MCRWebappLibraryResourceProvider extends MCRLibraryResourceProviderBase {
 
+    public static final String DEFAULT_KEY_PREFIX = MCRResourceProviderBase.DEFAULT_KEY_PREFIX + ".WebappLibrary";
+
     public static final String MODE_KEY = "Mode";
 
     private final MCRResourceFilterMode mode;
@@ -76,10 +78,10 @@ public final class MCRWebappLibraryResourceProvider extends MCRLibraryResourcePr
 
     public static class Factory implements Supplier<MCRWebappLibraryResourceProvider> {
 
-        @MCRProperty(name = COVERAGE_KEY, defaultName = "MCR.Resource.Provider.Default.WebappLibrary.Coverage")
+        @MCRProperty(name = COVERAGE_KEY, defaultNamePrefix = DEFAULT_KEY_PREFIX)
         public String coverage;
 
-        @MCRProperty(name = MODE_KEY, defaultName = "MCR.Resource.Provider.Default.WebappLibrary.Mode")
+        @MCRProperty(name = MODE_KEY, defaultNamePrefix = DEFAULT_KEY_PREFIX)
         public String mode;
 
         @Override

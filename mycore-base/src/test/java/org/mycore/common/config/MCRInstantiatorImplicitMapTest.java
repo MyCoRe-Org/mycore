@@ -213,7 +213,8 @@ public class MCRInstantiatorImplicitMapTest {
         Configurable instance = null;
         MCRConfigurationException exception = null;
         try {
-            instance = MCRInstanceConfiguration.ofName(Configurable.class, "Foo").instantiate();
+            instance = MCRInstanceConfiguration.ofName(Configurable.class, "Foo",
+                MCRConfiguration2.getAllPropertiesTree()).instantiate();
         } catch (MCRConfigurationException e) {
             exception = e;
         }
@@ -235,7 +236,7 @@ public class MCRInstantiatorImplicitMapTest {
             assertNull(instance);
             assertNotNull(exception);
 
-            assertEquals("Instance map, configured in Foo.Nested (and its sub-properties)," +
+            assertEquals("Instance map, configured in Foo.Nested (and sub-properties thereof)," +
                 " for target field 'nestedMap' in configured class " + configuredClass.getName()
                 + " is empty", exception.getMessage());
 

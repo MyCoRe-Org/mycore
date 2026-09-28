@@ -54,6 +54,8 @@ public class MCRInstantiatorConfigTest {
 
     private static final String INSTANCE_2_NAME = INSTANCE_NAME_PREFIX + INSTANCE_2_KEY;
 
+    private static final String DEFAULT_PREFIX = "MCR.Default";
+
     private static final String DEFAULT_KEY = "DefaultKey";
 
     private static final String DEFAULT_VALUE = "DefaultValue";
@@ -166,7 +168,9 @@ public class MCRInstantiatorConfigTest {
         Optional<String> fullInstanceValue = MCRConfiguration2.getString(fullInstanceName);
         assertTrue(fullInstanceValue.isPresent(), "Properties should contain " + instanceName);
 
-        ConfigurableTestInstance instance = ofName(ConfigurableTestInstance.class, fullInstanceName).instantiate();
+        ConfigurableTestInstance instance = ofName(ConfigurableTestInstance.class, fullInstanceName,
+            MCRConfiguration2.getAllPropertiesTree()).instantiate();
+
         assertNotNull(instance, "Test " + fullInstanceName + " should be present");
 
         validateFields(instance);
@@ -290,6 +294,8 @@ public class MCRInstantiatorConfigTest {
     public void setTestProperties() {
 
         set(DEFAULT_KEY, DEFAULT_VALUE);
+        set(DEFAULT_PREFIX + "." + KEY_REQUIRED_FIELD_WITH_DEFAULT , DEFAULT_VALUE);
+        set(DEFAULT_PREFIX + "." + KEY_REQUIRED_METHOD_WITH_DEFAULT , DEFAULT_VALUE);
         set(KEY_ABSOLUTE_FIELD, VALUE_ABSOLUTE_FIELD);
         set(KEY_ABSOLUTE_METHOD, VALUE_ABSOLUTE_METHOD);
 
@@ -330,7 +336,7 @@ public class MCRInstantiatorConfigTest {
         @MCRProperty(name = KEY_REQUIRED_FIELD)
         public String required;
 
-        @MCRProperty(name = KEY_REQUIRED_FIELD_WITH_DEFAULT, defaultName = DEFAULT_KEY)
+        @MCRProperty(name = KEY_REQUIRED_FIELD_WITH_DEFAULT, defaultNamePrefix = DEFAULT_PREFIX)
         public String requiredWithDefault;
 
         @MCRProperty(name = KEY_ABSENT_OPTIONAL_FIELD, required = false)
@@ -407,7 +413,7 @@ public class MCRInstantiatorConfigTest {
             return requiredMethodValueWithDefault;
         }
 
-        @MCRProperty(name = KEY_REQUIRED_METHOD_WITH_DEFAULT, defaultName = DEFAULT_KEY)
+        @MCRProperty(name = KEY_REQUIRED_METHOD_WITH_DEFAULT, defaultNamePrefix = DEFAULT_PREFIX)
         public void setRequiredWithDefault(String requiredValueWithDefault) {
             this.requiredMethodValueWithDefault = requiredValueWithDefault;
         }

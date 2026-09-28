@@ -52,6 +52,8 @@ import org.mycore.resource.provider.MCRResourceProviderMode;
 @MCRConfigurationProxy(proxyClass = MCRWCMSWebResourceProvider.Factory.class)
 public final class MCRWCMSWebResourceProvider extends MCRFileSystemResourceProviderBase {
 
+    public static final String DEFAULT_KEY_PREFIX = MCRResourceProviderBase.DEFAULT_KEY_PREFIX + ".WCMS";
+
     public MCRWCMSWebResourceProvider(String coverage) {
         super(coverage, MCRResourceProviderMode.WEB_RESOURCES);
     }
@@ -68,7 +70,7 @@ public final class MCRWCMSWebResourceProvider extends MCRFileSystemResourceProvi
 
     public static class Factory implements Supplier<MCRWCMSWebResourceProvider> {
 
-        @MCRProperty(name = COVERAGE_KEY, defaultName = "MCR.Resource.Provider.Default.WCMS.Coverage")
+        @MCRProperty(name = COVERAGE_KEY, defaultNamePrefix = DEFAULT_KEY_PREFIX)
         public String coverage;
 
         @Override
