@@ -19,6 +19,7 @@
 package org.mycore.common.config.instantiator.source;
 
 import org.mycore.common.MCRClassTools;
+import org.mycore.common.config.instantiator.MCRProperTree;
 
 /**
  * A {@link MCRClassPropertyExtractor} is a {@link MCRValueExtractor} that uses
@@ -33,12 +34,20 @@ final class MCRClassPropertyExtractor implements MCRValueExtractor<Class<?>> {
     }
 
     @Override
-    public Class<?> toValue(MCRSourceContext context, String value) {
-        Class<?> configuredClass = loadConfiguredClass(context, value);
+    public Class<?> toValue(MCRSourceContext context, MCRProperTree properties, MCRProperTree fullProperties) {
+
+        String className = properties.value();
+
+        if (className == null) {
+            return null;
+        }
+
+        Class<?> configuredClass = loadConfiguredClass(context, className);
         if (!superClass.isAssignableFrom(configuredClass)) {
-            throw context.incompatibilityException(superClass, configuredClass);
+            throw context.classIncompatibilityException(superClass, configuredClass);
         }
         return configuredClass;
+
     }
 
     private Class<?> loadConfiguredClass(MCRSourceContext context, String value) {

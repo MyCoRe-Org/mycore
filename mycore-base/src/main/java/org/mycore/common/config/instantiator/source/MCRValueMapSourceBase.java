@@ -24,10 +24,19 @@ import java.util.stream.Collectors;
 
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
-import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
+import org.mycore.common.config.annotation.MCRSentinel;
+import org.mycore.common.config.instantiator.MCRProperTree;
 
+/**
+ * A {@link MCRValueMapSourceBase} is a base implementation of {@link MCRSource} that
+ * obtains a {@link Map} of values for annotation based injection from properties.
+ * It provides support for {@link MCRSentinel} for each map entry and
+ * uses a {@link MCRValueExtractor} to obtain each map entry value from the corresponding nested properties.
+ *
+ * @param <Value> the type of injected map values.
+ */
 abstract sealed class MCRValueMapSourceBase<Value> extends MCRSourceBase<Map<String, Value>> permits
-    MCRClassPropertyMapSource, MCRPropertyMapSource {
+    MCRClassPropertyMapSource, MCRInstanceMapSource, MCRPropertyMapSource {
 
     private final MCRValueExtractor<Value> extractor;
 
@@ -37,39 +46,39 @@ abstract sealed class MCRValueMapSourceBase<Value> extends MCRSourceBase<Map<Str
     }
 
     @Override
-    protected final Map<String, Value> getResult(MCRSourceContext context, MCRInstanceConfiguration<?> configuration,
-        Map<String, String> properties, String prefix) {
+    protected final Map<String, Value> getResult(MCRSourceContext context, MCRProperTree properties,
+        MCRProperTree fullProperties) {
 
-        Map<String, String> shortFormMap = Map.of();
-        String shortFormProperty = properties.get(prefix);
-        if (shortFormProperty != null) {
-            shortFormMap = parseShortFormMap(shortFormProperty);
+        Map<String, Value> map = new HashMap<>();
+
+        String shortFormProperty = properties.value();
+        if (supportsShortForm() && shortFormProperty != null) {
+            parseShortFormMap(shortFormProperty).forEach((key, shortFormValue) -> {
+                MCRSourceContext keyContext = context.withHint("for key " + key);
+                Value value = extractor.toValue(keyContext, MCRProperTree.of(shortFormValue), fullProperties);
+                if (value != null) {
+                    map.put(key, value);
+                }
+            });
         }
 
-        Map<String, String> mapProperties = new HashMap<>(shortFormMap);
-        String keyPrefix = prefix.isEmpty() ? prefix : prefix + ".";
-        int keyPrefixLength = keyPrefix.length();
-        properties.forEach((key, value) -> {
-            if (key.startsWith(keyPrefix) && !key.isEmpty()) {
-                int index = key.indexOf('.', keyPrefixLength);
-                if (index == -1) {
-                    mapProperties.put(key.substring(keyPrefixLength), value);
+        String entryDescription = context.description() + " entry";
+        properties.keys().forEach(key -> {
+            MCRSourceContext nestedContext = context.nested(key, entryDescription);
+            MCRProperTree nestedProperties = properties.nested(key);
+            if (!rejectedBySentinel(nestedContext, nestedProperties)) {
+                Value value = extractor.toValue(nestedContext, nestedProperties, fullProperties);
+                if (value != null) {
+                    map.put(key, value);
                 }
             }
         });
 
-        Map<String, Value> map = new HashMap<>();
-
-        for (String key : mapProperties.keySet()) {
-            MCRSourceContext nestedContext = context.nested(key, context.description() + " entry");
-            if (!rejectedBySentinel(nestedContext, properties, keyPrefix + key + ".")) {
-                map.put(key, extractor.toValue(nestedContext, mapProperties.get(key)));
-            }
-        }
-
         return map;
 
     }
+
+    protected abstract boolean supportsShortForm();
 
     private Map<String, String> parseShortFormMap(String value) {
         return MCRConfiguration2.splitValue(value)
