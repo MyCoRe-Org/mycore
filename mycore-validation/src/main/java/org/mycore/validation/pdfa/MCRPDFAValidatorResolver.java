@@ -45,7 +45,11 @@ import org.w3c.dom.Document;
  *<p><br>
  * Note: This implementation assumes that the 'href' parameter follows the 'mcrpdfa:{derivateId}' format, and the 'base'
  * parameter is not used in the resolution process.
+ *
+ * @deprecated Validating while a document is transformed can take long enough to time out the request. Use
+ *             {@link MCRPDFAReportResolver} instead, which reads reports that were produced asynchronously.
  */
+@Deprecated
 public class MCRPDFAValidatorResolver implements URIResolver {
 
     @Override
