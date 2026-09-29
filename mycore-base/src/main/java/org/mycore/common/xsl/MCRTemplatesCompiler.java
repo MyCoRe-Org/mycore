@@ -18,22 +18,17 @@
 
 package org.mycore.common.xsl;
 
-import javax.xml.transform.ErrorListener;
 import javax.xml.transform.Source;
 import javax.xml.transform.SourceLocator;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.sax.SAXTransformerFactory;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.xml.utils.WrappedRuntimeException;
 import org.mycore.common.MCRExceptionCauseFinder;
 import org.mycore.common.config.MCRConfigurationException;
-import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 
 /**
  * Compiles XSL sources, reports compile errors and returns transformer
@@ -45,44 +40,15 @@ public class MCRTemplatesCompiler {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    /** The XSL transformer factory to use */
-    private static SAXTransformerFactory factory;
-
-    static {
-        System.setProperty("javax.xml.transform.TransformerFactory",
-            "org.apache.xalan.processor.TransformerFactoryImpl");
-        TransformerFactory tf = TransformerFactory.newInstance();
-        LOGGER.info("Transformerfactory: {}", () -> tf.getClass().getName());
-
-        if (!tf.getFeature(SAXTransformerFactory.FEATURE)) {
-            throw new MCRConfigurationException("Could not load a SAXTransformerFactory for use with XSLT");
-        }
-
-        factory = (SAXTransformerFactory) tf;
-        factory.setURIResolver(MCRURIResolver.obtainInstance());
-        factory.setErrorListener(new ErrorListener() {
-            @Override
-            public void error(TransformerException ex) {
-                throw new WrappedRuntimeException(MCRExceptionCauseFinder.getCause(ex));
-            }
-
-            @Override
-            public void fatalError(TransformerException ex) {
-                throw new WrappedRuntimeException(MCRExceptionCauseFinder.getCause(ex));
-            }
-
-            @Override
-            public void warning(TransformerException ex) {
-                LOGGER.warn(ex::getMessageAndLocation);
-            }
-        });
-    }
+    /** The shared transformer factory used to compile templates. */
+    private static final MCRSAXTransformerFactoryManager FACTORY =
+        MCRSAXTransformerFactoryManager.obtainInstance("Xalan");
 
     /** Compiles the given XSL source code */
     public static Templates compileTemplates(MCRTemplatesSource ts) {
         try {
             Source source = ts.getSource();
-            return factory.newTemplates(source);
+            return FACTORY.newTemplates(source);
         } catch (Exception exc) {
             LOGGER.error("Error while compiling template", exc);
             Exception cause = MCRExceptionCauseFinder.getCause(exc);
@@ -94,7 +60,7 @@ public class MCRTemplatesCompiler {
     /** Returns a new transformer for the compiled XSL templates
      */
     public static Transformer getTransformer(Templates templates) throws TransformerConfigurationException {
-        return factory.newTransformerHandler(templates).getTransformer();
+        return FACTORY.newTransformerHandler(templates).getTransformer();
     }
 
     private static String buildErrorMessage(String resource, Exception cause) {
