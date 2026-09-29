@@ -23,7 +23,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Request body for updating an existing user.
+ * Request body for updating an existing user. Administrative counterpart to
+ * {@link MCRUpdateUserProfileRequest}: in addition to a user's own profile fields (name, email,
+ * password hint), this also covers the administrative fields (roles, lock state, validity
+ * period, ownership) that only an administrator may change.
  *
  * <p>All fields are required and will completely replace the existing user data.
  *
@@ -36,6 +39,7 @@ import java.util.Map;
  * @param attributes    the user attributes, or {@code null}
  * @param owner         the ID of the user that owns this user, or {@code null} if independent
  * @param roles         the roles assigned to the user, or {@code null}
+ * @see MCRUpdateUserProfileRequest
  */
 public record MCRUpdateUserRequest(
     String name,
