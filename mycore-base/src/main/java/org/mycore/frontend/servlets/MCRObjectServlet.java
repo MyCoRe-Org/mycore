@@ -69,7 +69,7 @@ public class MCRObjectServlet extends MCRContentServlet {
         if (!MCRAccessManager.checkPermission(mcrid, PERMISSION_READ)) { // check read permission for ID
             final MCRSession currentSession = MCRSessionMgr.getCurrentSession();
             resp.sendError(
-                HttpServletResponse.SC_UNAUTHORIZED,
+                HttpServletResponse.SC_FORBIDDEN,
                 getErrorI18N(I18N_ERROR_PREFIX, "accessDenied", mcrid.toString(), currentSession.getUserInformation()
                     .getUserID(), currentSession.getCurrentIP()));
             return null;
@@ -104,7 +104,7 @@ public class MCRObjectServlet extends MCRContentServlet {
         if (!MCRAccessManager.checkPermission(mcrid, PERMISSION_HISTORY_READ)) {
             final MCRSession currentSession = MCRSessionMgr.getCurrentSession();
             resp.sendError(
-                HttpServletResponse.SC_UNAUTHORIZED,
+                HttpServletResponse.SC_FORBIDDEN,
                 getErrorI18N(I18N_ERROR_PREFIX, "accessToVersionDenied", mcrid.toString(), rev,
                     currentSession.getUserInformation().getUserID(), currentSession.getCurrentIP()));
             return null;
