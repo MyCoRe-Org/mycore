@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.mycore</groupId>
     <artifactId>mycore-parent</artifactId>
-    <version>59</version>
+    <version>60-SNAPSHOT</version>
   </parent>
   <artifactId>mycore</artifactId>
   <version>2026.12.0-SNAPSHOT</version>
@@ -33,7 +33,7 @@
   <description xml:space="preserve">
 MyCoRe is a system for the development of institutional content repositories, publication servers, image collections, archives, or similar repositories.
 Applications based on MyCoRe use a common core, which provides the functionality typically required for such applications, for example metadata management, querying, OAI harvesting interface, or an image viewer module.</description>
-  <url>http://www.mycore.de/generated/mycore${site.suffix}</url>
+  <url>https://www.mycore.de/</url>
   <licenses>
     <license>
       <name>GNU General Public License, version 3</name>
@@ -55,9 +55,6 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <argLine />
     <!-- same as ocfl aws sdk version -->
     <aws-sdk.version>2.41.32</aws-sdk.version>
-    <changelog.since>2024-12-18</changelog.since>
-    <!-- until snapshot matches released version (required for 'mvn changes:changes-check') -->
-    <changes.version>2025.02</changes.version>
     <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
     <checkstyle.suppressions.location>${user.dir}/checkstyle-suppressions.xml</checkstyle.suppressions.location>
     <frontend.maven.plugin.version>1.12.0</frontend.maven.plugin.version>
@@ -95,7 +92,6 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <pmd.version>7.16.0</pmd.version>
     <rdf4j.version>5.2.2</rdf4j.version>
     <selenium.version>4.40.0</selenium.version>
-    <site.suffix />
     <solrj.version>10.0.0</solrj.version>
     <swagger.version>2.2.43</swagger.version>
     <uniqueVersion>false</uniqueVersion>
@@ -236,13 +232,6 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <url>https://central.sonatype.com/repository/maven-snapshots</url>
     </pluginRepository>
   </pluginRepositories>
-  <distributionManagement>
-    <site>
-      <id>MyCoRe HQ</id>
-      <name>MyCoRe HQ-sites</name>
-      <url>scp://server.mycore.de/mcr/mycore.de/generated/mycore${site.suffix}</url>
-    </site>
-  </distributionManagement>
   <profiles>
     <profile>
       <id>java-modules</id>
@@ -699,239 +688,6 @@ Applications based on MyCoRe use a common core, which provides the functionality
           </plugin>
         </plugins>
       </build>
-    </profile>
-    <profile>
-      <id>release-profile</id>
-      <properties>
-        <site.suffix>-${project.version}</site.suffix>
-      </properties>
-    </profile>
-    <profile>
-      <id>deployment</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-        <property>
-          <name>env.CI</name>
-          <value>true</value>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-changes-plugin</artifactId>
-            <configuration>
-              <issueManagementSystems>
-                <issueManagementSystem>JIRA</issueManagementSystem>
-              </issueManagementSystems>
-              <runOnlyAtExecutionRoot>true</runOnlyAtExecutionRoot>
-              <smtpPort implementation="java.lang.Integer">25</smtpPort>
-              <toAddresses>
-                <toAddress implementation="java.lang.String">developer@mycore.de</toAddress>
-              </toAddresses>
-              <mailSender>
-                <name>${changes.mailSender.name}</name>
-                <email>${changes.mailSender.email}</email>
-              </mailSender>
-              <template>announcement.vm</template>
-              <useJql>true</useJql>
-              <templateDirectory>src/changes</templateDirectory>
-              <!-- <statusIds>10002,Done</statusIds> -->
-              <!-- due to: http://jira.codehaus.org/browse/MCHANGES-333 -->
-              <maxEntries>1000</maxEntries>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-      <reporting>
-        <plugins>
-          <plugin>
-            <artifactId>maven-changelog-plugin</artifactId>
-            <configuration>
-              <issueLinkUrl>https://mycore.atlassian.net/browse/%ISSUE%</issueLinkUrl>
-              <type>date</type>
-              <dates>
-                <date implementation="java.lang.String">${changelog.since}</date>
-              </dates>
-              <dateFormat>yyyy-MM-dd</dateFormat>
-            </configuration>
-          </plugin>
-          <plugin>
-            <artifactId>maven-changes-plugin</artifactId>
-            <version>${maven-changes-plugin.version}</version>
-            <inherited>false</inherited>
-            <configuration>
-              <fixVersionIds>${changes.version}</fixVersionIds>
-              <useJql>true</useJql>
-              <columnNames>Type,Key,Summary,Assignee,Status,Resolution,Component</columnNames>
-              <sortColumnNames>Type,Component,Key DESC</sortColumnNames>
-            </configuration>
-            <reportSets>
-              <reportSet>
-                <reports>
-                  <report>jira-report</report>
-                </reports>
-              </reportSet>
-            </reportSets>
-          </plugin>
-          <plugin>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <configuration>
-              <quiet>true</quiet>
-              <source>${java.target.version}</source>
-              <groups>
-                <group>
-                  <title>MyCoRe Datamodel</title>
-                  <packages>org.mycore.datamodel*</packages>
-                </group>
-                <group>
-                  <title>MyCoRe Authorization System</title>
-                  <packages>org.mycore.access*</packages>
-                </group>
-                <group>
-                  <title>MyCoRe ACL</title>
-                  <packages>org.mycore.mcr.acl*</packages>
-                </group>
-                <group>
-                  <title>MyCoRe Persistence Backend Implementations</title>
-                  <packages>org.mycore.backend*</packages>
-                </group>
-                <group>
-                  <title>MyCoRe User Interface Frontend</title>
-                  <packages>org.mycore.frontend*</packages>
-                </group>
-                <group>
-                  <title>MyCoRe Common Functionality</title>
-                  <packages>org.mycore.common*</packages>
-                </group>
-                <group>
-                  <title>MyCoRe Services</title>
-                  <packages>org.mycore.services*</packages>
-                </group>
-                <group>
-                  <title>MyCoRe User and Group Management</title>
-                  <packages>org.mycore.user*</packages>
-                </group>
-                <group>
-                  <title>MyCoRe Component: FO</title>
-                  <packages>org.mycore.fo*</packages>
-                </group>
-                <group>
-                  <title>MyCoRe Component: IView 2</title>
-                  <packages>org.mycore.iview2*</packages>
-                </group>
-                <group>
-                  <title>MyCoRe Component: Import/Export</title>
-                  <packages>org.mycore.impex*</packages>
-                </group>
-                <group>
-                  <title>MyCoRe Component: Migration</title>
-                  <packages>org.mycore.migration*</packages>
-                </group>
-                <group>
-                  <title>MyCoRe Component: Media</title>
-                  <packages>org.mycore.media*</packages>
-                </group>
-                <group>
-                  <title>MyCoRe Component: METS</title>
-                  <packages>org.mycore.mets*</packages>
-                </group>
-                <group>
-                  <title>MyCoRe Component: MODS</title>
-                  <packages>org.mycore.mods*</packages>
-                </group>
-                <group>
-                  <title>MyCoRe Component: ORCID Integration</title>
-                  <packages>org.mycore.orcid*</packages>
-                </group>
-                <group>
-                  <title>MyCoRe Component: OAI</title>
-                  <packages>org.mycore.oai*</packages>
-                </group>
-                <group>
-                  <title>MyCoRe Component: REST API</title>
-                  <packages>org.mycore.restapi*</packages>
-                </group>
-                <group>
-                  <title>MyCoRe Component: SOLR</title>
-                  <packages>org.mycore.solr*</packages>
-                </group>
-                <group>
-                  <title>MyCoRe Component: Sword</title>
-                  <packages>org.mycore.sword*</packages>
-                </group>
-                <group>
-                  <title>MyCoRe Component: Web-CLI</title>
-                  <packages>org.mycore.webcli*</packages>
-                </group>
-                <group>
-                  <title>MyCoRe Component: WFC</title>
-                  <packages>org.mycore.wfc*</packages>
-                </group>
-              </groups>
-              <links>
-                <link>https://docs.oracle.com/en/java/javase/21/docs/api/</link>
-                <link>https://jakarta.ee/specifications/platform/10/apidocs/</link>
-                <!--
-                <link>http://www.jdom.org/docs/apidocs/</link>
-                -->
-                <link>https://logging.apache.org/log4j/2.x/javadoc/log4j-api/</link>
-                <!--
-                <link>https://docs.hibernate.org/orm/${hibernate.base.version}/javadocs/</link>
-                -->
-                <link>https://jakarta.ee/specifications/persistence/3.2/apidocs/</link>
-                <!--
-                <link>https://solr.apache.org/docs/8_11_2/solr-solrj/</link>
-                -->
-              </links>
-            </configuration>
-            <reportSets>
-              <reportSet>
-                <id>default</id>
-                <reports>
-                  <report>javadoc-no-fork</report>
-                  <report>test-javadoc-no-fork</report>
-                </reports>
-                <configuration />
-              </reportSet>
-              <reportSet>
-                <id>aggregate</id>
-                <reports>
-                  <report>aggregate-no-fork</report>
-                  <report>test-aggregate-no-fork</report>
-                </reports>
-                <inherited>false</inherited>
-              </reportSet>
-            </reportSets>
-          </plugin>
-          <plugin>
-            <artifactId>maven-jxr-plugin</artifactId>
-            <configuration>
-              <aggregate>true</aggregate>
-            </configuration>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-pmd-plugin</artifactId>
-            <reportSets>
-              <reportSet>
-                <id>aggregate</id>
-                <reports>
-                  <report>aggregate-pmd</report>
-                  <report>aggregate-cpd</report>
-                </reports>
-                <inherited>false</inherited>
-              </reportSet>
-              <reportSet>
-                <id>default</id>
-                <reports>
-                  <report>pmd</report>
-                  <report>cpd</report>
-                </reports>
-              </reportSet>
-            </reportSets>
-          </plugin>
-        </plugins>
-      </reporting>
     </profile>
     <profile>
       <id>keepNode</id>
