@@ -33,6 +33,8 @@ import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyNotFoundException;
 import org.mycore.mcr.acl.accesskey.mapper.MCRAccessKeyJsonMapper;
 import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyService;
 import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyUserService;
+import org.mycore.user2.MCRUser;
+import org.mycore.user2.MCRUserManager;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -165,10 +167,32 @@ public class MCRAccessKeyCommands {
      * Cleans up user attributes related to access keys.
      */
     @MCRCommand(syntax = "clean up access key user attributes",
-        help = "Cleans all access key secret attributes of users if the corresponding key does not exist.")
+        help = "Cleans all access key secret attributes of users if the corresponding key does not exist.",
+        order = 10)
     public static void cleanUp() {
         MCRAccessKeyUserService.obtainInstance().cleanUpUserAttributes();
         LOGGER.info("Cleaned up access keys.");
+    }
+
+    /**
+     * Cleans up user attributes for a given user related to access keys.
+     *
+     * @param userWithRealm the user in format {@code user@realm}
+     */
+    @MCRCommand(syntax = "clean up access key user attributes for user {0}",
+        help = "Cleans all access key secret attributes of users if the corresponding key does not exist.",
+        order = 5)
+    public static void cleanUp(String userWithRealm) {
+        String[] strings = userWithRealm.split("@");
+        if(strings.length != 2) {
+            LOGGER.error("Could not parse '{}' into a user and its realm", userWithRealm);
+            return;
+        }
+
+        MCRUser user = MCRUserManager.getUser(strings[0], strings[1]);
+        MCRAccessKeyUserService.obtainInstance().cleanUpUserAttributes(user);
+
+        LOGGER.info("Cleaned up access keys for user {}.", userWithRealm);
     }
 
     /**

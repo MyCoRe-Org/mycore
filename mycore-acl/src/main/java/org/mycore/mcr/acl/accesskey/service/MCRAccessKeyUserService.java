@@ -123,6 +123,15 @@ public class MCRAccessKeyUserService extends MCRAccessKeyContextService<MCRUser>
         } while (users.size() == limit);
     }
 
+    /**
+     * Cleans up the user's attributes related to access keys by checking their validity.
+     *
+     * @param user the {@link MCRUser}
+     */
+    public void cleanUpUserAttributes(MCRUser user) {
+        cleanUpAttributesForUser(user, new HashSet<>(), new HashSet<>());
+    }
+
     private static List<MCRUser> listUsersWithAccessKey(int offset, int limit) {
         return MCRUserManager.listUsers(null, null, null, null, ACCESS_KEY_USER_ATTRIBUTE_PREFIX + "*", null, offset,
             limit);
