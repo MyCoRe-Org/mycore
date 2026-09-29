@@ -25,8 +25,7 @@ import javax.xml.transform.URIResolver;
 import javax.xml.transform.dom.DOMSource;
 
 import org.mycore.access.MCRAccessManager;
-import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRSystemUserInformation;
+import org.mycore.common.MCRSessionUtils;
 import org.mycore.common.xml.MCRDOMUtils;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.common.xsl.uriresolver.MCRURIResolverResponse;
@@ -88,12 +87,11 @@ public class MCRUserObjectRightsURIResolver implements URIResolver {
                     MCRURIResolverResponse.ofBoolean(MCRXMLFunctions.isWorldReadableComplete(value));
                 case "isDisplayedEnabledDerivate" ->
                     MCRURIResolverResponse.ofBoolean(MCRAccessManager.checkDerivateDisplayPermission(value));
-                case "isCurrentUserInRole" -> MCRURIResolverResponse.ofBoolean(MCRSessionMgr
-                    .getCurrentSession().getUserInformation().isUserInRole(value));
-                case "isCurrentUserSuperUser" -> MCRURIResolverResponse.ofBoolean(MCRSessionMgr.getCurrentSession()
-                    .getUserInformation().getUserID().equals(MCRSystemUserInformation.SUPER_USER.getUserID()));
-                case "isCurrentUserGuestUser" -> MCRURIResolverResponse.ofBoolean(MCRSessionMgr.getCurrentSession()
-                    .getUserInformation().getUserID().equals(MCRSystemUserInformation.GUEST.getUserID()));
+                case "isCurrentUserInRole" ->
+                    MCRURIResolverResponse.ofBoolean(MCRSessionUtils.isCurrentUserInRole(value));
+                case "isCurrentUserSuperUser" ->
+                    MCRURIResolverResponse.ofBoolean(MCRSessionUtils.isCurrentUserSuperUser());
+                case "isCurrentUserGuestUser" -> MCRURIResolverResponse.ofBoolean(MCRSessionUtils.isCurrentUserGuest());
                 case "getCurrentUserAttribute" -> {
                     Document doc = MCRDOMUtils.getDocumentBuilder().newDocument();
                     Element attr = doc.createElement("userattribute");
@@ -101,7 +99,7 @@ public class MCRUserObjectRightsURIResolver implements URIResolver {
                     doc.appendChild(attr);
                     attr.appendChild(
                         doc.createTextNode(
-                            MCRSessionMgr.getCurrentSession().getUserInformation().getUserAttribute(value)));
+                            MCRSessionUtils.getCurrentUserAttribute(value)));
                     yield new DOMSource(doc);
                 }
                 default -> throw new TransformerException("Unknown query for MCRUserObjectRightsResolver: " + query);

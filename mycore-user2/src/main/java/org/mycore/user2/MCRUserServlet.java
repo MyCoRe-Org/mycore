@@ -49,7 +49,7 @@ import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRSystemUserInformation;
+import org.mycore.common.MCRSessionUtils;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRJAXBContent;
 import org.mycore.common.content.MCRJDOMContent;
@@ -174,8 +174,7 @@ public class MCRUserServlet extends MCRServlet {
     }
 
     private static boolean forbidIfGuest(HttpServletResponse res) throws IOException {
-        if (MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()
-            .equals(MCRSystemUserInformation.GUEST.getUserID())) {
+        if (MCRSessionUtils.isCurrentUserGuest()) {
             String msg = MCRTranslation.translate("component.user2.UserServlet.noGuestAction");
             res.sendError(HttpServletResponse.SC_FORBIDDEN, msg);
             return true;

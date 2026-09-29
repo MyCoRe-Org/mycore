@@ -32,8 +32,7 @@ import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.DOMOutputter;
 import org.jdom2.output.XMLOutputter;
-import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRSystemUserInformation;
+import org.mycore.common.MCRSessionUtils;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRXMLConstants;
 
@@ -71,8 +70,7 @@ public final class MCRWebsiteWriteProtection {
      */
     public static boolean isActive() {
         // if superuser is online, return false
-        String superUser = MCRSystemUserInformation.SUPER_USER.getUserID();
-        if (MCRSessionMgr.getCurrentSession().getUserInformation().getUserID().equals(superUser)) {
+        if (MCRSessionUtils.isCurrentUserSuperUser()) {
             return false;
         }
         // init, if impossible return false

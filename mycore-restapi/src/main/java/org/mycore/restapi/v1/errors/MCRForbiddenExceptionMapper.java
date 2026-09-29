@@ -19,8 +19,7 @@
 package org.mycore.restapi.v1.errors;
 
 import org.apache.logging.log4j.LogManager;
-import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRSystemUserInformation;
+import org.mycore.common.MCRSessionUtils;
 import org.mycore.restapi.v1.utils.MCRRestAPIUtil;
 
 import jakarta.ws.rs.ForbiddenException;
@@ -40,8 +39,7 @@ public class MCRForbiddenExceptionMapper implements ExceptionMapper<ForbiddenExc
 
     @Override
     public Response toResponse(ForbiddenException ex) {
-        String userID = MCRSessionMgr.getCurrentSession().getUserInformation().getUserID();
-        if (userID.equals(MCRSystemUserInformation.GUEST.getUserID())) {
+        if (MCRSessionUtils.isCurrentUserGuest()) {
             LogManager.getLogger().warn("Guest detected");
             return Response.fromResponse(ex.getResponse())
                 .status(Response.Status.UNAUTHORIZED)

@@ -69,7 +69,7 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCalendar;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRSessionUtils;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration2;
@@ -657,23 +657,35 @@ public class MCRXMLFunctions {
      * @param role
      *            a role name
      * @return true if user has this role
+     * @deprecated use {@link MCRSessionUtils#isCurrentUserInRole(String)} instead
      */
+    @Deprecated
     public static boolean isCurrentUserInRole(String role) {
-        return MCRSessionMgr.getCurrentSession().getUserInformation().isUserInRole(role);
+        return MCRSessionUtils.isCurrentUserInRole(role);
     }
 
+    /**
+     * @deprecated use {@link MCRSessionUtils#isCurrentUserSuperUser()} instead
+     */
+    @Deprecated
     public static boolean isCurrentUserSuperUser() {
-        return MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()
-            .equals(MCRSystemUserInformation.SUPER_USER.getUserID());
+        return MCRSessionUtils.isCurrentUserSuperUser();
     }
 
+    /**
+     * @deprecated use {@link MCRSessionUtils#isCurrentUserGuest()} instead
+     */
+    @Deprecated
     public static boolean isCurrentUserGuestUser() {
-        return MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()
-            .equals(MCRSystemUserInformation.GUEST.getUserID());
+        return MCRSessionUtils.isCurrentUserGuest();
     }
 
+    /**
+     * @deprecated use {@link MCRSessionUtils#getCurrentUserAttribute(String)} instead
+     */
+    @Deprecated
     public static String getCurrentUserAttribute(String attribute) {
-        return MCRSessionMgr.getCurrentSession().getUserInformation().getUserAttribute(attribute);
+        return MCRSessionUtils.getCurrentUserAttribute(attribute);
     }
 
     public static boolean exists(String objectId) {
