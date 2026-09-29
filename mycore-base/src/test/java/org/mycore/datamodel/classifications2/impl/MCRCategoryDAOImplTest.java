@@ -358,16 +358,48 @@ public class MCRCategoryDAOImplTest {
     }
 
     @Test
-    public void getRootCategory() {
+    public void getRootCategoryWithoutChildren() {
         addWorldClassification();
-        // Europe
-        MCRCategory find = category.getChildren().getFirst();
-        MCRCategory rootCategory = DAO.getRootCategory(find.getId(), 0);
-        assertEquals(2, countNodes(rootCategory), "Category count does not match.");
-        assertEquals(find.getRoot().getId(), rootCategory.getId(), "Did not get root Category.");
-        rootCategory = DAO.getRootCategory(find.getId(), -1);
-        assertEquals(1 + countNodes(find), countNodes(rootCategory), "Category count does not match.");
+
+        MCRCategoryID worldId = MCRCategoryID.ofString("World");
+        MCRCategoryID europeId = MCRCategoryID.ofString("World:Europe");
+
+        MCRCategory world = DAO.getRootCategory(europeId, 0);
+        assertEquals(worldId, world.getId(), "Did not get expected root Category.");
+        assertEquals(1, world.getChildren().size(), "Child count does not match.");
+        assertEquals(2, countNodes(world), "Category count does not match.");
+
+        MCRCategory europe = world.getChildren().getFirst();
+        assertEquals(europeId, europe.getId(), "Did not get expected child Category.");
+        assertEquals(0, europe.getChildren().size(), "Grandchild count does not match.");
+
     }
+
+    @Test
+    public void getRootCategoryWithChildren() {
+        addWorldClassification();
+
+        MCRCategoryID worldId = MCRCategoryID.ofString("World");
+        MCRCategoryID europeId = MCRCategoryID.ofString("World:Europe");
+        MCRCategoryID germanyId = MCRCategoryID.ofString("World:Germany");
+        MCRCategoryID spainId = MCRCategoryID.ofString("World:Spain");
+
+        MCRCategory preloadedEurope = category.getChildren().getFirst();
+
+        MCRCategory world = DAO.getRootCategory(europeId, -1);
+        assertEquals( worldId, world.getId(), "Did not get expected root Category.");
+        assertEquals(1, world.getChildren().size(), "Child count does not match.");
+        assertEquals(1 + countNodes(preloadedEurope), countNodes(world), "Category count does not match.");
+
+        MCRCategory europe = world.getChildren().getFirst();
+        assertEquals(europeId, europe.getId(), "Did not get expected child Category.");
+        assertEquals(4, europe.getChildren().size(), "Grandchild count does not match.");
+
+        assertEquals(germanyId, europe.getChildren().getFirst().getId(), "Did not get expected grandchild Category.");
+        assertEquals(spainId, europe.getChildren().getLast().getId(), "Did not get expected grandchild Category.");
+
+    }
+
 
     @Test
     public void children() {
