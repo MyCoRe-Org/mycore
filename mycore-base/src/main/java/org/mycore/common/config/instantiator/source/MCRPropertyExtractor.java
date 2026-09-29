@@ -18,6 +18,8 @@
 
 package org.mycore.common.config.instantiator.source;
 
+import java.util.Map;
+
 /**
  * A {@link MCRPropertyExtractor} is a {@link MCRValueExtractor} that extracts
  * {@link String} values.
@@ -25,8 +27,11 @@ package org.mycore.common.config.instantiator.source;
 final class MCRPropertyExtractor implements MCRValueExtractor<String> {
 
     @Override
-    public String toValue(MCRSourceContext context, String value) {
-        return value;
+    public String toValue(MCRSourceContext context, Map<String, String> properties,
+        Map<String, String> fullProperties) {
+
+        return properties.get("");
+
     }
 
 }

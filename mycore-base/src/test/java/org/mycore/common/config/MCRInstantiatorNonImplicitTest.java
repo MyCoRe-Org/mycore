@@ -229,7 +229,7 @@ public class MCRInstantiatorNonImplicitTest {
             assertNull(instance);
             assertNotNull(exception);
 
-            assertEquals("Instance, configured in Foo.Nested (and its sub-properties)," +
+            assertEquals("Instance, configured in Foo.Nested (and sub-properties thereof)," +
                 " for target field 'nested' in configured class " + configuredClass.getName()
                 + " is missing", exception.getMessage());
 
