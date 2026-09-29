@@ -27,8 +27,7 @@ import javax.xml.transform.TransformerException;
 
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRSystemUserInformation;
+import org.mycore.common.MCRSessionUtils;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.frontend.servlets.MCRContentServlet;
@@ -46,8 +45,7 @@ public class MCRPropertyHelperContentServlet extends MCRContentServlet {
     public MCRContent getContent(HttpServletRequest req, HttpServletResponse resp)
         throws IOException {
 
-        if (!MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()
-            .equals(MCRSystemUserInformation.SUPER_USER.getUserID())) {
+        if (!MCRSessionUtils.isCurrentUserSuperUser()) {
             resp.sendError(HttpServletResponse.SC_FORBIDDEN);
             return null;
         }

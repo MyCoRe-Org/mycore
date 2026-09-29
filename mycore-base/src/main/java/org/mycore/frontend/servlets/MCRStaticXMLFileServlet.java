@@ -30,9 +30,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.common.MCRUserInformation;
+import org.mycore.common.MCRSessionUtils;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRURLContent;
@@ -81,8 +79,7 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
         boolean hasAccess = MCRLayoutUtilities.webpageAccess(READ_WEBPAGE_PERMISSION, webpageID, true);
         if (!hasAccess) {
             HttpServletResponse response = job.getResponse();
-            MCRUserInformation currentUser = MCRSessionMgr.getCurrentSession().getUserInformation();
-            if (REDIRECT_GUESTS && currentUser.equals(MCRSystemUserInformation.GUEST)) {
+            if (REDIRECT_GUESTS && MCRSessionUtils.isCurrentUserGuest()) {
                 String contextPath = job.getRequest().getContextPath();
                 String encodedURL = URLEncoder.encode(contextPath + webpageID, StandardCharsets.UTF_8);
                 StringBuilder redirectTarget = new StringBuilder();

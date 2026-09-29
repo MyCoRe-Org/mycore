@@ -34,7 +34,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRSystemUserInformation;
+import org.mycore.common.MCRSessionUtils;
 import org.mycore.common.MCRTransactionManager;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
@@ -398,7 +398,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
 
         @Override
         public String getAuthenticationScheme() {
-            if (ui.getUserID().equals(MCRSystemUserInformation.GUEST.getUserID())) {
+            if (MCRSessionUtils.isGuest(ui)) {
                 return null;
             }
             if (ui instanceof MCRUser) {

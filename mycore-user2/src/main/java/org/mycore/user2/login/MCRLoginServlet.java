@@ -37,7 +37,7 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRSystemUserInformation;
+import org.mycore.common.MCRSessionUtils;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRJAXBContent;
@@ -139,8 +139,7 @@ public class MCRLoginServlet extends MCRServlet {
     }
 
     private static boolean currentUserIsGuest() {
-        return MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()
-            .equals(MCRSystemUserInformation.GUEST.getUserID());
+        return MCRSessionUtils.isCurrentUserGuest();
     }
 
     /**
