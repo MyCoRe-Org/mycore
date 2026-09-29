@@ -166,7 +166,9 @@ public class MCRInstantiatorConfigTest {
         Optional<String> fullInstanceValue = MCRConfiguration2.getString(fullInstanceName);
         assertTrue(fullInstanceValue.isPresent(), "Properties should contain " + instanceName);
 
-        ConfigurableTestInstance instance = ofName(ConfigurableTestInstance.class, fullInstanceName).instantiate();
+        ConfigurableTestInstance instance = ofName(ConfigurableTestInstance.class, fullInstanceName,
+            MCRConfiguration2.getAllPropertiesTree()).instantiate();
+
         assertNotNull(instance, "Test " + fullInstanceName + " should be present");
 
         validateFields(instance);

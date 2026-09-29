@@ -21,7 +21,6 @@ package org.mycore.common.config;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mycore.common.config.instantiator.MCRInstanceConfiguration.ofName;
 
 import java.util.List;
 import java.util.Map;
@@ -46,7 +45,7 @@ public class MCRInstantiatorInstanceBasicTest {
         })
     public void instanceValue() {
 
-        TestClass instance = ofName(TestClass.class, "Foo").instantiate();
+        TestClass instance = ofName(TestClass.class);
 
         assertNotNull(instance);
         assertEquals(FooValue.class, instance.value.getClass());
@@ -62,7 +61,7 @@ public class MCRInstantiatorInstanceBasicTest {
     public void incompatibleInstanceValue() {
 
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
-            () -> MCRInstanceConfiguration.ofName(TestClass.class, "Foo").instantiate());
+            () -> ofName(TestClass.class));
 
         assertEquals("Instance, configured in Foo.Value (and sub-properties thereof),"
             + " for target field 'value' in configured class " + TestClass.class.getName()
@@ -82,7 +81,7 @@ public class MCRInstantiatorInstanceBasicTest {
         })
     public void instanceValueMap() {
 
-        TestClassWithMap instance = ofName(TestClassWithMap.class, "Foo").instantiate();
+        TestClassWithMap instance = ofName(TestClassWithMap.class);
 
         assertNotNull(instance);
         assertEquals(FooValue.class, instance.values.get("foo").getClass());
@@ -101,12 +100,17 @@ public class MCRInstantiatorInstanceBasicTest {
         })
     public void instanceValueList() {
 
-        TestClassWithList instance = ofName(TestClassWithList.class, "Foo").instantiate();
+        TestClassWithList instance = ofName(TestClassWithList.class);
 
         assertNotNull(instance);
         assertEquals(FooValue.class, instance.values.getFirst().getClass());
         assertEquals(BarValue.class, instance.values.getLast().getClass());
 
+    }
+
+    private <S> S ofName(Class<S> superClass) {
+        return MCRInstanceConfiguration.ofName(superClass, "Foo", MCRConfiguration2
+            .getAllPropertiesTree()).instantiate();
     }
 
     public static class TestClass {

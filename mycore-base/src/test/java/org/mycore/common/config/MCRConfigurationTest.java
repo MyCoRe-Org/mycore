@@ -156,7 +156,7 @@ public class MCRConfigurationTest {
 
         propertyA = propertyA + ".Class";
         propertyB = propertyB + ".Class";
-        
+
         LogManager.getLogger().info("Colliding Strings:");
         LogManager.getLogger().info(classNameA + " " + propertyA + " => " + a);
         LogManager.getLogger().info(classNameB + " " + propertyB + " => " + b);
