@@ -23,8 +23,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRSystemUserInformation;
+import org.mycore.common.MCRSessionUtils;
 
 import jakarta.annotation.Priority;
 import jakarta.ws.rs.Priorities;
@@ -57,9 +56,8 @@ public class MCRResourceAccessFilter implements ContainerRequestFilter {
             requestContext.setEntityStream(new ByteArrayInputStream(entity));
             boolean hasPermission = accessChecker.isPermitted(requestContext);
             if (!hasPermission) {
-                boolean isGuest = MCRSystemUserInformation.GUEST.getUserID()
-                    .equals(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
-                Response.Status status = isGuest ? Response.Status.UNAUTHORIZED : Response.Status.FORBIDDEN;
+                Response.Status status = MCRSessionUtils.isCurrentUserGuest() ? Response.Status.UNAUTHORIZED
+                    : Response.Status.FORBIDDEN;
                 throw new WebApplicationException(status);
             }
             //restore input

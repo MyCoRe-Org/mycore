@@ -101,10 +101,10 @@ public class MCRJaxenXPathFactoryTest {
     @Test
     public void testExternalJavaTest() {
         assertTrue(evaluator.test(
-            "xed:call-java('org.mycore.common.xml.MCRXMLFunctions','isCurrentUserGuestUser')"));
+            "xed:call-java('org.mycore.common.MCRSessionUtils','isCurrentUserGuest')"));
         assertFalse(evaluator.test(
-            "xed:call-java('org.mycore.common.xml.MCRXMLFunctions','isCurrentUserSuperUser')"));
+            "xed:call-java('org.mycore.common.MCRSessionUtils','isCurrentUserSuperUser')"));
         assertFalse(evaluator.test(
-            "xed:call-java('org.mycore.common.xml.MCRXMLFunctions','isCurrentUserInRole','admins')"));
+            "xed:call-java('org.mycore.common.MCRSessionUtils','isCurrentUserInRole','admins')"));
     }
 }

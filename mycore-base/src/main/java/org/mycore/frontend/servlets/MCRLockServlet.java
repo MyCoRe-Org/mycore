@@ -25,8 +25,7 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRSystemUserInformation;
+import org.mycore.common.MCRSessionUtils;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.support.MCRObjectIDLockTable;
 
@@ -79,8 +78,7 @@ public class MCRLockServlet extends MCRServlet {
 
     @Override
     protected void think(MCRServletJob job) throws Exception {
-        if (MCRSessionMgr.getCurrentSession().getUserInformation()
-            .equals(MCRSystemUserInformation.GUEST)) {
+        if (MCRSessionUtils.isCurrentUserGuest()) {
             job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }

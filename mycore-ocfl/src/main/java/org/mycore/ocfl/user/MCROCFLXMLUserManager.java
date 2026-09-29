@@ -33,7 +33,7 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.MCRSystemUserInformation;
+import org.mycore.common.MCRSessionUtils;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRJDOMContent;
@@ -92,7 +92,7 @@ public class MCROCFLXMLUserManager {
          * Usually guests do not have rights to modify users, so the only time they trigger this event
          * is during the update of "lastLogin", since the user switch has not happened yet.
          */
-        if (MCRSystemUserInformation.GUEST.getUserID().equals(currentUser.getUserID())) {
+        if (MCRSessionUtils.isGuest(currentUser)) {
             LOGGER.debug("Login Detected, ignoring...");
             return;
         }

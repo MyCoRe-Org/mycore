@@ -33,7 +33,7 @@ import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRSystemUserInformation;
+import org.mycore.common.MCRSessionUtils;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
 
@@ -277,7 +277,7 @@ public final class MCRAccessControlSystem extends MCRAccessBaseImpl {
         MCRAccessRule rule = getAccessRule(objID, permission);
         LOGGER.debug("getAccess() is done");
         if (rule == null) {
-            return userInfo.getUserID().equals(MCRSystemUserInformation.SUPER_USER.getUserID());
+            return MCRSessionUtils.isSuperUser(userInfo);
         }
         return rule.checkAccess(userInfo, date, ip);
     }
