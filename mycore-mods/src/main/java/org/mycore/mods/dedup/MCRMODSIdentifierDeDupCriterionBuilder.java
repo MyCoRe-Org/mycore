@@ -46,15 +46,17 @@ public class MCRMODSIdentifierDeDupCriterionBuilder extends MCRMODSDeDupCriterio
     }
 
     /**
-     * Builds a deduplication criterion for a given identifier type and value. The value is normalized
-     * by removing hyphens so that for example {@code 978-1-56619-909-4} and {@code 9781566199094} match.
+     * Builds a deduplication criterion for a given identifier type and value. For the types {@code isbn}
+     * and {@code issn} the value is normalized by removing hyphens so that for example
+     * {@code 978-1-56619-909-4} and {@code 9781566199094} match. For all other types the hyphen is part of the
+     * value and is kept.
      *
      * @param type  the identifier type, e.g. {@code doi}, {@code isbn}, {@code issn}, {@code urn}
      * @param value the identifier value
      * @return the deduplication criterion
      */
     public MCRDeDupCriterion buildFromIdentifier(String type, String value) {
-        String normalizedValue = value.replace("-", "");
+        String normalizedValue = "isbn".equals(type) || "issn".equals(type) ? value.replace("-", "") : value;
         return new MCRDeDupCriterion(CRITERION_TYPE, type + ':' + normalizedValue);
     }
 }

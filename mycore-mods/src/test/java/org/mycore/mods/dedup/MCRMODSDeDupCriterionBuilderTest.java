@@ -49,6 +49,14 @@ public class MCRMODSDeDupCriterionBuilderTest {
     }
 
     @Test
+    public void identifierHyphensAreKeptForOtherTypes() {
+        assertNotEquals(IDENTIFIER_BUILDER.buildFromIdentifier("urn", "urn:nbn:de:hbz:6-1234-5"),
+            IDENTIFIER_BUILDER.buildFromIdentifier("urn", "urn:nbn:de:hbz:6-12345"));
+        assertNotEquals(IDENTIFIER_BUILDER.buildFromIdentifier("doi", "10.1000/a-b"),
+            IDENTIFIER_BUILDER.buildFromIdentifier("doi", "10.1000/ab"));
+    }
+
+    @Test
     public void identifierTypeIsRelevant() {
         assertNotEquals(IDENTIFIER_BUILDER.buildFromIdentifier("doi", "123"),
             IDENTIFIER_BUILDER.buildFromIdentifier("duepublico", "123"));
