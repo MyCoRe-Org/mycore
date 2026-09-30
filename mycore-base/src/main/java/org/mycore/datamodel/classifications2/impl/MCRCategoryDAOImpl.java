@@ -350,13 +350,15 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
                 }
                 List<MCRCategory> parents = getParents(baseID);
                 MCRCategory parent = parents.getFirst();
+                // parent has one child which is a copy of c, move children of c to that copy of c
+                List<MCRCategory> children = parent.getChildren().getFirst().getChildren();
                 c.getChildren()
                     .stream()
                     .toList()
                     .stream()
                     .map(MCRCategoryImpl.class::cast)
                     .peek(MCRCategoryImpl::detachFromParent)
-                    .forEachOrdered(parent.getChildren()::add);
+                    .forEachOrdered(children::add);
                 // return root node
                 return parents.getLast();
             })
