@@ -36,8 +36,9 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.request.QueryRequest;
+import org.apache.solr.client.solrj.request.GenericSolrRequest;
 import org.apache.solr.client.solrj.response.InputStreamResponseParser;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.util.NamedList;
@@ -65,11 +66,19 @@ public class MCRSolrProxyResource {
     private static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_MANAGER =
         MCRSolrAuthenticationManager.obtainInstance();
 
+    private static final String QUERY_HANDLER_PARAMETER = "qt";
+
     @GET
     @Path("{core}/{queryHandler: .+}")
     public Response query(@PathParam("core") String core,
         @PathParam("queryHandler") String queryHandler,
         @Context UriInfo uriInfo) {
+
+        if (uriInfo.getQueryParameters().containsKey(QUERY_HANDLER_PARAMETER)) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                .entity("Parameter " + QUERY_HANDLER_PARAMETER + " is not supported, use the request path instead")
+                .build();
+        }
 
         String queryHandlerPath = "/" + queryHandler;
 
@@ -93,8 +102,8 @@ public class MCRSolrProxyResource {
         ModifiableSolrParams solrParams = buildSolrParams(uriInfo.getQueryParameters());
         filterParams(solrParams);
 
-        QueryRequest queryRequest = new QueryRequest(solrParams);
-        queryRequest.setPath(queryHandlerPath);
+        GenericSolrRequest queryRequest = new GenericSolrRequest(SolrRequest.METHOD.GET, queryHandlerPath,
+            SolrRequest.SolrRequestType.QUERY, solrParams).setRequiresCollection(true);
         SOLR_AUTHENTICATION_MANAGER.applyAuthentication(queryRequest, MCRSolrAuthenticationLevel.SEARCH);
 
         Optional<MCRSolrIndex> optionalIndex = MCRSolrIndexRegistryManager.obtainRegistry().getIndex(core);
