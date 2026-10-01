@@ -47,6 +47,7 @@ import org.mycore.solr.MCRSolrIndex;
 import org.mycore.solr.MCRSolrIndexRegistryManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
+import org.mycore.solr.proxy.MCRSolrQueryParameterFilter;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -91,7 +92,7 @@ public class MCRSolrProxyResource {
 
     private Response handleQuery(String queryHandlerPath, String core, UriInfo uriInfo) {
         ModifiableSolrParams solrParams = buildSolrParams(uriInfo.getQueryParameters());
-        filterParams(solrParams);
+        filterParams(queryHandlerPath, solrParams);
 
         QueryRequest queryRequest = new QueryRequest(solrParams);
         queryRequest.setPath(queryHandlerPath);
@@ -149,7 +150,7 @@ public class MCRSolrProxyResource {
         return solrParams;
     }
 
-    private void filterParams(ModifiableSolrParams solrParameter) {
+    private void filterParams(String queryHandlerPath, ModifiableSolrParams solrParameter) {
         MCRConfiguration2.getString("MCR.Solr.Disallowed.Facets")
             .ifPresent(disallowedFacets -> MCRConfiguration2.splitValue(disallowedFacets)
                 .forEach(disallowedFacet -> solrParameter.remove("facet.field", disallowedFacet)));
@@ -157,6 +158,8 @@ public class MCRSolrProxyResource {
         MCRConfiguration2.getString("MCR.Solr.Proxy.Disallowed.Parameter")
             .ifPresent(disallowedParameter -> MCRConfiguration2.splitValue(disallowedParameter)
                 .forEach(solrParameter::remove));
+
+        MCRSolrQueryParameterFilter.obtainInstance().filter(queryHandlerPath, solrParameter);
     }
 
     private Set<String> getQueryHandlerWhitelist() {
