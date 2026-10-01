@@ -159,16 +159,16 @@ public class MCRDeDupKeyManager {
      */
     public void addNoDuplicate(MCRObjectID objectIdA, MCRObjectID objectIdB, String creator) {
         ObjectIdPair pair = ObjectIdPair.of(objectIdA.toString(), objectIdB.toString());
-        EntityManager em = getEntityManager();
-        boolean exists = !em
-            .createQuery("SELECT n FROM MCRDeDupNoDuplicate n WHERE n.objectId1 = :id1 AND n.objectId2 = :id2",
-                MCRDeDupNoDuplicate.class)
+        getEntityManager().createQuery("""
+            insert into MCRDeDupNoDuplicate (objectId1, objectId2, creator, created)
+            values (:id1, :id2, :creator, :created)
+            on conflict do nothing
+            """)
             .setParameter("id1", pair.first())
             .setParameter("id2", pair.second())
-            .getResultList().isEmpty();
-        if (!exists) {
-            em.persist(new MCRDeDupNoDuplicate(pair.first(), pair.second(), creator, Instant.now()));
-        }
+            .setParameter("creator", creator)
+            .setParameter("created", Instant.now())
+            .executeUpdate();
     }
 
     /**

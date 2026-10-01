@@ -96,7 +96,7 @@ const model = reactive({
   list: [] as NoDuplicateList,
   sortField: "created" as SortField,
   sortDir: "desc" as "asc" | "desc",
-  error: null as number | null,
+  error: null as number | string | null,
   selected: null as NoDuplicateEntry | null,
 });
 
@@ -149,19 +149,23 @@ const toggleSort = (field: SortField) => {
 const resolveList = async () => {
   model.loading = true;
   model.error = null;
-  const response = await fetch(`${getWebApplicationBaseURL()}api/dedup/no-duplicates`, {
-    cache: "no-store",
-    headers: {
-      authorization: await getAuthorizationHeader()
+  try {
+    const response = await fetch(`${getWebApplicationBaseURL()}api/dedup/no-duplicates`, {
+      cache: "no-store",
+      headers: {
+        authorization: await getAuthorizationHeader()
+      }
+    });
+    if (response.status != 200) {
+      model.error = response.status;
+      return;
     }
-  });
-  if (response.status != 200) {
-    model.error = response.status;
+    model.list = await response.json();
+  } catch (e) {
+    model.error = String(e);
+  } finally {
     model.loading = false;
-    return;
   }
-  model.list = await response.json();
-  model.loading = false;
 };
 
 const showDeleteModal = (entry: NoDuplicateEntry) => {
