@@ -59,7 +59,7 @@ public class MCRTikaHttpClient {
         try (HttpClient client = MCRHttpUtils.getHttpClient()) {
             HttpResponse<InputStream> response = client.send(httpPut, HttpResponse.BodyHandlers.ofInputStream());
             if (response.statusCode() != 200) {
-                throw new IOException("Tika server returned " + response.statusCode());
+                throw new IOException("Tika server " + url + " returned " + response.statusCode());
             }
 
             try (InputStream responseStream = response.body();
