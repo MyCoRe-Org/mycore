@@ -123,7 +123,7 @@ public class MCRDeDupURIResolver implements URIResolver {
         MCRObject object = new MCRObject(new Document(element.clone()));
         Set<MCRDeDupCriterion> criteria = MCRDeDupCriteriaProvider.obtainInstance().getCriteria(object);
         Map<MCRObjectID, Set<MCRDeDupCriterion>> duplicates = MCRDeDupKeyManager.obtainInstance()
-            .findDuplicates(criteria);
+            .findDuplicates(object.getId(), criteria);
         Map<String, Set<MCRDeDupCriterion>> byObjectId = duplicates.entrySet().stream()
             .collect(Collectors.toMap(entry -> entry.getKey().toString(), Map.Entry::getValue,
                 (left, right) -> left, LinkedHashMap::new));

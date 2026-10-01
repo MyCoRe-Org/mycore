@@ -219,6 +219,25 @@ public class MCRDeDupKeyManager {
     }
 
     /**
+     * Finds all existing objects other than the given one that share at least one of the given criteria
+     * and that are not marked as no-duplicates of the given object. This is meant for a version of the
+     * given object that is not (yet) stored, for example an object that is currently edited.
+     *
+     * @param objectId the id of the object the criteria belong to
+     * @param criteria the criteria to match, may be empty
+     * @return matching objects mapped to the criteria they share
+     * @see #findDuplicates(Set)
+     */
+    public Map<MCRObjectID, Set<MCRDeDupCriterion>> findDuplicates(MCRObjectID objectId,
+        Set<MCRDeDupCriterion> criteria) {
+        Map<MCRObjectID, Set<MCRDeDupCriterion>> result = new LinkedHashMap<>(findDuplicates(criteria));
+        Set<ObjectIdPair> noDuplicatePairs = loadNoDuplicatePairs(getEntityManager());
+        result.keySet().removeIf(other -> other.equals(objectId)
+            || noDuplicatePairs.contains(ObjectIdPair.of(objectId.toString(), other.toString())));
+        return result;
+    }
+
+    /**
      * Finds all existing objects that share at least one of the given criteria.
      * <p>
      * Criterion values are truncated to {@link MCRDeDupKey#MAX_VALUE_LENGTH} characters before

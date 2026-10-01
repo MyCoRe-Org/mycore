@@ -142,6 +142,22 @@ public class MCRDeDupURIResolverTest {
     }
 
     @Test
+    public void sessionObjectIgnoresItselfAndConfirmedNoDuplicates() throws Exception {
+        String sessionKey = "dedup-preview";
+        manager.storeKeys(id(1), Set.of(MCRDeDupTestCriterionBuilder.CRITERION));
+        manager.storeKeys(id(2), Set.of(MCRDeDupTestCriterionBuilder.CRITERION));
+        manager.storeKeys(id(3), Set.of(MCRDeDupTestCriterionBuilder.CRITERION));
+        manager.addNoDuplicate(id(1), id(2), "tester");
+        MCRSessionMgr.getCurrentSession().put(sessionKey, objectElement(1));
+
+        Element result = resolve("dedup:duplicates-for-session:" + sessionKey);
+
+        List<Element> duplicates = result.getChildren("duplicate");
+        assertEquals(1, duplicates.size());
+        assertEquals(id(3).toString(), duplicates.get(0).getAttributeValue("id"));
+    }
+
+    @Test
     public void acceptsSessionKeyWithAnyConfiguredPrefix() throws Exception {
         String sessionKey = "preview-object";
         manager.storeKeys(id(2), Set.of(MCRDeDupTestCriterionBuilder.CRITERION));
