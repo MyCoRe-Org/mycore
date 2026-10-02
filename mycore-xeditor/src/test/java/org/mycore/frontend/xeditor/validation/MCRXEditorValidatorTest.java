@@ -29,6 +29,7 @@ import org.jdom2.JDOMException;
 import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
+import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.xml.MCRNodeBuilder;
 import org.mycore.frontend.xeditor.MCRBinding;
 import org.mycore.frontend.xeditor.MCREditorSession;
@@ -296,6 +297,35 @@ public class MCRXEditorValidatorTest {
     }
 
     @Test
+    @MCRTestConfiguration(properties = {
+        @MCRTestProperty(key = "MCR.TestValidators.startsWithJ.Class", classNameOf = StartsWith.class),
+        @MCRTestProperty(key = "MCR.TestValidators.startsWithJ.Prefix", string = "J"),
+        @MCRTestProperty(key = "MCR.TestValidators.isJohnDoe.Class", classNameOf = NameEquals.class),
+        @MCRTestProperty(key = "MCR.TestValidators.isJohnDoe.FirstName", string = "John"),
+        @MCRTestProperty(key = "MCR.TestValidators.isJohnDoe.LastName", string = "Doe"),
+    })
+    public void testInstanceMethodRule() throws JaxenException, JDOMException {
+        MCREditorSession session = buildSession("document[author='Jim'][author[2]='Charles'][author[3]]");
+        addRule(session, "/document/author", "instance", "MCR.TestValidators.startsWithJ");
+        assertFalse(session.getValidator().isValid());
+        assertEquals("true", session.getVariables().get(MCRXEditorValidator.XED_VALIDATION_FAILED));
+
+        checkResult(session, "/document/author[1]", MCRValidationResults.MARKER_SUCCESS);
+        checkResult(session, "/document/author[2]", MCRValidationResults.MARKER_ERROR);
+        checkResult(session, "/document/author[3]", MCRValidationResults.MARKER_DEFAULT);
+
+        session = buildSession(
+            "document[author[1][first='John'][last='Doe']][author[2][first='James'][last='Watt']][author[3]]");
+        addRule(session, "/document/author", "instance", "MCR.TestValidators.isJohnDoe");
+        assertFalse(session.getValidator().isValid());
+        assertEquals("true", session.getVariables().get(MCRXEditorValidator.XED_VALIDATION_FAILED));
+
+        checkResult(session, "/document/author[1]", MCRValidationResults.MARKER_SUCCESS);
+        checkResult(session, "/document/author[2]", MCRValidationResults.MARKER_ERROR);
+        checkResult(session, "/document/author[3]", MCRValidationResults.MARKER_SUCCESS);
+    }
+
+    @Test
     public void testRequiredRelevantIfRule() throws JDOMException, JaxenException {
 
         MCREditorSession session;
@@ -458,6 +488,38 @@ public class MCRXEditorValidatorTest {
         } else {
             return "John".equals(author.getChildText("first")) && "Doe".equals(author.getChildText("last"));
         }
+    }
+
+    public static final class StartsWith extends MCRInstanceValidator.StringValidatorBase {
+
+        @MCRProperty(name = "Prefix")
+        public String prefix;
+
+        @Override
+        public boolean isValidString(String value) {
+            return value.startsWith(prefix);
+        }
+
+    }
+
+    public static final class NameEquals extends MCRInstanceValidator.ElementValidatorBase {
+
+        @MCRProperty(name = "FirstName")
+        public String firstName;
+
+        @MCRProperty(name = "LastName")
+        public String lastName;
+
+        @Override
+        public Boolean isValidElement(Element element) {
+            if (element.getChildren().isEmpty()) {
+                return true;
+            } else {
+                return firstName.equals(element.getChildText("first"))
+                    && lastName.equals(element.getChildText("last"));
+            }
+        }
+
     }
 
 }

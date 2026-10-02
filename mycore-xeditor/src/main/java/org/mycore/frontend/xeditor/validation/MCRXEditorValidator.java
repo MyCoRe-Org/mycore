@@ -90,6 +90,7 @@ public class MCRXEditorValidator {
         addIfConfigured(new MCRMinStringValidator(), baseXPath, ruleElement);
         addIfConfigured(new MCRMaxStringValidator(), baseXPath, ruleElement);
         addIfConfigured(new MCRExternalValidator(), baseXPath, ruleElement);
+        addIfConfigured(new MCRInstanceValidator(), baseXPath, ruleElement);
     }
 
     private void addIfConfigured(MCRValidator validator, String baseXPath, Element ruleElement) {
