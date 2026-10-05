@@ -5,6 +5,13 @@
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   exclude-result-prefixes="#all">
 
+  <xsl:function name="mcrobject:get" as="document-node()?">
+    <xsl:param name="id" as="xs:string" />
+
+    <xsl:variable name="uri" select="concat('mcrobject:', $id)" />
+    <xsl:sequence select="if (doc-available($uri)) then doc($uri) else ()" />
+  </xsl:function>
+
   <!--
     Returns version information for a MyCoRe object.
 
