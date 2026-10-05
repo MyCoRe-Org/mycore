@@ -155,7 +155,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
             boolean stateChanged = !Objects.equals(MCRORCIDUtils.getStateValue(object),
                 MCRORCIDUtils.getStateValue(outdatedObject));
 
-            boolean changedMetadata = MCRXMLHelper.deepEqual(new MCRMODSWrapper(object).getMODS(),
+            boolean changedMetadata = !MCRXMLHelper.deepEqual(new MCRMODSWrapper(object).getMODS(),
                 new MCRMODSWrapper(outdatedObject).getMODS());
 
             if (!changedMetadata && !stateChanged) {
