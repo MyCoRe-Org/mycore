@@ -21,6 +21,14 @@
       <xsl:sequence select="string($derivate/mycorederivate/derivate/linkmetas/linkmeta/@xlink:href)" />
     </xsl:function>
 
+    <xsl:function name="mcrderivate:get-file" as="document-node()?">
+      <xsl:param name="derivate-id" as="xs:string" />
+      <xsl:param name="path" as="xs:string" />
+
+      <xsl:variable name="uri" select="concat('mcrfile:', $derivate-id, '/', replace($path, '^/+', ''))" />
+      <xsl:sequence select="if (doc-available($uri)) then doc($uri) else ()" />
+    </xsl:function>
+
     <xsl:function name="mcrderivate:get-file-content-type" as="xs:string">
         <xsl:param name="derivID" as="xs:string"/>
         <xsl:param name="path" as="xs:string"/>
