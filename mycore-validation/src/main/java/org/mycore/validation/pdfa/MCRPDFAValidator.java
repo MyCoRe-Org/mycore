@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.verapdf.ReleaseDetails;
 import org.verapdf.core.EncryptedPdfException;
 import org.verapdf.core.ModelParsingException;
 import org.verapdf.core.ValidationException;
@@ -42,6 +43,18 @@ public class MCRPDFAValidator {
     private static volatile Boolean initialized = false;
 
     private static final Object MUTEX = new Object();
+
+    private static final String CORE_RELEASE_ID = "core";
+
+    /**
+     * Returns the version of the underlying veraPDF library. Validation results of different versions are not
+     * comparable, so persisted results should record the version they were produced with.
+     *
+     * @return the veraPDF version
+     */
+    public static String getVersion() {
+        return ReleaseDetails.byId(CORE_RELEASE_ID).getVersion();
+    }
 
     private static void initialise() {
         if (!initialized) {
