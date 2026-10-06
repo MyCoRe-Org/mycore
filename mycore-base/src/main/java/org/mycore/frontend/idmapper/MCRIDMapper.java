@@ -35,6 +35,12 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  */
 public interface MCRIDMapper {
 
+    /**
+     * Property prefix for configuring the {@link MCRIDMapper} implementation.
+     *
+     * @deprecated use {@link #obtainInstance()} to retrieve the configured instance
+     */
+    @Deprecated(forRemoval = true)
     String MAPPER_PROPERTY = "MCR.Object.IDMapper";
 
     /**
