@@ -9,10 +9,18 @@
   <xsl:include href="xslInclude:functions" />
 
   <xsl:param name="id" as="xs:string" />
+  <xsl:param name="expanded" as="xs:string" select="''" />
 
   <xsl:template match="/">
     <result>
-      <xsl:copy-of select="mcrobject:get($id)" />
+      <xsl:choose>
+        <xsl:when test="$expanded = ''">
+          <xsl:copy-of select="mcrobject:get($id)" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:copy-of select="mcrobject:get($id, xs:boolean($expanded))" />
+        </xsl:otherwise>
+      </xsl:choose>
     </result>
   </xsl:template>
 

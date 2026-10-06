@@ -65,6 +65,28 @@ public class MCRObjectFunctionsTests {
     }
 
     @Test
+    @DisplayName("mcrobject:get returns the expanded object")
+    public void testGetExpanded() throws TransformerException {
+        MCRMockResolver.setResultSource(new JDOMSource(new Document(new Element("mycoreobject"))));
+
+        Element result = get(OBJECT_ID, true);
+
+        assertEquals("mycoreobject", result.getChildren().getFirst().getName());
+        assertEquals("mcrobject:" + OBJECT_ID, MCRMockResolver.getCalls().getFirst().getHref());
+    }
+
+    @Test
+    @DisplayName("mcrobject:get returns the non-expanded object")
+    public void testGetNotExpanded() throws TransformerException {
+        MCRMockResolver.setResultSource(new JDOMSource(new Document(new Element("mycoreobject"))));
+
+        Element result = get(OBJECT_ID, false);
+
+        assertEquals("mycoreobject", result.getChildren().getFirst().getName());
+        assertEquals("mcrobject:" + OBJECT_ID + "?expanded=false", MCRMockResolver.getCalls().getFirst().getHref());
+    }
+
+    @Test
     @DisplayName("mcrobject:get returns nothing for a missing object")
     public void testGetMissing() throws TransformerException {
         assertTrue(get(OBJECT_ID).getChildren().isEmpty());
@@ -72,5 +94,10 @@ public class MCRObjectFunctionsTests {
 
     private static Element get(String id) throws TransformerException {
         return MCRTestCaseXSLTUtil.transform("/xslt/functions/object-test.xsl", Map.of("id", id)).getRootElement();
+    }
+
+    private static Element get(String id, boolean expanded) throws TransformerException {
+        return MCRTestCaseXSLTUtil.transform("/xslt/functions/object-test.xsl",
+            Map.of("id", id, "expanded", String.valueOf(expanded))).getRootElement();
     }
 }
