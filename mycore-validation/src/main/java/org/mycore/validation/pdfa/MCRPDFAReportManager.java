@@ -264,7 +264,8 @@ public final class MCRPDFAReportManager {
     /**
      * Validates a single PDF file and stores its report. Eligibility is checked before validation and again before
      * the report is written, so that a report is never stored for an object that meanwhile entered an excluded
-     * state. If the PDF file changed while it was validated, the outdated result is discarded.
+     * state. If the PDF file changed while it was validated, the outdated result is discarded. A file that already
+     * has an up to date report is not validated again.
      *
      * @param derivateId the ID of the derivate
      * @param file       the path of the PDF file, relative to the derivate root
@@ -278,6 +279,11 @@ public final class MCRPDFAReportManager {
         MCRPath pdf = MCRPath.getPath(derivateId.toString(), file);
         if (!Files.isRegularFile(pdf)) {
             deleteReport(derivateId, file);
+            return;
+        }
+        // a job scheduled while another one for the same file was processing finds the report of the first
+        if (findCurrentReport(derivateId, file).isPresent()) {
+            LOGGER.info("Skipping PDF/A validation of {}/{}, its report is up to date.", derivateId, file);
             return;
         }
         String lastModified = getLastModified(pdf);
