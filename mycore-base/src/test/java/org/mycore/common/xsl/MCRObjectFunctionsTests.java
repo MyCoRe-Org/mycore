@@ -87,6 +87,18 @@ public class MCRObjectFunctionsTests {
     }
 
     @Test
+    @DisplayName("mcrobject:get-revision returns the object revision")
+    public void testGetRevision() throws TransformerException {
+        MCRMockResolver.setResultSource(new JDOMSource(new Document(new Element("mycoreobject"))));
+
+        Element result = MCRTestCaseXSLTUtil.transform("/xslt/functions/object-test.xsl",
+            Map.of("id", OBJECT_ID, "revision", "3")).getRootElement();
+
+        assertEquals("mycoreobject", result.getChildren().getFirst().getName());
+        assertEquals("mcrobject:" + OBJECT_ID + "?r=3", MCRMockResolver.getCalls().getFirst().getHref());
+    }
+
+    @Test
     @DisplayName("mcrobject:get returns nothing for a missing object")
     public void testGetMissing() throws TransformerException {
         assertTrue(get(OBJECT_ID).getChildren().isEmpty());

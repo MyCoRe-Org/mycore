@@ -10,10 +10,14 @@
 
   <xsl:param name="id" as="xs:string" />
   <xsl:param name="expanded" as="xs:string" select="''" />
+  <xsl:param name="revision" as="xs:string" select="''" />
 
   <xsl:template match="/">
     <result>
       <xsl:choose>
+        <xsl:when test="$revision != ''">
+          <xsl:copy-of select="mcrobject:get-revision($id, $revision)" />
+        </xsl:when>
         <xsl:when test="$expanded = ''">
           <xsl:copy-of select="mcrobject:get($id)" />
         </xsl:when>
