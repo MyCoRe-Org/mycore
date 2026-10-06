@@ -196,7 +196,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
             .filter(entry -> !MCRPIManager.getInstance().exist(entry))
             .forEach(entry -> {
                 LOGGER.info("Add PI : {} with service {} to database!", entry::getIdentifier, entry::getService);
-                MCREntityManagerProvider.getCurrentEntityManager().persist(entry);
+                MCREntityManagerProvider.getCurrentEntityManager().merge(entry);
             });
     }
 
