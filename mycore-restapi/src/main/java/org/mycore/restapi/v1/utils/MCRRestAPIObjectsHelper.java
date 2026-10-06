@@ -114,9 +114,6 @@ public class MCRRestAPIObjectsHelper {
     private static final DateTimeFormatter SDF_UTC
         = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US).withZone(ZoneOffset.UTC);
 
-    private static final MCRIDMapper ID_MAPPER = MCRConfiguration2
-        .getInstanceOf(MCRIDMapper.class, MCRIDMapper.MAPPER_PROPERTY).get();
-
     public static Response showMCRObject(String pathParamId, String queryParamStyle, UriInfo info, Application app)
         throws MCRRestAPIException {
         MCRObjectID mcrObjId = retrieveMCRObjectID(pathParamId);
@@ -766,7 +763,7 @@ public class MCRRestAPIObjectsHelper {
     }
 
     private static MCRObjectID retrieveMCRObjectID(String paramMcrObjId) throws MCRRestAPIException {
-        Optional<MCRObjectID> optObjId = ID_MAPPER.mapMCRObjectID(paramMcrObjId);
+        Optional<MCRObjectID> optObjId = MCRIDMapper.obtainInstance().mapMCRObjectID(paramMcrObjId);
         if (optObjId.isEmpty() || !MCRMetadataManager.exists(optObjId.get())) {
             throw new MCRRestAPIException(Response.Status.NOT_FOUND,
                 new MCRRestAPIError(MCRRestAPIError.CODE_NOT_FOUND,
@@ -777,7 +774,7 @@ public class MCRRestAPIObjectsHelper {
 
     private static MCRObjectID retrieveMCRDerivateID(MCRObjectID parentObjId, String paramMcrDerId)
         throws MCRRestAPIException {
-        return ID_MAPPER.mapMCRDerivateID(parentObjId, paramMcrDerId)
+        return MCRIDMapper.obtainInstance().mapMCRDerivateID(parentObjId, paramMcrDerId)
             .filter(MCRMetadataManager::exists)
             .orElseThrow(() -> new MCRRestAPIException(Response.Status.NOT_FOUND,
                 new MCRRestAPIError(MCRRestAPIError.CODE_NOT_FOUND, "Derivate " + paramMcrDerId + " not found.",

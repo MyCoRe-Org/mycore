@@ -19,6 +19,7 @@ package org.mycore.frontend.idmapper;
 
 import java.util.Optional;
 
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
@@ -50,4 +51,14 @@ public interface MCRIDMapper {
      * @return a MCRObjectID instance for the derivate id
      */
     Optional<MCRObjectID> mapMCRDerivateID(MCRObjectID mcrObjId, String derid);
+
+    /**
+     * Returns the shared {@link MCRIDMapper} instance configured by the property
+     * <code>MCR.Object.IDMapper.Class</code>.
+     *
+     * @return the configured {@link MCRIDMapper} instance
+     */
+    static MCRIDMapper obtainInstance() {
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRIDMapper.class, "MCR.Object.IDMapper");
+    }
 }
