@@ -55,16 +55,12 @@ public class MCRSolrIDMapper extends MCRDefaultIDMapper implements MCRIDMapper {
 
     private Set<String> derivateSolrFields = Collections.emptySet();
 
-    //property MCR.RestAPI.V2.AlternativeIdentifier.Objects.Keys deprecated in 2024.06
-    @MCRProperty(name = "ObjectSolrFields", required = false,
-        defaultName = "MCR.RestAPI.V2.AlternativeIdentifier.Objects.Keys")
+    @MCRProperty(name = "ObjectSolrFields", required = false)
     public void setObjectSolrFields(String fields) {
         objectSolrFields = Stream.ofNullable(fields).flatMap(MCRConfiguration2::splitValue).collect(Collectors.toSet());
     }
 
-    //property MCR.RestAPI.V2.AlternativeIdentifier.Derivate.Keys deprecated in 2024.06
-    @MCRProperty(name = "DerivateSolrFields", required = false,
-        defaultName = "MCR.RestAPI.V2.AlternativeIdentifier.Derivates.Keys")
+    @MCRProperty(name = "DerivateSolrFields", required = false)
     public void setDerivateSolrFields(String fields) {
         derivateSolrFields =
             Stream.ofNullable(fields).flatMap(MCRConfiguration2::splitValue).collect(Collectors.toSet());
