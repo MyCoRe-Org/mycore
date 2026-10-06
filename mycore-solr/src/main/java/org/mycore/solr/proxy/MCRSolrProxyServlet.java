@@ -220,7 +220,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
     private void handleQuery(String queryHandlerPath, HttpServletRequest request, HttpServletResponse resp)
         throws IOException, TransformerException, SAXException {
         ModifiableSolrParams solrParameter = getSolrQueryParameter(request);
-        filterParams(solrParameter);
+        filterParams(queryHandlerPath, solrParameter);
 
         QueryRequest queryRequest = new QueryRequest(solrParameter);
         queryRequest.setPath(queryHandlerPath);
@@ -267,7 +267,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
             .orElse("xml");
     }
 
-    private void filterParams(ModifiableSolrParams solrParameter) {
+    private void filterParams(String queryHandlerPath, ModifiableSolrParams solrParameter) {
         MCRConfiguration2.getString("MCR.Solr.Disallowed.Facets")
             .ifPresent(disallowedFacets -> MCRConfiguration2.splitValue(disallowedFacets)
                 .forEach(disallowedFacet -> solrParameter.remove("facet.field", disallowedFacet)));
@@ -275,6 +275,8 @@ public class MCRSolrProxyServlet extends MCRServlet {
         MCRConfiguration2.getString("MCR.Solr.Proxy.Disallowed.Parameter")
             .ifPresent(disallowedParameter -> MCRConfiguration2.splitValue(disallowedParameter)
                 .forEach(solrParameter::remove));
+
+        MCRSolrQueryParameterFilter.obtainInstance().filter(queryHandlerPath, solrParameter);
     }
 
     private void updateQueryHandlerMap(HttpServletResponse resp) throws IOException {
