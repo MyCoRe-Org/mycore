@@ -30,7 +30,8 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * <p>
  * Unlike {@link MCRPDFAValidatorResolver} this resolver never validates a PDF file itself. Files without an up to
  * date report are reported as {@code <file name="..." status="pending"/>} and their validation is scheduled, so
- * that a later request can present the result.
+ * that a later request can present the result. While asynchronous validation is not activated, the result of a
+ * derivate with PDF files carries {@code activated="false"} instead.
  *
  * @see MCRPDFAReportManager#getReportSummary(MCRObjectID)
  */

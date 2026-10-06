@@ -39,8 +39,24 @@ import org.mycore.datamodel.niofs.MCRPath;
  * state removes the reports of all derivates of an object, returning to an eligible state schedules the validation
  * of every PDF file that has no report, without requiring another upload. Deleting an object or a derivate always
  * removes the associated reports.
+ * <p>
+ * Nothing is done while asynchronous PDF/A validation is not activated, see {@link MCRPDFAReportManager#isActivated()}.
  */
 public class MCRPDFAValidationEventHandler extends MCREventHandlerBase {
+
+    @Override
+    public void doHandleEvent(MCREvent evt) {
+        if (MCRPDFAReportManager.isActivated()) {
+            super.doHandleEvent(evt);
+        }
+    }
+
+    @Override
+    public void undoHandleEvent(MCREvent evt) {
+        if (MCRPDFAReportManager.isActivated()) {
+            super.undoHandleEvent(evt);
+        }
+    }
 
     @Override
     protected void handlePathCreated(MCREvent evt, Path path, BasicFileAttributes attrs) {

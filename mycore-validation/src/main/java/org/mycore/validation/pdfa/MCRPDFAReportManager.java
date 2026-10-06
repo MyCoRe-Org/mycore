@@ -51,6 +51,7 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.services.queuedjob.MCRJob;
+import org.mycore.services.queuedjob.MCRJobConfig;
 import org.mycore.services.queuedjob.MCRJobQueueManager;
 import org.mycore.services.queuedjob.MCRJobStatus;
 import org.w3c.dom.Document;
@@ -87,6 +88,19 @@ public final class MCRPDFAReportManager {
     private static final Object REPORT_LOCK = new Object();
 
     private MCRPDFAReportManager() {
+    }
+
+    /**
+     * Returns whether asynchronous PDF/A validation is activated, that is whether the job queue of
+     * {@link MCRPDFAValidationJobAction} is activated by {@code MCR.QueuedJob.MCRPDFAValidationJobAction.activated}
+     * or, if that is not set, by {@code MCR.QueuedJob.activated}. While it is not, no validation is scheduled and
+     * no report is created or removed.
+     *
+     * @return {@code true} if asynchronous PDF/A validation is activated
+     */
+    public static boolean isActivated() {
+        MCRJobConfig config = MCRJobQueueManager.getInstance().getJobConfig();
+        return config.activated(MCRPDFAValidationJobAction.class).orElseGet(config::activated);
     }
 
     /**
@@ -167,6 +181,9 @@ public final class MCRPDFAReportManager {
      * Returns a summary of the validation state of all PDF files of the given derivate and schedules validation of
      * every file that has no up to date report. No PDF file is parsed, so this is cheap enough to be called while a
      * page is rendered.
+     * <p>
+     * If asynchronous validation is not activated, the root element of a derivate with PDF files carries
+     * {@code activated="false"} and lists no files, as no report could become current.
      *
      * @param derivateId the ID of the derivate
      * @return a document with a {@code <derivate>} root element, holding one {@code <file>} element per PDF file
@@ -180,7 +197,12 @@ public final class MCRPDFAReportManager {
         if (!isEligible(derivateId)) {
             return summary;
         }
-        for (String file : listPDFFiles(derivateId)) {
+        List<String> files = listPDFFiles(derivateId);
+        if (!files.isEmpty() && !isActivated()) {
+            root.setAttribute("activated", "false");
+            return summary;
+        }
+        for (String file : files) {
             Optional<Element> report = findCurrentReport(derivateId, file);
             if (report.isPresent()) {
                 root.appendChild(summary.importNode(report.get(), true));
@@ -202,6 +224,10 @@ public final class MCRPDFAReportManager {
      * @param file       the path of the PDF file, relative to the derivate root
      */
     public static void scheduleValidation(MCRObjectID derivateId, String file) {
+        if (!isActivated()) {
+            LOGGER.debug("PDF/A validation of {}/{} is not scheduled, it is not activated.", derivateId, file);
+            return;
+        }
         Map<String, String> parameters = new HashMap<>();
         parameters.put(MCRPDFAValidationJobAction.DERIVATE_ID_PARAMETER, derivateId.toString());
         parameters.put(MCRPDFAValidationJobAction.PATH_PARAMETER, file);
@@ -227,7 +253,7 @@ public final class MCRPDFAReportManager {
      * @param derivateId the ID of the derivate
      */
     public static void scheduleMissingValidations(MCRObjectID derivateId) {
-        if (!isEligible(derivateId)) {
+        if (!isActivated() || !isEligible(derivateId)) {
             return;
         }
         listPDFFiles(derivateId).stream()
