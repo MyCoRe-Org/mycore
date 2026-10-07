@@ -22,9 +22,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRException;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
@@ -178,15 +180,20 @@ public class MCRAccessKeyCommands {
      * Cleans up user attributes for a given user related to access keys.
      *
      * @param userWithRealm the user in format {@code user@realm}
+     *
+     * @throws MCRException when {@code userWithRealm} is {@code null} or cannot be parsed into a user and its realm
      */
     @MCRCommand(syntax = "clean up access key user attributes for user {0}",
         help = "Cleans all access key secret attributes of users if the corresponding key does not exist.",
         order = 5)
     public static void cleanUp(String userWithRealm) {
+        if (Objects.isNull(userWithRealm)) {
+            throw new MCRException("Parameter providing user and its realm is null.");
+        }
+
         String[] strings = userWithRealm.split("@");
-        if(strings.length != 2) {
-            LOGGER.error("Could not parse '{}' into a user and its realm", userWithRealm);
-            return;
+        if (strings.length != 2) {
+            throw new MCRException("Could not parse '" + userWithRealm + "' into a user and its realm");
         }
 
         MCRUser user = MCRUserManager.getUser(strings[0], strings[1]);
