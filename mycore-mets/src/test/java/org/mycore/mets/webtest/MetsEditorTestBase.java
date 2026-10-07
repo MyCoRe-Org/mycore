@@ -21,30 +21,22 @@ package org.mycore.mets.webtest;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.junit.After;
 import org.junit.Before;
 import org.mycore.common.selenium.MCRSeleniumTestBase;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 
 import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.SimpleFileServer;
 
 public class MetsEditorTestBase extends MCRSeleniumTestBase {
 
-    private static final int MAX_ITERATIONS_TO_WAIT_FOR_A_ELEMENT = 100;
-
-    private static final int WAIT_FOR_ELEMENT_ITERATION_IN_MS = 100;
-
     HttpServer httpServer;
 
     @Before
-    public void setUp() throws InterruptedException, IOException {
+    public void setUp() throws IOException {
         InetSocketAddress serverAddress = new InetSocketAddress(0);
         Path baseDir = Path.of("target", "classes", "META-INF", "resources").toAbsolutePath();
         httpServer = SimpleFileServer.createFileServer(serverAddress, baseDir, SimpleFileServer.OutputLevel.INFO);
@@ -66,16 +58,7 @@ public class MetsEditorTestBase extends MCRSeleniumTestBase {
         this.takeScreenshot();
     }
 
-    protected void waitForElement(By byTextIgnoreCSS) throws InterruptedException {
-        int maxWait = MAX_ITERATIONS_TO_WAIT_FOR_A_ELEMENT;
-        WebDriver webDriver = this.getDriver();
-        List<WebElement> elements = new ArrayList<>(webDriver.findElements(byTextIgnoreCSS));
-        while (elements.isEmpty() && maxWait-- > 0) {
-            Thread.sleep(WAIT_FOR_ELEMENT_ITERATION_IN_MS);
-            elements = webDriver.findElements(byTextIgnoreCSS);
-        }
-        if (elements.isEmpty()) {
-            throw new AssertionError("The element to wait for was not found!");
-        }
+    protected void waitForElement(By locator) {
+        this.getDriver().waitAndFindElement(locator);
     }
 }

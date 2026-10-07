@@ -19,7 +19,6 @@
 package org.mycore.iview.tests.controller;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -59,11 +58,7 @@ public class SideBarController extends WebDriverController {
      */
     public int getSideBarWidth() {
         By selector = By.xpath("//div[contains(@class,\"sidebar\")]");
-        WebElement element = getDriver().findElement(selector);
-        if (element == null) {
-            LOGGER.error("No element with xpath: '{}' found!", selector.toString());
-            throw new NoSuchElementException();
-        }
+        WebElement element = waitAndFindElement(selector);
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Found ''{}'' with selector :''{}''", element.toString(), selector.toString());
@@ -93,6 +88,13 @@ public class SideBarController extends WebDriverController {
     public void scrollSidbar(WebDriver driver, int offestX) {
         ScrollUtil.scrollByXpath(driver,
             "//div[contains(@class,\"sidebar\")]/div[./div[contains(@class,\"thumbnail\")]]", 250);
+    }
+
+    /**
+     * Waits until the sidebar no longer has the given width, e.g. after it has been resized.
+     */
+    public void awaitSideBarWidthOtherThan(int width) {
+        waitUntil("sidebar width to differ from " + width, () -> getSideBarWidth() != width);
     }
 
 }

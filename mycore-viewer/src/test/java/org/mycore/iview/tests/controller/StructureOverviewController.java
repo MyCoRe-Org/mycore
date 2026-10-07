@@ -53,6 +53,14 @@ public class StructureOverviewController extends SideBarController {
         String xpath = new MessageFormat("//li/a[../span[@class=\"childLabel\" and contains(text(),\"{0}\")]"
             + "]|//li/a[contains(text(),\"{0}\")]", Locale.ROOT).format(new String[] { orderLabel });
         clickElementByXpath(xpath);
+        awaitImageSelected(orderLabel);
+    }
+
+    /**
+     * Waits until the image with the given <b>orderLabel</b> is marked as selected.
+     */
+    public void awaitImageSelected(String orderLabel) {
+        waitUntil(orderLabel + " to be selected", () -> isImageSelected(orderLabel));
     }
 
     public boolean isImageSelected(String orderLabel) {
