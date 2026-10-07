@@ -38,7 +38,7 @@ import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRUsageException;
-import org.mycore.common.xsl.MCRSAXTransformerFactoryManager;
+import org.mycore.common.xsl.MCRXSLTProcessor;
 import org.mycore.common.xsl.MCRXSLResourceHelper;
 import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
@@ -198,8 +198,7 @@ public class MCRCommandUtils {
 
         try {
             if (element != null) {
-                transformer = MCRSAXTransformerFactoryManager
-                    .obtainInstance()
+                transformer = MCRXSLTProcessor.obtainInstance()
                     .newTransformer(new JDOMSource(element));
                 cache.put(style, transformer);
                 LOGGER.info("Loaded transformer from resource {} for style {}.", xslFilePath, style);

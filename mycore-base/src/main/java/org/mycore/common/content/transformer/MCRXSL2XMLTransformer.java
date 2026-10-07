@@ -38,7 +38,7 @@ import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRXMLHelper;
-import org.mycore.common.xsl.MCRTransformerFactorySelector;
+import org.mycore.common.xsl.MCRXSLTProcessorSelector;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
@@ -68,7 +68,7 @@ public class MCRXSL2XMLTransformer extends MCRXSLTransformer {
     }
 
     /**
-     * @deprecated use a configured factory ID through {@link #obtainInstanceByFactory(String, String...)}
+     * @deprecated use a configured XSLT processor ID through {@link #obtainInstanceByProcessor(String, String...)}
      */
     @Deprecated(forRemoval = true)
     public MCRXSL2XMLTransformer(Class<? extends TransformerFactory> factoryClass) {
@@ -76,28 +76,28 @@ public class MCRXSL2XMLTransformer extends MCRXSLTransformer {
     }
 
     /**
-     * @deprecated use a configured factory ID through {@link #obtainInstanceByFactory(String, String...)}
+     * @deprecated use a configured XSLT processor ID through {@link #obtainInstanceByProcessor(String, String...)}
      */
     @Deprecated(forRemoval = true)
     public MCRXSL2XMLTransformer(Class<? extends TransformerFactory> factoryClass, String... stylesheets) {
         super(factoryClass, stylesheets);
     }
 
-    private MCRXSL2XMLTransformer(String factoryId, String[] stylesheets) {
-        super(stylesheets, factoryId);
+    private MCRXSL2XMLTransformer(String processorId, String[] stylesheets) {
+        super(stylesheets, processorId);
     }
 
     public static MCRXSL2XMLTransformer obtainInstance(String... stylesheets) {
-        return obtainInstanceByFactory(MCRTransformerFactorySelector.getDefaultFactoryId(), stylesheets);
+        return obtainInstanceByProcessor(MCRXSLTProcessorSelector.getDefaultProcessorId(), stylesheets);
     }
 
-    public static MCRXSL2XMLTransformer obtainInstanceByFactory(String factoryId, String... stylesheets) {
-        return obtainCachedInstance(INSTANCE_CACHE, factoryId, stylesheets,
-            () -> new MCRXSL2XMLTransformer(factoryId, stylesheets));
+    public static MCRXSL2XMLTransformer obtainInstanceByProcessor(String processorId, String... stylesheets) {
+        return obtainCachedInstance(INSTANCE_CACHE, processorId, stylesheets,
+            () -> new MCRXSL2XMLTransformer(processorId, stylesheets));
     }
 
     /**
-     * @deprecated use {@link #obtainInstanceByFactory(String, String...)}
+     * @deprecated use {@link #obtainInstanceByProcessor(String, String...)}
      */
     @Deprecated(forRemoval = true)
     public static MCRXSL2XMLTransformer obtainInstance(Class<? extends TransformerFactory> factoryClass,

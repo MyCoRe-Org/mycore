@@ -41,7 +41,7 @@ import org.mycore.common.content.transformer.MCRContentTransformerFactory;
 import org.mycore.common.content.transformer.MCRIdentityTransformer;
 import org.mycore.common.content.transformer.MCRTransformerPipe;
 import org.mycore.common.content.transformer.MCRXSLTransformer;
-import org.mycore.common.xsl.MCRTransformerFactorySelector;
+import org.mycore.common.xsl.MCRXSLTProcessorSelector;
 import org.mycore.common.xsl.MCRXSLResourceHelper;
 import org.xml.sax.SAXException;
 
@@ -103,7 +103,7 @@ public class MCRLayoutTransformerFactory {
         if (!MCRConfiguration2.getBoolean("MCR.LayoutTransformerFactory.SuggestProperties").get()) {
             return;
         }
-        String transformerFactory = MCRTransformerFactorySelector.getDefaultFactoryId();
+        String processorId = MCRXSLTProcessorSelector.getDefaultProcessorId();
         StringBuilder properties = new StringBuilder();
         properties.append("# Configuration for transformer ").append(idStripped).append('\n');
         String cfgPrefix = "MCR.ContentTransformer.";
@@ -115,8 +115,8 @@ public class MCRLayoutTransformerFactory {
                 .append('\n');
             properties.append(cfgPrefix)
                     .append(idStripped)
-                    .append(".TransformerFactory=")
-                    .append(transformerFactory)
+                    .append(".XSLTProcessor=")
+                    .append(processorId)
                     .append('\n');
             properties.append(cfgPrefix)
                 .append(idStripped)
@@ -131,8 +131,8 @@ public class MCRLayoutTransformerFactory {
                 .append('\n');
             properties.append(cfgPrefix)
                 .append(idStripped)
-                .append(".TransformerFactory=")
-                .append(transformerFactory)
+                .append(".XSLTProcessor=")
+                .append(processorId)
                 .append('\n');
             properties.append(cfgPrefix)
                 .append(idStripped)
@@ -154,8 +154,8 @@ public class MCRLayoutTransformerFactory {
                     .append('\n');
                 properties.append(cfgPrefix)
                     .append(thisTransformerId)
-                    .append(".TransformerFactory=")
-                    .append(transformerFactory)
+                    .append(".XSLTProcessor=")
+                    .append(processorId)
                     .append('\n');
                 properties.append(cfgPrefix)
                     .append(thisTransformerId)

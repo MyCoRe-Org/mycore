@@ -56,17 +56,17 @@ import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.common.xml.MCRXSLTransformerUtils;
 import org.mycore.common.xsl.MCRErrorListener;
 import org.mycore.common.xsl.MCRParameterCollector;
-import org.mycore.common.xsl.MCRSAXTransformerFactoryManager;
+import org.mycore.common.xsl.MCRXSLTProcessor;
 import org.mycore.common.xsl.MCRTemplatesSource;
-import org.mycore.common.xsl.MCRTransformerFactorySelector;
+import org.mycore.common.xsl.MCRXSLTProcessorSelector;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
 /**
  * Transforms XML content using a static XSL stylesheet. The stylesheet is configured via
  * <code>MCR.ContentTransformer.{ID}.Stylesheet</code>. You may choose your own instance of
- * transformer factory via <code>MCR.ContentTransformer.{ID}.TransformerFactory</code>.
- * The default transformer factory ID is configured with <code>MCR.LayoutService.TransformerFactory</code>.
+ * transformer factory via <code>MCR.ContentTransformer.{ID}.XSLTProcessor</code>.
+ * The default XSLT processor ID is configured with <code>MCR.LayoutService.XSLTProcessor</code>.
  *
  * @author Frank Lützenkirchen
  */
@@ -86,10 +86,10 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         .orElse(60_000L);
 
     /**
-     * @deprecated use {@link MCRTransformerFactorySelector#getDefaultFactoryId()} and a configured factory ID
+     * @deprecated use {@link MCRXSLTProcessorSelector#getDefaultProcessorId()} and a configured XSLT processor ID
      */
     @Deprecated(forRemoval = true)
-    public static final Class<? extends TransformerFactory> DEFAULT_FACTORY_CLASS = MCRSAXTransformerFactoryManager
+    public static final Class<? extends TransformerFactory> DEFAULT_FACTORY_CLASS = MCRXSLTProcessor
         .obtainInstance().getFactoryClass();
 
     /** The compiled XSL stylesheet */
@@ -101,18 +101,18 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
 
     protected long modifiedChecked;
 
-    private MCRSAXTransformerFactoryManager factoryManager;
+    private MCRXSLTProcessor processor;
 
     public MCRXSLTransformer() {
-        this(new String[0], MCRTransformerFactorySelector.getDefaultFactoryId());
+        this(new String[0], MCRXSLTProcessorSelector.getDefaultProcessorId());
     }
 
     public MCRXSLTransformer(String... stylesheets) {
-        this(stylesheets, MCRTransformerFactorySelector.getDefaultFactoryId());
+        this(stylesheets, MCRXSLTProcessorSelector.getDefaultProcessorId());
     }
 
     /**
-     * @deprecated use a configured factory ID through {@link #obtainInstanceByFactory(String, String...)}
+     * @deprecated use a configured XSLT processor ID through {@link #obtainInstanceByProcessor(String, String...)}
      */
     @Deprecated(forRemoval = true)
     public MCRXSLTransformer(Class<? extends TransformerFactory> factoryClass) {
@@ -120,16 +120,16 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
     }
 
     /**
-     * @deprecated use a configured factory ID through {@link #obtainInstanceByFactory(String, String...)}
+     * @deprecated use a configured XSLT processor ID through {@link #obtainInstanceByProcessor(String, String...)}
      */
     @Deprecated(forRemoval = true)
     public MCRXSLTransformer(Class<? extends TransformerFactory> factoryClass, String... stylesheets) {
-        setTransformerFactory(factoryClass);
+        setProcessor(factoryClass);
         setStylesheets(stylesheets);
     }
 
-    protected MCRXSLTransformer(String[] stylesheets, String factoryId) {
-        setTransformerFactory(factoryId);
+    protected MCRXSLTransformer(String[] stylesheets, String processorId) {
+        setProcessor(processorId);
         setStylesheets(stylesheets);
     }
 
@@ -139,25 +139,25 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
      * Must be called for thread safety before this instance is shared to other threads.
      */
     @SuppressWarnings("removal")
-    private void setTransformerFactory(Class<? extends TransformerFactory> factoryClass) {
-        this.factoryManager = MCRSAXTransformerFactoryManager.obtainInstance(factoryClass);
+    private void setProcessor(Class<? extends TransformerFactory> factoryClass) {
+        this.processor = MCRXSLTProcessor.obtainInstance(factoryClass);
     }
 
-    private void setTransformerFactory(String factoryId) {
-        this.factoryManager = MCRSAXTransformerFactoryManager.obtainInstance(factoryId);
+    private void setProcessor(String processorId) {
+        this.processor = MCRXSLTProcessor.obtainInstance(processorId);
     }
 
     public static MCRXSLTransformer obtainInstance(String... stylesheets) {
-        return obtainInstanceByFactory(MCRTransformerFactorySelector.getDefaultFactoryId(), stylesheets);
+        return obtainInstanceByProcessor(MCRXSLTProcessorSelector.getDefaultProcessorId(), stylesheets);
     }
 
-    public static MCRXSLTransformer obtainInstanceByFactory(String factoryId, String... stylesheets) {
-        return obtainCachedInstance(INSTANCE_CACHE, factoryId, stylesheets,
-            () -> new MCRXSLTransformer(stylesheets, factoryId));
+    public static MCRXSLTransformer obtainInstanceByProcessor(String processorId, String... stylesheets) {
+        return obtainCachedInstance(INSTANCE_CACHE, processorId, stylesheets,
+            () -> new MCRXSLTransformer(stylesheets, processorId));
     }
 
     /**
-     * @deprecated use {@link #obtainInstanceByFactory(String, String...)}
+     * @deprecated use {@link #obtainInstanceByProcessor(String, String...)}
      */
     @Deprecated(forRemoval = true)
     public static MCRXSLTransformer obtainInstance(Class<? extends TransformerFactory> factoryClass,
@@ -166,10 +166,10 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
             () -> new MCRXSLTransformer(factoryClass, stylesheets));
     }
 
-    protected static <T> T obtainCachedInstance(MCRCache<String, T> cache, String factoryKey, String[] stylesheets,
+    protected static <T> T obtainCachedInstance(MCRCache<String, T> cache, String processorKey, String[] stylesheets,
         Supplier<T> instanceSupplier) {
-        // NUL cannot occur in factory IDs or stylesheet paths, so every segment boundary remains unambiguous.
-        StringBuilder key = new StringBuilder(factoryKey).append('\0');
+        // NUL cannot occur in XSLT processor IDs or stylesheet paths, so every segment boundary remains unambiguous.
+        StringBuilder key = new StringBuilder(processorKey).append('\0');
         for (String stylesheet : stylesheets) {
             key.append(stylesheet).append('\0');
         }
@@ -190,9 +190,10 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
 
     /**
      * Creates a new {@link TransformerFactory} instance of the configured default implementation
-     * (see <code>MCR.LayoutService.TransformerFactory</code>).
+     * (see <code>MCR.LayoutService.XSLTProcessor</code>).
      *
-     * @deprecated use {@link MCRSAXTransformerFactoryManager#obtainInstance(String)} to reuse the configured provider
+     * @deprecated use {@link MCRXSLTProcessor#obtainInstance(String)} to reuse the
+     *             configured provider
      *
      * @return a new transformer factory
      */
@@ -207,11 +208,11 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         String property = "MCR.ContentTransformer." + id + ".Stylesheet";
         String[] stylesheets = MCRConfiguration2.getStringOrThrow(property).split(",");
         setStylesheets(stylesheets);
-        String factoryProperty = "MCR.ContentTransformer." + id + ".TransformerFactory";
-        String legacyFactoryProperty = factoryProperty + "Class";
-        String factoryId = MCRTransformerFactorySelector.getFactoryId(factoryProperty, legacyFactoryProperty,
-            factoryManager.getId());
-        setTransformerFactory(factoryId);
+        String processorProperty = "MCR.ContentTransformer." + id + ".XSLTProcessor";
+        String legacyProcessorProperty = "MCR.ContentTransformer." + id + ".TransformerFactoryClass";
+        String processorId = MCRXSLTProcessorSelector.getProcessorId(processorProperty, legacyProcessorProperty,
+            processor.getId());
+        setProcessor(processorId);
     }
 
     public void setStylesheets(String... stylesheets) {
@@ -238,7 +239,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
                         throw new TransformerConfigurationException(
                             "XSLT Stylesheet could not be found: " + templateSources[i].getKey());
                     }
-                    templates[i] = factoryManager.newTemplates(source);
+                    templates[i] = processor.newTemplates(source);
                     if (templates[i] == null) {
                         throw new TransformerConfigurationException(
                             "XSLT Stylesheet could not be compiled: " + templateSources[i].getURL());
@@ -369,7 +370,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         Deque<TransformerHandler> xslSteps = new ArrayDeque<>();
         //every transformhandler shares the same ErrorListener instance
         for (Templates template : templates) {
-            TransformerHandler handler = factoryManager.newTransformerHandler(template);
+            TransformerHandler handler = processor.newTransformerHandler(template);
             parameterCollector.setParametersTo(handler.getTransformer());
             handler.getTransformer().setErrorListener(new MCRErrorListener());
             if (!xslSteps.isEmpty()) {

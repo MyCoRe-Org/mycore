@@ -41,14 +41,14 @@ public class MCRTemplatesCompiler {
     private static final Logger LOGGER = LogManager.getLogger();
 
     /** The shared transformer factory used to compile templates. */
-    private static final MCRSAXTransformerFactoryManager FACTORY =
-        MCRSAXTransformerFactoryManager.obtainInstance("Xalan");
+    private static final MCRXSLTProcessor PROCESSOR =
+        MCRXSLTProcessor.obtainInstance("xalan");
 
     /** Compiles the given XSL source code */
     public static Templates compileTemplates(MCRTemplatesSource ts) {
         try {
             Source source = ts.getSource();
-            return FACTORY.newTemplates(source);
+            return PROCESSOR.newTemplates(source);
         } catch (Exception exc) {
             LOGGER.error("Error while compiling template", exc);
             Exception cause = MCRExceptionCauseFinder.getCause(exc);
@@ -60,7 +60,7 @@ public class MCRTemplatesCompiler {
     /** Returns a new transformer for the compiled XSL templates
      */
     public static Transformer getTransformer(Templates templates) throws TransformerConfigurationException {
-        return FACTORY.newTransformerHandler(templates).getTransformer();
+        return PROCESSOR.newTransformerHandler(templates).getTransformer();
     }
 
     private static String buildErrorMessage(String resource, Exception cause) {

@@ -56,8 +56,8 @@ import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRSourceContent;
-import org.mycore.common.xsl.MCRSAXTransformerFactoryManager;
-import org.mycore.common.xsl.MCRTransformerFactorySelector;
+import org.mycore.common.xsl.MCRXSLTProcessor;
+import org.mycore.common.xsl.MCRXSLTProcessorSelector;
 import org.mycore.resource.MCRResourceHelper;
 
 /**
@@ -70,13 +70,13 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final String FACTORY_PROPERTY = "MCR.LayoutService.FoFormatter.TransformerFactory";
+    private static final String PROCESSOR_PROPERTY = "MCR.LayoutService.FoFormatter.XSLTProcessor";
 
-    private static final String LEGACY_FACTORY_PROPERTY = "MCR.LayoutService.FoFormatter.transformerFactoryImpl";
+    private static final String LEGACY_PROCESSOR_PROPERTY = "MCR.LayoutService.FoFormatter.transformerFactoryImpl";
 
     private FopFactory fopFactory;
 
-    private MCRSAXTransformerFactoryManager factoryManager;
+    private MCRXSLTProcessor processor;
 
     final ResourceResolver resolver = new ResourceResolver() {
         @Override
@@ -144,13 +144,13 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
             }
         }
         fopFactory = fopFactoryBuilder.build();
-        factoryManager = getTransformerFactoryManager();
+        processor = getXSLTProcessor();
     }
 
-    private static MCRSAXTransformerFactoryManager getTransformerFactoryManager() {
-        String factoryId = MCRTransformerFactorySelector.getFactoryId(FACTORY_PROPERTY, LEGACY_FACTORY_PROPERTY,
-            MCRTransformerFactorySelector.getDefaultFactoryId());
-        return MCRSAXTransformerFactoryManager.obtainInstance(factoryId);
+    private static MCRXSLTProcessor getXSLTProcessor() {
+        String processorId = MCRXSLTProcessorSelector.getProcessorId(PROCESSOR_PROPERTY, LEGACY_PROCESSOR_PROPERTY,
+            MCRXSLTProcessorSelector.getDefaultProcessorId());
+        return MCRXSLTProcessor.obtainInstance(processorId);
     }
 
     @Override
@@ -163,7 +163,7 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
             final Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, userAgent, out);
             final Source src = input.getSource();
             final Result res = new SAXResult(fop.getDefaultHandler());
-            Transformer transformer = factoryManager.newTransformer();
+            Transformer transformer = processor.newTransformer();
             transformer.transform(src, res);
         } catch (FOPException e) {
             throw new TransformerException(e);

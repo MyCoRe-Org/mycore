@@ -31,7 +31,7 @@ import org.mycore.test.MyCoReTest;
 public class MCRPostProcessorXSLTest {
 
     @Test
-    public void usesPlainXalanFactoryId() throws Exception {
+    public void usesPlainXalanProcessorId() throws Exception {
         MCRPostProcessorXSL postProcessor = new MCRPostProcessorXSL();
         postProcessor.setAttributes(Map.of("xsl", "post-processor-test.xsl", "transformer", "xalan"));
 
