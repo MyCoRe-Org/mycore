@@ -56,12 +56,14 @@
                   <xsl:variable name="uri" select="$ifs/der/mcr_directory/children//child[@type='file']/uri" />
                   <xsl:variable name="derId" select="substring-before(substring-after($uri,':/'), ':')" />
                   <xsl:variable name="filePath" select="substring-after(substring-after($uri, ':'), ':')" />
-                  <xsl:value-of select="concat($ServletsBaseURL,'MCRFileNodeServlet/',$derId,$filePath)" />
+                  <xsl:value-of select="concat($WebApplicationBaseURL,'api/v2/objects/',$mycoreobject/@ID,
+                    '/derivates/',$derId,'/contents',$filePath)" />
                 </xsl:when>
                 <xsl:otherwise>
                   <xsl:choose>
                     <xsl:when test="$dernumber = 1">
-                      <xsl:value-of select="concat($ServletsBaseURL,'MCRZipServlet/',$ifs/der/@id)" />
+                      <xsl:value-of select="concat($WebApplicationBaseURL,'api/v2/objects/',$mycoreobject/@ID,
+                        '/derivates/',$ifs/der/@id,'/archive/zip')" />
                     </xsl:when>
                     <xsl:otherwise>
                       <xsl:value-of select="concat($ServletsBaseURL,'MCRZipServlet/',/mycoreobject/@ID)" />
