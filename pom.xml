@@ -57,6 +57,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <aws-sdk.version>2.41.32</aws-sdk.version>
     <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
     <checkstyle.suppressions.location>${user.dir}/checkstyle-suppressions.xml</checkstyle.suppressions.location>
+    <ffmpeg.version>0.9.1</ffmpeg.version>
     <frontend.maven.plugin.version>1.12.0</frontend.maven.plugin.version>
     <grizzly.version>5.0.1</grizzly.version>
     <hamcrest.version>3.0</hamcrest.version>
@@ -1038,6 +1039,11 @@ Applications based on MyCoRe use a common core, which provides the functionality
             <artifactId>xml-apis</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>net.bramp.ffmpeg</groupId>
+        <artifactId>ffmpeg</artifactId>
+        <version>${ffmpeg.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.abdera</groupId>
