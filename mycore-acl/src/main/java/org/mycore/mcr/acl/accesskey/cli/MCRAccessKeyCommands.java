@@ -197,8 +197,12 @@ public class MCRAccessKeyCommands {
         }
 
         MCRUser user = MCRUserManager.getUser(strings[0], strings[1]);
-        MCRAccessKeyUserService.obtainInstance().cleanUpUserAttributes(user);
+        if (user == null) {
+            LOGGER.warn("Could not find user {}.", userWithRealm);
+            return;
+        }
 
+        MCRAccessKeyUserService.obtainInstance().cleanUpUserAttributes(user);
         LOGGER.info("Cleaned up access keys for user {}.", userWithRealm);
     }
 
