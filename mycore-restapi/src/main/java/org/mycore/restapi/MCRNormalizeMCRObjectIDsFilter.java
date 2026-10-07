@@ -64,9 +64,6 @@ public class MCRNormalizeMCRObjectIDsFilter implements ContainerRequestFilter {
     @Context
     HttpServletResponse response;
 
-    private MCRIDMapper mcrIdMapper = MCRConfiguration2
-        .getInstanceOf(MCRIDMapper.class, MCRIDMapper.MAPPER_PROPERTY).get();
-
     @Override
     @SuppressWarnings("PMD.NPathComplexity")
     public void filter(ContainerRequestContext requestContext) {
@@ -85,8 +82,8 @@ public class MCRNormalizeMCRObjectIDsFilter implements ContainerRequestFilter {
             String objectId = DECODE_MCR_OBJECT_IDS ? URLDecoder.decode(mcrid, StandardCharsets.UTF_8) : mcrid;
             String objectIdExtension = getExtension(objectId);
             objectId = objectId.substring(0, objectId.length() - objectIdExtension.length());
-            
-            Optional<MCRObjectID> optObjId = mcrIdMapper.mapMCRObjectID(objectId);
+
+            Optional<MCRObjectID> optObjId = MCRIDMapper.obtainInstance().mapMCRObjectID(objectId);
             if (optObjId.isEmpty()) {
                 throw new NotFoundException("No unique MyCoRe Object ID found for query " + objectId);
             }
@@ -98,7 +95,8 @@ public class MCRNormalizeMCRObjectIDsFilter implements ContainerRequestFilter {
                     DECODE_MCR_OBJECT_IDS ? URLDecoder.decode(derid, StandardCharsets.UTF_8) : derid;
                 String deridExtension = getExtension(derivateId);
                 derivateId = derivateId.substring(0, derivateId.length() - deridExtension.length());
-                Optional<MCRObjectID> optDerId = mcrIdMapper.mapMCRDerivateID(optObjId.get(), derivateId);
+                Optional<MCRObjectID> optDerId =
+                    MCRIDMapper.obtainInstance().mapMCRDerivateID(optObjId.get(), derivateId);
                 if (optDerId.isEmpty()) {
                     throw new NotFoundException("No unique MyCoRe Derivate ID found for query " + derivateId);
                 }
