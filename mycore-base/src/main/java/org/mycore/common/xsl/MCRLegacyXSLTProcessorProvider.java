@@ -1,0 +1,129 @@
+/*
+ * This file is part of ***  M y C o R e  ***
+ * See https://www.mycore.de/ for details.
+ *
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package org.mycore.common.xsl;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.sax.SAXTransformerFactory;
+
+import org.mycore.common.MCRClassTools;
+import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationException;
+
+/**
+ * Compatibility support for class-based transformer factory selection.
+ * <p>
+ * Resolves legacy classes to a unique configured ID, preferring exact matches to subclasses.
+ * Classes without a unique match receive an internal {@code legacy:} ID. Their processors are created
+ * lazily, shared within the owning registry and always accessed serially.
+ * The class-to-ID mapping is independent of registry initialization so legacy properties can be
+ * resolved while the registry is being constructed.
+ */
+final class MCRLegacyXSLTProcessorProvider {
+
+    private static final String CLASS_PROPERTY_SUFFIX = ".Factory.Class";
+
+    private static final String LEGACY_PROCESSOR_ID_PREFIX = "legacy:";
+
+    private static final ConcurrentMap<String, Class<? extends TransformerFactory>> LEGACY_FACTORY_CLASSES =
+        new ConcurrentHashMap<>();
+
+    private final ConcurrentMap<String, MCRXSLTProcessor> processors = new ConcurrentHashMap<>();
+
+    /**
+     * Returns the shared legacy XSLT processor, or {@code null} if the ID has not been registered for a class.
+     */
+    MCRXSLTProcessor get(String id) {
+        Class<? extends TransformerFactory> factoryClass = LEGACY_FACTORY_CLASSES.get(id);
+        return factoryClass == null ? null
+            : processors.computeIfAbsent(id, _ -> createLegacyProcessor(id, factoryClass));
+    }
+
+    static String getProcessorId(Class<? extends TransformerFactory> factoryClass,
+        Map<String, MCRXSLTProcessor> configuredProcessors) {
+        Map<String, Class<? extends TransformerFactory>> factoryClasses = new HashMap<>();
+        configuredProcessors.forEach((id, factory) -> factoryClasses.put(id, factory.getFactoryClass()));
+        return resolveProcessorId(factoryClasses, factoryClass);
+    }
+
+    /**
+     * Resolves an ID directly from properties without initializing the shared registry.
+     * This keeps legacy-property migration out of the registry's construction path.
+     */
+    static String getProcessorId(Class<? extends TransformerFactory> factoryClass) {
+        String propertyPrefix = MCRXSLTProcessorRegistry.ENTRIES_PROPERTY_PREFIX;
+        Map<String, Class<? extends TransformerFactory>> factoryClasses = new HashMap<>();
+        MCRConfiguration2.getSubpropertiesMap(propertyPrefix).keySet().stream()
+            .filter(key -> key.endsWith(CLASS_PROPERTY_SUFFIX))
+            .filter(key -> key.indexOf('.') == key.length() - CLASS_PROPERTY_SUFFIX.length())
+            .map(key -> key.substring(0, key.length() - CLASS_PROPERTY_SUFFIX.length()))
+            .forEach(id -> MCRConfiguration2.<TransformerFactory>getClass(propertyPrefix + id + CLASS_PROPERTY_SUFFIX)
+                .ifPresent(configuredClass -> factoryClasses.put(id, configuredClass)));
+
+        return resolveProcessorId(factoryClasses, factoryClass);
+    }
+
+    private static String resolveProcessorId(Map<String, Class<? extends TransformerFactory>> factoryClasses,
+        Class<? extends TransformerFactory> factoryClass) {
+        List<String> exactMatches = factoryClasses.entrySet().stream()
+            .filter(entry -> entry.getValue().equals(factoryClass))
+            .map(Map.Entry::getKey)
+            .toList();
+        if (!exactMatches.isEmpty()) {
+            return getConfiguredOrLegacyId(exactMatches, factoryClass);
+        }
+        List<String> assignableMatches = factoryClasses.entrySet().stream()
+            .filter(entry -> factoryClass.isAssignableFrom(entry.getValue()))
+            .map(Map.Entry::getKey)
+            .toList();
+        return getConfiguredOrLegacyId(assignableMatches, factoryClass);
+    }
+
+    private static String getConfiguredOrLegacyId(List<String> matches,
+        Class<? extends TransformerFactory> factoryClass) {
+        if (matches.size() == 1) {
+            return matches.getFirst();
+        }
+        String legacyProcessorId = LEGACY_PROCESSOR_ID_PREFIX + factoryClass.getName();
+        LEGACY_FACTORY_CLASSES.putIfAbsent(legacyProcessorId, factoryClass);
+        return legacyProcessorId;
+    }
+
+    static boolean isLegacyProcessorId(String processorId) {
+        return processorId.startsWith(LEGACY_PROCESSOR_ID_PREFIX);
+    }
+
+    private MCRXSLTProcessor createLegacyProcessor(String id,
+        Class<? extends TransformerFactory> factoryClass) {
+        TransformerFactory factory = TransformerFactory.newInstance(factoryClass.getName(),
+            MCRClassTools.getClassLoader());
+        if (factory instanceof SAXTransformerFactory saxTransformerFactory) {
+            return new MCRXSLTProcessor(id, saxTransformerFactory, false);
+        } else {
+            throw new MCRConfigurationException("Transformer Factory " + factory.getClass().getName()
+                + " does not implement SAXTransformerFactory");
+        }
+    }
+
+}
