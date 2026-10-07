@@ -45,8 +45,7 @@ import org.mycore.common.config.annotation.MCRSentinel;
  * <ul>
  *   <li>{@code Factory.Class} – the {@link SAXTransformerFactory} implementation</li>
  *   <li>{@code SupportsConcurrency} – {@code true} if the factory may be used by several threads at the same
- *   time; otherwise access is serialized
- *   (default: {@code MCR.Default.XSLTProcessorRegistry.SupportsConcurrency})</li>
+ *   time; otherwise access is serialized (default: {@code false})</li>
  *   <li>{@code Initializers.{n}.Class} – optional {@link FactoryInitializer} instances applied to the factory
  *   in order</li>
  * </ul>
@@ -60,8 +59,6 @@ public final class MCRXSLTProcessorRegistry {
     public static final String ENTRIES_KEY = "Entries";
 
     public static final String ENTRIES_PROPERTY_PREFIX = REGISTRY_PROPERTY + "." + ENTRIES_KEY + ".";
-
-    public static final String DEFAULT_PROPERTY_PREFIX = "MCR.Default.XSLTProcessorRegistry.";
 
     public static final String FACTORY_KEY = "Factory";
 
@@ -188,8 +185,7 @@ public final class MCRXSLTProcessorRegistry {
             @MCRInstance(name = FACTORY_KEY, valueClass = SAXTransformerFactory.class)
             public SAXTransformerFactory factory;
 
-            @MCRProperty(name = SUPPORTS_CONCURRENCY_KEY,
-                defaultName = DEFAULT_PROPERTY_PREFIX + SUPPORTS_CONCURRENCY_KEY)
+            @MCRProperty(name = SUPPORTS_CONCURRENCY_KEY, required = false)
             public String supportsConcurrency;
 
             @MCRSentinel
@@ -203,6 +199,9 @@ public final class MCRXSLTProcessorRegistry {
             }
 
             private boolean parseBoolean(String value) {
+                if (value == null) {
+                    return false;
+                }
                 return switch (value.trim().toLowerCase(Locale.ROOT)) {
                     case "true" -> true;
                     case "false" -> false;
