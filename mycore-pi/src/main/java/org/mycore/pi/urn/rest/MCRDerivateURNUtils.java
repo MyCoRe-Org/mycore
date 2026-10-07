@@ -36,7 +36,6 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.xml.MCRXMLFunctions;
-import org.mycore.datamodel.ifs.MCRFileNodeServlet;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -84,14 +83,15 @@ public class MCRDerivateURNUtils {
                 }
 
                 if (!isFileSupported(file)) {
-                    if (LOGGER.isInfoEnabled()) { // false-positive on PMD:GuardLogStatement (static method reference)
-                        LOGGER.info("File is not displayable within iView2. Use {} as url",
-                            MCRFileNodeServlet.class::getSimpleName);
+                    LOGGER.info("File is not displayable within iView2. Use REST API as url");
+                    MCRObjectID derID = MCRObjectID.getInstance(derivateID);
+                    final MCRObjectID objectId = MCRMetadataManager.getObjectId(derID);
+                    if (objectId == null) {
+                        LOGGER.warn("Object for {} could NOT be found", derivateID);
+                        return null;
                     }
-                    String filePath = "/" + file.getOwner()
-                        + MCRXMLFunctions.encodeURIPath(file.getOwnerRelativePath());
-                    return new URI(MCRFrontendUtil.getBaseURL() + "servlets/" + MCRFileNodeServlet.class.getSimpleName()
-                        + filePath).toURL();
+                    return new URI(MCRFrontendUtil.getBaseURL() + "api/v2/objects/" + objectId + "/derivates/"
+                        + derID + "/contents" + MCRXMLFunctions.encodeURIPath(file.getOwnerRelativePath())).toURL();
                 }
 
                 return new URI(getViewerURL(file)).toURL();
