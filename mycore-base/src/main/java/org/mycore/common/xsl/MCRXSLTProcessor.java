@@ -34,18 +34,20 @@ import javax.xml.transform.sax.TransformerHandler;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 
 /**
- * Manages access to one application-scoped {@link SAXTransformerFactory}.
+ * An application-scoped XSLT processor (e.g. Saxon or Xalan) registered under an ID in the
+ * {@link MCRXSLTProcessorRegistry}.
+ * <p>
+ * The processor manages access to its underlying JAXP {@link SAXTransformerFactory}.
  * <p>
  * JAXP does not guarantee that a factory supports concurrent operations. Access can therefore be serialized for
  * providers that require it, while the returned {@link Templates}, {@link Transformer}, and
  * {@link TransformerHandler} instances can follow their individual JAXP lifecycle rules.
  */
-public final class MCRSAXTransformerFactoryManager {
+public final class MCRXSLTProcessor {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -53,7 +55,7 @@ public final class MCRSAXTransformerFactoryManager {
 
     private final SAXTransformerFactory factory;
 
-    private final boolean serializeAccess;
+    private final boolean supportsConcurrency;
 
     private final Supplier<URIResolver> uriResolverSupplier;
 
@@ -65,58 +67,53 @@ public final class MCRSAXTransformerFactoryManager {
 
     private boolean initializing;
 
-    MCRSAXTransformerFactoryManager(String id, TransformerFactory factory, boolean serializeAccess) {
-        this(id, factory, serializeAccess, MCRURIResolver::obtainInstance);
+    MCRXSLTProcessor(String id, SAXTransformerFactory factory, boolean supportsConcurrency) {
+        this(id, factory, supportsConcurrency, MCRURIResolver::obtainInstance);
     }
 
-    MCRSAXTransformerFactoryManager(String id, TransformerFactory factory, boolean serializeAccess,
+    MCRXSLTProcessor(String id, SAXTransformerFactory factory, boolean supportsConcurrency,
         Supplier<URIResolver> uriResolverSupplier) {
         this.id = Objects.requireNonNull(id);
-        Objects.requireNonNull(factory);
-        if (factory instanceof SAXTransformerFactory saxTransformerFactory) {
-            this.factory = saxTransformerFactory;
-        } else {
-            throw new MCRConfigurationException("Transformer Factory " + factory.getClass().getName()
-                + " does not implement SAXTransformerFactory");
-        }
-        this.serializeAccess = serializeAccess;
+        this.factory = Objects.requireNonNull(factory);
+        this.supportsConcurrency = supportsConcurrency;
         this.uriResolverSupplier = Objects.requireNonNull(uriResolverSupplier);
     }
 
     /**
-     * Returns the shared factory manager for the default selected at call time.
+     * Returns the shared XSLT processor for the default selected at call time.
      *
-     * @return shared manager selected by {@link MCRTransformerFactorySelector#getDefaultFactoryId()}
+     * @return shared XSLT processor selected by {@link MCRXSLTProcessorSelector#getDefaultProcessorId()}
      */
-    public static MCRSAXTransformerFactoryManager obtainInstance() {
-        return obtainInstance(MCRTransformerFactorySelector.getDefaultFactoryId());
+    public static MCRXSLTProcessor obtainInstance() {
+        return MCRXSLTProcessorRegistry.obtainInstance().getDefaultProcessor();
     }
 
     /**
-     * Returns the shared, fully configured factory manager with the supplied ID.
+     * Returns the shared XSLT processor with the supplied ID.
      *
-     * @param id configured factory ID
-     * @return shared manager for this ID
+     * @param id configured XSLT processor ID
+     * @return shared XSLT processor for this ID
      */
-    public static MCRSAXTransformerFactoryManager obtainInstance(String id) {
-        return LazyInstanceHolder.REGISTRY.get(id);
+    public static MCRXSLTProcessor obtainInstance(String id) {
+        return MCRXSLTProcessorRegistry.obtainInstance().getProcessor(id);
     }
 
     /**
-     * Returns the uniquely configured factory with the supplied implementation class.
+     * Returns the shared XSLT processor whose factory is uniquely configured with the supplied implementation
+     * class, or a shared legacy XSLT processor created for that class.
      *
-     * @deprecated use {@link #obtainInstance(String)} with a configured factory ID
+     * @deprecated use {@link #obtainInstance(String)} with a configured XSLT processor ID
      */
     @Deprecated(forRemoval = true)
-    public static MCRSAXTransformerFactoryManager obtainInstance(
-        Class<? extends TransformerFactory> factoryClass) {
-        return LazyInstanceHolder.REGISTRY.get(factoryClass);
+    @SuppressWarnings("removal")
+    public static MCRXSLTProcessor obtainInstance(Class<? extends TransformerFactory> factoryClass) {
+        return MCRXSLTProcessorRegistry.obtainInstance().getProcessor(factoryClass);
     }
 
     /**
-     * Returns the configured ID of this manager.
+     * Returns the configured ID of this XSLT processor.
      *
-     * @return configured factory ID
+     * @return configured XSLT processor ID
      */
     public String getId() {
         return id;
@@ -150,13 +147,13 @@ public final class MCRSAXTransformerFactoryManager {
         return withFactoryAccess(factory::newTransformer);
     }
 
-    boolean isAccessSerialized() {
-        return serializeAccess;
+    boolean supportsConcurrency() {
+        return supportsConcurrency;
     }
 
     private <T> T withFactoryAccess(FactoryOperation<T> operation) throws TransformerConfigurationException {
         initialize();
-        if (!serializeAccess) {
+        if (supportsConcurrency) {
             return operation.execute();
         }
         synchronized (factoryMonitor) {
@@ -178,7 +175,7 @@ public final class MCRSAXTransformerFactoryManager {
                 return;
             }
             if (initializing) {
-                throw new MCRConfigurationException("Recursive initialization of transformer factory manager '"
+                throw new MCRConfigurationException("Recursive initialization of XSLT processor '"
                     + id + "'");
             }
             initializing = true;
@@ -196,14 +193,6 @@ public final class MCRSAXTransformerFactoryManager {
     private interface FactoryOperation<T> {
 
         T execute() throws TransformerConfigurationException;
-
-    }
-
-    private static final class LazyInstanceHolder {
-
-        private static final MCRTransformerFactoryRegistry REGISTRY = MCRConfiguration2
-            .getSingleInstanceOfOrThrow(MCRTransformerFactoryRegistry.class,
-                MCRTransformerFactoryRegistry.CONFIGURATION_PREFIX);
 
     }
 

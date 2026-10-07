@@ -33,15 +33,16 @@ import org.apache.logging.log4j.core.appender.AbstractAppender;
 import org.apache.logging.log4j.core.config.Property;
 import org.apache.xalan.processor.TransformerFactoryImpl;
 import org.jdom2.Element;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRJDOMContent;
-import org.mycore.common.xsl.MCRSAXTransformerFactoryManager;
+import org.mycore.common.xsl.MCRXSLTProcessorRegistry;
 import org.mycore.common.xsl.MCRXalanTransformerFactory;
-import org.mycore.common.xsl.MCRTransformerFactorySelector;
+import org.mycore.common.xsl.MCRXSLTProcessorSelector;
 import org.mycore.common.xsl.uriresolver.MCRXSLStyleURIResolver.Flavor;
 import org.mycore.test.MyCoReTest;
 
@@ -50,13 +51,20 @@ public class MCRXSLTransformerTest {
 
     private static final String TRANSFORMER_PREFIX = "MCR.ContentTransformer.Legacy";
 
-    private static final String LAYOUT_FACTORY_PROPERTY = "MCR.LayoutService.TransformerFactory";
+    private static final String LAYOUT_PROCESSOR_PROPERTY = "MCR.LayoutService.XSLTProcessor";
 
-    private static final String FO_FACTORY_PROPERTY = "MCR.LayoutService.FoFormatter.TransformerFactory";
+    private static final String LEGACY_LAYOUT_PROCESSOR_PROPERTY = "MCR.LayoutService.TransformerFactoryClass";
 
-    private static final String LEGACY_FO_FACTORY_PROPERTY = "MCR.LayoutService.FoFormatter.transformerFactoryImpl";
+    private static final String FO_PROCESSOR_PROPERTY = "MCR.LayoutService.FoFormatter.XSLTProcessor";
+
+    private static final String LEGACY_FO_PROCESSOR_PROPERTY = "MCR.LayoutService.FoFormatter.transformerFactoryImpl";
 
     private static final String FLAVOR_PREFIX = "MCR.Test.LegacyFlavor";
+
+    @BeforeEach
+    public void resetLegacyWarnings() {
+        MCRXSLTProcessorSelector.resetLegacyWarnings();
+    }
 
     @Test
     @MCRTestConfiguration(properties = {
@@ -70,56 +78,56 @@ public class MCRXSLTransformerTest {
 
         assertEquals(List.of("Configuration property '" + TRANSFORMER_PREFIX
             + ".TransformerFactoryClass' is deprecated. Replace it with '" + TRANSFORMER_PREFIX
-            + ".TransformerFactory=SlowXalan'."), warnings);
+            + ".XSLTProcessor=slowXalan'."), warnings);
     }
 
     @Test
     @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = LAYOUT_FACTORY_PROPERTY, empty = true),
-        @MCRTestProperty(key = LAYOUT_FACTORY_PROPERTY + "Class", classNameOf = TransformerFactoryImpl.class),
-        @MCRTestProperty(key = LEGACY_FO_FACTORY_PROPERTY, classNameOf = TransformerFactoryImpl.class)
+        @MCRTestProperty(key = LAYOUT_PROCESSOR_PROPERTY, empty = true),
+        @MCRTestProperty(key = LEGACY_LAYOUT_PROCESSOR_PROPERTY, classNameOf = TransformerFactoryImpl.class),
+        @MCRTestProperty(key = LEGACY_FO_PROCESSOR_PROPERTY, classNameOf = TransformerFactoryImpl.class)
     })
     public void supportsLegacyLayoutAndFoFactoryProperties() {
         List<String> warnings = collectWarnings(() -> {
-            String defaultFactoryId = MCRTransformerFactorySelector.getDefaultFactoryId();
-            assertEquals("SlowXalan", defaultFactoryId);
-            assertEquals("SlowXalan", MCRTransformerFactorySelector.getFactoryId(FO_FACTORY_PROPERTY,
-                LEGACY_FO_FACTORY_PROPERTY, defaultFactoryId));
+            String defaultProcessorId = MCRXSLTProcessorSelector.getDefaultProcessorId();
+            assertEquals("slowXalan", defaultProcessorId);
+            assertEquals("slowXalan", MCRXSLTProcessorSelector.getProcessorId(FO_PROCESSOR_PROPERTY,
+                LEGACY_FO_PROCESSOR_PROPERTY, defaultProcessorId));
         });
 
         assertEquals(List.of(
             "Configuration property 'MCR.LayoutService.TransformerFactoryClass' is deprecated. Replace it with "
-                + "'MCR.LayoutService.TransformerFactory=SlowXalan'.",
+                + "'MCR.LayoutService.XSLTProcessor=slowXalan'.",
             "Configuration property 'MCR.LayoutService.FoFormatter.transformerFactoryImpl' is deprecated. Replace "
-                + "it with 'MCR.LayoutService.FoFormatter.TransformerFactory=SlowXalan'."),
+                + "it with 'MCR.LayoutService.FoFormatter.XSLTProcessor=slowXalan'."),
             warnings);
     }
 
     @Test
     @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = LAYOUT_FACTORY_PROPERTY, string = "Xalan")
+        @MCRTestProperty(key = LAYOUT_PROCESSOR_PROPERTY, string = "xalan")
     })
-    public void resolvesDefaultFactoryIdAtCallTime() {
-        assertEquals("Xalan", MCRTransformerFactorySelector.getDefaultFactoryId());
-        assertSame(MCRSAXTransformerFactoryManager.obtainInstance("Xalan"),
-            MCRSAXTransformerFactoryManager.obtainInstance());
+    public void resolvesDefaultProcessorIdAtCallTime() {
+        MCRXSLTProcessorRegistry registry = MCRXSLTProcessorRegistry.obtainInstance();
+        assertEquals("xalan", MCRXSLTProcessorSelector.getDefaultProcessorId());
+        assertSame(registry.getProcessor("xalan"), registry.getDefaultProcessor());
     }
 
     @Test
     @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = LAYOUT_FACTORY_PROPERTY, empty = true),
-        @MCRTestProperty(key = LAYOUT_FACTORY_PROPERTY + "Class", empty = true)
+        @MCRTestProperty(key = LAYOUT_PROCESSOR_PROPERTY, empty = true),
+        @MCRTestProperty(key = LEGACY_LAYOUT_PROCESSOR_PROPERTY, empty = true)
     })
-    public void rejectsMissingDefaultFactoryConfiguration() {
+    public void rejectsMissingDefaultProcessorConfiguration() {
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
-            MCRSAXTransformerFactoryManager::obtainInstance);
+            () -> MCRXSLTProcessorRegistry.obtainInstance().getDefaultProcessor());
 
-        assertTrue(exception.getMessage().contains(LAYOUT_FACTORY_PROPERTY));
+        assertTrue(exception.getMessage().contains(LAYOUT_PROCESSOR_PROPERTY));
     }
 
     private List<String> collectWarnings(Runnable action) {
         org.apache.logging.log4j.core.Logger logger =
-            (org.apache.logging.log4j.core.Logger) LogManager.getLogger(MCRTransformerFactorySelector.class);
+            (org.apache.logging.log4j.core.Logger) LogManager.getLogger(MCRXSLTProcessorSelector.class);
         CollectingAppender appender = new CollectingAppender();
         appender.start();
         logger.addAppender(appender);
@@ -133,12 +141,12 @@ public class MCRXSLTransformerTest {
     }
 
     @Test
-    public void cachesXSL2XMLTransformersPerFactoryId() throws Exception {
+    public void cachesXSL2XMLTransformersPerProcessorId() throws Exception {
         String stylesheet = "xsl/reflection.xsl";
         MCRJDOMContent source = new MCRJDOMContent(new Element("root"));
 
-        MCRXSL2XMLTransformer saxon = MCRXSL2XMLTransformer.obtainInstanceByFactory("Saxon", stylesheet);
-        MCRXSL2XMLTransformer xalan = MCRXSL2XMLTransformer.obtainInstanceByFactory("Xalan", stylesheet);
+        MCRXSL2XMLTransformer saxon = MCRXSL2XMLTransformer.obtainInstanceByProcessor("saxon", stylesheet);
+        MCRXSL2XMLTransformer xalan = MCRXSL2XMLTransformer.obtainInstanceByProcessor("xalan", stylesheet);
 
         assertEquals("Saxonica", saxon.transform(source).asXML().getRootElement().getAttributeValue("vendor"));
         assertEquals("Apache Software Foundation",
@@ -146,11 +154,11 @@ public class MCRXSLTransformerTest {
     }
 
     @Test
-    public void cacheKeySeparatesFactoryAndStylesheetSegments() {
-        MCRXSLTransformer.obtainInstanceByFactory("Saxon", "collision_A_B");
+    public void cacheKeySeparatesProcessorAndStylesheetSegments() {
+        MCRXSLTransformer.obtainInstanceByProcessor("saxon", "collision_A_B");
 
         assertThrows(MCRConfigurationException.class,
-            () -> MCRXSLTransformer.obtainInstanceByFactory("Saxon_collision_A", "B"));
+            () -> MCRXSLTransformer.obtainInstanceByProcessor("Saxon_collision_A", "B"));
     }
 
     @Test
@@ -197,12 +205,27 @@ public class MCRXSLTransformerTest {
     }
 
     @Test
+    @MCRTestConfiguration(properties = {
+        @MCRTestProperty(key = FLAVOR_PREFIX + ".Class", classNameOf = Flavor.class),
+        @MCRTestProperty(key = FLAVOR_PREFIX + ".XSLTProcessor", string = "saxon"),
+        @MCRTestProperty(
+            key = FLAVOR_PREFIX + ".TransformerFactory.Class",
+            classNameOf = MCRXalanTransformerFactory.class),
+        @MCRTestProperty(key = FLAVOR_PREFIX + ".XSLFolder", string = "xsl")
+    })
+    public void legacyFlavorFactoryClassPropertyOverridesInheritedProcessorId() {
+        Flavor flavor = MCRConfiguration2.getInstanceOfOrThrow(Flavor.class, FLAVOR_PREFIX);
+
+        assertEquals("xalan", flavor.getXSLTProcessorId());
+    }
+
+    @Test
     @SuppressWarnings("removal")
     public void migratesLegacyFlavorClassValue() {
         Flavor flavor = new Flavor();
 
         List<String> warnings = collectWarnings(
-            () -> flavor.setTransformerFactoryId(UnregisteredTransformerFactory.class.getName()));
+            () -> flavor.setXSLTProcessorId(UnregisteredTransformerFactory.class.getName()));
 
         assertEquals(UnregisteredTransformerFactory.class, flavor.getTransformerFactory());
         assertTrue(warnings.stream().anyMatch(message -> message.contains("class value")));

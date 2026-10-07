@@ -47,7 +47,7 @@ import org.mycore.common.xsl.MCRXSLResourceHelper;
  * You can specify with param xsl the stylesheet, which should be processed and
  * you can select a supported processor with the optional transformer parameter.
  * If no transformer is specified the default transformer will be used
- * (property: MCR.LayoutService.TransformerFactory).
+ * (property: MCR.LayoutService.XSLTProcessor).
  * <p>
  * The params xsl and transformer are deprecated. Use a configured content transformer
  * (MCR.ContentTransformer.{id}) instead:
@@ -77,17 +77,17 @@ public class MCRPostProcessorXSL implements MCRXEditorPostProcessor {
         LOGGER.warn("xed:post-processor attributes 'xsl' and 'transformer' are deprecated, configure a content"
             + " transformer for {} and use attribute 'contentTransformer'", stylesheet);
 
-        String factoryId = switch (transformer) {
-            case "xalan" -> "SlowXalan";
-            case "saxon" -> "Saxon";
+        String processorId = switch (transformer) {
+            case "xalan" -> "slowXalan";
+            case "saxon" -> "saxon";
             case null, default -> null;
         };
 
         final String xslFolder = MCRXSLResourceHelper.getXSLFolder();
         MCRContent source = new MCRJDOMContent(xml);
         MCRXSL2XMLTransformer transformer =
-            factoryId == null ? MCRXSL2XMLTransformer.obtainInstance(xslFolder + "/" + stylesheet)
-                : MCRXSL2XMLTransformer.obtainInstanceByFactory(factoryId, xslFolder + "/" + stylesheet);
+            processorId == null ? MCRXSL2XMLTransformer.obtainInstance(xslFolder + "/" + stylesheet)
+                : MCRXSL2XMLTransformer.obtainInstanceByProcessor(processorId, xslFolder + "/" + stylesheet);
         MCRContent transformed = transformer.transform(source);
         MCRContent normalized = new MCRNormalizeUnicodeTransformer().transform(transformed);
         return normalized.asXML();

@@ -27,7 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 
-import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.sax.SAXTransformerFactory;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -36,7 +36,7 @@ import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
-public class MCRSaxonTransformerFactoryConfigurationTest {
+public class MCRSaxonConfigurationFileInitializerTest {
 
     private static final String ALLOW_EXTERNAL_FUNCTIONS_ATTRIBUTE =
         "http://saxon.sf.net/feature/allow-external-functions";
@@ -48,34 +48,35 @@ public class MCRSaxonTransformerFactoryConfigurationTest {
             .resolve(relativeConfigurationFile);
         Files.createDirectories(configurationFile.getParent());
         writeSaxonConfiguration(configurationFile);
-        MCRSaxonTransformerFactoryConfiguration configuration = new MCRSaxonTransformerFactoryConfiguration();
-        configuration.setFile(relativeConfigurationFile.toString());
-        TransformerFactory saxonFactory = new net.sf.saxon.TransformerFactoryImpl();
+        MCRSaxonConfigurationFileInitializer initializer = new MCRSaxonConfigurationFileInitializer(
+            relativeConfigurationFile.toString());
+        SAXTransformerFactory saxonFactory = new net.sf.saxon.TransformerFactoryImpl();
 
-        configuration.accept(saxonFactory);
+        initializer.initialize(saxonFactory);
 
         assertEquals(Boolean.FALSE, saxonFactory.getAttribute(ALLOW_EXTERNAL_FUNCTIONS_ATTRIBUTE));
     }
 
     @Test
     public void rejectsMissingConfigurationFile(@TempDir Path temporaryDirectory) {
-        MCRSaxonTransformerFactoryConfiguration configuration = new MCRSaxonTransformerFactoryConfiguration();
-        configuration.setFile(temporaryDirectory.resolve("missing.xml").toString());
-        TransformerFactory saxonFactory = new net.sf.saxon.TransformerFactoryImpl();
+        String missingConfigurationFile = temporaryDirectory.resolve("missing.xml").toString();
+        MCRSaxonConfigurationFileInitializer initializer = new MCRSaxonConfigurationFileInitializer(
+            missingConfigurationFile);
+        SAXTransformerFactory saxonFactory = new net.sf.saxon.TransformerFactoryImpl();
 
-        assertThrows(MCRConfigurationException.class, () -> configuration.accept(saxonFactory));
+        assertThrows(MCRConfigurationException.class, () -> initializer.initialize(saxonFactory));
     }
 
     @Test
     public void reportsUnsupportedFactoryWithoutClaimingThatTheFileCouldNotBeLoaded(@TempDir Path temporaryDirectory)
         throws IOException {
         Path configurationFile = writeSaxonConfiguration(temporaryDirectory.resolve("saxon-config.xml"));
-        MCRSaxonTransformerFactoryConfiguration configuration = new MCRSaxonTransformerFactoryConfiguration();
-        configuration.setFile(configurationFile.toString());
-        TransformerFactory xalanFactory = new MCRXalanTransformerFactory();
+        MCRSaxonConfigurationFileInitializer initializer = new MCRSaxonConfigurationFileInitializer(
+            configurationFile.toString());
+        SAXTransformerFactory xalanFactory = new MCRXalanTransformerFactory();
 
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
-            () -> configuration.accept(xalanFactory));
+            () -> initializer.initialize(xalanFactory));
 
         assertTrue(exception.getMessage().contains("Could not apply Saxon configuration file"));
         assertTrue(exception.getMessage().contains(xalanFactory.getClass().getName()));
