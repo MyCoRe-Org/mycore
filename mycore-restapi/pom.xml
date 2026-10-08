@@ -33,17 +33,6 @@
     <manifest.priority>65</manifest.priority>
     <pmd.failOnViolation>false</pmd.failOnViolation>
   </properties>
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.mycore</groupId>
-        <artifactId>mycore-bom</artifactId>
-        <version>${project.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
   <dependencies>
     <dependency>
       <groupId>com.auth0</groupId>
@@ -143,12 +132,6 @@
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
-      <artifactId>mycore-base</artifactId>
-      <type>test-jar</type>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.mycore</groupId>
       <artifactId>mycore-media</artifactId>
     </dependency>
     <dependency>
@@ -184,5 +167,22 @@
       <artifactId>mockito-core</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.mycore</groupId>
+      <artifactId>mycore-base</artifactId>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-bom</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 </project>
