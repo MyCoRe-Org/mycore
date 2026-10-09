@@ -79,6 +79,16 @@ public class MCRSessionHookFilter implements ContainerRequestFilter, ContainerRe
                         LOGGER.debug("Closing EntityStream done");
                     }
                 }
+
+                @Override
+                protected void handleIOException(IOException exception) throws IOException {
+                    try {
+                        releaseSessionIfNeeded(requestSession);
+                    } catch (RuntimeException cleanupException) {
+                        exception.addSuppressed(cleanupException);
+                    }
+                    throw exception;
+                }
             });
         } else {
             LOGGER.debug("No Entity in response, closing MCRSession");
