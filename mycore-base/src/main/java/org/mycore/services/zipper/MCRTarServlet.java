@@ -20,13 +20,9 @@ package org.mycore.services.zipper;
 
 import java.io.IOException;
 import java.io.Serial;
-import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.niofs.MCRPath;
 
 import jakarta.servlet.ServletOutputStream;
@@ -37,65 +33,46 @@ import jakarta.servlet.ServletOutputStream;
  * This servlet produces TAR files as defined in POSIX.1-2001 standard and UTF-8 encoding for file names.
  * 
  * @author Thomas Scheffler (yagee)
+ * @see MCRTarArchiver
  */
 public class MCRTarServlet extends MCRCompressServlet<TarArchiveOutputStream> {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final MCRTarArchiver ARCHIVER = new MCRTarArchiver();
 
     @Override
     protected void sendCompressedDirectory(MCRPath file, BasicFileAttributes attrs,
         TarArchiveOutputStream container) throws IOException {
-        TarArchiveEntry entry = new TarArchiveEntry(getFilename(file) + '/');
-        entry.setModTime(attrs.lastModifiedTime().toMillis());
-        container.putArchiveEntry(entry);
-        container.closeArchiveEntry();
+        ARCHIVER.sendDirectory(file, attrs, container);
     }
 
     @Override
     protected void sendCompressedFile(MCRPath file, BasicFileAttributes attrs,
         TarArchiveOutputStream container) throws IOException {
-        TarArchiveEntry entry = new TarArchiveEntry(getFilename(file));
-        entry.setModTime(attrs.lastModifiedTime().toMillis());
-        entry.setSize(attrs.size());
-        container.putArchiveEntry(entry);
-        try {
-            Files.copy(file, container);
-        } finally {
-            container.closeArchiveEntry();
-        }
+        ARCHIVER.sendFile(file, attrs, container);
     }
 
     @Override
     protected void sendMetadataCompressed(String fileName, byte[] content, long lastModified,
         TarArchiveOutputStream container) throws IOException {
-        TarArchiveEntry entry = new TarArchiveEntry(fileName);
-        entry.setModTime(lastModified);
-        entry.setSize(content.length);
-        container.putArchiveEntry(entry);
-        container.write(content);
-        container.closeArchiveEntry();
+        ARCHIVER.sendMetadata(fileName, content, lastModified, container);
     }
 
     @Override
     protected String getMimeType() {
-        return "application/x-tar";
+        return ARCHIVER.getMimeType();
     }
 
     @Override
     protected String getFileExtension() {
-        return "tar";
+        return ARCHIVER.getFileExtension();
     }
 
     @Override
     protected TarArchiveOutputStream createContainer(ServletOutputStream sout, String comment) {
-        LOGGER.info("Constructing tar archive: {}", comment);
-        TarArchiveOutputStream tout = new TarArchiveOutputStream(sout, "UTF8");
-        tout.setBigNumberMode(TarArchiveOutputStream.BIGNUMBER_POSIX);
-        tout.setLongFileMode(TarArchiveOutputStream.LONGFILE_POSIX);
-        return tout;
+        return ARCHIVER.createContainer(sout, comment);
     }
 
     @Override

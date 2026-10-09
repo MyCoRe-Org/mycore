@@ -18,14 +18,11 @@
 
 package org.mycore.services.zipper;
 
-import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.Serial;
-import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.zip.Deflater;
 
-import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.mycore.datamodel.niofs.MCRPath;
 
@@ -35,62 +32,46 @@ import jakarta.servlet.ServletOutputStream;
  * Uses ZIP format to deliver requested content.
  * {@link Deflater#BEST_COMPRESSION} is used for compression.
  * @author Thomas Scheffler
+ * @see MCRZipArchiver
  */
 public class MCRZipServlet extends MCRCompressServlet<ZipArchiveOutputStream> {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    private static final MCRZipArchiver ARCHIVER = new MCRZipArchiver();
+
     @Override
     protected void sendCompressedDirectory(MCRPath file, BasicFileAttributes attrs, ZipArchiveOutputStream container)
         throws IOException {
-        ZipArchiveEntry entry = new ZipArchiveEntry(getFilename(file) + "/");
-        entry.setTime(attrs.lastModifiedTime().toMillis());
-        container.putArchiveEntry(entry);
-        container.closeArchiveEntry();
+        ARCHIVER.sendDirectory(file, attrs, container);
     }
 
     @Override
     protected void sendCompressedFile(MCRPath file, BasicFileAttributes attrs, ZipArchiveOutputStream container)
         throws IOException {
-        ZipArchiveEntry entry = new ZipArchiveEntry(getFilename(file));
-        entry.setTime(attrs.lastModifiedTime().toMillis());
-        entry.setSize(attrs.size());
-        container.putArchiveEntry(entry);
-        try {
-            Files.copy(file, container);
-        } finally {
-            container.closeArchiveEntry();
-        }
+        ARCHIVER.sendFile(file, attrs, container);
     }
 
     @Override
     protected void sendMetadataCompressed(String fileName, byte[] content, long lastModified,
         ZipArchiveOutputStream container) throws IOException {
-        ZipArchiveEntry entry = new ZipArchiveEntry(fileName);
-        entry.setSize(content.length);
-        entry.setTime(lastModified);
-        container.putArchiveEntry(entry);
-        container.write(content);
-        container.closeArchiveEntry();
+        ARCHIVER.sendMetadata(fileName, content, lastModified, container);
     }
 
     @Override
     protected String getMimeType() {
-        return "application/zip";
+        return ARCHIVER.getMimeType();
     }
 
     @Override
     protected String getFileExtension() {
-        return "zip";
+        return ARCHIVER.getFileExtension();
     }
 
     @Override
     protected ZipArchiveOutputStream createContainer(ServletOutputStream sout, String comment) {
-        ZipArchiveOutputStream zout = new ZipArchiveOutputStream(new BufferedOutputStream(sout));
-        zout.setComment(comment);
-        zout.setLevel(Deflater.BEST_COMPRESSION);
-        return zout;
+        return ARCHIVER.createContainer(sout, comment);
     }
 
     @Override
