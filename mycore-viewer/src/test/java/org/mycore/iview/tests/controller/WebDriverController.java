@@ -19,16 +19,22 @@
 package org.mycore.iview.tests.controller;
 
 import java.text.MessageFormat;
+import java.time.Duration;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.function.BooleanSupplier;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.common.selenium.drivers.MCRWebdriverWrapper;
+import org.mycore.iview.tests.ViewerTestBase;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 /**
  * @author Sebastian Röher (basti890)
@@ -56,13 +62,60 @@ public class WebDriverController {
     }
 
     /**
+     * Waits for the given condition and returns its result. Since selenium-utils 0.12 the drivers no longer use an
+     * implicit wait, so every lookup of an element that the viewer creates asynchronously has to go through an
+     * explicit wait.
+     */
+    protected <R> R waitFor(ExpectedCondition<R> condition) {
+        long start = System.nanoTime();
+        try {
+            return ((MCRWebdriverWrapper) driver).waitFor(condition);
+        } finally {
+            ViewerTestBase.addWaitTime(Duration.ofNanos(System.nanoTime() - start));
+        }
+    }
+
+    /**
+     * Waits until the given check holds. Use for conditions that are expressed by one of the
+     * <code>assert…</code>/<code>is…</code> methods of a controller instead of by a locator.
+     */
+    protected void waitUntil(String description, BooleanSupplier check) {
+        waitFor(new ExpectedCondition<Boolean>() {
+
+            @Override
+            public Boolean apply(WebDriver ignored) {
+                return check.getAsBoolean() ? Boolean.TRUE : null;
+            }
+
+            @Override
+            public String toString() {
+                return description;
+            }
+        });
+    }
+
+    /**
+     * Waits until an element matching <b>selector</b> is present and returns it.
+     */
+    protected WebElement waitAndFindElement(By selector) {
+        return waitFor(ExpectedConditions.presenceOfElementLocated(selector));
+    }
+
+    /**
+     * Waits until an element matching <b>selector</b> is visible and enabled and returns it.
+     */
+    protected WebElement waitAndFindClickableElement(By selector) {
+        return waitFor(ExpectedConditions.elementToBeClickable(selector));
+    }
+
+    /**
      * clicks the first element specified by <b>xPath</b>
      *
      * @param xpath
      */
     public void clickElementByXpath(String xpath) {
         By selector = By.xpath(xpath);
-        WebElement element = getDriver().findElement(selector);
+        WebElement element = waitAndFindClickableElement(selector);
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Found ''{}'' with selector :''{}''", element.toString(), selector.toString());
@@ -80,7 +133,7 @@ public class WebDriverController {
      */
     public void dragAndDropByXpath(String xPath, int offsetX, int offsetY) {
         By selector = By.xpath(xPath);
-        WebElement element = getDriver().findElement(selector);
+        WebElement element = waitAndFindElement(selector);
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Found ''{}'' with selector :''{}''", element.toString(), selector.toString());
