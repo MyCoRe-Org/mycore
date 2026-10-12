@@ -31,9 +31,6 @@
 
   <xsl:variable name="nbsp" select="'&#xa0;'"/>
 
-  <xsl:import href="resource:xslt/functions/stringutils.xsl" />
-  <xsl:import href="resource:xslt/functions/i18n.xsl" />
-
   <xsl:template mode="mods.type" match="mods:mods">
     <xsl:choose>
       <xsl:when
