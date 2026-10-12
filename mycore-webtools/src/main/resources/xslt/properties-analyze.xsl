@@ -4,7 +4,8 @@
   xmlns:mcri18n="http://www.mycore.de/xslt/i18n"
   exclude-result-prefixes="#all">
 
-    <xsl:include href="resource:xslt/functions/i18n.xsl" />
+    <xsl:include href="resource:xslt/default-parameters.xsl" />
+    <xsl:include href="xslInclude:functions" />
 
     <xsl:template match="properties-analyze">
         <site title="Properties">

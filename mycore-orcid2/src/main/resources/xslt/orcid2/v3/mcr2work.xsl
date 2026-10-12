@@ -9,6 +9,8 @@
   exclude-result-prefixes="#all">
 
   <xsl:import href="resource:xslt/orcid2/v3/mcr2work_generic.xsl" />
+  <xsl:include href="resource:xslt/default-parameters.xsl" />
+  <xsl:include href="xslInclude:functions" />
 
   <xsl:template name="workType">
     <work:type>journal-article</work:type> <!-- TODO -->
