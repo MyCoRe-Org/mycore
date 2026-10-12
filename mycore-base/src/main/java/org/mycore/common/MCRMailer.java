@@ -47,6 +47,9 @@ import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJAXBContent;
 import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.common.content.transformer.MCRContentTransformer;
+import org.mycore.common.content.transformer.MCRContentTransformerFactory;
+import org.mycore.common.content.transformer.MCRParameterizedTransformer;
 import org.mycore.common.content.transformer.MCRXSL2XMLTransformer;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.common.xsl.MCRXSLResourceHelper;
@@ -106,10 +109,16 @@ public class MCRMailer extends MCRServlet {
     @Override
     protected void doGetPost(MCRServletJob job) throws Exception {
         String goTo = job.getRequest().getParameter("goto");
-        String xsl = job.getRequest().getParameter("xsl");
+        String transformerId = job.getRequest().getParameter("transformer");
 
         Document input = (Document) (job.getRequest().getAttribute("MCRXEditorSubmission"));
-        sendMail(input, xsl);
+        if (transformerId != null) {
+            sendMailWithTransformer(input, transformerId);
+        } else {
+            String xsl = job.getRequest().getParameter("xsl");
+            LOGGER.warn("Parameter 'xsl' is deprecated, use 'transformer' with a configured content transformer");
+            sendMail(input, xsl);
+        }
 
         job.getResponse().sendRedirect(goTo);
     }
@@ -476,6 +485,48 @@ public class MCRMailer extends MCRServlet {
     }
 
     /**
+     * Generates e-mail from the given input document by transforming it with the configured content transformer
+     * (MCR.ContentTransformer.{transformerId}), and sends the e-mail afterwards.
+     *
+     * @param input the xml input document
+     * @param transformerId the id of the content transformer that will generate the e-mail
+     * @param parameters the optionally empty table of xsl parameters
+     * @return the generated e-mail
+     * @throws MCRConfigurationException if no content transformer is configured for the given id
+     *
+     * @see org.mycore.common.MCRMailer
+     */
+    public static Element sendMailWithTransformer(Document input, String transformerId,
+        Map<String, String> parameters) throws Exception {
+        MCRContentTransformer transformer = MCRContentTransformerFactory.getTransformer(transformerId);
+        if (transformer == null) {
+            throw new MCRConfigurationException("Content transformer " + transformerId + " is not configured, set "
+                + "MCR.ContentTransformer." + transformerId + ".Stylesheet or .Class");
+        }
+        LOGGER.info("Generating e-mail from {} using content transformer {}", () -> input.getRootElement().getName(),
+            () -> transformerId);
+        if (LOGGER.isDebugEnabled()) {
+            debug(input.getRootElement());
+        }
+        return sendGeneratedMail(transform(input, transformer, parameters).getRootElement());
+    }
+
+    /**
+     * Generates e-mail from the given input document by transforming it with the configured content transformer
+     * (MCR.ContentTransformer.{transformerId}), and sends the e-mail afterwards.
+     *
+     * @param input the xml input document
+     * @param transformerId the id of the content transformer that will generate the e-mail
+     * @return the generated e-mail
+     * @throws MCRConfigurationException if no content transformer is configured for the given id
+     *
+     * @see org.mycore.common.MCRMailer
+     */
+    public static Element sendMailWithTransformer(Document input, String transformerId) throws Exception {
+        return sendMailWithTransformer(input, transformerId, Collections.emptyMap());
+    }
+
+    /**
      * Generates e-mail from the given input document by transforming it with an xsl stylesheet,
      * and sends the e-mail afterwards.
      *
@@ -485,14 +536,36 @@ public class MCRMailer extends MCRServlet {
      * @return the generated e-mail
      *
      * @see org.mycore.common.MCRMailer
+     * @deprecated use {@link #sendMailWithTransformer(Document, String, Map)} with a configured content transformer;
+     *             will be removed in a future release
      */
+    @Deprecated
     public static Element sendMail(Document input, String stylesheet, Map<String, String> parameters) throws Exception {
         LOGGER.info("Generating e-mail from {} using {}.xsl", () -> input.getRootElement().getName(), () -> stylesheet);
         if (LOGGER.isDebugEnabled()) {
             debug(input.getRootElement());
         }
+        return sendGeneratedMail(transform(input, stylesheet, parameters).getRootElement());
+    }
 
-        Element eMail = transform(input, stylesheet, parameters).getRootElement();
+    /**
+     * Generates e-mail from the given input document by transforming it with an xsl stylesheet,
+     * and sends the e-mail afterwards.
+     *
+     * @param input the xml input document
+     * @param stylesheet the xsl stylesheet that will generate the e-mail, without the ending ".xsl"
+     * @return the generated e-mail
+     *
+     * @see org.mycore.common.MCRMailer
+     * @deprecated use {@link #sendMailWithTransformer(Document, String)} with a configured content transformer;
+     *             will be removed in a future release
+     */
+    @Deprecated
+    public static Element sendMail(Document input, String stylesheet) throws Exception {
+        return sendMail(input, stylesheet, Collections.emptyMap());
+    }
+
+    private static Element sendGeneratedMail(Element eMail) throws Exception {
         if (LOGGER.isDebugEnabled()) {
             debug(eMail);
         }
@@ -509,20 +582,6 @@ public class MCRMailer extends MCRServlet {
     }
 
     /**
-     * Generates e-mail from the given input document by transforming it with an xsl stylesheet,
-     * and sends the e-mail afterwards.
-     *
-     * @param input the xml input document
-     * @param stylesheet the xsl stylesheet that will generate the e-mail, without the ending ".xsl"
-     * @return the generated e-mail
-     *
-     * @see org.mycore.common.MCRMailer
-     */
-    public static Element sendMail(Document input, String stylesheet) throws Exception {
-        return sendMail(input, stylesheet, Collections.emptyMap());
-    }
-
-    /**
      * Transforms the given input element using xsl stylesheet.
      *
      * @param input the input document to transform.
@@ -532,12 +591,34 @@ public class MCRMailer extends MCRServlet {
      */
     private static Document transform(Document input, String stylesheet, Map<String, String> parameters)
         throws Exception {
-        MCRJDOMContent source = new MCRJDOMContent(input);
         final String xslFolder = MCRXSLResourceHelper.getXSLFolder();
         MCRXSL2XMLTransformer transformer = MCRXSL2XMLTransformer.obtainInstance(xslFolder + "/" + stylesheet + ".xsl");
-        MCRParameterCollector parameterCollector = MCRParameterCollector.ofCurrentSession();
-        parameterCollector.setParameters(parameters);
-        MCRContent result = transformer.transform(source, parameterCollector);
+        return transform(input, transformer, parameters);
+    }
+
+    /**
+     * Transforms the given input element using a content transformer.
+     *
+     * @param input the input document to transform.
+     * @param transformer the content transformer to use.
+     * @param parameters the optionally empty table of xsl parameters
+     * @return the output document generated by the transformation process
+     */
+    private static Document transform(Document input, MCRContentTransformer transformer,
+        Map<String, String> parameters) throws Exception {
+        MCRJDOMContent source = new MCRJDOMContent(input);
+        MCRContent result;
+        if (transformer instanceof MCRParameterizedTransformer parameterizedTransformer) {
+            MCRParameterCollector parameterCollector = MCRParameterCollector.ofCurrentSession();
+            parameterCollector.setParameters(parameters);
+            result = parameterizedTransformer.transform(source, parameterCollector);
+        } else {
+            if (!parameters.isEmpty()) {
+                LOGGER.warn("Ignoring parameters {}, {} does not support parameters", parameters::keySet,
+                    () -> transformer.getClass().getName());
+            }
+            result = transformer.transform(source);
+        }
         return result.asXML();
     }
 
