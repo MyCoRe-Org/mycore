@@ -23,6 +23,7 @@ import static org.mycore.frontend.jersey.MCRJerseyUtil.APPLICATION_XML_UTF_8;
 import static org.mycore.frontend.jersey.MCRJerseyUtil.TEXT_PLAIN_ISO_8859_1;
 import static org.mycore.frontend.jersey.MCRJerseyUtil.TEXT_PLAIN_UTF_8;
 import static org.mycore.frontend.jersey.MCRJerseyUtil.TEXT_XML_UTF_8;
+import static org.mycore.solr.MCRSolrConstants.SOLR_QUERY_PATH;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,6 +40,7 @@ import org.mycore.solr.MCRSolrIndex;
 import org.mycore.solr.MCRSolrIndexRegistryManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
+import org.mycore.solr.proxy.MCRSolrQueryParameterFilter;
 import org.mycore.solr.search.MCRSolrSearchUtils;
 
 import jakarta.ws.rs.DefaultValue;
@@ -111,6 +113,8 @@ public class MCRRestAPISearch {
         appendListQueryParam(params, "facet.field", facetFields);
         appendQueryParam(params, "json.wrf", jsonWrf);
 
+        MCRSolrQueryParameterFilter.obtainInstance().filter(SOLR_QUERY_PATH, params);
+
         return executeSolrQuery(params, wt);
     }
 
@@ -133,6 +137,7 @@ public class MCRRestAPISearch {
         MCRSolrIndex solrIndex = MCRSolrIndexRegistryManager.requireMainIndex();
         SolrClient client = solrIndex.getClient();
         QueryRequest queryRequest = new QueryRequest(params);
+        queryRequest.setPath(SOLR_QUERY_PATH);
         MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(queryRequest,
             MCRSolrAuthenticationLevel.SEARCH);
 
