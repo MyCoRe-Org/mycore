@@ -5,22 +5,22 @@
  See http://schema.datacite.org/meta/kernel-3/
  ====================================================================== -->
 
-<xsl:stylesheet version="1.0"
+<xsl:stylesheet version="3.0"
   xmlns="http://datacite.org/schema/kernel-3"
-  xmlns:mcrmodsclass="xalan://org.mycore.mods.classification.MCRMODSClassificationSupport"
+  xmlns:mcrmods="http://www.mycore.de/xslt/mods"
+  xmlns:mcrproperty="http://www.mycore.de/xslt/property"
   xmlns:mods="http://www.loc.gov/mods/v3"
-  xmlns:xalan="http://xml.apache.org/xalan"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  exclude-result-prefixes="mods mcrmodsclass mods xalan xsl">
+  exclude-result-prefixes="#all">
 
-  <xsl:include href="coreFunctions.xsl" />
+  <xsl:output method="xml" encoding="UTF-8" indent="yes" />
 
-  <xsl:output method="xml" encoding="UTF-8" indent="yes" xalan:indent-amount="2" />
+  <xsl:mode on-no-match="deep-skip" />
 
-  <xsl:param name="MCR.DOI.Prefix" select="''" />
-  <xsl:param name="MCR.DOI.HostingInstitution" select="''" />
-  <xsl:param name="MCR.DOI.NISSPattern" select="'yyyyMMdd-HHmmss'" />
+  <xsl:template match="/">
+    <xsl:apply-templates />
+  </xsl:template>
 
   <xsl:template match="mycoreobject">
     <xsl:apply-templates select="metadata/def.modsContainer/modsContainer/mods:mods" />
@@ -70,12 +70,13 @@
   </xsl:template>
 
   <xsl:template match="mycoreobject/service/servdates/servdate[@type='createdate']" mode="identifier">
-    <xsl:value-of select="$MCR.DOI.Prefix" />
+    <xsl:variable name="pattern" select="(mcrproperty:one('MCR.DOI.NISSPattern'), 'yyyyMMdd-HHmmss')[1]" />
+    <xsl:variable name="formatISODate"
+      select="string-join(('callJava:org.mycore.common.xml.MCRXMLFunctions:formatISODate',
+        encode-for-uri(.), encode-for-uri($pattern), encode-for-uri($CurrentLang)), ':')" />
+    <xsl:value-of select="mcrproperty:one('MCR.DOI.Prefix')" />
     <xsl:text>/</xsl:text>
-    <xsl:call-template name="formatISODate">
-      <xsl:with-param name="date" select="." />
-      <xsl:with-param name="format" select="$MCR.DOI.NISSPattern" />
-    </xsl:call-template>
+    <xsl:value-of select="document($formatISODate)" />
   </xsl:template>
 
   <!-- ========== titles (1-n) ========== -->
@@ -151,15 +152,10 @@
               <xsl:value-of select="mods:displayForm" />
             </xsl:when>
             <xsl:otherwise>
-              <xsl:variable name="classlink" select="mcrmodsclass:getClassCategParentLink(.)" />
-              <xsl:if test="string-length($classlink) &gt; 0">
-                <xsl:for-each select="document($classlink)/mycoreclass//category[position()=1 or position()=last()]">
-                  <xsl:if test="position() > 1">
-                    <xsl:value-of select="', '" />
-                  </xsl:if>
-                  <xsl:value-of select="./label[lang($CurrentLang)]/@text" />
-                </xsl:for-each>
-              </xsl:if>
+              <!-- labels of the first and last category in the parent path of the classification -->
+              <xsl:variable name="categories"
+                select="mcrmods:to-mycoreclass(., 'parent')//category[position() = 1 or position() = last()]" />
+              <xsl:value-of select="string-join($categories ! string(label[lang($CurrentLang)]/@text), ', ')" />
             </xsl:otherwise>
           </xsl:choose>
         </creatorName>
@@ -173,10 +169,10 @@
     <publisher>
       <xsl:choose>
         <xsl:when test="mods:originInfo[not(@eventType) or @eventType='publication']/mods:publisher">
-          <xsl:value-of select="mods:originInfo[not(@eventType) or @eventType='publication']/mods:publisher" />
+          <xsl:value-of select="(mods:originInfo[not(@eventType) or @eventType='publication']/mods:publisher)[1]" />
         </xsl:when>
         <xsl:otherwise>
-          <xsl:value-of select="$MCR.DOI.HostingInstitution" />
+          <xsl:value-of select="mcrproperty:one('MCR.DOI.HostingInstitution')" />
         </xsl:otherwise>
       </xsl:choose>
     </publisher>
@@ -227,7 +223,7 @@
   <xsl:template name="hostingInstitution">
     <contributor contributorType="HostingInstitution">
       <contributorName>
-        <xsl:value-of select="$MCR.DOI.HostingInstitution" />
+        <xsl:value-of select="mcrproperty:one('MCR.DOI.HostingInstitution')" />
       </contributorName>
     </contributor>
   </xsl:template>
@@ -238,7 +234,7 @@
         <xsl:value-of select="'European Commission'" />
       </contributorName>
       <nameIdentifier nameIdentifierScheme="info">
-        <xsl:value-of select="mods:identifier[@type='project'][contains(text(), 'FP7')]" />
+        <xsl:value-of select="mods:identifier[@type='project'][contains(text(), 'FP7')][1]" />
       </nameIdentifier>
     </contributor>
   </xsl:template>
@@ -266,7 +262,7 @@
   <xsl:template name="language">
     <xsl:if test="mods:language/mods:languageTerm[@authority='rfc5646' and @type='code']">
       <language>
-        <xsl:value-of select="mods:language/mods:languageTerm[@authority='rfc5646' and @type='code']" />
+        <xsl:value-of select="(mods:language/mods:languageTerm[@authority='rfc5646' and @type='code'])[1]" />
       </language>
     </xsl:if>
   </xsl:template>
@@ -275,7 +271,7 @@
 
   <xsl:template name="resourceType">
     <resourceType resourceTypeGeneral="Text">
-      <xsl:value-of select="substring-after(mods:genre/@valueURI, '#')" />
+      <xsl:value-of select="substring-after((mods:genre/@valueURI)[1], '#')" />
     </resourceType>
   </xsl:template>
 
@@ -300,7 +296,8 @@
 
   <xsl:template name="dates">
     <dates>
-      <xsl:apply-templates select="mods:originInfo[not(@eventType) or @eventType='publication']/mods:dateOther|mods:originInfo[not(@eventType) or @eventType='publication']/mods:dateIssued|mods:originInfo[not(@eventType) or @eventType='publication']/mods:dateCreated|mods:originInfo[not(@eventType) or @eventType='publication']/mods:dateModified" />
+      <xsl:apply-templates select="mods:originInfo[not(@eventType) or @eventType='publication']
+        /(mods:dateOther|mods:dateIssued|mods:dateCreated|mods:dateModified)" />
     </dates>
   </xsl:template>
 
@@ -344,7 +341,7 @@
   </xsl:template>
 
   <xsl:template match="mods:identifier[not(@type='doi')]">
-    <alternateIdentifier alternateIdentifierType="{translate(@type,'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')}">
+    <alternateIdentifier alternateIdentifierType="{upper-case(@type)}">
       <xsl:value-of select="." />
     </alternateIdentifier>
   </xsl:template>
@@ -354,9 +351,5 @@
       <xsl:value-of select="." />
     </alternateIdentifier>
   </xsl:template>
-
-  <!-- ========== ignore the rest ========== -->
-
-  <xsl:template match="*|@*" />
 
 </xsl:stylesheet>
