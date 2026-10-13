@@ -25,17 +25,24 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Supplier;
 
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStreamContent;
-import org.mycore.common.content.transformer.MCRXSLTransformer;
+import org.mycore.common.content.transformer.MCRContentTransformer;
+import org.mycore.common.content.transformer.MCRContentTransformerFactory;
 import org.mycore.frontend.fileupload.MCRPostUploadFileProcessor;
 
 public class MCRGoobiMetsPostUploadProcessor extends MCRPostUploadFileProcessor {
 
-    private final MCRXSLTransformer goobiMetsTransformer;
+    private static final String TRANSFORMER_ID = "goobi-mycore-mets";
+
+    private final MCRContentTransformer goobiMetsTransformer;
 
     public MCRGoobiMetsPostUploadProcessor() {
-        goobiMetsTransformer = MCRXSLTransformer.obtainInstance("xsl/goobi-mycore-mets.xsl");
+        goobiMetsTransformer = MCRContentTransformerFactory.getTransformer(TRANSFORMER_ID);
+        if (goobiMetsTransformer == null) {
+            throw new MCRConfigurationException("Content transformer " + TRANSFORMER_ID + " is not configured");
+        }
     }
 
     @Override
