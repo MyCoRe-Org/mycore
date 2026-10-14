@@ -35,10 +35,13 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstance;
 import org.mycore.common.config.annotation.MCRInstanceMap;
+import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.content.transformer.MCRXSLTransformer;
 import org.mycore.common.xsl.MCRParameterCollector;
+import org.mycore.common.xsl.MCRXSLTProcessor;
+import org.mycore.common.xsl.MCRXSLTProcessorSelector;
 import org.mycore.common.xsl.MCRXSLResourceHelper;
 
 /**
@@ -163,7 +166,7 @@ public class MCRXSLStyleURIResolver implements URIResolver {
             String[] stylesheets = augmentStylesheetsPaths(stylesheetPaths.split(","),
                 flavor.xslFolder);
             MCRXSLTransformer transformer =
-                MCRXSLTransformer.obtainInstance(flavor.getTransformerFactory(), stylesheets);
+                MCRXSLTransformer.obtainInstanceByProcessor(flavor.getXSLTProcessorId(), stylesheets);
 
             //prepare parameter collector
             MCRParameterCollector parameterCollector = MCRParameterCollector.ofCurrentSession();
@@ -185,11 +188,11 @@ public class MCRXSLStyleURIResolver implements URIResolver {
     }
 
     /**
-     * Represents a named combination of a {@link TransformerFactory} class and an XSL folder.
+     * Represents a named combination of an XSLT processor ID and an XSL folder.
      */
     public static class Flavor {
 
-        private Class<? extends TransformerFactory> transformerFactory;
+        private String xsltProcessorId;
 
         private String xslFolder;
 
@@ -197,22 +200,69 @@ public class MCRXSLStyleURIResolver implements URIResolver {
 
         }
 
-        public Flavor(Class<? extends TransformerFactory> transformerFactory, String xslFolder) {
-            this.transformerFactory = transformerFactory;
+        public Flavor(String xsltProcessorId, String xslFolder) {
+            this.xsltProcessorId = xsltProcessorId;
             this.xslFolder = xslFolder;
         }
 
+        /**
+         * @deprecated use {@link #Flavor(String, String)} with a configured XSLT processor ID
+         */
+        @Deprecated(forRemoval = true)
+        public Flavor(Class<? extends TransformerFactory> transformerFactory, String xslFolder) {
+            setTransformerFactory(transformerFactory);
+            this.xslFolder = xslFolder;
+        }
+
+        public String getXSLTProcessorId() {
+            return xsltProcessorId;
+        }
+
+        @MCRProperty(name = "XSLTProcessor", required = false, order = 1)
+        public void setXSLTProcessorId(String xsltProcessorId) {
+            this.xsltProcessorId = MCRXSLTProcessorSelector.getProcessorId(xsltProcessorId);
+        }
+
+        /**
+         * @deprecated use {@link #getXSLTProcessorId()}
+         */
+        @Deprecated(forRemoval = true)
         public Class<? extends TransformerFactory> getTransformerFactory() {
-            return transformerFactory;
+            return MCRXSLTProcessor.obtainInstance(xsltProcessorId).getFactoryClass();
         }
 
+        /**
+         * @deprecated use {@link #setXSLTProcessorId(String)}
+         */
+        @Deprecated(forRemoval = true)
+        @SuppressWarnings("removal")
         public void setTransformerFactory(Class<? extends TransformerFactory> transformerFactory) {
-            this.transformerFactory = transformerFactory;
+            this.xsltProcessorId = MCRXSLTProcessorSelector.getProcessorId(transformerFactory);
         }
 
-        @MCRInstance(name = "TransformerFactory", valueClass = TransformerFactory.class)
+        /**
+         * @deprecated configure {@code XSLTProcessor=<id>} instead of {@code TransformerFactory.Class=<class>}
+         */
+        @Deprecated(forRemoval = true)
         public void setTransformerFactoryInstance(TransformerFactory transformerFactory) {
-            this.transformerFactory = transformerFactory.getClass();
+            LOGGER.warn("Class-based transformer factory configuration is deprecated. Configure and reference a "
+                + "XSLT processor ID instead.");
+            setTransformerFactory(transformerFactory.getClass());
+        }
+
+        @MCRPostConstruction
+        public void initialize(String configurationPrefix) {
+            // a legacy class property can only come from an application layer and overrides the MyCoRe default
+            String legacyProperty = configurationPrefix + ".TransformerFactory.Class";
+            MCRConfiguration2.<TransformerFactory>getClass(legacyProperty).ifPresent(factoryClass -> {
+                if (xsltProcessorId != null) {
+                    LOGGER.warn("Configuration property '{}' overrides '{}.XSLTProcessor={}'.",
+                        legacyProperty, configurationPrefix, xsltProcessorId);
+                }
+                LOGGER.warn("Configuration property '{}' is deprecated. Configure and reference an XSLT processor ID "
+                    + "instead.", legacyProperty);
+                setTransformerFactory(factoryClass);
+            });
         }
 
         public String getXslFolder() {
@@ -226,7 +276,7 @@ public class MCRXSLStyleURIResolver implements URIResolver {
 
         @Override
         public String toString() {
-            return "Flavor[transformerFactory=" + transformerFactory + ", xslFolder=" + xslFolder + "]";
+            return "Flavor[xsltProcessorId=" + xsltProcessorId + ", xslFolder=" + xslFolder + "]";
         }
 
     }
@@ -238,7 +288,7 @@ public class MCRXSLStyleURIResolver implements URIResolver {
 
         /**
          * Optional explicit default flavor. If {@code null}, the default flavor is derived
-         * from {@code MCR.LayoutService.TransformerFactoryClass} and
+         * from {@code MCR.LayoutService.XSLTProcessor} and
          * {@link MCRXSLResourceHelper#getXSLFolder()}.
          */
         @MCRInstance(name = "DefaultFlavor", valueClass = Flavor.class, required = false)
@@ -257,10 +307,7 @@ public class MCRXSLStyleURIResolver implements URIResolver {
         }
 
         private Flavor getDefaultFlavor() {
-            Class<? extends TransformerFactory> factory =
-                MCRConfiguration2.<TransformerFactory>getClass("MCR.LayoutService.TransformerFactoryClass")
-                    .orElseGet(TransformerFactory.newInstance()::getClass);
-            return new Flavor(factory, MCRXSLResourceHelper.getXSLFolder());
+            return new Flavor(MCRXSLTProcessorSelector.getDefaultProcessorId(), MCRXSLResourceHelper.getXSLFolder());
         }
 
     }
