@@ -22,9 +22,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRException;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
@@ -33,6 +35,8 @@ import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyNotFoundException;
 import org.mycore.mcr.acl.accesskey.mapper.MCRAccessKeyJsonMapper;
 import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyService;
 import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyUserService;
+import org.mycore.user2.MCRUser;
+import org.mycore.user2.MCRUserManager;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -165,10 +169,41 @@ public class MCRAccessKeyCommands {
      * Cleans up user attributes related to access keys.
      */
     @MCRCommand(syntax = "clean up access key user attributes",
-        help = "Cleans all access key secret attributes of users if the corresponding key does not exist.")
+        help = "Cleans all access key secret attributes of users if the corresponding key does not exist.",
+        order = 10)
     public static void cleanUp() {
         MCRAccessKeyUserService.obtainInstance().cleanUpUserAttributes();
         LOGGER.info("Cleaned up access keys.");
+    }
+
+    /**
+     * Cleans up user attributes for a given user related to access keys.
+     *
+     * @param userWithRealm the user in format {@code user@realm}
+     *
+     * @throws MCRException when {@code userWithRealm} is {@code null} or cannot be parsed into a user and its realm
+     */
+    @MCRCommand(syntax = "clean up access key user attributes for user {0}",
+        help = "Cleans all access key secret attributes of users if the corresponding key does not exist.",
+        order = 5)
+    public static void cleanUp(String userWithRealm) {
+        if (Objects.isNull(userWithRealm)) {
+            throw new MCRException("Parameter providing user and its realm is null.");
+        }
+
+        String[] strings = userWithRealm.split("@");
+        if (strings.length != 2) {
+            throw new MCRException("Could not parse '" + userWithRealm + "' into a user and its realm");
+        }
+
+        MCRUser user = MCRUserManager.getUser(strings[0], strings[1]);
+        if (user == null) {
+            LOGGER.warn("Could not find user {}.", userWithRealm);
+            return;
+        }
+
+        MCRAccessKeyUserService.obtainInstance().cleanUpUserAttributes(user);
+        LOGGER.info("Cleaned up access keys for user {}.", userWithRealm);
     }
 
     /**
