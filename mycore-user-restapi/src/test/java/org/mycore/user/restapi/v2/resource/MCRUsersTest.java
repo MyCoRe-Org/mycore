@@ -19,9 +19,11 @@
 package org.mycore.user.restapi.v2.resource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -38,8 +40,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mycore.restapi.MCRRestConstants;
 import org.mycore.test.MyCoReTest;
+import org.mycore.user.restapi.exception.MCRUserNoLocalPasswordException;
+import org.mycore.user.restapi.exception.MCRUserValidationException;
 import org.mycore.user.restapi.v2.MCRUserService;
 import org.mycore.user.restapi.v2.dto.MCRCreateUserRequest;
+import org.mycore.user.restapi.v2.dto.MCRSetPasswordRequest;
 import org.mycore.user.restapi.v2.dto.MCRUpdateUserRequest;
 import org.mycore.user.restapi.v2.dto.MCRUserDetail;
 import org.mycore.user.restapi.v2.dto.MCRUserStandard;
@@ -50,6 +55,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.fge.jsonpatch.JsonPatch;
 
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -58,7 +64,7 @@ import jakarta.ws.rs.core.UriInfo;
 
 @MyCoReTest
 @ExtendWith(MockitoExtension.class)
-class MCRUsersTest {
+public class MCRUsersTest {
 
     @Mock
     private MCRUserService userService;
@@ -96,6 +102,18 @@ class MCRUsersTest {
 
         assertEquals(201, response.getStatus());
         assertTrue(response.getLocation().toString().endsWith("/alice"));
+    }
+
+    @Test
+    void createUserShouldThrowBadRequestWhenValidationFails() {
+        // Was previously untested at the resource layer for any validation failure; the
+        // service layer is mocked here, so the actual reason for the exception is
+        // irrelevant - this only proves createUser() maps MCRUserValidationException to 400.
+        MCRCreateUserRequest dto = buildCreateUserRequest("me");
+        doThrow(new MCRUserValidationException("id 'me' is reserved and cannot be used"))
+            .when(userService).createUser(dto);
+
+        assertThrows(BadRequestException.class, () -> resource.createUser(dto));
     }
 
     @Test
@@ -193,6 +211,15 @@ class MCRUsersTest {
     }
 
     @Test
+    void updateUserShouldThrowBadRequestWhenPasswordSetForNonLocalRealmUser() {
+        MCRUpdateUserRequest dto = buildUpdateUserRequest();
+        doThrow(new MCRUserNoLocalPasswordException("bob@shibboleth"))
+            .when(userService).updateUser("bob@shibboleth", dto);
+
+        assertThrows(BadRequestException.class, () -> resource.updateUser("bob@shibboleth", dto));
+    }
+
+    @Test
     void patchUserShouldReturn204() throws Exception {
         String patchJson = "[{\"op\":\"replace\",\"path\":\"/name\",\"value\":\"Bob\"}]";
         ObjectMapper realMapper = new ObjectMapper()
@@ -217,6 +244,25 @@ class MCRUsersTest {
 
         assertEquals(204, response.getStatus());
         verify(userService).updateUser("alice", state.toUpdateRequest());
+    }
+
+    @Test
+    void setUserPasswordShouldReturn204() {
+        MCRSetPasswordRequest dto = new MCRSetPasswordRequest("new-secret");
+
+        Response response = resource.setUserPassword("alice", dto);
+
+        assertEquals(204, response.getStatus());
+        verify(userService).setPassword("alice", dto);
+    }
+
+    @Test
+    void setUserPasswordShouldThrowBadRequestWhenUserNotInLocalRealm() {
+        MCRSetPasswordRequest dto = new MCRSetPasswordRequest("new-secret");
+        doThrow(new MCRUserNoLocalPasswordException("bob@shibboleth"))
+            .when(userService).setPassword("bob@shibboleth", dto);
+
+        assertThrows(BadRequestException.class, () -> resource.setUserPassword("bob@shibboleth", dto));
     }
 
     @Test
