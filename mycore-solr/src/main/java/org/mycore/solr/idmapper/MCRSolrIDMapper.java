@@ -18,10 +18,10 @@
 package org.mycore.solr.idmapper;
 
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,8 +31,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.ModifiableSolrParams;
-import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.config.annotation.MCRPropertyList;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.idmapper.MCRDefaultIDMapper;
 import org.mycore.frontend.idmapper.MCRIDMapper;
@@ -55,19 +54,14 @@ public class MCRSolrIDMapper extends MCRDefaultIDMapper implements MCRIDMapper {
 
     private Set<String> derivateSolrFields = Collections.emptySet();
 
-    //property MCR.RestAPI.V2.AlternativeIdentifier.Objects.Keys deprecated in 2024.06
-    @MCRProperty(name = "ObjectSolrFields", required = false,
-        defaultName = "MCR.RestAPI.V2.AlternativeIdentifier.Objects.Keys")
-    public void setObjectSolrFields(String fields) {
-        objectSolrFields = Stream.ofNullable(fields).flatMap(MCRConfiguration2::splitValue).collect(Collectors.toSet());
+    @MCRPropertyList(name = "ObjectSolrFields", required = false)
+    public void setObjectSolrFields(List<String> fields) {
+        objectSolrFields = new HashSet<>(fields);
     }
 
-    //property MCR.RestAPI.V2.AlternativeIdentifier.Derivate.Keys deprecated in 2024.06
-    @MCRProperty(name = "DerivateSolrFields", required = false,
-        defaultName = "MCR.RestAPI.V2.AlternativeIdentifier.Derivates.Keys")
-    public void setDerivateSolrFields(String fields) {
-        derivateSolrFields =
-            Stream.ofNullable(fields).flatMap(MCRConfiguration2::splitValue).collect(Collectors.toSet());
+    @MCRPropertyList(name = "DerivateSolrFields", required = false)
+    public void setDerivateSolrFields(List<String> fields) {
+        derivateSolrFields = new HashSet<>(fields);
     }
 
     @Override
