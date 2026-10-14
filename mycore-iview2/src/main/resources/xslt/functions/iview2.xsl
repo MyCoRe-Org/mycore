@@ -11,4 +11,12 @@
         <xsl:value-of select="count($isCompletelyTiled/true)&gt;0" />
     </xsl:function>
 
+    <!-- Checks availability only; IIIF enforces permissions when serving the image. -->
+    <xsl:function name="mcriview2:has-tiles" as="xs:boolean">
+        <xsl:param name="derivateID" as="xs:string"/>
+        <xsl:param name="path" as="xs:string"/>
+        <xsl:sequence select="exists(document(concat('iview2:hasTiles:', $derivateID, '/',
+            encode-for-uri($path)))/true)"/>
+    </xsl:function>
+
 </xsl:stylesheet>
