@@ -23,7 +23,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mycore.common.config.instantiator.MCRInstanceConfiguration.ofClass;
 import static org.mycore.common.config.instantiator.MCRInstanceConfiguration.ofName;
 
-import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRTestConfiguration;
@@ -33,8 +34,6 @@ import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
 public class MCRInstanceConfigurationTest {
-
-    private static final String TEST_CLASS = TestClass.class.getName();
 
     @Test
     @MCRTestConfiguration(properties = {
@@ -60,9 +59,10 @@ public class MCRInstanceConfigurationTest {
 
         MCRInstanceConfiguration<?> configuration = ofName(Object.class, "Foo.Bar");
 
-        assertEquals("Value1", configuration.properties().get("Key1"));
-        assertEquals("Value2", configuration.properties().get("Key2"));
-        assertEquals(2, configuration.properties().size());
+        Set<String> keySet = configuration.properties().keys().collect(Collectors.toSet());
+        assertEquals("Value1", configuration.properties().nested("Key1").value());
+        assertEquals("Value2", configuration.properties().nested("Key2").value());
+        assertEquals(2, keySet.size());
 
     }
 
@@ -85,13 +85,13 @@ public class MCRInstanceConfigurationTest {
     })
     public void directConfigurationRemovesClassEntry() {
 
-        MCRInstanceConfiguration<?> configuration =
-            ofClass(Object.class, TestClass.class, "Instance");
+        MCRInstanceConfiguration<?> configuration = ofClass(Object.class, TestClass.class, "Instance");
 
-        assertFalse(configuration.properties().containsKey("Class"));
-        assertEquals("ClassValue", configuration.properties().get("class"));
-        assertEquals("ClassValue", configuration.properties().get(""));
-        assertEquals(2, configuration.properties().size());
+        Set<String> keySet = configuration.properties().keys().collect(Collectors.toSet());
+        assertFalse(keySet.contains("Class"));
+        assertEquals("ClassValue", configuration.properties().nested("class").value());
+        assertEquals("ClassValue", configuration.properties().value());
+        assertEquals(1, keySet.size());
 
     }
 
