@@ -1,6 +1,6 @@
 import { App, createApp } from 'vue';
 import router from '@/router';
-import ContactManager from '@/App.vue';
+import AccessKeyManager from '@/App.vue';
 import { createI18n } from 'vue-i18n';
 import { LangApiClient } from '@jsr/mycore__js-common/i18n';
 import { appConfig, accessKeyConfig, I18N_PREFIX } from '@/config/provider';
@@ -8,14 +8,25 @@ import {
   UnauthorizedActionError,
   PermissionError,
 } from '@jsr/mycore__js-common/utils/errors';
+import { AuthStrategy } from '@jsr/mycore__js-common/auth';
+import { createAccessKeyManager } from '@mycore-org/vue-access-key-manager';
 if (import.meta.env.DEV) {
   import('bootstrap/dist/css/bootstrap.min.css');
   import('font-awesome/css/font-awesome.min.css');
 }
 import '@mycore-org/vue-access-key-manager/dist/vue-access-key-manager.css';
-import { AppConfigKey, AccessKeyConfigKey } from './keys';
 
 const APP_ID = 'app';
+
+const devAuthStrategy: AuthStrategy | undefined = import.meta.env.DEV
+  ? new (class implements AuthStrategy {
+      async getHeaders(): Promise<Record<string, string>> {
+        return {
+          Authorization: `Basic ${import.meta.env.VITE_APP_API_TOKEN}`,
+        };
+      }
+    })()
+  : undefined;
 
 const VUE_I18N_PREFIX = 'component.vue.';
 
@@ -65,11 +76,19 @@ const initApp = async () => {
       locale: appConfig.currentLang,
       messages: { [appConfig.currentLang]: translations },
     });
-    const app = createApp(ContactManager);
+    const app = createApp(AccessKeyManager);
     app.use(i18n);
     app.use(router);
-    app.provide(AppConfigKey, appConfig);
-    app.provide(AccessKeyConfigKey, accessKeyConfig);
+    app.use(
+      createAccessKeyManager({
+        baseUrl: appConfig.baseUrl,
+        authStrategy: devAuthStrategy,
+        accessKeyConfig: {
+          allowedSessionPermissions:
+            accessKeyConfig.allowedAccessKeySessionPermissions,
+        },
+      })
+    );
     setErrorHandler(app);
     app.mount(`#${APP_ID}`);
   } catch (error) {
