@@ -18,23 +18,12 @@
 
 package org.mycore.mcr.acl.accesskey.service.processor;
 
-import org.mycore.common.MCRException;
-import org.mycore.crypt.MCRCipherManager;
-import org.mycore.crypt.MCRCryptKeyFileNotFoundException;
-import org.mycore.crypt.MCRCryptKeyNoPermissionException;
-
 /**
  * This {@link MCRAccessKeyCrypSecretProcessor} encrypts the concatenation of reference and secret.
+ *
+ * @deprecated Use {@link MCRAccessKeyCryptSecretProcessor} instead.
  */
-public class MCRAccessKeyCrypSecretProcessor implements MCRAccessKeySecretProcessor {
-
-    @Override
-    public String processSecret(String reference, String secret) {
-        try {
-            return MCRCipherManager.getCipher("accesskey").encrypt(reference + secret);
-        } catch (MCRCryptKeyFileNotFoundException | MCRCryptKeyNoPermissionException e) {
-            throw new MCRException(e);
-        }
-    }
+@Deprecated
+public class MCRAccessKeyCrypSecretProcessor extends MCRAccessKeyCryptSecretProcessor {
 
 }

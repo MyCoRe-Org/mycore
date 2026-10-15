@@ -19,7 +19,7 @@
 package org.mycore.mcr.acl.accesskey.service.processor;
 
 /**
- * This {@link MCRAccessKeyCrypSecretProcessor} leaves the secret unchanged.
+ * This {@link MCRAccessKeyPlainSecretProcessor} leaves the secret unchanged.
  */
 public class MCRAccessKeyPlainSecretProcessor implements MCRAccessKeySecretProcessor {
 
