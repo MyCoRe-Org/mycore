@@ -76,7 +76,7 @@ class MCRIdentifierResolver {
      * @param identifier the identifier's value, e.g. a DOI or ISBN
      * @return the publication data in MODS format, or null if the data source did not return data for this identifier
      */
-    Element resolve(String identifier) {
+    MCRDataSourceResult resolve(String identifier) {
         Object[] params = { identifier, URLEncoder.encode(identifier, StandardCharsets.UTF_8) };
         String uri = new MessageFormat(uriPattern, Locale.ROOT).format(params);
 
@@ -96,7 +96,7 @@ class MCRIdentifierResolver {
 
         try {
             ensureIsValidMODS(resolved);
-            return resolved;
+            return new MCRDataSourceResult(uri, resolved);
         } catch (Exception ex) {
             LOGGER.warn(() -> ds + " returned invalid MODS for " + identifier + ": " + ex.getMessage(), ex);
             return null;

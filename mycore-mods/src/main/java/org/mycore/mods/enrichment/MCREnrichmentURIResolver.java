@@ -21,7 +21,11 @@ package org.mycore.mods.enrichment;
 import javax.xml.transform.Source;
 import javax.xml.transform.URIResolver;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 
@@ -30,6 +34,8 @@ import org.mycore.common.xsl.uriresolver.MCRURIResolver;
  * external data sources via a configured {@link MCREnricher}.
  */
 public class MCREnrichmentURIResolver implements URIResolver {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * Resolves the target URI, enriches the returned MODS element using the specified
@@ -75,7 +81,16 @@ public class MCREnrichmentURIResolver implements URIResolver {
 
     public void enrichPublication(Element mods, String configID) {
         MCREnricher enricher = new MCREnricher(configID);
+        MCRToXMLEnrichmentDebugger debugger = null;
+        if (LOGGER.isDebugEnabled()) {
+            debugger = new MCRToXMLEnrichmentDebugger();
+            enricher.setDebugger(debugger);
+        }
         enricher.enrich(mods);
+        if (LOGGER.isDebugEnabled() && debugger != null) {
+            XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
+            LOGGER.debug(outputter.outputString(debugger.getDebugXML()));
+        }
     }
 
 }

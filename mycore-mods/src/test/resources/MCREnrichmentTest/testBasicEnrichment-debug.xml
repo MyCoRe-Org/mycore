@@ -10,7 +10,7 @@
     <newIdentifiersFound>
       <mods:identifier xmlns:mods="http://www.loc.gov/mods/v3" type="doi">10.123/456</mods:identifier>
     </newIdentifiersFound>
-    <resolved from="DSA">
+    <resolved from="DSA" uri="resource:MCREnrichmentTest/dsa-doi.xml">
       <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
         <mods:note>from data source A</mods:note>
         <mods:identifier type="doi">10.123/456</mods:identifier>
@@ -30,7 +30,7 @@
         </mods:relatedItem>
       </mods:mods>
     </afterMerge>
-    <resolved from="DSB">
+    <resolved from="DSB" uri="resource:MCREnrichmentTest/dsb-doi.xml">
       <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
         <mods:note>from data source B</mods:note>
         <mods:identifier type="doi">10.123/456</mods:identifier>
@@ -71,7 +71,7 @@
       <mods:identifier xmlns:mods="http://www.loc.gov/mods/v3" type="issn">1234-6789</mods:identifier>
       <mods:identifier xmlns:mods="http://www.loc.gov/mods/v3" type="issn">1000-9999</mods:identifier>
     </newIdentifiersFound>
-    <resolved from="DSC">
+    <resolved from="DSC" uri="resource:MCREnrichmentTest/dsc-issn-1234-5678.xml">
       <mods:relatedItem xmlns:mods="http://www.loc.gov/mods/v3" type="host">
         <mods:note>from data source C for ISSN 1234-5678</mods:note>
         <mods:identifier type="issn">1234-5678</mods:identifier>
@@ -87,7 +87,7 @@
         <mods:note>from data source C for ISSN 1234-5678</mods:note>
       </mods:relatedItem>
     </afterMerge>
-    <resolved from="DSC">
+    <resolved from="DSC" uri="resource:MCREnrichmentTest/dsc-issn-1234-6789.xml">
       <mods:relatedItem xmlns:mods="http://www.loc.gov/mods/v3" type="host">
         <mods:note>from data source C for ISSN 1234-6789</mods:note>
         <mods:identifier type="issn">1234-6789</mods:identifier>
