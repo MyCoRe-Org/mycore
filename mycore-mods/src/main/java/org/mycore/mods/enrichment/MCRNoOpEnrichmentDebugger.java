@@ -52,7 +52,7 @@ public class MCRNoOpEnrichmentDebugger implements MCREnrichmentDebugger {
     }
 
     @Override
-    public void debugResolved(String token, Element result) {
+    public void debugResolved(String token, MCRDataSourceResult result) {
         // Do nothing here
     }
 }

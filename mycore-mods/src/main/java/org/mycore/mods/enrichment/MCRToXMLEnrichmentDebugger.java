@@ -62,10 +62,12 @@ public class MCRToXMLEnrichmentDebugger implements MCREnrichmentDebugger {
     }
 
     @Override
-    public void debugResolved(String dataSourceID, Element result) {
-        Element resolved = new Element("resolved").setAttribute("from", dataSourceID);
+    public void debugResolved(String dataSourceID, MCRDataSourceResult result) {
+        Element resolved = new Element("resolved");
+        resolved.setAttribute("from", dataSourceID);
+        resolved.setAttribute("uri", result.uri());
         debugElement.addContent(resolved);
-        resolved.addContent(result.clone());
+        resolved.addContent(result.element().clone());
     }
 
     public Element getDebugXML() {

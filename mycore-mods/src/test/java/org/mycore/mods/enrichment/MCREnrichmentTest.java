@@ -88,7 +88,13 @@ public class MCREnrichmentTest {
         enricher.enrich(publication);
 
         if (debugFile != null) {
+
+
             boolean debugResult = checkXMLResult(debugFile, debugger.getDebugXML());
+
+
+
+
             assertTrue(debugResult);
         } else {
             logXML(debugger.getDebugXML());
