@@ -225,7 +225,7 @@
           <field name="mods.yearIssued.{$type}">
             <xsl:value-of select="substring(.,1,4)" />
           </field>
-	        <xsl:if test="$type='host' and not(ancestor::mods:mods/mods:originInfo[not(@eventType)
+          <xsl:if test="$type='host' and not(ancestor::mods:mods/mods:originInfo[not(@eventType)
 	                                           or @eventType='publication']/mods:dateIssued[@encoding='w3cdtf'])">
             <field name="mods.dateIssued">
               <xsl:value-of select="." />
@@ -233,7 +233,7 @@
             <field name="mods.yearIssued">
               <xsl:value-of select="substring(.,1,4)" />
             </field>
-	        </xsl:if>
+          </xsl:if>
         </xsl:if>
       </xsl:for-each>
       <xsl:for-each select=".//*[@xlink:title|text()]">
