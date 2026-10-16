@@ -39,5 +39,5 @@ public interface MCREnrichmentDebugger {
 
     void debugNewIdentifiers(Set<MCRIdentifier> ids);
 
-    void debugResolved(String token, Element result);
+    void debugResolved(String token, MCRDataSourceResult result);
 }

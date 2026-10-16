@@ -10,7 +10,7 @@
     <newIdentifiersFound>
       <mods:identifier xmlns:mods="http://www.loc.gov/mods/v3" type="foo">2</mods:identifier>
     </newIdentifiersFound>
-    <resolved from="DSMA">
+    <resolved from="DSMA" uri="resource:MCREnrichmentTest/dsma.xml">
       <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
         <mods:note>from data source A</mods:note>
       </mods:mods>
@@ -22,7 +22,7 @@
         <mods:note>from data source A</mods:note>
       </mods:mods>
     </afterMerge>
-    <resolved from="DSMC">
+    <resolved from="DSMC" uri="resource:MCREnrichmentTest/dsmc-2.xml">
       <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
         <mods:note>from data source C</mods:note>
         <mods:identifier type="foo">2</mods:identifier>
@@ -37,7 +37,7 @@
         <mods:note>from data source C</mods:note>
       </mods:mods>
     </afterMerge>
-    <resolved from="DSMD">
+    <resolved from="DSMD" uri="resource:MCREnrichmentTest/dsmd.xml">
       <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
         <mods:note>from data source D</mods:note>
       </mods:mods>

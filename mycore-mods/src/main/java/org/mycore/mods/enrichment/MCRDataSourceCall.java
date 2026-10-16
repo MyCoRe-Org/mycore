@@ -24,7 +24,6 @@ import java.util.concurrent.Callable;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jdom2.Element;
 
 /**
  * Used to request publication data from a given data source,
@@ -46,11 +45,11 @@ class MCRDataSourceCall implements Callable<Boolean> {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private MCRDataSource ds;
+    private final MCRDataSource ds;
 
-    private MCRIdentifierPool idPool;
+    private final MCRIdentifierPool idPool;
 
-    private List<Element> results = new ArrayList<>();
+    private final List<MCRDataSourceResult> results = new ArrayList<>();
 
     private boolean gotResults;
 
@@ -75,11 +74,11 @@ class MCRDataSourceCall implements Callable<Boolean> {
                     }
 
                     LOGGER.debug(() -> ds + " with " + id + " starting call...");
-                    Element result = idResolver.resolve(id.getValue());
+                    MCRDataSourceResult result = idResolver.resolve(id.getValue());
                     if (result != null) {
                         gotResults = true;
                         results.add(result);
-                        idPool.addIdentifiersFrom(result);
+                        idPool.addIdentifiersFrom(result.element());
                     }
 
                     LOGGER.info(() -> ds + " with " + id + " returned " + (result != null ? "" : "no ") + "valid data");
@@ -98,7 +97,7 @@ class MCRDataSourceCall implements Callable<Boolean> {
         return ds.shouldStopOnFirstResult() && wasSuccessful();
     }
 
-    List<Element> getResults() {
+    List<MCRDataSourceResult> getResults() {
         return results;
     }
 
