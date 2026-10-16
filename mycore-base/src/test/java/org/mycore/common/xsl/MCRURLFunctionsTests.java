@@ -20,6 +20,8 @@ package org.mycore.common.xsl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -116,6 +118,24 @@ public class MCRURLFunctionsTests {
     @DisplayName("mcrurl:del-param")
     public void testDelParam(String queryUrl, String param, String expected) throws Exception {
         assertEquals(URL_PREFIX + expected, delParam(URL_PREFIX + queryUrl, param));
+    }
+
+    @ParameterizedTest(name = "[{index}] {0} → \"{1}\"")
+    @CsvSource(delimiter = '|', value = {
+        "abc-XYZ_09.|abc-XYZ_09.",
+        "a b|a+b",
+        "a+b=c|a%2Bb%3Dc",
+        "x^2 * y~z|x%5E2+*+y%7Ez",
+        "100%|100%25",
+        "%20|%2520",
+        "\\frac{1}{2}|%5Cfrac%7B1%7D%7B2%7D",
+        "äß€|%C3%A4%C3%9F%E2%82%AC",
+        "''|''"
+    })
+    @DisplayName("mcrurl:url-encode")
+    public void testUrlEncode(String value, String expected) throws Exception {
+        assertEquals(expected, callFunction("url-encode", Map.of(VALUE_PARAM_NAME, value)));
+        assertEquals(expected, URLEncoder.encode(value, StandardCharsets.UTF_8));
     }
 
     private String getParam(String url, String param) throws TransformerException {

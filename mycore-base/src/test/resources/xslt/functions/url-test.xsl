@@ -25,6 +25,9 @@
         <xsl:when test="$fn-name = 'del-param'">
           <xsl:value-of select="mcrurl:del-param($url, $par)" />
         </xsl:when>
+        <xsl:when test="$fn-name = 'url-encode'">
+          <xsl:value-of select="mcrurl:url-encode($value)" />
+        </xsl:when>
         <xsl:otherwise>
           <xsl:message terminate="yes">
             Unknown function: <xsl:value-of select="$fn-name" />
