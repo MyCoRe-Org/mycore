@@ -184,7 +184,7 @@ public class MCRAccessKeyCommands {
      * @throws MCRException when {@code userWithRealm} is {@code null} or cannot be parsed into a user and its realm
      */
     @MCRCommand(syntax = "clean up access key user attributes for user {0}",
-        help = "Cleans all access key secret attributes of users if the corresponding key does not exist.",
+        help = "Cleans all access key secret attributes of an user if the corresponding key does not exist.",
         order = 5)
     public static void cleanUp(String userWithRealm) {
         if (Objects.isNull(userWithRealm)) {
@@ -198,8 +198,7 @@ public class MCRAccessKeyCommands {
 
         MCRUser user = MCRUserManager.getUser(strings[0], strings[1]);
         if (user == null) {
-            LOGGER.warn("Could not find user {}.", userWithRealm);
-            return;
+            throw new MCRException("Could not find user " + userWithRealm);
         }
 
         MCRAccessKeyUserService.obtainInstance().cleanUpUserAttributes(user);
