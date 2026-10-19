@@ -63,7 +63,7 @@
                   <xsl:choose>
                     <xsl:when test="$dernumber = 1">
                       <xsl:value-of select="concat($WebApplicationBaseURL,'api/v2/objects/',$mycoreobject/@ID,
-                        '/derivates/',$ifs/der/@id,'/archive/zip')" />
+                        '/derivates/',$ifs/der/@id,'/contents.zip')" />
                     </xsl:when>
                     <xsl:otherwise>
                       <xsl:value-of select="concat($ServletsBaseURL,'MCRZipServlet/',/mycoreobject/@ID)" />
