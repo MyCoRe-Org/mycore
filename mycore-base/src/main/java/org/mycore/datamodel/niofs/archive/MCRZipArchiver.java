@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.services.zipper;
+package org.mycore.datamodel.niofs.archive;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -35,14 +35,24 @@ import org.mycore.datamodel.niofs.MCRPath;
  */
 public class MCRZipArchiver extends MCRArchiver<ZipArchiveOutputStream> {
 
+    /**
+     * The mime type of the archive format.
+     */
+    public static final String MIME_TYPE = "application/zip";
+
+    /**
+     * The file extension of the archive format (without a leading dot).
+     */
+    public static final String FILE_EXTENSION = "zip";
+
     @Override
     public String getMimeType() {
-        return "application/zip";
+        return MIME_TYPE;
     }
 
     @Override
     public String getFileExtension() {
-        return "zip";
+        return FILE_EXTENSION;
     }
 
     @Override

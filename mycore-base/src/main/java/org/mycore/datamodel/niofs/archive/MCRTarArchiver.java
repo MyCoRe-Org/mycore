@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.services.zipper;
+package org.mycore.datamodel.niofs.archive;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -36,16 +36,26 @@ import org.mycore.datamodel.niofs.MCRPath;
  */
 public class MCRTarArchiver extends MCRArchiver<TarArchiveOutputStream> {
 
+    /**
+     * The mime type of the archive format.
+     */
+    public static final String MIME_TYPE = "application/x-tar";
+
+    /**
+     * The file extension of the archive format (without a leading dot).
+     */
+    public static final String FILE_EXTENSION = "tar";
+
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     public String getMimeType() {
-        return "application/x-tar";
+        return MIME_TYPE;
     }
 
     @Override
     public String getFileExtension() {
-        return "tar";
+        return FILE_EXTENSION;
     }
 
     @Override
