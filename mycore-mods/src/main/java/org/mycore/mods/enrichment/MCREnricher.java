@@ -25,6 +25,7 @@ import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -34,6 +35,9 @@ import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
+import org.mycore.common.MCRException;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.mods.MCRMODSSorter;
 import org.mycore.mods.merger.MCRMergeTool;
@@ -89,6 +93,21 @@ import org.mycore.util.concurrent.MCRTransactionableCallable;
 public class MCREnricher {
 
     private static final Logger LOGGER = LogManager.getLogger();
+
+    private static final String CONFIG_PREFIX = "MCR.MODS.EnrichmentResolver.";
+
+    /**
+     * Maximum number of concurrently running virtual threads for datasource resolution.
+     * A value of {@code 0} means one virtual thread per datasource call.
+     */
+    private static final int MAX_VIRTUAL_THREADS = MCRConfiguration2
+        .getInt(CONFIG_PREFIX + "MaxVirtualThreads").orElse(0);
+
+    /**
+     * Timeout in milliseconds for resolving all datasource calls. A value of {@code 0} means no timeout.
+     */
+    private static final long RESOLVE_TIMEOUT_MILLIS = MCRConfiguration2
+        .getLong(CONFIG_PREFIX + "ResolveTimeout").orElse(0L);
 
     private static final String XPATH_HOST_SERIES = "mods:relatedItem[@type='host' or @type='series']";
 
@@ -156,15 +175,26 @@ public class MCREnricher {
     }
 
     private void resolveExternalData() {
+        MCRSession enricherSession = MCRSessionMgr.getCurrentSession();
+
         Collection<MCRTransactionableCallable<Boolean>> calls = id2call.values()
             .stream()
-            .map(MCRTransactionableCallable::new)
+            .map(call -> new MCRTransactionableCallable<Boolean>(call, enricherSession))
             .collect(Collectors.toList());
-        ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
+
+        ExecutorService executor = MAX_VIRTUAL_THREADS == 0 ?
+                                   Executors.newVirtualThreadPerTaskExecutor() :
+                                   Executors.newFixedThreadPool(MAX_VIRTUAL_THREADS, Thread.ofVirtual().factory());
         try {
-            executor.invokeAll(calls);
+            if (RESOLVE_TIMEOUT_MILLIS == 0) {
+                executor.invokeAll(calls);
+            } else {
+                executor.invokeAll(calls, RESOLVE_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+            }
         } catch (InterruptedException ex) {
             LOGGER.warn(ex);
+            Thread.currentThread().interrupt();
+            throw new MCRException("Enrichment failed with timeout of " + RESOLVE_TIMEOUT_MILLIS + " ms: ", ex);
         } finally {
             executor.shutdown();
         }
