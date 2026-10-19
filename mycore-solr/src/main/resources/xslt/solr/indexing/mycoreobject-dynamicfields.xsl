@@ -7,8 +7,6 @@
   
   <xsl:import href="xslImport:solr-document:solr/indexing/mycoreobject-dynamicfields.xsl" />
 
-  <xsl:import href="resource:xslt/functions/solr.xsl" />
-
   <xsl:param name="MCR.Solr.DynamicFields" select="'false'" />
   <xsl:param name="MCR.Solr.DynamicFields.excludes" select="''" />
 

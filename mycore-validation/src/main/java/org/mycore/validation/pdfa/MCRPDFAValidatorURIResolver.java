@@ -31,7 +31,11 @@ import org.w3c.dom.Document;
 
 /**
  * {@link URIResolver} that validates PDF/A files in a given derivate and returns the results as XML.
+ *
+ * @deprecated Validating while a document is transformed can take long enough to time out the request. Use
+ *             {@link MCRPDFAReportURIResolver} instead, which reads reports that were produced asynchronously.
  */
+@Deprecated
 public class MCRPDFAValidatorURIResolver implements URIResolver {
 
     /**

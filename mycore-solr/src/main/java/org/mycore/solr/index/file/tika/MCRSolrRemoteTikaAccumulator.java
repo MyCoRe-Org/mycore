@@ -130,6 +130,7 @@ public class MCRSolrRemoteTikaAccumulator implements MCRSolrFileIndexAccumulator
         } catch (Exception e) {
             hasError = true;
             errorMessage = Objects.requireNonNullElse(e.getMessage(), e.getClass().getSimpleName());
+            LOGGER.error("Error extracting text from {} using Tika", filePath, e);
         } finally {
             LOGGER.debug("Extracted text from {} using Tika in {}ms", () -> filePath,
                 () -> System.currentTimeMillis() - start);
