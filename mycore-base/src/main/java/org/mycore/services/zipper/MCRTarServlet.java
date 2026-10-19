@@ -18,10 +18,15 @@
 
 package org.mycore.services.zipper;
 
+import java.io.IOException;
 import java.io.Serial;
+import java.nio.file.attribute.BasicFileAttributes;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
+import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.archive.MCRTarArchiver;
+
+import jakarta.servlet.ServletOutputStream;
 
 /**
  * Uses TAR format to deliver requested content.
@@ -39,8 +44,40 @@ public class MCRTarServlet extends MCRCompressServlet<TarArchiveOutputStream> {
     private static final MCRTarArchiver ARCHIVER = new MCRTarArchiver();
 
     @Override
-    protected MCRTarArchiver getArchiver() {
-        return ARCHIVER;
+    protected void sendCompressedDirectory(MCRPath file, BasicFileAttributes attrs,
+        TarArchiveOutputStream container) throws IOException {
+        ARCHIVER.sendDirectory(file, attrs, container);
     }
 
+    @Override
+    protected void sendCompressedFile(MCRPath file, BasicFileAttributes attrs,
+        TarArchiveOutputStream container) throws IOException {
+        ARCHIVER.sendFile(file, attrs, container);
+    }
+
+    @Override
+    protected void sendMetadataCompressed(String fileName, byte[] content, long lastModified,
+        TarArchiveOutputStream container) throws IOException {
+        ARCHIVER.sendMetadata(fileName, content, lastModified, container);
+    }
+
+    @Override
+    protected String getMimeType() {
+        return ARCHIVER.getMimeType();
+    }
+
+    @Override
+    protected String getFileExtension() {
+        return ARCHIVER.getFileExtension();
+    }
+
+    @Override
+    protected TarArchiveOutputStream createContainer(ServletOutputStream sout, String comment) {
+        return ARCHIVER.createContainer(sout, comment);
+    }
+
+    @Override
+    protected void disposeContainer(TarArchiveOutputStream container) throws IOException {
+        container.finish();
+    }
 }

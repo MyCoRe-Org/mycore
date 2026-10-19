@@ -25,8 +25,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serial;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.MessageFormat;
 import java.util.Date;
@@ -35,7 +38,6 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.compress.archivers.ArchiveOutputStream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
@@ -81,7 +83,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author Thomas Scheffler (yagee)
  *
  */
-public abstract class MCRCompressServlet<T extends ArchiveOutputStream<?>> extends MCRServlet {
+public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRServlet {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -156,8 +158,8 @@ public abstract class MCRCompressServlet<T extends ArchiveOutputStream<?>> exten
             MCRISO8601Date mcriso8601Date = new MCRISO8601Date();
             mcriso8601Date.setDate(new Date());
             String comment = "Created by " + requestURL + " at " + mcriso8601Date.getISOString();
-            try (T container = getArchiver().createContainer(sout, comment)) {
-                job.getResponse().setContentType(getArchiver().getMimeType());
+            try (T container = createContainer(sout, comment)) {
+                job.getResponse().setContentType(getMimeType());
                 String filename = getFileName(id, path);
                 job.getResponse().addHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"");
                 if (id.getTypeId().equals(MCRDerivate.OBJECT_TYPE)) {
@@ -165,7 +167,7 @@ public abstract class MCRCompressServlet<T extends ArchiveOutputStream<?>> exten
                 } else {
                     sendObject(id, job, container);
                 }
-                container.finish();
+                disposeContainer(container);
             }
         }
     }
@@ -179,7 +181,7 @@ public abstract class MCRCompressServlet<T extends ArchiveOutputStream<?>> exten
         long lastModified = MCRXMLMetadataManager.obtainInstance().getLastModified(id);
         HttpServletRequest req = job.getRequest();
         byte[] metaDataContent = getMetaDataContent(content, req);
-        getArchiver().sendMetadata("metadata.xml", metaDataContent, lastModified, container);
+        sendMetadataCompressed("metadata.xml", metaDataContent, lastModified, container);
 
         // zip all derivates
         List<Element> li = content.asXML().getRootElement().getChild(MCRObjectStructure.XML_NAME)
@@ -226,21 +228,20 @@ public abstract class MCRCompressServlet<T extends ArchiveOutputStream<?>> exten
 
         if (Files.isRegularFile(resolvedPath)) {
             BasicFileAttributes attrs = Files.readAttributes(resolvedPath, BasicFileAttributes.class);
-            getArchiver().sendFile(resolvedPath, attrs, container);
+            sendCompressedFile(resolvedPath, attrs, container);
             LOGGER.debug("file {} zipped", resolvedPath);
             return;
         }
         // root is a directory
-        getArchiver().sendTree(resolvedPath, container);
+        Files.walkFileTree(resolvedPath, new CompressVisitor<>(this, container));
     }
 
     private String getFileName(MCRObjectID id, String path) {
         if (path == null || path.equals("")) {
-            return new MessageFormat("{0}.{1}", Locale.ROOT)
-                .format(new Object[] { id, getArchiver().getFileExtension() });
+            return new MessageFormat("{0}.{1}", Locale.ROOT).format(new Object[] { id, getFileExtension() });
         } else {
             return new MessageFormat("{0}-{1}.{2}", Locale.ROOT).format(
-                new Object[] { id, path.replaceAll("/", "-"), getArchiver().getFileExtension() });
+                new Object[] { id, path.replaceAll("/", "-"), getFileExtension() });
         }
     }
 
@@ -252,9 +253,46 @@ public abstract class MCRCompressServlet<T extends ArchiveOutputStream<?>> exten
         return MCRArchiver.getEntryName(path);
     }
 
-    /**
-     * Returns the archiver that writes the archive format of this servlet.
-     */
-    protected abstract MCRArchiver<T> getArchiver();
+    protected abstract void sendCompressedDirectory(MCRPath file, BasicFileAttributes attrs, T container)
+        throws IOException;
+
+    protected abstract void sendCompressedFile(MCRPath file, BasicFileAttributes attrs, T container) throws IOException;
+
+    protected abstract void sendMetadataCompressed(String fileName, byte[] content, long modified, T container)
+        throws IOException;
+
+    protected abstract String getMimeType();
+
+    protected abstract String getFileExtension();
+
+    protected abstract T createContainer(ServletOutputStream sout, String comment);
+
+    protected abstract void disposeContainer(T container) throws IOException;
+
+    private static class CompressVisitor<T extends AutoCloseable> extends SimpleFileVisitor<Path> {
+
+        private MCRCompressServlet<T> impl;
+
+        private T container;
+
+        CompressVisitor(MCRCompressServlet<T> impl, T container) {
+            this.impl = impl;
+            this.container = container;
+        }
+
+        @Override
+        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+            impl.sendCompressedDirectory(MCRPath.ofPath(dir), attrs, container);
+            return super.preVisitDirectory(dir, attrs);
+        }
+
+        @Override
+        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+            impl.sendCompressedFile(MCRPath.ofPath(file), attrs, container);
+            LOGGER.debug("file {} zipped", file);
+            return super.visitFile(file, attrs);
+        }
+
+    }
 
 }

@@ -18,11 +18,16 @@
 
 package org.mycore.services.zipper;
 
+import java.io.IOException;
 import java.io.Serial;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.zip.Deflater;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
+import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.archive.MCRZipArchiver;
+
+import jakarta.servlet.ServletOutputStream;
 
 /**
  * Uses ZIP format to deliver requested content.
@@ -38,8 +43,40 @@ public class MCRZipServlet extends MCRCompressServlet<ZipArchiveOutputStream> {
     private static final MCRZipArchiver ARCHIVER = new MCRZipArchiver();
 
     @Override
-    protected MCRZipArchiver getArchiver() {
-        return ARCHIVER;
+    protected void sendCompressedDirectory(MCRPath file, BasicFileAttributes attrs, ZipArchiveOutputStream container)
+        throws IOException {
+        ARCHIVER.sendDirectory(file, attrs, container);
     }
 
+    @Override
+    protected void sendCompressedFile(MCRPath file, BasicFileAttributes attrs, ZipArchiveOutputStream container)
+        throws IOException {
+        ARCHIVER.sendFile(file, attrs, container);
+    }
+
+    @Override
+    protected void sendMetadataCompressed(String fileName, byte[] content, long lastModified,
+        ZipArchiveOutputStream container) throws IOException {
+        ARCHIVER.sendMetadata(fileName, content, lastModified, container);
+    }
+
+    @Override
+    protected String getMimeType() {
+        return ARCHIVER.getMimeType();
+    }
+
+    @Override
+    protected String getFileExtension() {
+        return ARCHIVER.getFileExtension();
+    }
+
+    @Override
+    protected ZipArchiveOutputStream createContainer(ServletOutputStream sout, String comment) {
+        return ARCHIVER.createContainer(sout, comment);
+    }
+
+    @Override
+    protected void disposeContainer(ZipArchiveOutputStream container) throws IOException {
+        container.finish();
+    }
 }
