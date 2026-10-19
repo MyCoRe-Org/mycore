@@ -90,7 +90,7 @@
     <xsl:value-of select="text()" />
   </xsl:template>
 
-  <xsl:template match="mods:abstract[fn:string-length(text()) &gt; 0]">
+  <xsl:template match="mods:abstract[normalize-space(.) != '' and not(preceding-sibling::mods:abstract[normalize-space(.) != ''])]">
     <work:short-description>
       <xsl:value-of select="mcrstring:shorten(text(), ($short-description-max-length - 1), '…')"/>
     </work:short-description>
