@@ -32,7 +32,9 @@ import java.io.UncheckedIOException;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.SecureDirectoryStream;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -48,6 +50,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import org.apache.commons.compress.archivers.ArchiveOutputStream;
 import org.apache.commons.io.output.CountingOutputStream;
 import org.apache.commons.io.output.DeferredFileOutputStream;
 import org.apache.logging.log4j.LogManager;
@@ -66,6 +69,9 @@ import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 import org.mycore.frontend.jersey.MCRCacheControl;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
+import org.mycore.services.zipper.MCRArchiver;
+import org.mycore.services.zipper.MCRTarArchiver;
+import org.mycore.services.zipper.MCRZipArchiver;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -96,6 +102,7 @@ import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.StreamingOutput;
 import jakarta.ws.rs.core.UriInfo;
 import jakarta.ws.rs.core.Variant;
 import jakarta.xml.bind.annotation.XmlAccessType;
@@ -107,6 +114,16 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 @Path("/objects/{" + PARAM_MCRID + "}/derivates/{" + PARAM_DERID + "}/contents{" + PARAM_DER_PATH + ":(/[^/]+)*}")
 public class MCRRestDerivateContents {
     private static final String HTTP_HEADER_IS_DIRECTORY = "X-MCR-IsDirectory";
+
+    private static final MediaType MEDIA_TYPE_ZIP = new MediaType("application", "zip");
+
+    private static final MediaType MEDIA_TYPE_TAR = new MediaType("application", "x-tar");
+
+    private static final Map<MediaType, MCRArchiver<?>> ARCHIVERS = Map.of(MEDIA_TYPE_ZIP, new MCRZipArchiver(),
+        MEDIA_TYPE_TAR, new MCRTarArchiver());
+
+    private static final List<Variant> DIRECTORY_VARIANTS = Variant.mediaTypes(MediaType.APPLICATION_XML_TYPE,
+        MediaType.APPLICATION_JSON_TYPE, MEDIA_TYPE_ZIP, MEDIA_TYPE_TAR).build();
 
     @Context
     ContainerRequestContext request;
@@ -319,11 +336,15 @@ public class MCRRestDerivateContents {
 
     @GET
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON + ";charset=UTF-8",
-        MediaType.WILDCARD })
+        "application/zip", "application/x-tar", MediaType.WILDCARD })
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     @Operation(
         summary = "List directory contents or serves file given by {path} in derivate",
+        description = "If {path} is a directory, the response depends on the Accept header: application/xml or "
+            + "application/json list the directory, application/zip or application/x-tar deliver all files of "
+            + "the directory as archive. For the whole derivate the archive formats can also be requested with "
+            + "the file extensions 'contents.zip' and 'contents.tar'.",
         tags = MCRRestUtils.TAG_MYCORE_FILE)
     public Response getFileOrDirectory(@Context UriInfo uriInfo, @Context HttpHeaders requestHeader) {
         MCRRestDerivates.validateDerivateRelation(mcrId, derid);
@@ -342,6 +363,11 @@ public class MCRRestDerivateContents {
         }
         Date lastModified = new Date(fileAttributes.lastModifiedTime().toMillis());
         if (fileAttributes.isDirectory()) {
+            Variant variant = request.getRequest().selectVariant(DIRECTORY_VARIANTS);
+            MCRArchiver<?> archiver = variant == null ? null : ARCHIVERS.get(variant.getMediaType());
+            if (archiver != null) {
+                return serveArchive(mcrPath, archiver);
+            }
             return MCRRestUtils
                 .getCachedResponse(request.getRequest(), lastModified)
                 .orElseGet(() -> serveDirectory(mcrPath, fileAttributes));
@@ -487,6 +513,57 @@ public class MCRRestDerivateContents {
         return ((!"true".equalsIgnoreCase(headers.getFirst(HTTP_HEADER_IS_DIRECTORY))))
             && !request.getUriInfo().getPath().endsWith("/")
             && (headers.containsKey(HttpHeaders.CONTENT_LENGTH) || headers.containsKey("Transfer-Encoding"));
+    }
+
+    private <T extends ArchiveOutputStream<?>> Response serveArchive(MCRPath dir, MCRArchiver<T> archiver) {
+        Date lastModified = getLastModified(dir);
+        Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request.getRequest(), lastModified);
+        if (cachedResponse.isPresent()) {
+            return cachedResponse.get();
+        }
+        String comment = "Created by " + request.getUriInfo().getRequestUri() + " at " + lastModified.toInstant();
+        StreamingOutput stream = out -> {
+            try (T container = archiver.createContainer(out, comment)) {
+                archiver.sendTree(dir, container);
+                container.finish();
+            }
+        };
+        String fileName = path.isEmpty() ? derid.toString() : derid + path.replace('/', '-');
+        return Response.ok(stream, archiver.getMimeType())
+            .lastModified(lastModified)
+            .header(HttpHeaders.CONTENT_DISPOSITION,
+                "attachment; filename=\"" + fileName + "." + archiver.getFileExtension() + "\"")
+            .build();
+    }
+
+    /**
+     * Returns the latest modification date of the given directory and all files and directories below.
+     */
+    private Date getLastModified(MCRPath dir) {
+        long[] lastModified = { 0 };
+        try {
+            Files.walkFileTree(dir, new SimpleFileVisitor<>() {
+                @Override
+                public FileVisitResult preVisitDirectory(java.nio.file.Path d, BasicFileAttributes attrs) {
+                    lastModified[0] = Math.max(lastModified[0], attrs.lastModifiedTime().toMillis());
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult visitFile(java.nio.file.Path file, BasicFileAttributes attrs) {
+                    lastModified[0] = Math.max(lastModified[0], attrs.lastModifiedTime().toMillis());
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        } catch (IOException e) {
+            throw MCRErrorResponse.ofStatusCode(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
+                .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_FILE_IO_ERROR)
+                .withMessage("Could not read files of " + dir + ".")
+                .withDetail(e.getMessage())
+                .withCause(e)
+                .toException();
+        }
+        return new Date(lastModified[0]);
     }
 
     private Response serveDirectory(MCRPath mcrPath, MCRFileAttributes dirAttrs) {
