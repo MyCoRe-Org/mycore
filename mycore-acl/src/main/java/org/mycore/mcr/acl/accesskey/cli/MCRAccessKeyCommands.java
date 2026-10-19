@@ -187,9 +187,7 @@ public class MCRAccessKeyCommands {
         help = "Cleans all access key secret attributes of an user if the corresponding key does not exist.",
         order = 5)
     public static void cleanUp(String userWithRealm) {
-        if (Objects.isNull(userWithRealm)) {
-            throw new MCRException("Parameter providing user and its realm is null.");
-        }
+        Objects.requireNonNull(userWithRealm, "Parameter providing user and its realm is null");
 
         String[] strings = userWithRealm.split("@");
         if (strings.length != 2) {
