@@ -67,7 +67,7 @@ public final class MCRInstanceConfiguration<S> {
         this.superClass = superClass;
         this.valueClass = valueClass;
         this.name = name;
-        this.properties = properties;
+        this.properties = properties.excludeKey(CLASS_KEY);
         this.fullProperties = fullProperties;
     }
 
@@ -197,7 +197,7 @@ public final class MCRInstanceConfiguration<S> {
     private static <S> Class<? extends S> resolveValueClass(Class<S> superClass, MCRInstanceName name,
         MCRProperTree properties, Set<Option> options) {
 
-        String className = properties.classValue();
+        String className = properties.nested(CLASS_KEY).value();
         if (className != null) {
             try {
                 return MCRClassTools.forName(className);

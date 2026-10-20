@@ -116,8 +116,7 @@ abstract sealed class MCRSourceBase<Result> implements MCRSource permits MCRValu
 
     protected abstract Result missingResultReplacement();
 
-    protected final boolean rejectedBySentinel(MCRSourceContext context,
-        MCRProperTree properties) {
+    protected final boolean rejectedBySentinel(MCRSourceContext context, MCRProperTree properties) {
 
         if (sentinel != null) {
             boolean sentinelValue = sentinel.defaultValue();
@@ -138,6 +137,10 @@ abstract sealed class MCRSourceBase<Result> implements MCRSource permits MCRValu
 
         return false;
 
+    }
+
+    protected final MCRProperTree filterProperties(MCRProperTree properties) {
+        return sentinel != null ? properties.excludeKey(sentinel.name()) : properties;
     }
 
 }

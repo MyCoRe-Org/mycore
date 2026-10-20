@@ -28,6 +28,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRSentinel;
 import org.mycore.common.config.instantiator.MCRProperTree;
+import org.mycore.common.config.instantiator.MCRPropertiesTree;
 
 /**
  * A {@link MCRValueListSourceBase} is a base implementation of {@link MCRSource} that
@@ -59,7 +60,7 @@ abstract sealed class MCRValueListSourceBase<Value> extends MCRSourceBase<List<V
             MCRSourceContext nestedContext = context.nested(key, elementDescription);
             MCRProperTree nestedProperties = properties.nested(key);
             if (!rejectedBySentinel(nestedContext, nestedProperties)) {
-                Value value = extractor.toValue(nestedContext, nestedProperties, fullProperties);
+                Value value = extractor.toValue(nestedContext, filterProperties(nestedProperties), fullProperties);
                 if (value != null) {
                     if (key.charAt(0) == '-') {
                         negativeKeyCount++;
@@ -75,7 +76,7 @@ abstract sealed class MCRValueListSourceBase<Value> extends MCRSourceBase<List<V
             int shortFormIndex = 0;
             for (String shortFormValue : parseShortFormList(shortFormProperty)) {
                 MCRSourceContext indexContext = context.withHint("at index " + shortFormIndex);
-                Value value = extractor.toValue(indexContext, MCRProperTree.of(shortFormValue), fullProperties);
+                Value value = extractor.toValue(indexContext, MCRPropertiesTree.of(shortFormValue), fullProperties);
                 if (value != null) {
                     shortFormList.add(value);
                 }
