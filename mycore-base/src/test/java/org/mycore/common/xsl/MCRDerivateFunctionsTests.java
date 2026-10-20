@@ -29,6 +29,7 @@ import javax.xml.transform.TransformerException;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -54,6 +55,11 @@ public class MCRDerivateFunctionsTests {
         MCRMockResolver.clearCalls();
         MCRMockResolver.setResultSource(null);
         MCRURIResolver.obtainInstance().reinitialize();
+    }
+
+    @AfterEach
+    public void tearDown() throws Exception {
+        MCRMockResolver.clearCalls();
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
