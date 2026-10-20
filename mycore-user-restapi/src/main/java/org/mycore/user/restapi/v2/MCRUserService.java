@@ -27,6 +27,7 @@ import org.mycore.user.restapi.exception.MCRUserAlreadyExistsException;
 import org.mycore.user.restapi.exception.MCRUserLockedException;
 import org.mycore.user.restapi.exception.MCRUserNoLocalPasswordException;
 import org.mycore.user.restapi.exception.MCRUserNotFoundException;
+import org.mycore.user.restapi.exception.MCRUserPasswordNotAllowedException;
 import org.mycore.user.restapi.exception.MCRUserValidationException;
 import org.mycore.user.restapi.exception.MCRUserWrongPasswordException;
 import org.mycore.user.restapi.v2.dto.MCRChangePasswordRequest;
@@ -88,6 +89,7 @@ public class MCRUserService {
      * @throws MCRUserValidationException if the user data is invalid
      */
     public MCRUserDetail createUser(MCRCreateUserRequest createUserRequest) {
+        requireRequest(createUserRequest);
         validateCreateRequest(createUserRequest);
         MCRUser owner = Optional.ofNullable(createUserRequest.owner()).map(this::getUserOrThrow).orElse(null);
         MCRUser user = userDtoMapper.toDomain(createUserRequest, owner);
@@ -183,9 +185,12 @@ public class MCRUserService {
      * @throws MCRUserNotFoundException if no user with the given ID exists
      * @throws MCRUserNoLocalPasswordException if a password was given and the user is not in
      *         the local realm
+     * @throws MCRUserPasswordNotAllowedException if a password was given and the caller is not
+     *         permitted to write it
      * @throws MCRUserValidationException if the updated user data is invalid
      */
     public MCRUserDetail updateUser(String userId, MCRUpdateUserRequest updateUserRequest) {
+        requireRequest(updateUserRequest);
         validateUpdateRequest(updateUserRequest);
         MCRUser user = getUserOrThrow(userId);
         if (updateUserRequest.password() != null) {
@@ -195,11 +200,11 @@ public class MCRUserService {
         MCRUser updated = userDtoMapper.applyUpdate(user, updateUserRequest, owner);
         try {
             MCRUserManager.updateUser(updated);
-            if (updateUserRequest.password() != null) {
-                MCRUserManager.setPassword(updated, updateUserRequest.password());
-            }
         } catch (MCRException e) {
             throw new MCRUserValidationException(user.getUserName(), e.getMessage(), e);
+        }
+        if (updateUserRequest.password() != null) {
+            writePassword(updated, updateUserRequest.password());
         }
         MCRUser fresh = getUserOrThrow(updated.getUserID());
         return userDtoMapper.toDetail(fresh, getOwns(fresh));
@@ -217,6 +222,7 @@ public class MCRUserService {
      * @see MCRUpdateUserProfileRequest
      */
     public MCRUserDetail updateUser(String userId, MCRUpdateUserProfileRequest updateUserRequest) {
+        requireRequest(updateUserRequest);
         validateName(updateUserRequest.name());
         validateEmail(updateUserRequest.email());
         MCRUser user = getUserOrThrow(userId);
@@ -242,17 +248,16 @@ public class MCRUserService {
      * @param setPasswordRequest the request containing the new password
      * @throws MCRUserNotFoundException if no user with the given ID exists
      * @throws MCRUserNoLocalPasswordException if the user is not in the local realm
+     * @throws MCRUserPasswordNotAllowedException if the caller is not permitted to write the
+     *         password
      * @throws MCRUserValidationException if the new password is invalid
      */
     public void setPassword(String userId, MCRSetPasswordRequest setPasswordRequest) {
+        requireRequest(setPasswordRequest);
         validatePassword(setPasswordRequest.newPassword());
         MCRUser user = getUserOrThrow(userId);
         requireLocalRealm(user);
-        try {
-            MCRUserManager.setPassword(user, setPasswordRequest.newPassword());
-        } catch (MCRException e) {
-            throw new MCRUserValidationException(userId, e.getMessage(), e);
-        }
+        writePassword(user, setPasswordRequest.newPassword());
     }
 
     /**
@@ -264,28 +269,32 @@ public class MCRUserService {
      * @param userId the ID of the user whose password should be changed
      * @param changePasswordRequest the request containing the current and new password
      * @throws MCRUserNotFoundException if no user with the given ID exists
-     * @throws MCRUserLockedException if the user is locked or disabled
+     * @throws MCRUserLockedException if the user is locked, disabled or expired
      * @throws MCRUserNoLocalPasswordException if the user is not in the local realm, or has no
      *         locally stored password to verify against
      * @throws MCRUserWrongPasswordException if the current password does not match
+     * @throws MCRUserPasswordNotAllowedException if the caller is not permitted to write the
+     *         password
      * @throws MCRUserValidationException if the new password is invalid
      */
     public void changePassword(String userId, MCRChangePasswordRequest changePasswordRequest) {
+        requireRequest(changePasswordRequest);
         MCRUser user = getUserOrThrow(userId);
         requireNotLocked(user);
         requireLocalRealm(user);
         if (user.getHashType() == null) {
             throw new MCRUserNoLocalPasswordException(userId);
         }
+        // checkPassword also returns null for expired users, which must not be reported as a
+        // wrong password
+        if (!user.loginAllowed()) {
+            throw new MCRUserLockedException(userId);
+        }
         if (MCRUserManager.checkPassword(user.getUserID(), changePasswordRequest.oldPassword()) == null) {
             throw new MCRUserWrongPasswordException(userId);
         }
         validatePassword(changePasswordRequest.newPassword());
-        try {
-            MCRUserManager.setPassword(user, changePasswordRequest.newPassword());
-        } catch (MCRException e) {
-            throw new MCRUserValidationException(userId, e.getMessage(), e);
-        }
+        writePassword(user, changePasswordRequest.newPassword());
     }
 
     /**
@@ -338,6 +347,31 @@ public class MCRUserService {
     private static void requireNotLocked(MCRUser user) {
         if (user.isLocked() || user.isDisabled()) {
             throw new MCRUserLockedException(user.getUserID());
+        }
+    }
+
+    /**
+     * Writes the password of the given user.
+     * <p>
+     * {@link MCRUserManager#setPassword} signals a missing permission with a plain
+     * {@link MCRException}; all input validation has already happened at this point.
+     *
+     * @param user the user whose password should be written
+     * @param password the new password
+     * @throws MCRUserPasswordNotAllowedException if the caller is not permitted to write the
+     *         password
+     */
+    private static void writePassword(MCRUser user, String password) {
+        try {
+            MCRUserManager.setPassword(user, password);
+        } catch (MCRException e) {
+            throw new MCRUserPasswordNotAllowedException(user.getUserID(), e);
+        }
+    }
+
+    private static void requireRequest(Object request) {
+        if (request == null) {
+            throw new MCRUserValidationException("request body is required");
         }
     }
 

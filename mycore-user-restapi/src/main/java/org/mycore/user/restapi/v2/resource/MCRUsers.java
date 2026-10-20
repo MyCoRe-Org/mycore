@@ -21,6 +21,7 @@ package org.mycore.user.restapi.v2.resource;
 import static org.mycore.restapi.v2.MCRRestStatusCode.BAD_REQUEST;
 import static org.mycore.restapi.v2.MCRRestStatusCode.CONFLICT;
 import static org.mycore.restapi.v2.MCRRestStatusCode.CREATED;
+import static org.mycore.restapi.v2.MCRRestStatusCode.FORBIDDEN;
 import static org.mycore.restapi.v2.MCRRestStatusCode.NOT_FOUND;
 import static org.mycore.restapi.v2.MCRRestStatusCode.NO_CONTENT;
 import static org.mycore.restapi.v2.MCRRestStatusCode.OK;
@@ -42,6 +43,7 @@ import org.mycore.restapi.v2.annotation.MCRRestRequiredPermission;
 import org.mycore.user.restapi.exception.MCRUserAlreadyExistsException;
 import org.mycore.user.restapi.exception.MCRUserNoLocalPasswordException;
 import org.mycore.user.restapi.exception.MCRUserNotFoundException;
+import org.mycore.user.restapi.exception.MCRUserPasswordNotAllowedException;
 import org.mycore.user.restapi.exception.MCRUserValidationException;
 import org.mycore.user.restapi.v2.MCRUserObjectMapper;
 import org.mycore.user.restapi.v2.MCRUserService;
@@ -73,6 +75,7 @@ import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.PATCH;
@@ -120,6 +123,7 @@ public class MCRUsers {
     static final String TAG_MCR_USER = "mcr_user";
     private static final String DESC_USER_NOT_FOUND = "User not found";
     static final String DESC_INVALID_BODY_CONTENT = "Invalid body";
+    private static final String DESC_PASSWORD_NOT_ALLOWED = "Caller is not permitted to change the password";
 
     @Context
     private UriInfo uriInfo;
@@ -369,6 +373,8 @@ public class MCRUsers {
      * @throws NotFoundException if no user with the given ID exists
      * @throws BadRequestException if the user data is invalid, or a password was given and the
      *         user is not in the local realm
+     * @throws ForbiddenException if a password was given and the caller is not permitted to
+     *         change it
      */
     @Operation(
         summary = "Updates an existing user by ID",
@@ -391,6 +397,11 @@ public class MCRUsers {
                 content = @Content(mediaType = MediaType.TEXT_PLAIN),
                 description = DESC_INVALID_BODY_CONTENT
             ),
+            @ApiResponse(
+                responseCode = FORBIDDEN,
+                content = @Content(mediaType = MediaType.TEXT_PLAIN),
+                description = DESC_PASSWORD_NOT_ALLOWED
+            ),
             @ApiResponse(responseCode = NO_CONTENT, description = "User successfully updated"),
         },
         tags = TAG_MCR_USER
@@ -408,6 +419,8 @@ public class MCRUsers {
             throw new NotFoundException(e);
         } catch (MCRUserValidationException | MCRUserNoLocalPasswordException e) {
             throw new BadRequestException(e);
+        } catch (MCRUserPasswordNotAllowedException e) {
+            throw new ForbiddenException(e);
         }
     }
 
@@ -454,6 +467,9 @@ public class MCRUsers {
     @MCRRequireTransaction
     @MCRRestRequiredPermission(PERMISSION_MANAGE_USER)
     public Response patchUser(@PathParam(PARAM_USER_ID) String userId, JsonPatch patch) {
+        if (patch == null) {
+            throw new BadRequestException("request body is required");
+        }
         try {
             MCRUserDetail existing = userService.getUserDetail(userId);
             JsonNode userNode = objectMapper.valueToTree(existing);
@@ -481,6 +497,7 @@ public class MCRUsers {
      * @return 204 No Content
      * @throws NotFoundException if no user with the given ID exists
      * @throws BadRequestException if the new password is invalid
+     * @throws ForbiddenException if the caller is not permitted to change the password
      */
     @Operation(
         summary = "Sets the password of an existing user",
@@ -503,6 +520,11 @@ public class MCRUsers {
                 content = @Content(mediaType = MediaType.TEXT_PLAIN),
                 description = DESC_INVALID_BODY_CONTENT
             ),
+            @ApiResponse(
+                responseCode = FORBIDDEN,
+                content = @Content(mediaType = MediaType.TEXT_PLAIN),
+                description = DESC_PASSWORD_NOT_ALLOWED
+            ),
             @ApiResponse(responseCode = NO_CONTENT, description = "Password successfully set"),
         },
         tags = TAG_MCR_USER
@@ -520,6 +542,8 @@ public class MCRUsers {
             throw new NotFoundException(e);
         } catch (MCRUserValidationException | MCRUserNoLocalPasswordException e) {
             throw new BadRequestException(e);
+        } catch (MCRUserPasswordNotAllowedException e) {
+            throw new ForbiddenException(e);
         }
     }
 

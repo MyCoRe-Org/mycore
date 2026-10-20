@@ -38,9 +38,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mycore.common.MCRException;
 import org.mycore.restapi.MCRRestConstants;
 import org.mycore.test.MyCoReTest;
 import org.mycore.user.restapi.exception.MCRUserNoLocalPasswordException;
+import org.mycore.user.restapi.exception.MCRUserPasswordNotAllowedException;
 import org.mycore.user.restapi.exception.MCRUserValidationException;
 import org.mycore.user.restapi.v2.MCRUserService;
 import org.mycore.user.restapi.v2.dto.MCRCreateUserRequest;
@@ -56,6 +58,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.fge.jsonpatch.JsonPatch;
 
 import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -263,6 +266,29 @@ public class MCRUsersTest {
             .when(userService).setPassword("bob@shibboleth", dto);
 
         assertThrows(BadRequestException.class, () -> resource.setUserPassword("bob@shibboleth", dto));
+    }
+
+    @Test
+    void setUserPasswordShouldThrowForbiddenWhenPasswordNotAllowed() {
+        MCRSetPasswordRequest dto = new MCRSetPasswordRequest("new-secret");
+        doThrow(new MCRUserPasswordNotAllowedException("alice", new MCRException("not allowed")))
+            .when(userService).setPassword("alice", dto);
+
+        assertThrows(ForbiddenException.class, () -> resource.setUserPassword("alice", dto));
+    }
+
+    @Test
+    void updateUserShouldThrowForbiddenWhenPasswordNotAllowed() {
+        MCRUpdateUserRequest dto = buildUpdateUserRequest();
+        doThrow(new MCRUserPasswordNotAllowedException("alice", new MCRException("not allowed")))
+            .when(userService).updateUser("alice", dto);
+
+        assertThrows(ForbiddenException.class, () -> resource.updateUser("alice", dto));
+    }
+
+    @Test
+    void patchUserShouldThrowBadRequestWhenPatchNull() {
+        assertThrows(BadRequestException.class, () -> resource.patchUser("alice", null));
     }
 
     @Test

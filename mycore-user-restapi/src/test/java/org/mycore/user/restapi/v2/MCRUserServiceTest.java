@@ -44,6 +44,7 @@ import org.mycore.user.restapi.exception.MCRUserAlreadyExistsException;
 import org.mycore.user.restapi.exception.MCRUserLockedException;
 import org.mycore.user.restapi.exception.MCRUserNoLocalPasswordException;
 import org.mycore.user.restapi.exception.MCRUserNotFoundException;
+import org.mycore.user.restapi.exception.MCRUserPasswordNotAllowedException;
 import org.mycore.user.restapi.exception.MCRUserValidationException;
 import org.mycore.user.restapi.exception.MCRUserWrongPasswordException;
 import org.mycore.user.restapi.v2.dto.MCRChangePasswordRequest;
@@ -551,7 +552,7 @@ public class MCRUserServiceTest {
     }
 
     @Test
-    void setPasswordShouldThrowValidationExceptionWhenMCRExceptionOccurs() {
+    void setPasswordShouldThrowPasswordNotAllowedWhenMCRExceptionOccurs() {
         MCRUser user = mock(MCRUser.class);
         MCRRealm localRealm = mock(MCRRealm.class);
         when(user.getRealm()).thenReturn(localRealm);
@@ -563,8 +564,79 @@ public class MCRUserServiceTest {
             mgr.when(() -> MCRUserManager.setPassword(user, "new-secret"))
                 .thenThrow(new MCRException("not allowed"));
 
-            assertThrows(MCRUserValidationException.class,
+            assertThrows(MCRUserPasswordNotAllowedException.class,
                 () -> userService.setPassword("alice", new MCRSetPasswordRequest("new-secret")));
+        }
+    }
+
+    @Test
+    void setPasswordShouldThrowValidationExceptionWhenRequestNull() {
+        assertThrows(MCRUserValidationException.class, () -> userService.setPassword("alice", null));
+    }
+
+    @Test
+    void changePasswordShouldThrowValidationExceptionWhenRequestNull() {
+        assertThrows(MCRUserValidationException.class, () -> userService.changePassword("alice", null));
+    }
+
+    @Test
+    void createUserShouldThrowValidationExceptionWhenRequestNull() {
+        assertThrows(MCRUserValidationException.class, () -> userService.createUser(null));
+    }
+
+    @Test
+    void updateUserShouldThrowValidationExceptionWhenRequestNull() {
+        assertThrows(MCRUserValidationException.class,
+            () -> userService.updateUser("alice", (MCRUpdateUserRequest) null));
+    }
+
+    @Test
+    void updateUserWithOwnRequestShouldThrowValidationExceptionWhenRequestNull() {
+        assertThrows(MCRUserValidationException.class,
+            () -> userService.updateUser("alice", (MCRUpdateUserProfileRequest) null));
+    }
+
+    @Test
+    void changePasswordShouldThrowLockedWhenUserExpired() {
+        // checkPassword returns null for expired users; that must not surface as a wrong password
+        MCRUser user = mock(MCRUser.class);
+        MCRRealm localRealm = mock(MCRRealm.class);
+        when(user.getRealm()).thenReturn(localRealm);
+        when(user.getHashType()).thenReturn("sha256");
+        when(user.loginAllowed()).thenReturn(false);
+
+        try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class);
+            MockedStatic<MCRRealmFactory> realmFactory = mockStatic(MCRRealmFactory.class)) {
+            realmFactory.when(MCRRealmFactory::getLocalRealm).thenReturn(localRealm);
+            mgr.when(() -> MCRUserManager.getUser("alice")).thenReturn(user);
+
+            assertThrows(MCRUserLockedException.class,
+                () -> userService.changePassword("alice", new MCRChangePasswordRequest("old-secret", "new-secret")));
+
+            mgr.verify(() -> MCRUserManager.checkPassword(any(), any()), never());
+            mgr.verify(() -> MCRUserManager.setPassword(any(), any()), never());
+        }
+    }
+
+    @Test
+    void changePasswordShouldThrowPasswordNotAllowedWhenMCRExceptionOccurs() {
+        MCRUser user = mock(MCRUser.class);
+        MCRRealm localRealm = mock(MCRRealm.class);
+        when(user.getRealm()).thenReturn(localRealm);
+        when(user.getUserID()).thenReturn("alice");
+        when(user.getHashType()).thenReturn("sha256");
+        when(user.loginAllowed()).thenReturn(true);
+
+        try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class);
+            MockedStatic<MCRRealmFactory> realmFactory = mockStatic(MCRRealmFactory.class)) {
+            realmFactory.when(MCRRealmFactory::getLocalRealm).thenReturn(localRealm);
+            mgr.when(() -> MCRUserManager.getUser("alice")).thenReturn(user);
+            mgr.when(() -> MCRUserManager.checkPassword("alice", "old-secret")).thenReturn(user);
+            mgr.when(() -> MCRUserManager.setPassword(user, "new-secret"))
+                .thenThrow(new MCRException("not allowed"));
+
+            assertThrows(MCRUserPasswordNotAllowedException.class,
+                () -> userService.changePassword("alice", new MCRChangePasswordRequest("old-secret", "new-secret")));
         }
     }
 
@@ -575,6 +647,7 @@ public class MCRUserServiceTest {
         when(user.getRealm()).thenReturn(localRealm);
         when(user.getUserID()).thenReturn("alice");
         when(user.getHashType()).thenReturn("sha256");
+        when(user.loginAllowed()).thenReturn(true);
 
         try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class);
             MockedStatic<MCRRealmFactory> realmFactory = mockStatic(MCRRealmFactory.class)) {
@@ -595,6 +668,7 @@ public class MCRUserServiceTest {
         when(user.getRealm()).thenReturn(localRealm);
         when(user.getUserID()).thenReturn("alice");
         when(user.getHashType()).thenReturn("sha256");
+        when(user.loginAllowed()).thenReturn(true);
 
         try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class);
             MockedStatic<MCRRealmFactory> realmFactory = mockStatic(MCRRealmFactory.class)) {
