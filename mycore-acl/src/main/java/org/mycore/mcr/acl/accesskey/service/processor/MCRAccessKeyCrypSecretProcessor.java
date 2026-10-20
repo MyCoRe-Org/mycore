@@ -23,7 +23,7 @@ package org.mycore.mcr.acl.accesskey.service.processor;
  *
  * @deprecated Use {@link MCRAccessKeyCryptSecretProcessor} instead.
  */
-@Deprecated
+@Deprecated(forRemoval = true)
 public class MCRAccessKeyCrypSecretProcessor extends MCRAccessKeyCryptSecretProcessor {
 
 }
