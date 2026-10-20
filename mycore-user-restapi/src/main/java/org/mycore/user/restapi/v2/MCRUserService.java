@@ -277,7 +277,7 @@ public class MCRUserService {
         if (user.getHashType() == null) {
             throw new MCRUserNoLocalPasswordException(userId);
         }
-        if (MCRUserManager.checkPassword(user.getUserName(), changePasswordRequest.oldPassword()) == null) {
+        if (MCRUserManager.checkPassword(user.getUserID(), changePasswordRequest.oldPassword()) == null) {
             throw new MCRUserWrongPasswordException(userId);
         }
         validatePassword(changePasswordRequest.newPassword());

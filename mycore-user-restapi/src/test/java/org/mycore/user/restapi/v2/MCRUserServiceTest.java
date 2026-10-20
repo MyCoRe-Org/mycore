@@ -571,7 +571,7 @@ public class MCRUserServiceTest {
     @Test
     void changePasswordShouldSucceedWhenOldPasswordCorrect() {
         MCRUser user = mock(MCRUser.class);
-        when(user.getUserName()).thenReturn("alice");
+        when(user.getUserID()).thenReturn("alice");
         when(user.getHashType()).thenReturn("sha256");
 
         try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class)) {
@@ -587,7 +587,7 @@ public class MCRUserServiceTest {
     @Test
     void changePasswordShouldThrowWrongPasswordWhenOldPasswordIncorrect() {
         MCRUser user = mock(MCRUser.class);
-        when(user.getUserName()).thenReturn("alice");
+        when(user.getUserID()).thenReturn("alice");
         when(user.getHashType()).thenReturn("sha256");
 
         try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class)) {
@@ -598,6 +598,25 @@ public class MCRUserServiceTest {
                 () -> userService.changePassword("alice", new MCRChangePasswordRequest("wrong", "new-secret")));
 
             mgr.verify(() -> MCRUserManager.setPassword(any(), any()), never());
+        }
+    }
+
+    @Test
+    void changePasswordShouldCheckPasswordByQualifiedUserIdForNonLocalRealmUser() {
+        // checkPassword resolves a bare user name against the LOCAL realm, so passing
+        // getUserName() would verify the password of a different (local) account.
+        MCRUser user = mock(MCRUser.class);
+        when(user.getUserID()).thenReturn("alice@ldap");
+        when(user.getHashType()).thenReturn("sha256");
+
+        try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class)) {
+            mgr.when(() -> MCRUserManager.getUser("alice@ldap")).thenReturn(user);
+            mgr.when(() -> MCRUserManager.checkPassword("alice@ldap", "old-secret")).thenReturn(user);
+
+            userService.changePassword("alice@ldap", new MCRChangePasswordRequest("old-secret", "new-secret"));
+
+            mgr.verify(() -> MCRUserManager.checkPassword("alice@ldap", "old-secret"));
+            mgr.verify(() -> MCRUserManager.setPassword(user, "new-secret"));
         }
     }
 
