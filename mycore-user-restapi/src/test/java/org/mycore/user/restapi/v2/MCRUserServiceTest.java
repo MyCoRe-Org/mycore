@@ -41,6 +41,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mycore.common.MCRException;
 import org.mycore.test.MyCoReTest;
 import org.mycore.user.restapi.exception.MCRUserAlreadyExistsException;
+import org.mycore.user.restapi.exception.MCRUserLockedException;
 import org.mycore.user.restapi.exception.MCRUserNoLocalPasswordException;
 import org.mycore.user.restapi.exception.MCRUserNotFoundException;
 import org.mycore.user.restapi.exception.MCRUserValidationException;
@@ -623,6 +624,51 @@ public class MCRUserServiceTest {
 
             assertThrows(MCRUserNotFoundException.class,
                 () -> userService.changePassword("ghost", new MCRChangePasswordRequest("old", "new-secret")));
+        }
+    }
+
+    @Test
+    void changePasswordShouldThrowLockedWhenUserLocked() {
+        MCRUser user = mock(MCRUser.class);
+        when(user.isLocked()).thenReturn(true);
+
+        try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class)) {
+            mgr.when(() -> MCRUserManager.getUser("alice")).thenReturn(user);
+
+            assertThrows(MCRUserLockedException.class,
+                () -> userService.changePassword("alice", new MCRChangePasswordRequest("old-secret", "new-secret")));
+
+            mgr.verify(() -> MCRUserManager.setPassword(any(), any()), never());
+        }
+    }
+
+    @Test
+    void updateUserWithOwnRequestShouldThrowLockedWhenUserLocked() {
+        MCRUpdateUserProfileRequest request = new MCRUpdateUserProfileRequest("Alice", "alice@example.com", null);
+        MCRUser user = mock(MCRUser.class);
+        when(user.isLocked()).thenReturn(true);
+
+        try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class)) {
+            mgr.when(() -> MCRUserManager.getUser("alice")).thenReturn(user);
+
+            assertThrows(MCRUserLockedException.class, () -> userService.updateUser("alice", request));
+
+            mgr.verify(() -> MCRUserManager.updateUser(any()), never());
+        }
+    }
+
+    @Test
+    void updateUserWithOwnRequestShouldThrowLockedWhenUserDisabled() {
+        MCRUpdateUserProfileRequest request = new MCRUpdateUserProfileRequest("Alice", "alice@example.com", null);
+        MCRUser user = mock(MCRUser.class);
+        when(user.isDisabled()).thenReturn(true);
+
+        try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class)) {
+            mgr.when(() -> MCRUserManager.getUser("alice")).thenReturn(user);
+
+            assertThrows(MCRUserLockedException.class, () -> userService.updateUser("alice", request));
+
+            mgr.verify(() -> MCRUserManager.updateUser(any()), never());
         }
     }
 

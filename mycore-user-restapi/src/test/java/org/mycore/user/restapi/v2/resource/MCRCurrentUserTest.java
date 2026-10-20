@@ -38,6 +38,7 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.test.MyCoReTest;
+import org.mycore.user.restapi.exception.MCRUserLockedException;
 import org.mycore.user.restapi.exception.MCRUserNoLocalPasswordException;
 import org.mycore.user.restapi.exception.MCRUserNotFoundException;
 import org.mycore.user.restapi.exception.MCRUserValidationException;
@@ -182,6 +183,25 @@ public class MCRCurrentUserTest {
             .when(userService).changePassword("alice", dto);
 
         assertThrows(ForbiddenException.class, () -> resource.changePassword(dto));
+    }
+
+    @Test
+    void changePasswordShouldThrowForbiddenWhenUserLocked() {
+        MCRChangePasswordRequest dto = new MCRChangePasswordRequest("old-secret", "new-secret");
+        setCurrentUser("alice");
+        doThrow(new MCRUserLockedException("alice"))
+            .when(userService).changePassword("alice", dto);
+
+        assertThrows(ForbiddenException.class, () -> resource.changePassword(dto));
+    }
+
+    @Test
+    void updateCurrentUserShouldThrowForbiddenWhenUserLocked() {
+        MCRUpdateUserProfileRequest dto = new MCRUpdateUserProfileRequest("Alice", "alice@example.com", null);
+        setCurrentUser("alice");
+        doThrow(new MCRUserLockedException("alice")).when(userService).updateUser("alice", dto);
+
+        assertThrows(ForbiddenException.class, () -> resource.updateCurrentUser(dto));
     }
 
     @Test

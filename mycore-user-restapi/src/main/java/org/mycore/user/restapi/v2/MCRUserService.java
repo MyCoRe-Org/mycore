@@ -24,6 +24,7 @@ import java.util.function.Function;
 
 import org.mycore.common.MCRException;
 import org.mycore.user.restapi.exception.MCRUserAlreadyExistsException;
+import org.mycore.user.restapi.exception.MCRUserLockedException;
 import org.mycore.user.restapi.exception.MCRUserNoLocalPasswordException;
 import org.mycore.user.restapi.exception.MCRUserNotFoundException;
 import org.mycore.user.restapi.exception.MCRUserValidationException;
@@ -211,6 +212,7 @@ public class MCRUserService {
      * @param updateUserRequest the request containing the updated profile data
      * @return the updated user as a detailed view
      * @throws MCRUserNotFoundException if no user with the given ID exists
+     * @throws MCRUserLockedException if the user is locked or disabled
      * @throws MCRUserValidationException if the updated data is invalid
      * @see MCRUpdateUserProfileRequest
      */
@@ -218,6 +220,7 @@ public class MCRUserService {
         validateName(updateUserRequest.name());
         validateEmail(updateUserRequest.email());
         MCRUser user = getUserOrThrow(userId);
+        requireNotLocked(user);
         MCRUser updated = userDtoMapper.applyUpdate(user, updateUserRequest);
         try {
             MCRUserManager.updateUser(updated);
@@ -262,6 +265,7 @@ public class MCRUserService {
      * @param userId the ID of the user whose password should be changed
      * @param changePasswordRequest the request containing the current and new password
      * @throws MCRUserNotFoundException if no user with the given ID exists
+     * @throws MCRUserLockedException if the user is locked or disabled
      * @throws MCRUserNoLocalPasswordException if the user has no locally stored password to
      *         verify against, e.g. because they are authenticated via an external realm
      * @throws MCRUserWrongPasswordException if the current password does not match
@@ -269,6 +273,7 @@ public class MCRUserService {
      */
     public void changePassword(String userId, MCRChangePasswordRequest changePasswordRequest) {
         MCRUser user = getUserOrThrow(userId);
+        requireNotLocked(user);
         if (user.getHashType() == null) {
             throw new MCRUserNoLocalPasswordException(userId);
         }
@@ -321,6 +326,19 @@ public class MCRUserService {
     private static void requireLocalRealm(MCRUser user) {
         if (!MCRRealmFactory.getLocalRealm().equals(user.getRealm())) {
             throw new MCRUserNoLocalPasswordException(user.getUserID());
+        }
+    }
+
+    /**
+     * Rejects self-service modifications by a user who is locked or disabled, mirroring
+     * the checks in {@code MCRUserServlet}.
+     *
+     * @param user the user attempting to modify their own account
+     * @throws MCRUserLockedException if the user is locked or disabled
+     */
+    private static void requireNotLocked(MCRUser user) {
+        if (user.isLocked() || user.isDisabled()) {
+            throw new MCRUserLockedException(user.getUserID());
         }
     }
 
