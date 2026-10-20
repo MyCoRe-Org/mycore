@@ -5,6 +5,28 @@
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   exclude-result-prefixes="#all">
 
+  <xsl:function name="mcrobject:get" as="document-node()?">
+    <xsl:param name="id" as="xs:string" />
+
+    <xsl:sequence select="mcrobject:get($id, true())" />
+  </xsl:function>
+
+  <xsl:function name="mcrobject:get" as="document-node()?">
+    <xsl:param name="id" as="xs:string" />
+    <xsl:param name="expanded" as="xs:boolean" />
+
+    <xsl:variable name="uri" select="concat('mcrobject:', $id, if ($expanded) then '' else '?expanded=false')" />
+    <xsl:sequence select="if (doc-available($uri)) then doc($uri) else ()" />
+  </xsl:function>
+
+  <xsl:function name="mcrobject:get-revision" as="document-node()?">
+    <xsl:param name="id" as="xs:string" />
+    <xsl:param name="revision" as="xs:string" />
+
+    <xsl:variable name="uri" select="concat('mcrobject:', $id, '?r=', encode-for-uri($revision))" />
+    <xsl:sequence select="if (doc-available($uri)) then doc($uri) else ()" />
+  </xsl:function>
+
   <!--
     Returns version information for a MyCoRe object.
 
