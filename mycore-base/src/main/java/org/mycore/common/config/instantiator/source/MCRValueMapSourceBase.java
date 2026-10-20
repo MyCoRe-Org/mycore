@@ -26,6 +26,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRSentinel;
 import org.mycore.common.config.instantiator.MCRProperTree;
+import org.mycore.common.config.instantiator.MCRPropertiesTree;
 
 /**
  * A {@link MCRValueMapSourceBase} is a base implementation of {@link MCRSource} that
@@ -55,7 +56,7 @@ abstract sealed class MCRValueMapSourceBase<Value> extends MCRSourceBase<Map<Str
         if (supportsShortForm() && shortFormProperty != null) {
             parseShortFormMap(shortFormProperty).forEach((key, shortFormValue) -> {
                 MCRSourceContext keyContext = context.withHint("for key " + key);
-                Value value = extractor.toValue(keyContext, MCRProperTree.of(shortFormValue), fullProperties);
+                Value value = extractor.toValue(keyContext, MCRPropertiesTree.of(shortFormValue), fullProperties);
                 if (value != null) {
                     map.put(key, value);
                 }
@@ -67,7 +68,7 @@ abstract sealed class MCRValueMapSourceBase<Value> extends MCRSourceBase<Map<Str
             MCRSourceContext nestedContext = context.nested(key, entryDescription);
             MCRProperTree nestedProperties = properties.nested(key);
             if (!rejectedBySentinel(nestedContext, nestedProperties)) {
-                Value value = extractor.toValue(nestedContext, nestedProperties, fullProperties);
+                Value value = extractor.toValue(nestedContext, filterProperties(nestedProperties), fullProperties);
                 if (value != null) {
                     map.put(key, value);
                 }
