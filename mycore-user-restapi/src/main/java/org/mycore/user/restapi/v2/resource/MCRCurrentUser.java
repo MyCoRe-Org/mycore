@@ -31,6 +31,7 @@ import org.mycore.restapi.v2.MCRRestSchemaType;
 import org.mycore.user.restapi.exception.MCRUserLockedException;
 import org.mycore.user.restapi.exception.MCRUserNoLocalPasswordException;
 import org.mycore.user.restapi.exception.MCRUserNotFoundException;
+import org.mycore.user.restapi.exception.MCRUserPasswordNotAllowedException;
 import org.mycore.user.restapi.exception.MCRUserValidationException;
 import org.mycore.user.restapi.exception.MCRUserWrongPasswordException;
 import org.mycore.user.restapi.v2.MCRUserService;
@@ -226,7 +227,8 @@ public class MCRCurrentUser {
             @ApiResponse(
                 responseCode = FORBIDDEN,
                 content = @Content(mediaType = MediaType.TEXT_PLAIN),
-                description = "Current password is incorrect, or caller is locked or disabled"
+                description = "Current password is incorrect, caller is locked, disabled or expired, "
+                    + "or caller is not permitted to change the password"
             ),
             @ApiResponse(
                 responseCode = BAD_REQUEST,
@@ -247,7 +249,7 @@ public class MCRCurrentUser {
             userService.changePassword(userId, changePasswordDto);
             return Response.noContent().build();
         } catch (MCRUserWrongPasswordException | MCRUserNotFoundException | MCRUserNoLocalPasswordException
-            | MCRUserLockedException e) {
+            | MCRUserLockedException | MCRUserPasswordNotAllowedException e) {
             throw new ForbiddenException(e);
         } catch (MCRUserValidationException e) {
             throw new BadRequestException(e);

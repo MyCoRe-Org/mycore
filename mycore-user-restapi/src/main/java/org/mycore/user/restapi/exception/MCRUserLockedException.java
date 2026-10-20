@@ -21,7 +21,7 @@ package org.mycore.user.restapi.exception;
 import java.io.Serial;
 
 /**
- * Thrown when a user who is locked or disabled attempts to modify their own account.
+ * Thrown when a user who is locked, disabled or expired attempts to modify their own account.
  */
 public class MCRUserLockedException extends MCRUserException {
 
@@ -31,9 +31,9 @@ public class MCRUserLockedException extends MCRUserException {
     /**
      * Creates a new exception for the given user ID.
      *
-     * @param userId the ID of the locked or disabled user
+     * @param userId the ID of the locked, disabled or expired user
      */
     public MCRUserLockedException(String userId) {
-        super("User '" + userId + "' is locked or disabled");
+        super("User '" + userId + "' is locked, disabled or expired");
     }
 }
