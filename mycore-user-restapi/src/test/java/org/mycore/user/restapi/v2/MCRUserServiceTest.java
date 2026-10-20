@@ -571,10 +571,14 @@ public class MCRUserServiceTest {
     @Test
     void changePasswordShouldSucceedWhenOldPasswordCorrect() {
         MCRUser user = mock(MCRUser.class);
+        MCRRealm localRealm = mock(MCRRealm.class);
+        when(user.getRealm()).thenReturn(localRealm);
         when(user.getUserID()).thenReturn("alice");
         when(user.getHashType()).thenReturn("sha256");
 
-        try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class)) {
+        try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class);
+            MockedStatic<MCRRealmFactory> realmFactory = mockStatic(MCRRealmFactory.class)) {
+            realmFactory.when(MCRRealmFactory::getLocalRealm).thenReturn(localRealm);
             mgr.when(() -> MCRUserManager.getUser("alice")).thenReturn(user);
             mgr.when(() -> MCRUserManager.checkPassword("alice", "old-secret")).thenReturn(user);
 
@@ -587,10 +591,14 @@ public class MCRUserServiceTest {
     @Test
     void changePasswordShouldThrowWrongPasswordWhenOldPasswordIncorrect() {
         MCRUser user = mock(MCRUser.class);
+        MCRRealm localRealm = mock(MCRRealm.class);
+        when(user.getRealm()).thenReturn(localRealm);
         when(user.getUserID()).thenReturn("alice");
         when(user.getHashType()).thenReturn("sha256");
 
-        try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class)) {
+        try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class);
+            MockedStatic<MCRRealmFactory> realmFactory = mockStatic(MCRRealmFactory.class)) {
+            realmFactory.when(MCRRealmFactory::getLocalRealm).thenReturn(localRealm);
             mgr.when(() -> MCRUserManager.getUser("alice")).thenReturn(user);
             mgr.when(() -> MCRUserManager.checkPassword("alice", "wrong")).thenReturn(null);
 
@@ -602,30 +610,38 @@ public class MCRUserServiceTest {
     }
 
     @Test
-    void changePasswordShouldCheckPasswordByQualifiedUserIdForNonLocalRealmUser() {
-        // checkPassword resolves a bare user name against the LOCAL realm, so passing
-        // getUserName() would verify the password of a different (local) account.
+    void changePasswordShouldThrowNoLocalPasswordForNonLocalRealmUserWithStoredHash() {
+        // A legacy or imported external-realm user may still carry a hash; that must not
+        // allow writing a local password the realm's login flow never consults.
         MCRUser user = mock(MCRUser.class);
+        MCRRealm localRealm = mock(MCRRealm.class);
+        MCRRealm externalRealm = mock(MCRRealm.class);
+        when(user.getRealm()).thenReturn(externalRealm);
         when(user.getUserID()).thenReturn("alice@ldap");
-        when(user.getHashType()).thenReturn("sha256");
 
-        try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class)) {
+        try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class);
+            MockedStatic<MCRRealmFactory> realmFactory = mockStatic(MCRRealmFactory.class)) {
+            realmFactory.when(MCRRealmFactory::getLocalRealm).thenReturn(localRealm);
             mgr.when(() -> MCRUserManager.getUser("alice@ldap")).thenReturn(user);
-            mgr.when(() -> MCRUserManager.checkPassword("alice@ldap", "old-secret")).thenReturn(user);
 
-            userService.changePassword("alice@ldap", new MCRChangePasswordRequest("old-secret", "new-secret"));
+            assertThrows(MCRUserNoLocalPasswordException.class,
+                () -> userService.changePassword("alice@ldap", new MCRChangePasswordRequest("old", "new-secret")));
 
-            mgr.verify(() -> MCRUserManager.checkPassword("alice@ldap", "old-secret"));
-            mgr.verify(() -> MCRUserManager.setPassword(user, "new-secret"));
+            mgr.verify(() -> MCRUserManager.checkPassword(any(), any()), never());
+            mgr.verify(() -> MCRUserManager.setPassword(any(), any()), never());
         }
     }
 
     @Test
     void changePasswordShouldThrowNoLocalPasswordWhenUserHasNoLocalPassword() {
         MCRUser user = mock(MCRUser.class);
+        MCRRealm localRealm = mock(MCRRealm.class);
+        when(user.getRealm()).thenReturn(localRealm);
         when(user.getHashType()).thenReturn(null);
 
-        try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class)) {
+        try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class);
+            MockedStatic<MCRRealmFactory> realmFactory = mockStatic(MCRRealmFactory.class)) {
+            realmFactory.when(MCRRealmFactory::getLocalRealm).thenReturn(localRealm);
             mgr.when(() -> MCRUserManager.getUser("alice")).thenReturn(user);
 
             assertThrows(MCRUserNoLocalPasswordException.class,
