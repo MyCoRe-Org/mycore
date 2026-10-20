@@ -28,6 +28,7 @@ import org.mycore.restapi.annotations.MCRApiDraft;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.mycore.restapi.v2.MCRDetailLevelResolver;
 import org.mycore.restapi.v2.MCRRestSchemaType;
+import org.mycore.user.restapi.exception.MCRUserLockedException;
 import org.mycore.user.restapi.exception.MCRUserNoLocalPasswordException;
 import org.mycore.user.restapi.exception.MCRUserNotFoundException;
 import org.mycore.user.restapi.exception.MCRUserValidationException;
@@ -69,6 +70,9 @@ import jakarta.ws.rs.core.Response;
 public class MCRCurrentUser {
 
     private static final String DESC_NO_LOCAL_ACCOUNT = "Caller has no corresponding local user account";
+
+    private static final String DESC_NO_LOCAL_ACCOUNT_OR_LOCKED =
+        "Caller has no corresponding local user account, or is locked or disabled";
 
     @Context
     private ContainerRequestContext request;
@@ -156,7 +160,8 @@ public class MCRCurrentUser {
      * @param updateOwnUserDto the request body containing the updated profile data
      * @return 204 No Content
      * @throws NotAuthorizedException if the caller is not authenticated
-     * @throws ForbiddenException if the caller has no corresponding local user account
+     * @throws ForbiddenException if the caller has no corresponding local user account, or is
+     *         locked or disabled
      * @throws BadRequestException if the data is invalid
      */
     @Operation(
@@ -172,7 +177,7 @@ public class MCRCurrentUser {
             @ApiResponse(
                 responseCode = FORBIDDEN,
                 content = @Content(mediaType = MediaType.TEXT_PLAIN),
-                description = DESC_NO_LOCAL_ACCOUNT
+                description = DESC_NO_LOCAL_ACCOUNT_OR_LOCKED
             ),
             @ApiResponse(
                 responseCode = BAD_REQUEST,
@@ -191,7 +196,7 @@ public class MCRCurrentUser {
         try {
             userService.updateUser(userId, updateOwnUserDto);
             return Response.noContent().build();
-        } catch (MCRUserNotFoundException e) {
+        } catch (MCRUserNotFoundException | MCRUserLockedException e) {
             throw new ForbiddenException(e);
         } catch (MCRUserValidationException e) {
             throw new BadRequestException(e);
@@ -204,8 +209,8 @@ public class MCRCurrentUser {
      * @param changePasswordDto the request body containing the current and new password
      * @return 204 No Content
      * @throws NotAuthorizedException if the caller is not authenticated
-     * @throws ForbiddenException if the current password does not match, or the caller has
-     *         no corresponding local user account
+     * @throws ForbiddenException if the current password does not match, the caller has
+     *         no corresponding local user account, or the caller is locked or disabled
      * @throws BadRequestException if the new password is invalid
      */
     @Operation(
@@ -221,7 +226,7 @@ public class MCRCurrentUser {
             @ApiResponse(
                 responseCode = FORBIDDEN,
                 content = @Content(mediaType = MediaType.TEXT_PLAIN),
-                description = "Current password is incorrect"
+                description = "Current password is incorrect, or caller is locked or disabled"
             ),
             @ApiResponse(
                 responseCode = BAD_REQUEST,
@@ -241,7 +246,8 @@ public class MCRCurrentUser {
         try {
             userService.changePassword(userId, changePasswordDto);
             return Response.noContent().build();
-        } catch (MCRUserWrongPasswordException | MCRUserNotFoundException | MCRUserNoLocalPasswordException e) {
+        } catch (MCRUserWrongPasswordException | MCRUserNotFoundException | MCRUserNoLocalPasswordException
+            | MCRUserLockedException e) {
             throw new ForbiddenException(e);
         } catch (MCRUserValidationException e) {
             throw new BadRequestException(e);
