@@ -23,13 +23,11 @@ import java.util.Set;
 import java.util.function.Function;
 
 import org.mycore.common.config.MCRConfigurationException;
-import org.mycore.common.config.instantiator.MCRProperTree;
 import org.mycore.common.config.annotation.MCRRawProperties;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.common.config.instantiator.MCRInstantiatorUtils;
+import org.mycore.common.config.instantiator.MCRProperTree;
 import org.mycore.common.config.instantiator.target.MCRTarget;
-
-import com.google.common.base.Functions;
 
 /**
  * A {@link MCRRawPropertiesSource} is a {@link MCRRawProperties} that interprets a {@link MCRSource}.
@@ -44,7 +42,7 @@ final class MCRRawPropertiesSource implements MCRSource {
         this.annotation = annotation;
         String namePattern = annotation.namePattern();
         if (namePattern.equals("*")) {
-            this.treeFinder = Functions.identity();
+            this.treeFinder = Function.identity();
         } else if (namePattern.endsWith(".*")) {
             this.treeFinder = tree -> tree.deeplyNested(namePattern.substring(0, namePattern.length() - 2));
         } else {

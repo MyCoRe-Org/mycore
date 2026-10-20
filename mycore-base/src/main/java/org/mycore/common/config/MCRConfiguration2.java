@@ -129,7 +129,7 @@ public class MCRConfiguration2 {
     }
 
     /**
-     * Returns all configuration properties, excluding properties with empty values, i.e.
+     * Returns all configuration properties, excluding properties with blank values, i.e.
      * only properties that are recognized by, for example, {@link #getString(String)} as a tree.
      */
     public static MCRProperTree getAllPropertiesTree() {
@@ -522,7 +522,7 @@ public class MCRConfiguration2 {
     }
 
     static void clearCaches() {
-        // BEWARE: do NOT replace with constant value, i.e. do NOT replace with PROPERTIES.set(Map.of());
+        // BEWARE: do NOT replace with constant values, i.e. do NOT replace with PROPERTIES.set(Map.of());
         // AtomicReference#updateAndGet only works as expected, when each update sets a distinct value
         PROPERTIES.set(new HashMap<>());
         PROPER_TREE.set(MCRProperTree.empty());
@@ -552,9 +552,6 @@ public class MCRConfiguration2 {
     }
 
     record ConfigSingletonKey(String property, String classname) implements SingletonKey {
-    }
-
-    record ConfigurationKey(String superclassName, String name) {
     }
 
 }

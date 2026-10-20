@@ -120,9 +120,9 @@ public class MCRDeveloperCommands {
     }
 
     @MCRCommand(
-        syntax = "show properties {0}",
+        syntax = "show properties with prefix {0}",
         help = "Show configuration properties starting with key prefix {0}",
-        order = 45)
+        order = 41)
     public static void showProperties(String keyPrefix) {
         Map<String, String> values = MCRConfiguration2.getSubpropertiesMap(keyPrefix);
         if (values.isEmpty()) {
@@ -135,7 +135,7 @@ public class MCRDeveloperCommands {
     @MCRCommand(
         syntax = "show properties tree",
         help = "Show configuration properties as tree",
-        order = 35)
+        order = 50)
     public static void showPropertiesTree() {
         MCRProperTree values = MCRConfiguration2.getAllPropertiesTree();
         if (LOGGER.isInfoEnabled()) {
@@ -144,9 +144,9 @@ public class MCRDeveloperCommands {
     }
 
     @MCRCommand(
-        syntax = "show properties tree for node {0}",
+        syntax = "show properties tree for prefix {0}",
         help = "Show configuration properties starting with key prefix {0} as tree",
-        order = 30)
+        order = 51)
     public static void showPropertiesTree(String keyPrefix) {
         MCRProperTree values = MCRConfiguration2.getAllPropertiesTree().deeplyNested(keyPrefix);
         if (LOGGER.isInfoEnabled()) {

@@ -21,10 +21,10 @@ package org.mycore.common.config.instantiator.source;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfigurationException;
-import org.mycore.common.config.instantiator.MCRProperTree;
 import org.mycore.common.config.annotation.MCRSentinel;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.common.config.instantiator.MCRInstantiatorUtils;
+import org.mycore.common.config.instantiator.MCRProperTree;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
 /**
