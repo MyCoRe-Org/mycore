@@ -236,8 +236,7 @@ public class MCRUserService {
      * <p>
      * This only works for users in the local realm. Setting a password for a user
      * authenticated via an external realm (LDAP, Shibboleth, CAS, ...) would silently do
-     * nothing useful, since that realm's login flow never consults it - and would poison the
-     * signal {@link #changePassword} relies on to detect that exact situation.
+     * nothing useful, since that realm's login flow never consults it.
      *
      * @param userId the ID of the user whose password should be set
      * @param setPasswordRequest the request containing the new password
@@ -266,14 +265,15 @@ public class MCRUserService {
      * @param changePasswordRequest the request containing the current and new password
      * @throws MCRUserNotFoundException if no user with the given ID exists
      * @throws MCRUserLockedException if the user is locked or disabled
-     * @throws MCRUserNoLocalPasswordException if the user has no locally stored password to
-     *         verify against, e.g. because they are authenticated via an external realm
+     * @throws MCRUserNoLocalPasswordException if the user is not in the local realm, or has no
+     *         locally stored password to verify against
      * @throws MCRUserWrongPasswordException if the current password does not match
      * @throws MCRUserValidationException if the new password is invalid
      */
     public void changePassword(String userId, MCRChangePasswordRequest changePasswordRequest) {
         MCRUser user = getUserOrThrow(userId);
         requireNotLocked(user);
+        requireLocalRealm(user);
         if (user.getHashType() == null) {
             throw new MCRUserNoLocalPasswordException(userId);
         }
@@ -316,9 +316,8 @@ public class MCRUserService {
     /**
      * Rejects setting a local password for a user who is not in the local realm.
      * <p>
-     * {@link #changePassword} itself does not call this method: it does not need to, since
-     * its own password write only runs after that same {@code getHashType() == null} check
-     * already passed.
+     * A stored hash is not a reliable signal for this: legacy or imported users of an
+     * external realm may still carry one, which that realm's login flow never consults.
      *
      * @param user the user a password write is being attempted for
      * @throws MCRUserNoLocalPasswordException if the user is not in the local realm
