@@ -19,8 +19,8 @@
 package org.mycore.common.config.instantiator.source;
 
 import org.mycore.common.config.MCRConfigurationException;
-import org.mycore.common.config.instantiator.MCRProperTree;
 import org.mycore.common.config.annotation.MCRSentinel;
+import org.mycore.common.config.instantiator.MCRProperTree;
 
 /**
  * A {@link MCRValueSourceBase} is a base implementation of {@link MCRSource} that

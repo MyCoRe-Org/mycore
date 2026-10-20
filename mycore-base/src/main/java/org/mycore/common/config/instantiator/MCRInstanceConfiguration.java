@@ -132,7 +132,7 @@ public final class MCRInstanceConfiguration<S> {
     /**
      * Shorthand for {@link MCRInstanceConfiguration#ofName(Class, MCRInstanceName, MCRProperTree, Set)} that
      * creates the name with {@link MCRInstanceName#of(String)} and
-     * uses {@link MCRConfiguration2#getAllPropertiesTree()} to obtain the properties and.
+     * uses {@link MCRConfiguration2#getAllPropertiesTree()} to obtain the properties.
      * uses {@link Options#NONE} as the options.
      */
     public static <T> MCRInstanceConfiguration<T> ofName(Class<T> superClass, String name) {

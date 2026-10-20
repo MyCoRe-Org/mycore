@@ -88,7 +88,7 @@ abstract sealed class MCRValueListSourceBase<Value> extends MCRSourceBase<List<V
 
     }
 
-    public List<String> orderedKeys(MCRSourceContext context, Stream<String> keys) {
+    private static List<String> orderedKeys(MCRSourceContext context, Stream<String> keys) {
 
         SortedMap<Integer, String> keyMap = new TreeMap<>();
         keys.forEach(key -> {
