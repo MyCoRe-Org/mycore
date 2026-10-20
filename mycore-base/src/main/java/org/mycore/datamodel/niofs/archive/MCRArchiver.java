@@ -93,6 +93,31 @@ public abstract class MCRArchiver<T extends ArchiveOutputStream<?>> {
     }
 
     /**
+     * Returns the latest modification time of all directories and files below the given path (including the path
+     * itself). This is the modification time of the archive that {@link #sendTree(MCRPath, ArchiveOutputStream)}
+     * produces for the same path.
+     *
+     * @return the latest modification time in milliseconds since the epoch
+     */
+    public long getLastModified(MCRPath root) throws IOException {
+        long[] lastModified = { 0L };
+        Files.walkFileTree(root, new SimpleFileVisitor<>() {
+            @Override
+            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
+                lastModified[0] = Math.max(lastModified[0], attrs.lastModifiedTime().toMillis());
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+                lastModified[0] = Math.max(lastModified[0], attrs.lastModifiedTime().toMillis());
+                return FileVisitResult.CONTINUE;
+            }
+        });
+        return lastModified[0];
+    }
+
+    /**
      * Constructs an entry name in form of {ownerID}+'/'+{path} or {ownerID} if path is root component.
      * @param path absolute path
      */

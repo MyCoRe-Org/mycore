@@ -248,7 +248,10 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
     /**
      * Constructs a path name in form of {ownerID}+'/'+{path} or {ownerID} if path is root component.
      * @param path absolute path
+     * @deprecated this method is no longer called, entry names are created by
+     * {@link MCRArchiver#getEntryName(MCRPath)}
      */
+    @Deprecated
     protected String getFilename(MCRPath path) {
         return MCRArchiver.getEntryName(path);
     }

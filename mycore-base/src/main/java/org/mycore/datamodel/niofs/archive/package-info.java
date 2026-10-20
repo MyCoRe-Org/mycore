@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 /**
  * Writes files and directories of the java.nio.file API (e.g. derivate contents) to archives like ZIP or TAR.

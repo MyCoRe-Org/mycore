@@ -44,9 +44,13 @@ public class MCRExceptionMapper implements ExceptionMapper<Exception> {
 
     @Override
     public Response toResponse(Exception exception) {
-        return Optional.ofNullable(request.selectVariant(SUPPORTED_VARIANTS))
-            .map(v -> fromException(exception))
-            .orElseGet(() -> (exception instanceof WebApplicationException wae) ? wae.getResponse() : null);
+        Response response = fromException(exception);
+        if (request.selectVariant(SUPPORTED_VARIANTS) == null && response.hasEntity()
+            && response.getMediaType() == null) {
+            //client accepts neither JSON nor XML (e.g. only archives), error responses are delivered as JSON anyway
+            return Response.fromResponse(response).type(MediaType.APPLICATION_JSON_TYPE).build();
+        }
+        return response;
     }
 
     public static Response fromWebApplicationException(WebApplicationException wae) {

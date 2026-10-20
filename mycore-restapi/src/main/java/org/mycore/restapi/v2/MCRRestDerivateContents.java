@@ -517,6 +517,22 @@ public class MCRRestDerivateContents {
     }
 
     private <T extends ArchiveOutputStream<?>> Response serveArchive(MCRPath dir, MCRArchiver<T> archiver) {
+        // the archive is generated on the fly, so the tree is walked once to get a validator for caches
+        Date lastModified;
+        try {
+            lastModified = new Date(archiver.getLastModified(dir));
+        } catch (IOException e) {
+            throw MCRErrorResponse.ofStatusCode(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
+                .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_FILE_IO_ERROR)
+                .withMessage("Could not read " + dir + ".")
+                .withDetail(e.getMessage())
+                .withCause(e)
+                .toException();
+        }
+        Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request.getRequest(), lastModified);
+        if (cachedResponse.isPresent()) {
+            return cachedResponse.get();
+        }
         String comment = "Created by " + request.getUriInfo().getRequestUri() + " at " + Instant.now();
         StreamingOutput stream = out -> {
             // the shield keeps the entity stream open, closing it would end the MCRSession too early
@@ -529,6 +545,7 @@ public class MCRRestDerivateContents {
         };
         String fileName = path.isEmpty() ? derid.toString() : derid + path.replace('/', '-');
         return Response.ok(stream, archiver.getMimeType())
+            .lastModified(lastModified)
             .header(HttpHeaders.CONTENT_DISPOSITION,
                 MCRRestUtils.getContentDisposition("attachment", fileName + "." + archiver.getFileExtension()))
             .build();
