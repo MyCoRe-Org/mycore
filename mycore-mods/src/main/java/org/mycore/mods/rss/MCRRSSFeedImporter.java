@@ -92,8 +92,10 @@ import com.rometools.rome.io.XmlReader;
  * 4. Saves the publication in persistent store, with the given projectID and object type "mods".
  * <p>
  * When the total number of publications imported is &gt; 0 AND the property
- * MCR.MODS.RSSFeedImporter.[sourceSystemID].XSL2BuildNotificationMail=foo.xsl
+ * MCR.MODS.RSSFeedImporter.[sourceSystemID].NotificationMailTransformer=[content transformer ID]
  * is set, builds and sends a notification mail via MCRMailer.
+ * The deprecated property MCR.MODS.RSSFeedImporter.[sourceSystemID].XSL2BuildNotificationMail=foo
+ * (stylesheet name without ".xsl") is still supported.
  *
  * @author Frank Lützenkirchen
  */
@@ -110,6 +112,8 @@ public class MCRRSSFeedImporter {
     private String field2queryID;
 
     private String importURI;
+
+    private String notificationMailTransformer;
 
     private String xsl2BuildNotificationMail;
 
@@ -133,7 +137,12 @@ public class MCRRSSFeedImporter {
         feedURL = MCRConfiguration2.getStringOrThrow(prefix + "FeedURL");
         importURI = MCRConfiguration2.getStringOrThrow(prefix + "PublicationURI");
         field2queryID = MCRConfiguration2.getStringOrThrow(prefix + "Field2QueryID");
+        notificationMailTransformer = MCRConfiguration2.getString(prefix + "NotificationMailTransformer").orElse(null);
         xsl2BuildNotificationMail = MCRConfiguration2.getString(prefix + "XSL2BuildNotificationMail").orElse(null);
+        if (xsl2BuildNotificationMail != null) {
+            LOGGER.warn("Property {}XSL2BuildNotificationMail is deprecated, use {}NotificationMailTransformer",
+                prefix, prefix);
+        }
 
         pattern2findID = retrievePattern2FindID(prefix);
     }
@@ -164,7 +173,8 @@ public class MCRRSSFeedImporter {
         int numPublicationsImported = importedObjects.size();
         LOGGER.info("imported {} publications.", numPublicationsImported);
 
-        if ((numPublicationsImported > 0) && (xsl2BuildNotificationMail != null)) {
+        if ((numPublicationsImported > 0)
+            && (notificationMailTransformer != null || xsl2BuildNotificationMail != null)) {
             sendNotificationMail(importedObjects);
         }
     }
@@ -256,6 +266,7 @@ public class MCRRSSFeedImporter {
         return obj;
     }
 
+    @SuppressWarnings("deprecation")
     private void sendNotificationMail(List<MCRObject> importedObjects) throws Exception {
         Element xml = new Element(STATUS_FLAG).setAttribute("source", this.sourceSystemID);
         for (MCRObject obj : importedObjects) {
@@ -264,6 +275,10 @@ public class MCRRSSFeedImporter {
 
         Map<String, String> parameters = new HashMap<>();
         parameters.put(PROPERTY_MAIL_ADDRESS, MCRConfiguration2.getStringOrThrow(PROPERTY_MAIL_ADDRESS));
-        MCRMailer.sendMail(new Document(xml), xsl2BuildNotificationMail, parameters);
+        if (notificationMailTransformer != null) {
+            MCRMailer.sendMailWithTransformer(new Document(xml), notificationMailTransformer, parameters);
+        } else {
+            MCRMailer.sendMail(new Document(xml), xsl2BuildNotificationMail, parameters);
+        }
     }
 }

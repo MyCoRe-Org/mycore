@@ -39,7 +39,10 @@ import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.MCRPathXML;
 
 /**
- * Uses "e-mail-events.xsl" to transform derivate, object and files to emails.
+ * Uses the content transformer "e-mail-events" to transform derivate, object and files to emails.
+ * By default, it is configured to use "xslt/e-mail-events.xsl":
+ * <p>
+ * <code>MCR.ContentTransformer.e-mail-events.Stylesheet=xslt/e-mail-events.xsl</code>
  * <p>
  * See {@link MCRMailer} for email xml format.
  *
@@ -50,6 +53,8 @@ public class MCRMailEventHandler extends MCREventHandlerBase {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    private static final String TRANSFORMER_ID = "e-mail-events";
+
     private void sendNotificationMail(MCREvent evt, MCRContent doc, String description) throws Exception {
         LOGGER.info("Preparing mail for: {}", description);
         Map<String, String> parameters = new HashMap<>();
@@ -59,7 +64,7 @@ public class MCRMailEventHandler extends MCREventHandlerBase {
         parameters.put("action", evt.getEventType().toString());
         parameters.put("type", evt.getObjectType().toString());
 
-        MCRMailer.sendMail(doc.asXML(), "e-mail-events", parameters);
+        MCRMailer.sendMailWithTransformer(doc.asXML(), TRANSFORMER_ID, parameters);
     }
 
     private void handleCategoryEvent(MCREvent evt, MCRCategory obj) {
