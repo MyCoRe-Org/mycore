@@ -20,7 +20,6 @@ package org.mycore.common.config.instantiator.source;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRRawProperties;
@@ -36,17 +35,20 @@ final class MCRRawPropertiesSource implements MCRSource {
 
     private final MCRRawProperties annotation;
 
-    private final Function<MCRProperTree, MCRProperTree> treeFinder;
+    private final PatternHandler patternHandler;
 
     MCRRawPropertiesSource(MCRRawProperties annotation) {
         this.annotation = annotation;
-        String namePattern = annotation.namePattern();
+        this.patternHandler = toPatternHandler(annotation.namePattern());
+    }
+
+    private static PatternHandler toPatternHandler(String namePattern) {
         if (namePattern.equals("*")) {
-            this.treeFinder = Function.identity();
+            return new RootPatternHandler();
         } else if (namePattern.endsWith(".*")) {
-            this.treeFinder = tree -> tree.deeplyNested(namePattern.substring(0, namePattern.length() - 2));
+            return new NestedPatternHandler(namePattern);
         } else {
-            throw new MCRConfigurationException("Unsupported name pattern:" + annotation.namePattern());
+            throw new MCRConfigurationException("Unsupported name pattern:" + namePattern);
         }
     }
 
@@ -74,8 +76,8 @@ final class MCRRawPropertiesSource implements MCRSource {
     public Map<String, String> get(MCRInstanceConfiguration<?> configuration, MCRTarget target) {
 
         MCRProperTree properties = annotation.absolute() ? configuration.fullProperties() : configuration.properties();
-        Map<String, String> rawProperties = treeFinder.apply(properties).toProperties();
-        rawProperties.remove(MCRInstanceConfiguration.CLASS_KEY);
+        Map<String, String> rawProperties = patternHandler.findTree(properties).toProperties();
+        patternHandler.prepareRawProperties(rawProperties);
 
         if (rawProperties.isEmpty() && annotation.required()) {
             String property;
@@ -91,6 +93,47 @@ final class MCRRawPropertiesSource implements MCRSource {
         }
 
         return rawProperties;
+
+    }
+
+    private sealed interface PatternHandler permits RootPatternHandler, NestedPatternHandler {
+
+        MCRProperTree findTree(MCRProperTree properties);
+
+        void prepareRawProperties(Map<String, String> rawProperties);
+
+    }
+
+    private static final class RootPatternHandler implements PatternHandler {
+
+        @Override
+        public MCRProperTree findTree(MCRProperTree properties) {
+            return properties;
+        }
+
+        @Override
+        public void prepareRawProperties(Map<String, String> rawProperties) {
+            rawProperties.remove(MCRInstanceConfiguration.CLASS_KEY);
+        }
+
+    }
+
+    private static final class NestedPatternHandler implements PatternHandler {
+
+        private final String key;
+
+        private NestedPatternHandler(String namePattern) {
+            this.key = namePattern.substring(0, namePattern.length() - 2);
+        }
+
+        @Override
+        public MCRProperTree findTree(MCRProperTree properties) {
+            return properties.deeplyNested(key);
+        }
+
+        @Override
+        public void prepareRawProperties(Map<String, String> rawProperties) {
+        }
 
     }
 
