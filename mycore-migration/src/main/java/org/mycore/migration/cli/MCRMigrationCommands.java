@@ -48,9 +48,11 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRXlink;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStreamContent;
-import org.mycore.common.content.transformer.MCRXSLTransformer;
+import org.mycore.common.content.transformer.MCRContentTransformer;
+import org.mycore.common.content.transformer.MCRContentTransformerFactory;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
@@ -86,6 +88,8 @@ import jakarta.persistence.TypedQuery;
 public class MCRMigrationCommands {
 
     private static final Logger LOGGER = LogManager.getLogger();
+
+    private static final String METS_TRANSFORMER_ID = "mets-translation-migration";
 
     public static final String CHILDREN_ORDER_STRATEGY_PROPERTY = "MCR.Migration.ChildrenOrder.Strategy";
 
@@ -317,7 +321,10 @@ public class MCRMigrationCommands {
             return;
         }
 
-        final MCRXSLTransformer transformer = MCRXSLTransformer.obtainInstance("xsl/mets-translation-migration.xsl");
+        final MCRContentTransformer transformer = MCRContentTransformerFactory.getTransformer(METS_TRANSFORMER_ID);
+        if (transformer == null) {
+            throw new MCRConfigurationException("Content transformer " + METS_TRANSFORMER_ID + " is not configured");
+        }
 
         final Document xml;
 
