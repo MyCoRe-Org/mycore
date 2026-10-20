@@ -48,7 +48,7 @@ abstract sealed class MCRValueSourceBase<Value> extends MCRSourceBase<Value> per
             return null;
         }
 
-        return extractor.toValue(context, properties, fullProperties);
+        return extractor.toValue(context, filterProperties(properties), fullProperties);
 
     }
 

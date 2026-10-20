@@ -34,11 +34,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.mycore.common.MCRClassTools;
+import org.mycore.common.config.instantiator.MCREmptyTree;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration.Options;
 import org.mycore.common.config.instantiator.MCRInstanceName;
 import org.mycore.common.config.instantiator.MCRInstantiatorUtils;
 import org.mycore.common.config.instantiator.MCRProperTree;
+import org.mycore.common.config.instantiator.MCRPropertiesTree;
 import org.mycore.common.function.MCRTriConsumer;
 
 import jakarta.inject.Singleton;
@@ -97,7 +99,7 @@ public class MCRConfiguration2 {
 
     private static final AtomicReference<Map<String, String>> PROPERTIES = new AtomicReference<>(Map.of());
 
-    private static final AtomicReference<MCRProperTree> PROPER_TREE = new AtomicReference<>(MCRProperTree.empty());
+    private static final AtomicReference<MCRProperTree> PROPER_TREE = new AtomicReference<>(MCRPropertiesTree.EMPTY);
 
     static Map<SingletonKey, Object> instanceHolder = new MCRConcurrentHashMap<>();
 
@@ -134,8 +136,8 @@ public class MCRConfiguration2 {
      */
     public static MCRProperTree getAllPropertiesTree() {
         return PROPER_TREE.updateAndGet(existingValue -> {
-            if (existingValue.isEmpty()) {
-                return MCRProperTree.ofProperties(getAllPropertiesMap());
+            if (existingValue instanceof MCREmptyTree) {
+                return MCRPropertiesTree.ofProperties(getAllPropertiesMap());
             }
             return existingValue;
         });
@@ -525,7 +527,7 @@ public class MCRConfiguration2 {
         // BEWARE: do NOT replace with constant values, i.e. do NOT replace with PROPERTIES.set(Map.of());
         // AtomicReference#updateAndGet only works as expected, when each update sets a distinct value
         PROPERTIES.set(new HashMap<>());
-        PROPER_TREE.set(MCRProperTree.empty());
+        PROPER_TREE.set(new MCREmptyTree());
     }
 
     private static class EventListener {
