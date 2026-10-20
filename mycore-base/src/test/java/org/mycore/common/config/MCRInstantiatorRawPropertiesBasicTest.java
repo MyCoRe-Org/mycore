@@ -43,7 +43,7 @@ public class MCRInstantiatorRawPropertiesBasicTest {
             @MCRTestProperty(key = "MCR.Values.1", string = "MCR-Value-1"),
             @MCRTestProperty(key = "MCR.Values.2", string = "MCR-Value-2")
         })
-    public void annotated() {
+    public void testRawProperties() {
 
         TestClass instance = ofName(TestClass.class);
 
@@ -64,6 +64,41 @@ public class MCRInstantiatorRawPropertiesBasicTest {
         assertEquals(Map.of(
             "1", "MCR-Value-1",
             "2", "MCR-Value-2"),
+            instance.absoluteValues);
+
+    }
+
+    @Test
+    @MCRTestConfiguration(
+        properties = {
+            @MCRTestProperty(key = "Foo.Class", classNameOf = TestClass.class),
+            @MCRTestProperty(key = "Foo", string = "Empty"),
+            @MCRTestProperty(key = "Foo.Values.Class", string = "Value-Class"),
+            @MCRTestProperty(key = "Foo.Values.", string = "Value-Cursed"),
+            @MCRTestProperty(key = "Foo.Values", string = "Value-Empty"),
+            @MCRTestProperty(key = "MCR.Values.Class", string = "MCR-Value-Class"),
+            @MCRTestProperty(key = "MCR.Values.", string = "MCR-Value-Cursed"),
+            @MCRTestProperty(key = "MCR.Values", string = "MCR-Value-Empty")
+        })
+    public void testRawPropertiesUncommonValues() {
+
+        TestClass instance = ofName(TestClass.class);
+
+        assertEquals(Map.of(
+            "", "Empty",
+            "Values.Class", "Value-Class",
+            "Values.", "Value-Cursed",
+            "Values", "Value-Empty"),
+            instance.values);
+
+        assertEquals(Map.of(
+            "Class", "Value-Class",
+            "", "Value-Cursed"),
+            instance.nestedValues);
+
+        assertEquals(Map.of(
+            "Class", "MCR-Value-Class",
+            "", "MCR-Value-Cursed"),
             instance.absoluteValues);
 
     }
