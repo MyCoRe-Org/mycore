@@ -161,4 +161,10 @@
         if (exists($kept)) then concat($base, '?', string-join($kept, '&amp;')) else $base,
         $fragment )" />
   </xsl:function>
+
+  <xsl:function name="mcrurl:url-encode" as="xs:string">
+    <xsl:param name="value" as="xs:string?" />
+    <xsl:sequence select="replace(replace(replace(encode-for-uri($value), '%20', '+'), '%2A', '*'), '~', '%7E')" />
+  </xsl:function>
+
 </xsl:stylesheet>

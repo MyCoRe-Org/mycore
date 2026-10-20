@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0"
-  xmlns:encoder="xalan://java.net.URLEncoder"
+<xsl:stylesheet version="3.0"
+  xmlns:mcrurl="http://www.mycore.de/xslt/url"
   xmlns:tei="http://www.tei-c.org/ns/1.0"
-  xmlns:xalan="http://xml.apache.org/xalan"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  exclude-result-prefixes="tei xsl">
+  exclude-result-prefixes="#all">
 
-  <xsl:output method="html"/>
+  <xsl:import href="resource:xslt/output-html.xsl" />
+
+  <xsl:include href="resource:xslt/default-parameters.xsl" />
+  <xsl:include href="xslInclude:functions" />
+
   <xsl:template match="tei:TEI">
     <div>
       <xsl:apply-templates/>
@@ -157,7 +160,7 @@
               transform:scale(0.7)
             </xsl:attribute>
             <xsl:attribute name="src">
-              <xsl:text>http://dinglr.de/formula/</xsl:text><xsl:value-of select="encoder:encode(.)"/>
+              <xsl:text>http://dinglr.de/formula/</xsl:text><xsl:value-of select="mcrurl:url-encode(.)"/>
             </xsl:attribute>
           </xsl:element>
         </xsl:element>
