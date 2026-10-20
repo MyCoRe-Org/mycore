@@ -47,9 +47,24 @@ public class MCRInstantiatorRawPropertiesBasicTest {
 
         TestClass instance = ofName(TestClass.class);
 
-        assertEquals(Map.of("1", "1", "2", "2", "Values.1", "Value-1", "Values.2", "Value-2"), instance.values);
-        assertEquals(Map.of("1", "Value-1", "2", "Value-2"), instance.nestedValues);
-        assertEquals(Map.of("1", "MCR-Value-1", "2", "MCR-Value-2"), instance.absoluteValues);
+        assertEquals(Map.of(
+            "1", "1",
+            "2", "2",
+            "Values.1",
+            "Value-1",
+            "Values.2",
+            "Value-2"),
+            instance.values);
+
+        assertEquals(Map.of(
+            "1", "Value-1",
+            "2", "Value-2"),
+            instance.nestedValues);
+
+        assertEquals(Map.of(
+            "1", "MCR-Value-1",
+            "2", "MCR-Value-2"),
+            instance.absoluteValues);
 
     }
 

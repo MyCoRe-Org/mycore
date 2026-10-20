@@ -47,7 +47,7 @@ public final class MCRProperTree {
 
     private static final MCRProperTree EMPTY = empty();
 
-    public static final Predicate<String> CLASS_KEY_FILTER = key -> !key.equals(CLASS_KEY);
+    private static final Predicate<String> CLASS_KEY_FILTER = key -> !key.equals(CLASS_KEY);
 
     private static final Function<String, Object> HASH_MAP = _ -> new HashMap<>();
 
@@ -126,6 +126,10 @@ public final class MCRProperTree {
     }
 
     public static MCRProperTree empty() {
+        // BEWARE: do NOT replace with constant value, i.e. do NOT replace with EMPTY,
+        // otherwise the caching strategy implemented in MCRConfiguration2 will break,
+        // because AtomicReference#updateAndGet only works as expected,
+        // if each update sets a distinct value
         return new MCRProperTree(null, Map.of());
     }
 
