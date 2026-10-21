@@ -217,21 +217,22 @@
       </xsl:for-each>
       <xsl:for-each select="mods:originInfo[not(@eventType) or @eventType='publication']/mods:dateIssued">
         <xsl:sort data-type="number" select="count(ancestor::mods:originInfo[not(@eventType) or @eventType='publication'])" />
-        <xsl:if test="position()=1">
+        <!-- consider only the first mods:dateIssued in the first mods:relatedItem of the given type -->
+        <xsl:if test="position()=1 and not(ancestor::mods:relatedItem/preceding-sibling::mods:relatedItem[@type=$type])">
           <field name="mods.dateIssued.{$type}">
             <xsl:value-of select="." />
           </field>
           <field name="mods.yearIssued.{$type}">
             <xsl:value-of select="substring(.,1,4)" />
           </field>
-	  <xsl:if test="$type='host' and not(ancestor::mods:mods/mods:originInfo[not(@eventType) or @eventType='publication']/mods:dateIssued[@encoding='w3cdtf'])">
+          <xsl:if test="$type='host' and not(ancestor::mods:mods/mods:originInfo[not(@eventType) or @eventType='publication']/mods:dateIssued[@encoding='w3cdtf'])">
             <field name="mods.dateIssued">
               <xsl:value-of select="." />
             </field>
             <field name="mods.yearIssued">
               <xsl:value-of select="substring(.,1,4)" />
             </field>
-	  </xsl:if>
+          </xsl:if>
         </xsl:if>
       </xsl:for-each>
       <xsl:for-each select=".//*[@xlink:title|text()]">
