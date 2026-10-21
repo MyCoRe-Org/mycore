@@ -52,7 +52,7 @@ public class MCRDisplayHideDerivateServlet extends MCRServlet {
         }
 
         if (!MCRAccessManager.checkPermission(MCRObjectID.getInstance(derivate), PERMISSION_WRITE)) {
-            job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN, "You have to be logged in.");
+            job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN, "You do not have the required permission.");
             return;
         }
 
