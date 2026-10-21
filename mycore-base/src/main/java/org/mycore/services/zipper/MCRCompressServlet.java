@@ -251,7 +251,7 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
      * @deprecated this method is no longer called, entry names are created by
      * {@link MCRArchiver#getEntryName(MCRPath)}
      */
-    @Deprecated
+    @Deprecated(forRemoval = true)
     protected String getFilename(MCRPath path) {
         return MCRArchiver.getEntryName(path);
     }
