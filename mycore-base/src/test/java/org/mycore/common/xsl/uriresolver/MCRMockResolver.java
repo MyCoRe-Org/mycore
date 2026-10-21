@@ -27,8 +27,17 @@ import javax.xml.transform.URIResolver;
 
 /**
  * Can be used to write test against the {@link MCRURIResolver}.
- * Just add MCR.URIResolver.ModuleResolver.YOUR_PREFIX with MCRMockResolver.class.getName() to the
- * test-properties.
+ * Just add <code>MCR.URIResolver.ModuleResolver.YOUR_PREFIX</code> with
+ * <code>MCRMockResolver.class.getName()</code> to the test-properties.
+ * <p>
+ * Use {@link MCRMockResolver#setResultSource(Source)} to set the content
+ * to be returned by all subsequent resolutions answered by instances of this resolver.
+ * <p>
+ * Use {@link MCRMockResolver#getCalls()} to obtain a list of {@link MCRMockResolverCall}
+ * instances the represent the resolutions answered by instances of this resolver.
+ * <p>
+ * <strong>Important:</strong> Use {@link MCRMockResolver#clearCalls()} after each test case
+ * that made use of an instance of this resolver. Do not run tests concurrently.
  */
 public class MCRMockResolver implements URIResolver {
 
