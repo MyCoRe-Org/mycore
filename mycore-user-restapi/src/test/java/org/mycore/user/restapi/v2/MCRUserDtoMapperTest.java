@@ -35,6 +35,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.test.MCRJPAExtension;
 import org.mycore.test.MyCoReTest;
 import org.mycore.user.restapi.v2.dto.MCRCreateUserRequest;
+import org.mycore.user.restapi.v2.dto.MCRUpdateUserProfileRequest;
 import org.mycore.user.restapi.v2.dto.MCRUpdateUserRequest;
 import org.mycore.user.restapi.v2.dto.MCRUserDetail;
 import org.mycore.user.restapi.v2.dto.MCRUserStandard;
@@ -85,7 +86,7 @@ public class MCRUserDtoMapperTest {
 
     @Test
     void toDomainShouldResolveOwner() {
-        MCRUser owner = buildUser("admin");
+        MCRUser owner = new MCRUser("admin");
 
         MCRCreateUserRequest request = new MCRCreateUserRequest(
             "john", null, null,
@@ -100,7 +101,7 @@ public class MCRUserDtoMapperTest {
 
     @Test
     void toSummaryShouldMapUserIdAndRealName() {
-        MCRUser user = buildUser("john");
+        MCRUser user = new MCRUser("john");
         user.setRealName("John Doe");
 
         MCRUserSummary summary = mapper.toSummary(user);
@@ -111,7 +112,7 @@ public class MCRUserDtoMapperTest {
 
     @Test
     void toSummaryShouldHandleNullRealName() {
-        MCRUser user = buildUser("john");
+        MCRUser user = new MCRUser("john");
 
         MCRUserSummary summary = mapper.toSummary(user);
 
@@ -120,7 +121,7 @@ public class MCRUserDtoMapperTest {
 
     @Test
     void toStandardShouldMapAllFields() {
-        MCRUser user = buildUser("john");
+        MCRUser user = new MCRUser("john");
         user.setRealName("John Doe");
         user.setEMail("john@example.com");
         user.setLocked(true);
@@ -140,7 +141,7 @@ public class MCRUserDtoMapperTest {
 
     @Test
     void toStandardShouldHandleNullValidUntil() {
-        MCRUser user = buildUser("john");
+        MCRUser user = new MCRUser("john");
 
         MCRUserStandard standard = mapper.toStandard(user);
 
@@ -149,7 +150,7 @@ public class MCRUserDtoMapperTest {
 
     @Test
     void toStandardShouldHandleNullOwner() {
-        MCRUser user = buildUser("john");
+        MCRUser user = new MCRUser("john");
 
         MCRUserStandard standard = mapper.toStandard(user);
 
@@ -158,8 +159,8 @@ public class MCRUserDtoMapperTest {
 
     @Test
     void toStandardShouldMapOwner() {
-        MCRUser owner = buildUser("admin");
-        MCRUser user = buildUser("john");
+        MCRUser owner = new MCRUser("admin");
+        MCRUser user = new MCRUser("john");
         user.setOwner(owner);
 
         MCRUserStandard standard = mapper.toStandard(user);
@@ -169,7 +170,7 @@ public class MCRUserDtoMapperTest {
 
     @Test
     void toStandardShouldMapAttributes() {
-        MCRUser user = buildUser("john");
+        MCRUser user = new MCRUser("john");
         user.setUserAttribute("foo", "bar");
 
         MCRUserStandard standard = mapper.toStandard(user);
@@ -181,7 +182,7 @@ public class MCRUserDtoMapperTest {
 
     @Test
     void toDetailShouldMapAllFields() {
-        MCRUser user = buildUser("john");
+        MCRUser user = new MCRUser("john");
         user.setRealName("John Doe");
         user.setEMail("john@example.com");
         user.setLocked(false);
@@ -201,8 +202,8 @@ public class MCRUserDtoMapperTest {
 
     @Test
     void toDetailShouldMapOwnedUsers() {
-        MCRUser user = buildUser("admin");
-        MCRUser owned = buildUser("editor");
+        MCRUser user = new MCRUser("admin");
+        MCRUser owned = new MCRUser("editor");
 
         MCRUserDetail detail = mapper.toDetail(user, List.of(owned));
 
@@ -212,7 +213,7 @@ public class MCRUserDtoMapperTest {
 
     @Test
     void toDetailShouldHandleNullLastLogin() {
-        MCRUser user = buildUser("john");
+        MCRUser user = new MCRUser("john");
 
         MCRUserDetail detail = mapper.toDetail(user, List.of());
 
@@ -221,7 +222,7 @@ public class MCRUserDtoMapperTest {
 
     @Test
     void applyUpdateShouldReplaceRoles() {
-        MCRUser user = buildUser("john");
+        MCRUser user = new MCRUser("john");
         user.assignRole("editor");
 
         MCRUpdateUserRequest request = new MCRUpdateUserRequest(
@@ -237,7 +238,7 @@ public class MCRUserDtoMapperTest {
 
     @Test
     void applyUpdateShouldReplaceAttributes() {
-        MCRUser user = buildUser("john");
+        MCRUser user = new MCRUser("john");
         user.setUserAttribute("old", "value");
 
         MCRUpdateUserRequest request = new MCRUpdateUserRequest(
@@ -251,7 +252,48 @@ public class MCRUserDtoMapperTest {
         assertNull(result.getUserAttribute("old"));
     }
 
-    private MCRUser buildUser(String userId) {
-        return new MCRUser(userId);
+    @Test
+    void applyUpdateWithOwnRequestShouldUpdateProfileFields() {
+        MCRUser user = new MCRUser("john");
+
+        MCRUpdateUserProfileRequest request = new MCRUpdateUserProfileRequest("John Doe", "john@example.com", "hint");
+
+        MCRUser result = mapper.applyUpdate(user, request);
+
+        assertEquals("John Doe", result.getRealName());
+        assertEquals("john@example.com", result.getEMail());
+        assertEquals("hint", result.getHint());
+    }
+
+    @Test
+    void applyUpdateWithOwnRequestShouldNotTouchRoles() {
+        MCRUser user = new MCRUser("john");
+        user.assignRole("editor");
+
+        MCRUpdateUserProfileRequest request = new MCRUpdateUserProfileRequest("John Doe", null, null);
+
+        MCRUser result = mapper.applyUpdate(user, request);
+
+        assertEquals(1, result.getSystemRoleIDs().size());
+        assertTrue(result.getSystemRoleIDs().contains("editor"));
+    }
+
+    @Test
+    void applyUpdateWithOwnRequestShouldNotTouchAttributesLockStateValidUntilOrOwner() {
+        MCRUser owner = new MCRUser("admin");
+        MCRUser user = new MCRUser("john");
+        user.setUserAttribute("foo", "bar");
+        user.setLocked(true);
+        user.setValidUntil(Date.from(Instant.parse("2099-01-01T00:00:00Z")));
+        user.setOwner(owner);
+
+        MCRUpdateUserProfileRequest request = new MCRUpdateUserProfileRequest("John Doe", null, null);
+
+        MCRUser result = mapper.applyUpdate(user, request);
+
+        assertEquals("bar", result.getUserAttribute("foo"));
+        assertTrue(result.isLocked());
+        assertNotNull(result.getValidUntil());
+        assertEquals("admin", result.getOwner().getUserID());
     }
 }
