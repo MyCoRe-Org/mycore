@@ -93,7 +93,7 @@
             </xsl:apply-templates>
           </xsl:when>
           <xsl:when test="string-length($type) &gt; 0 and string-length($position) &gt; 0">
-            <xsl:apply-templates select="mods:titleInfo[@type=$type][position()=$position]" mode="mods.printTitle">
+            <xsl:apply-templates select="mods:titleInfo[@type=$type][position()=number($position)]" mode="mods.printTitle">
               <xsl:with-param name="asHTML" select="$asHTML" />
               <xsl:with-param name="withSubtitle" select="$withSubtitle" />
             </xsl:apply-templates>
