@@ -82,7 +82,7 @@ public final class MCRErrorResponse {
     public WebApplicationException toException() {
         WebApplicationException e;
         Response.Status s = Response.Status.fromStatusCode(status);
-        final Response response = Response.status(s)
+        final Response response = Response.status(status)
             .header("X-Error-Code", getErrorCode())
             .header("X-Error-Message", getMessage())
             .header("X-Error-Time", new Date(getTimestamp().toEpochMilli())) //no HeaderDelegate for Instant
