@@ -96,7 +96,7 @@
     )" />
   </xsl:function>
 
-  <xsl:function name="mcrpi:get-pi-service-information" as="element()?">
+  <xsl:function name="mcrpi:get-pi-service-information" as="element()*">
     <xsl:param name="objectID" as="xs:string" />
 
     <xsl:sequence select="
