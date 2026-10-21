@@ -18,6 +18,7 @@
 
 package org.mycore.pi;
 
+import static org.mycore.common.config.instantiator.MCRInstanceConfiguration.CLASS_SUFFIX;
 import static org.mycore.pi.MCRPIJobService.CREATION_PREDICATE;
 
 import java.util.List;
@@ -53,7 +54,7 @@ public final class MCRPIServiceManager {
             .stream()
             .filter(service -> MCRConfiguration2
                 .getString(REGISTRATION_SERVICE_CONFIG_PREFIX + service.getServiceID() + "." +
-                    CREATION_PREDICATE)
+                    CREATION_PREDICATE + CLASS_SUFFIX)
                 .isPresent())
             .collect(Collectors.toList());
     }
