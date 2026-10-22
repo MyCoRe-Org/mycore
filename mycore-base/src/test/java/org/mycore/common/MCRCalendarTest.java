@@ -677,12 +677,12 @@ public class MCRCalendarTest {
     public void testParseJapaneseDate() {
         Calendar cal;
 
-        // Meiji era: 8.9.1868 - 29.07.1912
-        cal = MCRCalendar.getHistoryDateAsCalendar("8.9.M1", true, MCRCalendar.TAG_JAPANESE);
-        assertCalEqualWithActual(cal, 8, JapaneseCalendar.SEPTEMBER, 1, JapaneseCalendar.MEIJI);
+        // Meiji era: 23.10.1868 - 29.07.1912
+        cal = MCRCalendar.getHistoryDateAsCalendar("23.10.M1", true, MCRCalendar.TAG_JAPANESE);
+        assertCalEqualWithActual(cal, 23, JapaneseCalendar.OCTOBER, 1, JapaneseCalendar.MEIJI);
 
         assertEquals(MCRCalendar.getJulianDayNumber(cal), MCRCalendar.getJulianDayNumber(
-            MCRCalendar.getHistoryDateAsCalendar("8.9.1868", false, MCRCalendar.TAG_GREGORIAN)));
+            MCRCalendar.getHistoryDateAsCalendar("23.10.1868", false, MCRCalendar.TAG_GREGORIAN)));
 
         cal = MCRCalendar.getHistoryDateAsCalendar("29.7.M45", true, MCRCalendar.TAG_JAPANESE);
         assertCalEqualWithActual(cal, 29, JapaneseCalendar.JULY, 45, JapaneseCalendar.MEIJI);

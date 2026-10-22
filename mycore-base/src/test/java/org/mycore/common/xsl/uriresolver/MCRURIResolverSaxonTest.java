@@ -54,7 +54,7 @@ public class MCRURIResolverSaxonTest {
         assertEquals("xslt-test", id);
         assertEquals("3.0", version);
         assertEquals("Saxonica", vendor);
-        assertEquals("http://www.saxonica.com/", vendorUrl);
+        assertEquals("https://www.saxonica.com/", vendorUrl);
 
     }
 
