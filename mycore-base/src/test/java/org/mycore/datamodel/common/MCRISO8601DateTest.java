@@ -19,6 +19,7 @@
 package org.mycore.datamodel.common;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -106,5 +107,19 @@ public class MCRISO8601DateTest {
         ts.setDate(timeString);
         assertNull(ts.getDate(), "Date is not null");
 
+    }
+
+    @Test
+    public void equalsAndHashCode() {
+        MCRISO8601Date date1 = new MCRISO8601Date("2006-01-23");
+        MCRISO8601Date date2 = new MCRISO8601Date("2006-01-23");
+        assertEquals(date1, date2, "Dates with same value should be equal");
+        assertEquals(date1.hashCode(), date2.hashCode(), "Dates with same value should have same hash code");
+
+        MCRISO8601Date date3 = new MCRISO8601Date("2006-01-24");
+        assertNotEquals(date1, date3, "Dates with different value should not be equal");
+
+        date2.setFormat(MCRISO8601Format.YEAR);
+        assertNotEquals(date1, date2, "Dates with different format should not be equal");
     }
 }

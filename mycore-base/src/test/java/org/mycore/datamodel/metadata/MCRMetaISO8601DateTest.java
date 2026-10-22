@@ -20,6 +20,7 @@ package org.mycore.datamodel.metadata;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.io.IOException;
@@ -174,6 +175,53 @@ public class MCRMetaISO8601DateTest {
         ts.setFromDOM(datum);
         assertNull(ts.getDate(), "Date should be null");
         assertEquals(MCRISO8601Format.COMPLETE_HH_MM.toString(), ts.getFormat(), "Format should be set by jdom");
+    }
+
+    @Test
+    public void createXMLAfterChange() {
+        MCRMetaISO8601Date ts = new MCRMetaISO8601Date("servdate", MCRObjectService.DATE_TYPE_MODIFYDATE, 0);
+        ts.setDate("2006-01-23");
+        assertEquals("2006-01-23", ts.createXML().getText());
+
+        ts.setDate("2007-02-24");
+        assertEquals("2007-02-24", ts.createXML().getText(), "createXML() should reflect setDate()");
+
+        ts.setFormat(MCRISO8601Format.YEAR.toString());
+        Element yearElement = ts.createXML();
+        assertEquals("2007", yearElement.getText(), "createXML() should reflect setFormat()");
+        assertEquals(MCRISO8601Format.YEAR.toString(), yearElement.getAttributeValue("format"));
+
+        ts.setType(MCRObjectService.DATE_TYPE_CREATEDATE);
+        assertEquals(MCRObjectService.DATE_TYPE_CREATEDATE, ts.createXML().getAttributeValue("type"),
+            "createXML() should reflect setType()");
+
+        ts.getMCRISO8601Date().setDate("2008");
+        assertEquals("2008", ts.createXML().getText(), "createXML() should reflect changes of MCRISO8601Date");
+    }
+
+    @Test
+    public void cloneAndEquals() {
+        MCRMetaISO8601Date ts = new MCRMetaISO8601Date("servdate", MCRObjectService.DATE_TYPE_MODIFYDATE, 0);
+        ts.setDate("2006-01-23");
+        MCRMetaISO8601Date clone = ts.clone();
+        assertNotSame(ts, clone);
+        assertEquals(ts, clone, "Clone should be equal to original");
+        assertEquals(ts.hashCode(), clone.hashCode(), "Clone should have same hash code as original");
+        clone.setDate("2007-02-24");
+        assertEquals("2006-01-23", ts.getISOString(), "Changing the clone should not change the original");
+
+        MCRMetaISO8601Date tsFromDate = new MCRMetaISO8601Date("servdate", MCRObjectService.DATE_TYPE_MODIFYDATE, 0);
+        tsFromDate.setDate(new Date());
+        assertEquals(tsFromDate, tsFromDate.clone(), "Clone of date set by java.util.Date should be equal");
+
+        MCRMetaISO8601Date emptyDate = new MCRMetaISO8601Date();
+        assertEquals(emptyDate, emptyDate.clone(), "Clone of empty date should be equal");
+
+        MCRMetaISO8601Date fromDOM1 = new MCRMetaISO8601Date();
+        fromDOM1.setFromDOM(ts.createXML());
+        MCRMetaISO8601Date fromDOM2 = new MCRMetaISO8601Date();
+        fromDOM2.setFromDOM(ts.createXML());
+        assertEquals(fromDOM1, fromDOM2, "Dates created from same XML should be equal");
     }
 
 }

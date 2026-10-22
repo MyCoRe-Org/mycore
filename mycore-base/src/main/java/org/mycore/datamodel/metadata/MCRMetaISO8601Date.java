@@ -49,10 +49,6 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private Element export;
-
-    private boolean changed = true;
-
     private MCRISO8601Date isoDate;
 
     /**
@@ -82,17 +78,12 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
      */
     @Override
     public Element createXML() throws MCRException {
-        if (!changed) {
-            return export.clone();
-        }
         Element elm = super.createXML();
         if (!(isoDate.getIsoFormat() == null || isoDate.getIsoFormat() == MCRISO8601Format.COMPLETE_HH_MM_SS_SSS)) {
             elm.setAttribute("format", isoDate.getIsoFormat().toString());
         }
         elm.setText(getISOString());
-        export = elm;
-        changed = false;
-        return export.clone();
+        return elm;
     }
 
     /**
@@ -121,7 +112,6 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
         super.setFromDOM(element);
         setFormat(element.getAttributeValue("format"));
         setDate(element.getTextTrim());
-        export = element.clone();
     }
 
     /**
@@ -219,11 +209,13 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
     public MCRMetaISO8601Date clone() {
         MCRMetaISO8601Date clone = (MCRMetaISO8601Date) super.clone();
 
-        clone.changed = changed;
-        clone.export = export.clone();
+        // copy via ISO 8601 representation, same as createXML() and setFromDOM() do
         clone.isoDate = new MCRISO8601Date();
         clone.isoDate.setFormat(isoDate.getIsoFormat());
-        clone.isoDate.setDate(isoDate.getDate());
+        String isoString = isoDate.getISOString();
+        if (isoString != null) {
+            clone.isoDate.setDate(isoString);
+        }
 
         return clone;
     }
@@ -251,7 +243,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + Objects.hash(changed, export, isoDate);
+        result = prime * result + Objects.hash(isoDate);
         return result;
     }
 
@@ -261,9 +253,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
             return false;
         }
         final MCRMetaISO8601Date other = (MCRMetaISO8601Date) obj;
-        return changed == other.changed
-            && Objects.equals(export, other.export)
-            && Objects.equals(isoDate, other.isoDate);
+        return Objects.equals(isoDate, other.isoDate);
     }
 
 }
