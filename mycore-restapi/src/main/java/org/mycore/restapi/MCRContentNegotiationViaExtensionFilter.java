@@ -26,6 +26,8 @@ import java.util.regex.Pattern;
 
 import org.glassfish.jersey.server.filter.UriConnegFilter;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.datamodel.niofs.archive.MCRTarArchiver;
+import org.mycore.datamodel.niofs.archive.MCRZipArchiver;
 
 import jakarta.annotation.Priority;
 import jakarta.ws.rs.Priorities;
@@ -39,9 +41,13 @@ import jakarta.ws.rs.ext.Provider;
  * This filter uses Jersey's default implementation of UriConnectFilter to set
  * the content headers by file extension.
  * <p>
- * It is preconfigured for the extensions (*.json, *.xml) and ignores resources
+ * It is preconfigured for the extensions (*.json, *.xml, *.rdf) and ignores resources
  * behind REST-API path /contents/ since there is the possibility that a valid
- * file extension (*.xml) will be removed through this filter by mistake
+ * file extension (*.xml) will be removed through this filter by mistake.
+ * <p>
+ * The only exception is the derivate root itself: {@code contents.zip} and {@code contents.tar}
+ * are mapped to the media types {@code application/zip} and {@code application/x-tar} to request
+ * an archive of all files of a derivate.
  * 
  * @author Robert Stephan
  */
@@ -56,7 +62,9 @@ public class MCRContentNegotiationViaExtensionFilter implements ContainerRequest
     private static final Map<String, MediaType> MEDIA_TYPE_MAPPINGS = Map.ofEntries(
         Map.entry("json", MediaType.APPLICATION_JSON_TYPE),
         Map.entry("xml", MediaType.APPLICATION_XML_TYPE),
-        Map.entry("rdf", MediaType.valueOf(APPLICATION_RDF_XML)));
+        Map.entry("rdf", MediaType.valueOf(APPLICATION_RDF_XML)),
+        Map.entry(MCRZipArchiver.FILE_EXTENSION, MediaType.valueOf(MCRZipArchiver.MIME_TYPE)),
+        Map.entry(MCRTarArchiver.FILE_EXTENSION, MediaType.valueOf(MCRTarArchiver.MIME_TYPE)));
 
     private final UriConnegFilter uriConnegFilter = new UriConnegFilter(MEDIA_TYPE_MAPPINGS, Map.of());
 

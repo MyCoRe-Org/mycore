@@ -60,6 +60,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectStructure;
 import org.mycore.datamodel.metadata.MCRXMLConstants;
 import org.mycore.datamodel.niofs.MCRPath;
+import org.mycore.datamodel.niofs.archive.MCRArchiver;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
@@ -247,11 +248,12 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
     /**
      * Constructs a path name in form of {ownerID}+'/'+{path} or {ownerID} if path is root component.
      * @param path absolute path
+     * @deprecated this method is no longer called, entry names are created by
+     * {@link MCRArchiver#getEntryName(MCRPath)}
      */
+    @Deprecated(forRemoval = true)
     protected String getFilename(MCRPath path) {
-        return path.getNameCount() == 0 ? path.getOwner()
-            : path.getOwner() + '/'
-                + path.getRoot().relativize(path);
+        return MCRArchiver.getEntryName(path);
     }
 
     protected abstract void sendCompressedDirectory(MCRPath file, BasicFileAttributes attrs, T container)

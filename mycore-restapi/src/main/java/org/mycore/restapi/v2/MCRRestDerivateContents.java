@@ -36,6 +36,7 @@ import java.nio.file.Files;
 import java.nio.file.SecureDirectoryStream;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Comparator;
@@ -46,8 +47,11 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import org.apache.commons.compress.archivers.ArchiveOutputStream;
+import org.apache.commons.io.output.CloseShieldOutputStream;
 import org.apache.commons.io.output.CountingOutputStream;
 import org.apache.commons.io.output.DeferredFileOutputStream;
 import org.apache.logging.log4j.LogManager;
@@ -63,6 +67,9 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRDigestAttributeView;
 import org.mycore.datamodel.niofs.MCRFileAttributes;
 import org.mycore.datamodel.niofs.MCRPath;
+import org.mycore.datamodel.niofs.archive.MCRArchiver;
+import org.mycore.datamodel.niofs.archive.MCRTarArchiver;
+import org.mycore.datamodel.niofs.archive.MCRZipArchiver;
 import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 import org.mycore.frontend.jersey.MCRCacheControl;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
@@ -96,6 +103,7 @@ import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.StreamingOutput;
 import jakarta.ws.rs.core.UriInfo;
 import jakarta.ws.rs.core.Variant;
 import jakarta.xml.bind.annotation.XmlAccessType;
@@ -107,6 +115,16 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 @Path("/objects/{" + PARAM_MCRID + "}/derivates/{" + PARAM_DERID + "}/contents{" + PARAM_DER_PATH + ":(/[^/]+)*}")
 public class MCRRestDerivateContents {
     private static final String HTTP_HEADER_IS_DIRECTORY = "X-MCR-IsDirectory";
+
+    private static final List<MCRArchiver<?>> ARCHIVERS = List.of(new MCRZipArchiver(), new MCRTarArchiver());
+
+    private static final Map<MediaType, MCRArchiver<?>> ARCHIVERS_BY_MEDIA_TYPE = ARCHIVERS.stream()
+        .collect(Collectors.toMap(archiver -> MediaType.valueOf(archiver.getMimeType()), Function.identity()));
+
+    private static final List<Variant> DIRECTORY_VARIANTS = Variant.mediaTypes(Stream.concat(
+        Stream.of(MediaType.APPLICATION_XML_TYPE, MediaType.APPLICATION_JSON_TYPE),
+        ARCHIVERS.stream().map(archiver -> MediaType.valueOf(archiver.getMimeType())))
+        .toArray(MediaType[]::new)).build();
 
     @Context
     ContainerRequestContext request;
@@ -319,11 +337,15 @@ public class MCRRestDerivateContents {
 
     @GET
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON + ";charset=UTF-8",
-        MediaType.WILDCARD })
+        MCRZipArchiver.MIME_TYPE, MCRTarArchiver.MIME_TYPE, MediaType.WILDCARD })
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     @Operation(
         summary = "List directory contents or serves file given by {path} in derivate",
+        description = "If {path} is a directory, the response depends on the Accept header: application/xml or "
+            + "application/json list the directory, application/zip or application/x-tar deliver all files of "
+            + "the directory as archive. For the whole derivate the archive formats can also be requested with "
+            + "the file extensions 'contents.zip' and 'contents.tar'.",
         tags = MCRRestUtils.TAG_MYCORE_FILE)
     public Response getFileOrDirectory(@Context UriInfo uriInfo, @Context HttpHeaders requestHeader) {
         MCRRestDerivates.validateDerivateRelation(mcrId, derid);
@@ -342,6 +364,11 @@ public class MCRRestDerivateContents {
         }
         Date lastModified = new Date(fileAttributes.lastModifiedTime().toMillis());
         if (fileAttributes.isDirectory()) {
+            Variant variant = request.getRequest().selectVariant(DIRECTORY_VARIANTS);
+            MCRArchiver<?> archiver = variant == null ? null : ARCHIVERS_BY_MEDIA_TYPE.get(variant.getMediaType());
+            if (archiver != null) {
+                return serveArchive(mcrPath, archiver);
+            }
             return MCRRestUtils
                 .getCachedResponse(request.getRequest(), lastModified)
                 .orElseGet(() -> serveDirectory(mcrPath, fileAttributes));
@@ -487,6 +514,41 @@ public class MCRRestDerivateContents {
         return ((!"true".equalsIgnoreCase(headers.getFirst(HTTP_HEADER_IS_DIRECTORY))))
             && !request.getUriInfo().getPath().endsWith("/")
             && (headers.containsKey(HttpHeaders.CONTENT_LENGTH) || headers.containsKey("Transfer-Encoding"));
+    }
+
+    private <T extends ArchiveOutputStream<?>> Response serveArchive(MCRPath dir, MCRArchiver<T> archiver) {
+        // the archive is generated on the fly, so the tree is walked once to get a validator for caches
+        Date lastModified;
+        try {
+            lastModified = new Date(archiver.getLastModified(dir));
+        } catch (IOException e) {
+            throw MCRErrorResponse.ofStatusCode(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
+                .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_FILE_IO_ERROR)
+                .withMessage("Could not read " + dir + ".")
+                .withDetail(e.getMessage())
+                .withCause(e)
+                .toException();
+        }
+        Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request.getRequest(), lastModified);
+        if (cachedResponse.isPresent()) {
+            return cachedResponse.get();
+        }
+        String comment = "Created by " + request.getUriInfo().getRequestUri() + " at " + Instant.now();
+        StreamingOutput stream = out -> {
+            // the shield keeps the entity stream open, closing it would end the MCRSession too early
+            T container = archiver.createContainer(CloseShieldOutputStream.wrap(out), comment);
+            // on errors the archive is neither finished nor closed, so the client receives a broken download
+            // instead of a valid but incomplete archive
+            archiver.sendTree(dir, container);
+            container.finish();
+            container.close();
+        };
+        String fileName = path.isEmpty() ? derid.toString() : derid + path.replace('/', '-');
+        return Response.ok(stream, archiver.getMimeType())
+            .lastModified(lastModified)
+            .header(HttpHeaders.CONTENT_DISPOSITION,
+                MCRRestUtils.getContentDisposition("attachment", fileName + "." + archiver.getFileExtension()))
+            .build();
     }
 
     private Response serveDirectory(MCRPath mcrPath, MCRFileAttributes dirAttrs) {
