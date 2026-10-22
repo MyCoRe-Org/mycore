@@ -21,6 +21,7 @@ package org.mycore.datamodel.language;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -95,6 +96,32 @@ public class MCRLanguageFactoryTest extends MCRJPATestCase {
                 assertFalse(MCRTransactionHelper.isTransactionActive());
             } finally {
                 releaseAndCloseCurrentSession();
+            }
+        });
+    }
+
+    @Test
+    public void readsTheLanguageClassificationWithoutSession() throws Exception {
+        runInNewThread(() -> {
+            assertTrue(MCRSessionMgr.isLocked());
+            assertFalse(MCRSessionMgr.hasCurrentSession());
+            assertLanguageFromClassification();
+            assertTrue(MCRSessionMgr.isLocked());
+            assertFalse(MCRSessionMgr.hasCurrentSession());
+        });
+    }
+
+    @Test
+    public void readsTheLanguageClassificationInActiveTransactionWithoutSession() throws Exception {
+        runInNewThread(() -> {
+            assertTrue(MCRSessionMgr.isLocked());
+            MCRTransactionHelper.beginTransaction();
+            try {
+                assertLanguageFromClassification();
+                assertTrue(MCRTransactionHelper.isTransactionActive());
+                assertFalse(MCRSessionMgr.hasCurrentSession());
+            } finally {
+                MCRTransactionHelper.rollbackTransaction();
             }
         });
     }
