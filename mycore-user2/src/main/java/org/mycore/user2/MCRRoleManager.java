@@ -21,7 +21,7 @@ package org.mycore.user2;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
@@ -49,15 +49,10 @@ public class MCRRoleManager {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    /** Map of defined roles, key is the unique role name */
-    private static Map<String, MCRRole> rolesByName = new HashMap<>();
-
-    /** List of all defined roles */
-    private static List<MCRRole> rolesList = new ArrayList<>();
-
     private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.obtainInstance();
 
-    private static long lastLoaded;
+    /** defined system roles, replaced as a whole if the classification changes */
+    private static volatile SystemRoles systemRoles = new SystemRoles(-1, Map.of(), List.of());
 
     private static final MCRCategLinkService CATEG_LINK_SERVICE = MCRCategLinkServiceFactory.obtainInstance();
 
@@ -65,23 +60,26 @@ public class MCRRoleManager {
         loadSystemRoles();
     }
 
-    private static void loadSystemRoles() {
-        if (lastLoaded == DAO.getLastModified() || !DAO.exist(MCRUser2Constants.ROLE_CLASSID)) {
-            return;
+    private static SystemRoles loadSystemRoles() {
+        SystemRoles current = systemRoles;
+        long lastModified = DAO.getLastModified();
+        if (current.lastLoaded() == lastModified || !DAO.exist(MCRUser2Constants.ROLE_CLASSID)) {
+            return current;
         }
-        lastLoaded = DAO.getLastModified();
         int onlyNonHierarchicalRoles = 1;
         MCRCategory roleCategory = DAO.getCategory(MCRUser2Constants.ROLE_CLASSID, onlyNonHierarchicalRoles);
-        rolesByName.clear();
-        rolesList.clear();
+        Map<String, MCRRole> rolesByName = new LinkedHashMap<>();
         if (roleCategory != null) {
             for (MCRCategory child : roleCategory.getChildren()) {
                 String name = child.getId().getId();
-                MCRRole role = new MCRRole(name, child.getLabels());
-                rolesByName.put(name, role);
-                rolesList.add(role);
+                rolesByName.put(name, new MCRRole(name, child.getLabels()));
             }
         }
+        // never modify the current instance, as other threads may read it concurrently
+        SystemRoles loaded = new SystemRoles(lastModified, Map.copyOf(rolesByName),
+            List.copyOf(rolesByName.values()));
+        systemRoles = loaded;
+        return loaded;
     }
 
     /**
@@ -91,8 +89,7 @@ public class MCRRoleManager {
      * @return the role with the given role name, or null.
      */
     public static MCRRole getRole(String name) {
-        loadSystemRoles();
-        MCRRole mcrRole = rolesByName.get(name);
+        MCRRole mcrRole = loadSystemRoles().rolesByName().get(name);
         if (mcrRole == null) {
             return getExternalRole(name);
         }
@@ -124,7 +121,7 @@ public class MCRRoleManager {
      * @return array each element either MCRRole instance, or null
      */
     public static MCRRole[] getRoles(String... names) {
-        loadSystemRoles();
+        Map<String, MCRRole> rolesByName = loadSystemRoles().rolesByName();
         MCRRole[] roles = new MCRRole[names.length];
         for (int i = 0; i < names.length; i++) {
             roles[i] = rolesByName.get(names[i]);
@@ -142,7 +139,6 @@ public class MCRRoleManager {
      * @return collection each element is MCRRole instance.
      */
     public static Collection<MCRRole> getRoles(Collection<String> names) {
-        loadSystemRoles();
         String[] namesArr = names.toArray(String[]::new);
         MCRRole[] roles = getRoles(namesArr);
         return Arrays.asList(roles);
@@ -151,10 +147,10 @@ public class MCRRoleManager {
     /**
      * Returns a list of all defined roles
      *
-     * @return a list of all defined roles
+     * @return an unmodifiable list of all defined roles
      */
     public static List<MCRRole> listSystemRoles() {
-        return rolesList;
+        return loadSystemRoles().rolesList();
     }
 
     /**
@@ -261,4 +257,15 @@ public class MCRRoleManager {
         }
         return MCRCategoryID.ofString(role.getName());
     }
+
+    /**
+     * Immutable snapshot of the system roles.
+     *
+     * @param lastLoaded last modified timestamp of the classifications when the roles were loaded
+     * @param rolesByName defined roles, key is the unique role name
+     * @param rolesList all defined roles
+     */
+    private record SystemRoles(long lastLoaded, Map<String, MCRRole> rolesByName, List<MCRRole> rolesList) {
+    }
+
 }

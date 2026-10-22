@@ -29,10 +29,10 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -109,8 +109,6 @@ public class MCRLayoutUtilities {
     private static final boolean ACCESS_CONTROLL_ON = MCRConfiguration2
         .getOrThrow("MCR.Website.ReadAccessVerification", Boolean::parseBoolean);
 
-    private static Map<String, Element> itemStore = new HashMap<>();
-
     private static final LoadingCache<String, DocumentHolder> NAV_DOCUMENT_CACHE = CacheBuilder.newBuilder()
         .refreshAfterWrite(STANDARD_CACHE_SECONDS, TimeUnit.SECONDS).build(new CacheLoader<>() {
 
@@ -119,12 +117,7 @@ public class MCRLayoutUtilities {
             @Override
             public DocumentHolder load(String key) throws Exception {
                 URL url = MCRResourceHelper.getWebResourceUrl(key);
-                try {
-                    return new DocumentHolder(url);
-                } finally {
-                    itemStore.clear();
-                }
-
+                return new DocumentHolder(url);
             }
 
             @Override
@@ -284,11 +277,15 @@ public class MCRLayoutUtilities {
      * Returns a Element presentation of an item[@href=$webpageID]
      */
     private static Element getItem(String webpageID) {
-        Element item = itemStore.get(webpageID);
+        // items are cached per document, so a reloaded navigation.xml never returns stale items
+        DocumentHolder navigation = NAV_DOCUMENT_CACHE.getUnchecked(NAV_RESOURCE);
+        Element item = webpageID == null ? null : navigation.items.get(webpageID);
         if (item == null) {
             XPathExpression<Element> xpath = XPATH_FACTORY.compile("//.[@href='" + webpageID + "']", Filters.element());
-            item = xpath.evaluateFirst(getNavi());
-            itemStore.put(webpageID, item);
+            item = xpath.evaluateFirst(navigation.parsedDocument);
+            if (item != null && webpageID != null) {
+                navigation.items.put(webpageID, item);
+            }
         }
         return item;
     }
@@ -474,6 +471,9 @@ public class MCRLayoutUtilities {
         Document parsedDocument;
 
         long lastModified;
+
+        /** items of {@link #parsedDocument}, key is the webpage ID (item/@href) */
+        final Map<String, Element> items = new ConcurrentHashMap<>();
 
         DocumentHolder(URL url) throws JDOMException, IOException {
             docURL = url;
