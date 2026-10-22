@@ -370,11 +370,14 @@ public final class MCRTransactionManager {
      * <p>This method iterates over all active transactions in the current thread, attempts to roll back each one,
      * and then clears the active transactions list. If exceptions occur during the rollback process, they are
      * collected, and a {@link MCRTransactionException} is thrown at the end with all suppressed exceptions.</p>
+     * <p>
+     * Pending on-commit tasks of the current {@link MCRSession} are discarded.
      *
      * @throws MCRTransactionException if any errors occur during the rollback process
      */
     public static void rollbackTransactions() {
         List<? extends MCRPersistenceTransaction> transactionsToRollback = new ArrayList<>(getActiveTransactions());
+        discardOnCommitTasks();
         rollbackTransactions(transactionsToRollback);
     }
 
@@ -543,9 +546,19 @@ public final class MCRTransactionManager {
      */
     private static void throwAndRollback(MCRTransactionException transactionException) {
         List<MCRPersistenceTransaction> transactionsToRollback = new ArrayList<>(getActiveTransactions());
+        discardOnCommitTasks();
         List<Exception> exceptionsOnRollback = rollback(transactionsToRollback);
         exceptionsOnRollback.forEach(transactionException::addSuppressed);
         throw transactionException;
+    }
+
+    /**
+     * Discards the on-commit tasks of the current {@link MCRSession}, as all transactions are rolled back.
+     */
+    private static void discardOnCommitTasks() {
+        if (MCRSessionMgr.hasCurrentSession()) {
+            MCRSessionMgr.getCurrentSession().discardOnCommitTasks();
+        }
     }
 
     /**
