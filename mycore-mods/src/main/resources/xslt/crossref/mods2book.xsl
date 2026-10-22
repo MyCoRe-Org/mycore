@@ -80,7 +80,7 @@
       <xsl:for-each select="mods:titleInfo">
         <cr:title>
           <xsl:if test="mods:nonSort">
-            <xsl:value-of select="concat(mods:nonSort/text(), ' ')"/>
+            <xsl:value-of select="concat(mods:nonSort[1], ' ')"/>
           </xsl:if>
           <xsl:value-of select="mods:title/text()"/>
         </cr:title>
