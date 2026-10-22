@@ -10,7 +10,7 @@
     <newIdentifiersFound>
       <mods:identifier xmlns:mods="http://www.loc.gov/mods/v3" type="issn">1521-3765</mods:identifier>
     </newIdentifiersFound>
-    <resolved from="GBV">
+    <resolved from="GBV" uri="resource:MCREnrichmentTest/gbv-1521-3765.xml">
       <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
         <mods:note>from data source GBV via ISSN</mods:note>
         <mods:identifier type="issn">1521-3765</mods:identifier>
@@ -29,7 +29,7 @@
     <newIdentifiersFound>
       <mods:identifier xmlns:mods="http://www.loc.gov/mods/v3" type="doi">10.1002/(ISSN)1521-3765</mods:identifier>
     </newIdentifiersFound>
-    <resolved from="CrossRef">
+    <resolved from="CrossRef" uri="resource:MCREnrichmentTest/crossref-doi.xml">
       <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
         <mods:note>from data source CrossRef via DOI</mods:note>
         <mods:identifier type="issn">1521-3765</mods:identifier>
@@ -44,7 +44,7 @@
         <mods:note>from data source CrossRef via DOI</mods:note>
       </mods:mods>
     </afterMerge>
-    <resolved from="GBV">
+    <resolved from="GBV" uri="resource:MCREnrichmentTest/gbv-doi.xml">
       <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
         <mods:note>from data source GBV via DOI</mods:note>
         <mods:identifier type="issn">1521-3765</mods:identifier>

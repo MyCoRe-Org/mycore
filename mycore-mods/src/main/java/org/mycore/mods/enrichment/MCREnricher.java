@@ -185,7 +185,7 @@ public class MCREnricher {
                     if (call.wasSuccessful()) {
                         call.getResults().forEach(result -> {
                             LOGGER.info(() -> "merging data from " + token);
-                            merge(publication, result);
+                            merge(publication, result.element());
                             debugger.debugResolved(token, result);
                             debugger.debugPublication("afterMerge", publication);
                         });
