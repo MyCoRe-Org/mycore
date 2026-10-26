@@ -639,7 +639,7 @@ public class MCRRestObjects {
         MCRStreamContent inputContent = new MCRStreamContent(xmlSource, null, MCRObject.ROOT_NAME);
         MCRObject updatedObject;
         try {
-            updatedObject = new MCRObject(inputContent.asXML());
+            updatedObject = new MCRObject(MCRXMLParserFactory.getValidatingParser().parseXML(inputContent));
             updatedObject.validate();
         } catch (JDOMException | MCRException e) {
             throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
