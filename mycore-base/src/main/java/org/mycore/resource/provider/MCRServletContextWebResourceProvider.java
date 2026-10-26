@@ -47,13 +47,15 @@ import jakarta.servlet.ServletContext;
 @MCRConfigurationProxy(proxyClass = MCRServletContextWebResourceProvider.Factory.class)
 public final class MCRServletContextWebResourceProvider extends MCRLocatorResourceProvider {
 
+    public static final String DEFAULT_KEY_PREFIX = MCRResourceProviderBase.DEFAULT_KEY_PREFIX + ".ServletContext";
+
     public MCRServletContextWebResourceProvider(String coverage) {
         super(coverage, new MCRServletContextWebResourceLocator());
     }
 
     public static class Factory implements Supplier<MCRServletContextWebResourceProvider> {
 
-        @MCRProperty(name = COVERAGE_KEY, defaultName = "MCR.Resource.Provider.Default.ServletContext.Coverage")
+        @MCRProperty(name = COVERAGE_KEY, defaultNamePrefix = DEFAULT_KEY_PREFIX)
         public String coverage;
 
         @Override

@@ -58,6 +58,8 @@ import org.mycore.common.log.MCRTreeMessage;
 @MCRConfigurationProxy(proxyClass = MCRFileSystemResourceProvider.Factory.class)
 public final class MCRFileSystemResourceProvider extends MCRFileSystemResourceProviderBase {
 
+    public static final String DEFAULT_KEY_PREFIX = MCRResourceProviderBase.DEFAULT_KEY_PREFIX + ".FileSystem";
+
     public static final String BASE_DIRS_KEY = "BaseDirs";
 
     private final List<Path> baseDirs;
@@ -86,7 +88,7 @@ public final class MCRFileSystemResourceProvider extends MCRFileSystemResourcePr
 
     public static class Factory implements Supplier<MCRFileSystemResourceProvider> {
 
-        @MCRProperty(name = COVERAGE_KEY, defaultName = "MCR.Resource.Provider.Default.FileSystem.Coverage")
+        @MCRProperty(name = COVERAGE_KEY, defaultNamePrefix = DEFAULT_KEY_PREFIX)
         public String coverage;
 
         @MCRProperty(name = MODE_KEY)

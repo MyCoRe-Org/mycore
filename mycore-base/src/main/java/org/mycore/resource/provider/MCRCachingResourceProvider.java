@@ -61,6 +61,8 @@ import org.mycore.resource.common.MCRResourceTracer;
 @MCRConfigurationProxy(proxyClass = MCRCachingResourceProvider.Factory.class)
 public class MCRCachingResourceProvider extends MCRResourceProviderBase {
 
+    public static final String DEFAULT_KEY_PREFIX = MCRResourceProviderBase.DEFAULT_KEY_PREFIX + ".Caching";
+
     public static final String CAPACITY_KEY = "Capacity";
 
     public static final String PROVIDER_KEY = "Provider";
@@ -115,10 +117,10 @@ public class MCRCachingResourceProvider extends MCRResourceProviderBase {
 
     public static class Factory implements Supplier<MCRCachingResourceProvider> {
 
-        @MCRProperty(name = COVERAGE_KEY, defaultName = "MCR.Resource.Provider.Default.Caching.Coverage")
+        @MCRProperty(name = COVERAGE_KEY, defaultNamePrefix = DEFAULT_KEY_PREFIX)
         public String coverage;
 
-        @MCRProperty(name = CAPACITY_KEY, defaultName = "MCR.Resource.Provider.Default.Caching.Capacity")
+        @MCRProperty(name = CAPACITY_KEY, defaultNamePrefix = DEFAULT_KEY_PREFIX)
         public String capacity;
 
         @MCRInstance(name = PROVIDER_KEY, valueClass = MCRResourceProvider.class)

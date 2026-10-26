@@ -42,11 +42,13 @@ import org.mycore.util.concurrent.MCRFixedUserCallable;
  */
 public class MCRURNGranularRESTRegistrationCronjob extends MCRCronjob {
 
+    public static final String DEFAULT_PROPERTY_PREFIX = "MCR.CronJob.Default.URNGranularRESTRegistration";
+
     private static final Logger LOGGER = LogManager.getLogger();
 
     private int batchSize = 20;
 
-    @MCRProperty(name = "BatchSize", defaultName = "MCR.CronJob.Default.URNGranularRESTRegistration.BatchSize")
+    @MCRProperty(name = "BatchSize", defaultNamePrefix = DEFAULT_PROPERTY_PREFIX)
     public void setBatchSize(String batchSize) {
         this.batchSize = Integer.parseInt(batchSize);
     }
