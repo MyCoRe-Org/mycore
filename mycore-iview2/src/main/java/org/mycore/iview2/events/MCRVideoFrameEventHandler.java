@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCREvent;
@@ -36,6 +38,8 @@ import org.mycore.services.queuedjob.MCRJobQueueManager;
 
 /** Creates iView images for every video file, independent of the derivate's main document. */
 public class MCRVideoFrameEventHandler extends MCREventHandlerBase {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String VIDEO_FRAME_GENERATOR_PROPERTY = "MCR.Media.VideoFrameGenerator";
 
@@ -52,18 +56,15 @@ public class MCRVideoFrameEventHandler extends MCREventHandlerBase {
                 job.setParameter(MCRVideoFrameJobAction.PATH_PARAMETER, path.getOwnerRelativePath());
                 MCRJobQueueManager.getInstance().getJobQueue(MCRVideoFrameJobAction.class).add(job);
             }
-        } catch (IOException e) {
-            throw new MCRException("Could not enqueue video frame generation for " + file, e);
+        } catch (IOException | RuntimeException e) {
+            // The poster is optional and must not abort the file event.
+            LOGGER.warn("Could not enqueue video frame generation for {}", file, e);
         }
     }
 
     private boolean checkRequirements(MCRPath path) {
-        try {
-            return MCRConfiguration2.getInstanceOfOrThrow(MCRVideoFrameGenerator.class,
-                VIDEO_FRAME_GENERATOR_PROPERTY).checkRequirements(path);
-        } catch (RuntimeException e) {
-            throw new MCRException("Could not check video frame generator requirements", e);
-        }
+        return MCRConfiguration2.getInstanceOfOrThrow(MCRVideoFrameGenerator.class,
+            VIDEO_FRAME_GENERATOR_PROPERTY).checkRequirements(path);
     }
 
     @Override
