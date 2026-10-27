@@ -32,6 +32,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 
@@ -180,6 +181,13 @@ class MCRFFmpegVideoFrameGeneratorTest {
     })
     void replacesGeneratorThroughConfiguration() {
         assertInstanceOf(CustomGenerator.class, configuredGenerator());
+    }
+
+    @Test
+    void killsProcessAfterTimeout() throws Exception {
+        assumeTrue(Files.isExecutable(Path.of("/bin/sleep")), "sleep is required for the timeout test");
+        Process process = new MCRFFmpegVideoFrameGenerator.TimeoutProcessFunction(1).run(List.of("/bin/sleep", "60"));
+        assertTrue(process.waitFor(10, TimeUnit.SECONDS));
     }
 
     private MCRVideoFrameGenerator configuredGenerator() {

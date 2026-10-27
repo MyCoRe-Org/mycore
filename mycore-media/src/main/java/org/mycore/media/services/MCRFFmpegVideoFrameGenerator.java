@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
@@ -33,6 +34,7 @@ import org.mycore.common.config.annotation.MCRProperty;
 
 import net.bramp.ffmpeg.FFmpeg;
 import net.bramp.ffmpeg.FFprobe;
+import net.bramp.ffmpeg.RunProcessFunction;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
 import net.bramp.ffmpeg.probe.FFmpegProbeResult;
 import net.bramp.ffmpeg.probe.FFmpegStream;
@@ -50,6 +52,8 @@ public class MCRFFmpegVideoFrameGenerator implements MCRVideoFrameGenerator {
 
     private String probeExecutable = "ffprobe";
 
+    private long timeout;
+
     @MCRProperty(name = "Executable", required = false)
     public void setExecutable(String executable) {
         this.executable = executable;
@@ -60,11 +64,18 @@ public class MCRFFmpegVideoFrameGenerator implements MCRVideoFrameGenerator {
         this.probeExecutable = probeExecutable;
     }
 
+    /** Sets the maximum runtime in seconds of a single FFmpeg or FFprobe process. */
+    @MCRProperty(name = "Timeout")
+    public void setTimeout(String timeout) {
+        this.timeout = Long.parseLong(timeout);
+    }
+
     @Override
     public boolean checkRequirements(Path video) {
         try {
             return video != null && Files.isRegularFile(video) && Files.isReadable(video)
-                && new FFmpeg(executable).isFFmpeg() && new FFprobe(probeExecutable).isFFprobe();
+                && new FFmpeg(executable, processFunction()).isFFmpeg()
+                && new FFprobe(probeExecutable, processFunction()).isFFprobe();
         } catch (IOException e) {
             LOGGER.warn("Video frame generation is unavailable for {} because FFmpeg or FFprobe cannot be used",
                 video, e);
@@ -80,8 +91,8 @@ public class MCRFFmpegVideoFrameGenerator implements MCRVideoFrameGenerator {
             Files.copy(video, input, StandardCopyOption.REPLACE_EXISTING);
             Path output = Files.createTempFile("MyCoRe-Video-Frame-", ".png");
             try {
-                FFmpeg ffmpeg = new FFmpeg(executable);
-                FFmpegProbeResult probe = new FFprobe(probeExecutable).probe(input.toString());
+                FFmpeg ffmpeg = new FFmpeg(executable, processFunction());
+                FFmpegProbeResult probe = new FFprobe(probeExecutable, processFunction()).probe(input.toString());
                 FFmpegStream stream = selectStream(probe);
                 if (stream == null) {
                     throw new IOException("No video stream or embedded cover found in " + video);
@@ -175,6 +186,35 @@ public class MCRFFmpegVideoFrameGenerator implements MCRVideoFrameGenerator {
         }
         ffmpeg.run(builder);
         return Files.isRegularFile(output) && Files.size(output) > 0 ? ImageIO.read(output.toFile()) : null;
+    }
+
+    private TimeoutProcessFunction processFunction() {
+        return new TimeoutProcessFunction(timeout);
+    }
+
+    /** Starts processes like FFmpeg's default and kills them when they run longer than the timeout. */
+    static final class TimeoutProcessFunction extends RunProcessFunction {
+
+        private final long timeout;
+
+        TimeoutProcessFunction(long timeout) {
+            this.timeout = timeout;
+        }
+
+        @Override
+        public Process run(List<String> args) throws IOException {
+            Process process = super.run(args);
+            // The future completes when the process exits and fails only if the timeout elapses first.
+            process.onExit()
+                .orTimeout(timeout, TimeUnit.SECONDS)
+                .whenComplete((finished, timeoutError) -> {
+                    if (timeoutError != null) {
+                        LOGGER.warn("Killing {} after {} seconds", args, timeout);
+                        process.destroyForcibly();
+                    }
+                });
+            return process;
+        }
     }
 
 }
