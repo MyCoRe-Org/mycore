@@ -67,7 +67,7 @@ class MCRVideoFrameEventHandlerTest {
             contentTypes.when(() -> MCRContentTypes.probeContentType(second)).thenReturn("video/webm");
             configuration.when(() -> MCRConfiguration2.getInstanceOfOrThrow(MCRVideoFrameGenerator.class,
                 "MCR.Media.VideoFrameGenerator")).thenReturn(new AvailableGenerator());
-            MCRVideoFrameEventHandler handler = new MCRVideoFrameEventHandler();
+            MCRVideoFrameEventHandler handler = handlerWithTiles(false);
             handler.handlePathCreated(null, first, attributes);
             handler.handlePathCreated(null, second, attributes);
             handler.handlePathUpdated(null, second, attributes);
@@ -139,11 +139,24 @@ class MCRVideoFrameEventHandlerTest {
             contentTypes.when(() -> MCRContentTypes.probeContentType(path)).thenReturn("video/mp4");
             configuration.when(() -> MCRConfiguration2.getInstanceOfOrThrow(MCRVideoFrameGenerator.class,
                 "MCR.Media.VideoFrameGenerator")).thenReturn(new AvailableGenerator());
-            new MCRVideoFrameEventHandler().handlePathRepaired(null, path, attributes);
+            handlerWithTiles(false).handlePathRepaired(null, path, attributes);
             verify(dao).getJobCount(eq(MCRVideoFrameJobAction.class), eq(Map.of(
                 MCRVideoFrameJobAction.DERIVATE_PARAMETER, "test_derivate_00000001",
                 MCRVideoFrameJobAction.PATH_PARAMETER, "/queued.mp4")), anyList());
             verify(queue, times(0)).offer(any(MCRJob.class));
+        }
+    }
+
+    @Test
+    void repairSkipsVideoWithExistingTiles() {
+        MCRPath path = video("/tiled.mp4");
+        BasicFileAttributes attributes = mock(BasicFileAttributes.class);
+        when(attributes.isRegularFile()).thenReturn(true);
+        try (var managers = mockStatic(MCRJobQueueManager.class);
+            var contentTypes = mockStatic(MCRContentTypes.class)) {
+            handlerWithTiles(true).handlePathRepaired(null, path, attributes);
+            managers.verifyNoInteractions();
+            contentTypes.verifyNoInteractions();
         }
     }
 
@@ -158,6 +171,15 @@ class MCRVideoFrameEventHandlerTest {
             commands.verify(() -> MCRIView2Commands.deleteImageTiles("test_derivate_00000001", "/folder/deleted.mp4"));
             contentTypes.verifyNoInteractions();
         }
+    }
+
+    private MCRVideoFrameEventHandler handlerWithTiles(boolean tiled) {
+        return new MCRVideoFrameEventHandler() {
+            @Override
+            boolean hasTiles(MCRPath path) {
+                return tiled;
+            }
+        };
     }
 
     private MCRPath video(String relativePath) {
