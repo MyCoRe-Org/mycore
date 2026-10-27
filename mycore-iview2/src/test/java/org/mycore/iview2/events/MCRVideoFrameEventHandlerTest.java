@@ -24,10 +24,15 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.eq;
 
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.awt.image.BufferedImage;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -38,6 +43,7 @@ import org.mycore.iview2.backend.MCRVideoFrameJobAction;
 import org.mycore.iview2.frontend.MCRIView2Commands;
 import org.mycore.media.services.MCRVideoFrameGenerator;
 import org.mycore.services.queuedjob.MCRJob;
+import org.mycore.services.queuedjob.MCRJobDAO;
 import org.mycore.services.queuedjob.MCRJobQueue;
 import org.mycore.services.queuedjob.MCRJobQueueManager;
 
@@ -52,6 +58,7 @@ class MCRVideoFrameEventHandlerTest {
         MCRJobQueue queue = mock(MCRJobQueue.class);
         MCRJobQueueManager manager = mock(MCRJobQueueManager.class);
         when(manager.getJobQueue(MCRVideoFrameJobAction.class)).thenReturn(queue);
+        when(manager.getJobDAO()).thenReturn(mock(MCRJobDAO.class));
         try (var managers = mockStatic(MCRJobQueueManager.class);
             var contentTypes = mockStatic(MCRContentTypes.class);
             var configuration = mockStatic(MCRConfiguration2.class)) {
@@ -111,6 +118,32 @@ class MCRVideoFrameEventHandlerTest {
                 "MCR.Media.VideoFrameGenerator")).thenReturn(new UnavailableGenerator());
             new MCRVideoFrameEventHandler().handlePathCreated(null, path, attributes);
             verify(queue, times(0)).offer(org.mockito.ArgumentMatchers.any(MCRJob.class));
+        }
+    }
+
+    @Test
+    void doesNotQueueVideoWhenJobAlreadyExists() throws Exception {
+        MCRPath path = video("/queued.mp4");
+        BasicFileAttributes attributes = mock(BasicFileAttributes.class);
+        when(attributes.isRegularFile()).thenReturn(true);
+        MCRJobQueue queue = mock(MCRJobQueue.class);
+        MCRJobDAO dao = mock(MCRJobDAO.class);
+        when(dao.getJobCount(eq(MCRVideoFrameJobAction.class), anyMap(), anyList())).thenReturn(1);
+        MCRJobQueueManager manager = mock(MCRJobQueueManager.class);
+        when(manager.getJobQueue(MCRVideoFrameJobAction.class)).thenReturn(queue);
+        when(manager.getJobDAO()).thenReturn(dao);
+        try (var managers = mockStatic(MCRJobQueueManager.class);
+            var contentTypes = mockStatic(MCRContentTypes.class);
+            var configuration = mockStatic(MCRConfiguration2.class)) {
+            managers.when(MCRJobQueueManager::getInstance).thenReturn(manager);
+            contentTypes.when(() -> MCRContentTypes.probeContentType(path)).thenReturn("video/mp4");
+            configuration.when(() -> MCRConfiguration2.getInstanceOfOrThrow(MCRVideoFrameGenerator.class,
+                "MCR.Media.VideoFrameGenerator")).thenReturn(new AvailableGenerator());
+            new MCRVideoFrameEventHandler().handlePathRepaired(null, path, attributes);
+            verify(dao).getJobCount(eq(MCRVideoFrameJobAction.class), eq(Map.of(
+                MCRVideoFrameJobAction.DERIVATE_PARAMETER, "test_derivate_00000001",
+                MCRVideoFrameJobAction.PATH_PARAMETER, "/queued.mp4")), anyList());
+            verify(queue, times(0)).offer(any(MCRJob.class));
         }
     }
 

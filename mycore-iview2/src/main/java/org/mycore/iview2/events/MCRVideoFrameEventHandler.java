@@ -21,6 +21,7 @@ package org.mycore.iview2.events;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,6 +36,7 @@ import org.mycore.iview2.frontend.MCRIView2Commands;
 import org.mycore.media.services.MCRVideoFrameGenerator;
 import org.mycore.services.queuedjob.MCRJob;
 import org.mycore.services.queuedjob.MCRJobQueueManager;
+import org.mycore.services.queuedjob.MCRJobStatus;
 
 /** Creates iView images for every video file, independent of the derivate's main document. */
 public class MCRVideoFrameEventHandler extends MCREventHandlerBase {
@@ -54,7 +56,11 @@ public class MCRVideoFrameEventHandler extends MCREventHandlerBase {
                 MCRJob job = new MCRJob(MCRVideoFrameJobAction.class);
                 job.setParameter(MCRVideoFrameJobAction.DERIVATE_PARAMETER, path.getOwner());
                 job.setParameter(MCRVideoFrameJobAction.PATH_PARAMETER, path.getOwnerRelativePath());
-                if (!MCRJobQueueManager.getInstance().getJobQueue(MCRVideoFrameJobAction.class).offer(job)) {
+                MCRJobQueueManager manager = MCRJobQueueManager.getInstance();
+                if (manager.getJobDAO().getJobCount(MCRVideoFrameJobAction.class, job.getParameters(),
+                    List.of(MCRJobStatus.NEW, MCRJobStatus.ERROR)) > 0) {
+                    LOGGER.info("There is already a video frame job for {}. Skipping.", file);
+                } else if (!manager.getJobQueue(MCRVideoFrameJobAction.class).offer(job)) {
                     LOGGER.warn("Video frame job queue did not accept job for {}", file);
                 }
             }
