@@ -56,6 +56,8 @@ public class MCRFFmpegVideoFrameGenerator implements MCRVideoFrameGenerator {
 
     private long timeout;
 
+    private int thumbnailFrames;
+
     @MCRProperty(name = "Executable", required = false)
     public void setExecutable(String executable) {
         this.executable = executable;
@@ -70,6 +72,12 @@ public class MCRFFmpegVideoFrameGenerator implements MCRVideoFrameGenerator {
     @MCRProperty(name = "Timeout")
     public void setTimeout(String timeout) {
         this.timeout = Long.parseLong(timeout);
+    }
+
+    /** Sets the number of frames FFmpeg's thumbnail filter compares to select a representative frame. */
+    @MCRProperty(name = "ThumbnailFrames")
+    public void setThumbnailFrames(String thumbnailFrames) {
+        this.thumbnailFrames = Integer.parseInt(thumbnailFrames);
     }
 
     @Override
@@ -209,7 +217,7 @@ public class MCRFFmpegVideoFrameGenerator implements MCRVideoFrameGenerator {
             .disableSubtitle()
             .addExtraArgs("-map", "0:" + stream.index);
         if (representative) {
-            result.addExtraArgs("-vf", "thumbnail=100");
+            result.addExtraArgs("-vf", "thumbnail=" + thumbnailFrames);
         }
         ffmpeg.run(builder);
         return Files.isRegularFile(output) && Files.size(output) > 0 ? ImageIO.read(output.toFile()) : null;
