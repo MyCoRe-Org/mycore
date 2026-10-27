@@ -40,6 +40,7 @@ import org.mycore.media.services.MCRVideoFrameGenerator;
 import org.mycore.services.queuedjob.MCRJob;
 import org.mycore.services.queuedjob.MCRJobQueue;
 import org.mycore.services.queuedjob.MCRJobQueueManager;
+
 class MCRVideoFrameEventHandlerTest {
 
     @Test
@@ -65,7 +66,7 @@ class MCRVideoFrameEventHandlerTest {
             handler.handlePathUpdated(null, second, attributes);
             handler.handlePathRepaired(null, second, attributes);
             ArgumentCaptor<MCRJob> jobs = ArgumentCaptor.forClass(MCRJob.class);
-            verify(queue, times(4)).add(jobs.capture());
+            verify(queue, times(4)).offer(jobs.capture());
             assertEquals("/first.mp4", jobs.getAllValues().getFirst()
                 .getParameter(MCRVideoFrameJobAction.PATH_PARAMETER));
             for (MCRJob job : jobs.getAllValues().subList(1, 4)) {
@@ -109,7 +110,7 @@ class MCRVideoFrameEventHandlerTest {
             configuration.when(() -> MCRConfiguration2.getInstanceOfOrThrow(MCRVideoFrameGenerator.class,
                 "MCR.Media.VideoFrameGenerator")).thenReturn(new UnavailableGenerator());
             new MCRVideoFrameEventHandler().handlePathCreated(null, path, attributes);
-            verify(queue, times(0)).add(org.mockito.ArgumentMatchers.any(MCRJob.class));
+            verify(queue, times(0)).offer(org.mockito.ArgumentMatchers.any(MCRJob.class));
         }
     }
 

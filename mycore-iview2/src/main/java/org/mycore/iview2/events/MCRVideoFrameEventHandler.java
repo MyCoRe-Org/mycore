@@ -54,7 +54,9 @@ public class MCRVideoFrameEventHandler extends MCREventHandlerBase {
                 MCRJob job = new MCRJob(MCRVideoFrameJobAction.class);
                 job.setParameter(MCRVideoFrameJobAction.DERIVATE_PARAMETER, path.getOwner());
                 job.setParameter(MCRVideoFrameJobAction.PATH_PARAMETER, path.getOwnerRelativePath());
-                MCRJobQueueManager.getInstance().getJobQueue(MCRVideoFrameJobAction.class).add(job);
+                if (!MCRJobQueueManager.getInstance().getJobQueue(MCRVideoFrameJobAction.class).offer(job)) {
+                    LOGGER.warn("Video frame job queue did not accept job for {}", file);
+                }
             }
         } catch (IOException | RuntimeException e) {
             // The poster is optional and must not abort the file event.
