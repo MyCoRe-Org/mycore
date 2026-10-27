@@ -32,6 +32,7 @@ import javax.imageio.ImageIO;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.datamodel.niofs.MCRPath;
 
 import net.bramp.ffmpeg.FFmpeg;
 import net.bramp.ffmpeg.FFprobe;
@@ -86,8 +87,9 @@ public class MCRFFmpegVideoFrameGenerator implements MCRVideoFrameGenerator {
 
     @Override
     public BufferedImage generateFrame(Path video) throws IOException {
-        if (FileSystems.getDefault().equals(video.getFileSystem())) {
-            return generateFrame(video, video);
+        Path localVideo = localPath(video);
+        if (localVideo != null) {
+            return generateFrame(video, localVideo);
         }
         // FFmpeg needs a local file, so videos on other file systems are copied first.
         Path input = Files.createTempFile("MyCoRe-Video-", ".video");
@@ -97,6 +99,23 @@ public class MCRFFmpegVideoFrameGenerator implements MCRVideoFrameGenerator {
         } finally {
             Files.deleteIfExists(input);
         }
+    }
+
+    /** Returns a file FFmpeg can read directly, or {@code null} if the video has to be copied. */
+    private Path localPath(Path video) throws IOException {
+        if (video instanceof MCRPath mcrPath) {
+            try {
+                Path physicalPath = mcrPath.toPhysicalPath();
+                if (physicalPath != null && Files.isRegularFile(physicalPath)) {
+                    return physicalPath;
+                }
+            } catch (UnsupportedOperationException e) {
+                // OCFL stores provide no physical path.
+                LOGGER.debug("No physical path for {}", video, e);
+            }
+            return null;
+        }
+        return FileSystems.getDefault().equals(video.getFileSystem()) ? video : null;
     }
 
     private BufferedImage generateFrame(Path video, Path input) throws IOException {
