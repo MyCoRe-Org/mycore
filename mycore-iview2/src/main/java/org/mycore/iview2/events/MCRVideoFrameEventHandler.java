@@ -96,7 +96,7 @@ public class MCRVideoFrameEventHandler extends MCREventHandlerBase {
 
     @Override
     public void handlePathDeleted(MCREvent evt, Path file, BasicFileAttributes attrs) {
-        if (file instanceof MCRPath path && attrs.isRegularFile()) {
+        if (file instanceof MCRPath path) {
             // MIME detection need not work after deletion. The tiling handler also uses this cleanup.
             try {
                 MCRIView2Commands.deleteImageTiles(path.getOwner(), path.getOwnerRelativePath());

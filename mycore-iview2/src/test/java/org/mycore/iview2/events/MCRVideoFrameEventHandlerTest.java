@@ -163,11 +163,10 @@ class MCRVideoFrameEventHandlerTest {
     @Test
     void deletesTilesWithoutReadingDeletedVideo() {
         MCRPath path = video("/folder/deleted.mp4");
-        BasicFileAttributes attributes = mock(BasicFileAttributes.class);
-        when(attributes.isRegularFile()).thenReturn(true);
         try (var commands = mockStatic(MCRIView2Commands.class);
             var contentTypes = mockStatic(MCRContentTypes.class)) {
-            new MCRVideoFrameEventHandler().handlePathDeleted(null, path, attributes);
+            // Delete events carry no file attributes.
+            new MCRVideoFrameEventHandler().handlePathDeleted(null, path, null);
             commands.verify(() -> MCRIView2Commands.deleteImageTiles("test_derivate_00000001", "/folder/deleted.mp4"));
             contentTypes.verifyNoInteractions();
         }
