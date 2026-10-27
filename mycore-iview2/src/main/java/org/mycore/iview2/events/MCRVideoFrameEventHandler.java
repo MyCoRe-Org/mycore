@@ -19,7 +19,6 @@
 package org.mycore.iview2.events;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
@@ -32,7 +31,6 @@ import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.niofs.MCRContentTypes;
 import org.mycore.datamodel.niofs.MCRPath;
-import org.mycore.imagetiler.MCRImage;
 import org.mycore.iview2.backend.MCRVideoFrameJobAction;
 import org.mycore.iview2.frontend.MCRIView2Commands;
 import org.mycore.iview2.services.MCRIView2Tools;
@@ -93,8 +91,7 @@ public class MCRVideoFrameEventHandler extends MCREventHandlerBase {
     }
 
     boolean hasTiles(MCRPath path) {
-        return Files.exists(
-            MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), path.getOwner(), path.getOwnerRelativePath()));
+        return MCRIView2Tools.hasTiles(path.getOwner(), path.getOwnerRelativePath());
     }
 
     @Override

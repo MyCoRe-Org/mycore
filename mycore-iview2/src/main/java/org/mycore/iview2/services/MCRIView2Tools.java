@@ -56,7 +56,6 @@ import org.mycore.datamodel.niofs.MCRContentTypes;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.imagetiler.MCRImage;
 import org.mycore.imagetiler.MCRTiledPictureProps;
-import org.mycore.iview2.backend.MCRDefaultTileFileProvider;
 import org.mycore.iview2.backend.MCRTileFileProvider;
 import org.mycore.iview2.backend.MCRTileInfo;
 
@@ -164,8 +163,7 @@ public class MCRIView2Tools {
      */
     public static boolean hasTiles(String derivateId, String path) {
         MCRTileFileProvider provider = MCRConfiguration2
-            .getInstanceOf(MCRTileFileProvider.class, "MCR.IIIFImage.Iview.TileFileProvider")
-            .orElseGet(MCRDefaultTileFileProvider::new);
+            .getSingleInstanceOfOrThrow(MCRTileFileProvider.class, "MCR.IIIFImage.Iview.TileFileProvider");
         return provider.getTileFile(new MCRTileInfo(derivateId, path, null))
             .filter(Files::isRegularFile).isPresent();
     }
