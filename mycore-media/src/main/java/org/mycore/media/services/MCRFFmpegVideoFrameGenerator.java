@@ -20,6 +20,7 @@ package org.mycore.media.services;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -85,39 +86,46 @@ public class MCRFFmpegVideoFrameGenerator implements MCRVideoFrameGenerator {
 
     @Override
     public BufferedImage generateFrame(Path video) throws IOException {
-        // FFmpeg needs a local file, while derivates may use another NIO file system.
+        if (FileSystems.getDefault().equals(video.getFileSystem())) {
+            return generateFrame(video, video);
+        }
+        // FFmpeg needs a local file, so videos on other file systems are copied first.
         Path input = Files.createTempFile("MyCoRe-Video-", ".video");
         try {
             Files.copy(video, input, StandardCopyOption.REPLACE_EXISTING);
-            Path output = Files.createTempFile("MyCoRe-Video-Frame-", ".png");
-            try {
-                FFmpeg ffmpeg = new FFmpeg(executable, processFunction());
-                FFmpegProbeResult probe = new FFprobe(probeExecutable, processFunction()).probe(input.toString());
-                FFmpegStream stream = selectStream(probe);
-                if (stream == null) {
-                    throw new IOException("No video stream or embedded cover found in " + video);
-                }
-                if (!isCover(stream)) {
-                    BufferedImage firstFrame = extractFrame(ffmpeg, input, output, stream, 0, false);
-                    if (firstFrame != null && !isBlank(firstFrame)) {
-                        return firstFrame;
-                    }
-                }
-                long offset = isCover(stream) ? 0 : startOffset(probe, stream);
-                BufferedImage frame = extractFrame(ffmpeg, input, output, stream, offset, !isCover(stream));
-                // Very short videos may have no frame after seeking. Retry from the beginning.
-                if (frame == null && offset > 0) {
-                    frame = extractFrame(ffmpeg, input, output, stream, 0, !isCover(stream));
-                }
-                if (frame == null) {
-                    throw new IOException("FFmpeg produced no readable video frame for " + video);
-                }
-                return frame;
-            } finally {
-                Files.deleteIfExists(output);
-            }
+            return generateFrame(video, input);
         } finally {
             Files.deleteIfExists(input);
+        }
+    }
+
+    private BufferedImage generateFrame(Path video, Path input) throws IOException {
+        Path output = Files.createTempFile("MyCoRe-Video-Frame-", ".png");
+        try {
+            FFmpeg ffmpeg = new FFmpeg(executable, processFunction());
+            FFmpegProbeResult probe = new FFprobe(probeExecutable, processFunction()).probe(input.toString());
+            FFmpegStream stream = selectStream(probe);
+            if (stream == null) {
+                throw new IOException("No video stream or embedded cover found in " + video);
+            }
+            if (!isCover(stream)) {
+                BufferedImage firstFrame = extractFrame(ffmpeg, input, output, stream, 0, false);
+                if (firstFrame != null && !isBlank(firstFrame)) {
+                    return firstFrame;
+                }
+            }
+            long offset = isCover(stream) ? 0 : startOffset(probe, stream);
+            BufferedImage frame = extractFrame(ffmpeg, input, output, stream, offset, !isCover(stream));
+            // Very short videos may have no frame after seeking. Retry from the beginning.
+            if (frame == null && offset > 0) {
+                frame = extractFrame(ffmpeg, input, output, stream, 0, !isCover(stream));
+            }
+            if (frame == null) {
+                throw new IOException("FFmpeg produced no readable video frame for " + video);
+            }
+            return frame;
+        } finally {
+            Files.deleteIfExists(output);
         }
     }
 

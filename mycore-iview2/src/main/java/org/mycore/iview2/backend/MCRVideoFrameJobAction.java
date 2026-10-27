@@ -73,7 +73,9 @@ public class MCRVideoFrameJobAction extends MCRJobAction {
             if (!generator.checkRequirements(video)) {
                 return;
             }
-            BufferedImage frame = generator.generateFrame(video);
+            // FFmpeg can read files of local stores directly, other stores are copied by the generator.
+            Path physicalPath = video.toPhysicalPath();
+            BufferedImage frame = generator.generateFrame(physicalPath != null ? physicalPath : video);
             Path image = Files.createTempFile("MyCoRe-Video-Frame-", ".png");
             try {
                 if (!ImageIO.write(frame, "png", image.toFile())) {
