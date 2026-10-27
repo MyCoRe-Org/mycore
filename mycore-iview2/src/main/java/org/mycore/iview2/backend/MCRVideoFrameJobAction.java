@@ -27,7 +27,9 @@ import javax.imageio.ImageIO;
 
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.digest.MCRDigest;
 import org.mycore.datamodel.niofs.MCRContentTypes;
+import org.mycore.datamodel.niofs.MCRFileAttributes;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.imagetiler.MCRImage;
 import org.mycore.iview2.frontend.MCRIView2Commands;
@@ -73,14 +75,16 @@ public class MCRVideoFrameJobAction extends MCRJobAction {
             if (!generator.checkRequirements(video)) {
                 return;
             }
+            // A replaced video changes its digest. The job of the new content then creates the frame.
+            MCRDigest digest = digest(video);
             BufferedImage frame = generator.generateFrame(video);
             Path image = Files.createTempFile("MyCoRe-Video-Frame-", ".png");
             try {
                 if (!ImageIO.write(frame, "png", image.toFile())) {
                     throw new IOException("No PNG writer available");
                 }
-                // A queued video may have been deleted while FFmpeg was running.
-                if (!Files.isRegularFile(video)) {
+                // A queued video may have been deleted or replaced while FFmpeg was running.
+                if (!Files.isRegularFile(video) || !digest.equals(digest(video))) {
                     return;
                 }
                 MCRImage tiledImage = MCRImage.getInstance(image, video.getOwner(), video.getOwnerRelativePath());
@@ -95,6 +99,10 @@ public class MCRVideoFrameJobAction extends MCRJobAction {
         } catch (IOException e) {
             throw new MCRException("Could not generate iView image for video " + video, e);
         }
+    }
+
+    private static MCRDigest digest(MCRPath video) throws IOException {
+        return Files.readAttributes(video, MCRFileAttributes.class).digest();
     }
 
     @Override
