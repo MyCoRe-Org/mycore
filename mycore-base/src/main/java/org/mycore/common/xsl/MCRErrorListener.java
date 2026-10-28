@@ -20,11 +20,21 @@ package org.mycore.common.xsl;
 
 import javax.xml.transform.ErrorListener;
 import javax.xml.transform.SourceLocator;
+import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.xml.utils.WrappedRuntimeException;
+
+import net.sf.saxon.expr.instruct.TerminationException;
+import net.sf.saxon.jaxp.StreamingTransformerImpl;
+import net.sf.saxon.jaxp.TransformerImpl;
+import net.sf.saxon.om.Item;
+import net.sf.saxon.s9api.AbstractXsltTransformer;
+import net.sf.saxon.s9api.Location;
+import net.sf.saxon.s9api.Message;
+import net.sf.saxon.trans.XPathException;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -37,8 +47,40 @@ public final class MCRErrorListener implements ErrorListener {
 
     private String lastMessage;
 
+    /**
+     * Creates a new {@link MCRErrorListener} and sets it to the given transformer.
+     * <p>
+     * For Saxon transformers, <code>xsl:message</code> output is logged, too.
+     *
+     * @param transformer the transformer to configure
+     * @return the error listener set to the transformer
+     */
+    public static MCRErrorListener setTo(Transformer transformer) {
+        MCRErrorListener errorListener = new MCRErrorListener();
+        transformer.setErrorListener(errorListener);
+        AbstractXsltTransformer xsltTransformer = null;
+        if (transformer instanceof TransformerImpl saxonTransformer) {
+            xsltTransformer = saxonTransformer.getUnderlyingXsltTransformer();
+        } else if (transformer instanceof StreamingTransformerImpl saxonTransformer) {
+            xsltTransformer = saxonTransformer.getUnderlyingXsltTransformer();
+        }
+        if (xsltTransformer != null) {
+            // Saxon does not report xsl:message to the ErrorListener but writes it to System.err
+            xsltTransformer.setMessageHandler(MCRErrorListener::logMessage);
+        }
+        return errorListener;
+    }
+
     public TransformerException getExceptionThrown() {
         return exceptionThrown;
+    }
+
+    private static void logMessage(Message message) {
+        Location location = message.getLocation();
+        LOGGER.info(() -> location == null
+            ? getMessageAndLocation(null, 0, 0, message.getStringValue())
+            : getMessageAndLocation(location.getSystemId(), location.getLineNumber(), location.getColumnNumber(),
+                message.getStringValue()));
     }
 
     private boolean triggerException(TransformerException e) {
@@ -90,6 +132,10 @@ public final class MCRErrorListener implements ErrorListener {
             && stackTrace[0].getClassName().endsWith("ElemMessage")) {
             LOGGER.debug("Original exception: ", unwrappedException);
             unwrappedException = new TransformerException(lastMessage);
+        } else if (unwrappedException instanceof TerminationException) {
+            //Saxon: xsl:message with terminate="yes", the exception message does not contain the message text
+            LOGGER.debug("Original exception: ", unwrappedException);
+            unwrappedException = new TransformerException(getMyMessageAndLocation(unwrappedException));
         }
         if (triggerException(unwrappedException)) {
             LOGGER.fatal("Exception while XSL transformation.", unwrappedException);
@@ -114,27 +160,51 @@ public final class MCRErrorListener implements ErrorListener {
 
     public static String getMyMessageAndLocation(TransformerException exception) {
         SourceLocator locator = exception.getLocator();
-        StringBuilder msg = new StringBuilder();
-        if (locator != null) {
-            String systemID = locator.getSystemId();
-            int line = locator.getLineNumber();
-            int col = locator.getColumnNumber();
-            if (systemID != null) {
-                msg.append("SystemID: ");
-                msg.append(systemID);
-            }
-            if (line != 0) {
-                msg.append(" [");
-                msg.append(line);
-                if (col != 0) {
-                    msg.append(',');
-                    msg.append(col);
+        String message = getMessage(exception);
+        if (locator == null) {
+            return getMessageAndLocation(null, 0, 0, message);
+        }
+        return getMessageAndLocation(locator.getSystemId(), locator.getLineNumber(), locator.getColumnNumber(),
+            message);
+    }
+
+    /**
+     * Returns the message of the given exception. For a Saxon exception caused by <code>xsl:message</code> with
+     * <code>terminate="yes"</code> this is the text of the message, if it is not empty.
+     */
+    private static String getMessage(TransformerException exception) {
+        if (exception instanceof TerminationException terminationException
+            && terminationException.getErrorObject() != null) {
+            try {
+                Item content = terminationException.getErrorObject().head();
+                String text = content == null ? null : content.getStringValue();
+                if (text != null && !text.isBlank()) {
+                    return text;
                 }
-                msg.append(']');
+            } catch (XPathException e) {
+                LOGGER.debug("Could not get text of terminating xsl:message.", e);
             }
         }
+        return exception.getMessage();
+    }
+
+    private static String getMessageAndLocation(String systemID, int line, int col, String message) {
+        StringBuilder msg = new StringBuilder();
+        if (systemID != null) {
+            msg.append("SystemID: ");
+            msg.append(systemID);
+        }
+        if (line > 0) {
+            msg.append(" [");
+            msg.append(line);
+            if (col > 0) {
+                msg.append(',');
+                msg.append(col);
+            }
+            msg.append(']');
+        }
         msg.append(": ");
-        msg.append(exception.getMessage());
+        msg.append(message);
         return msg.toString();
     }
 }
