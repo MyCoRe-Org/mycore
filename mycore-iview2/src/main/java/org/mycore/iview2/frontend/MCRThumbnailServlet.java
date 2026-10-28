@@ -88,7 +88,7 @@ public class MCRThumbnailServlet extends MCRServlet {
             @Override
             public Long load(String id) {
                 ThumnailInfo thumbnailInfo = getThumbnailInfo(id);
-                Path iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), thumbnailInfo.derivate,
+                Path iviewFile = MCRImage.getTiledPath(MCRIView2Tools.getTileDir(), thumbnailInfo.derivate,
                     thumbnailInfo.imagePath);
                 try {
                     return Files.readAttributes(iviewFile, BasicFileAttributes.class).lastModifiedTime().toMillis();
@@ -132,7 +132,7 @@ public class MCRThumbnailServlet extends MCRServlet {
     protected void render(MCRServletJob job, Exception ex) throws IOException {
         try {
             ThumnailInfo thumbnailInfo = getThumbnailInfo(job.getRequest().getPathInfo());
-            Path iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), thumbnailInfo.derivate,
+            Path iviewFile = MCRImage.getTiledPath(MCRIView2Tools.getTileDir(), thumbnailInfo.derivate,
                 thumbnailInfo.imagePath);
             LOGGER.info("IView2 file: {}", iviewFile);
             BasicFileAttributes fileAttributes = MCRPathUtils.getAttributes(iviewFile, BasicFileAttributes.class);

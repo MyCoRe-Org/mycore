@@ -142,7 +142,7 @@ public class MCRTileCombineServlet extends MCRServlet {
             final String derivate = pathInfo.substring(0, pathInfo.indexOf('/'));
             String imagePath = pathInfo.substring(derivate.length());
             LOGGER.info("Zoom-Level: {}, derivate: {}, image: {}", zoomAlias, derivate, imagePath);
-            final Path iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivate, imagePath);
+            final Path iviewFile = MCRImage.getTiledPath(MCRIView2Tools.getTileDir(), derivate, imagePath);
             try (FileSystem fs = MCRIView2Tools.getFileSystem(iviewFile)) {
                 Path iviewFileRoot = fs.getRootDirectories().iterator().next();
                 final MCRTiledPictureProps pictureProps = MCRTiledPictureProps.getInstanceFromDirectory(iviewFileRoot);
