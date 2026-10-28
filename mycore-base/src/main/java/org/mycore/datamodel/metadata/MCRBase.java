@@ -164,7 +164,8 @@ public abstract class MCRBase {
      *                general Exception of MyCoRe
      */
     protected final void setFromURI(URI uri) throws JDOMException, IOException {
-        setFromXML(new MCRURLContent(uri.toURL()).asByteArray(), false);
+        setFromXML(new MCRURLContent(uri.toURL()).asByteArray(),
+            MCRConfiguration2.getOrThrow("MCR.XMLParser.ValidateSchema", Boolean::parseBoolean));
     }
 
     /**
