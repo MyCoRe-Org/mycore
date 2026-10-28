@@ -81,6 +81,7 @@ import org.mycore.restapi.converter.MCRContentAbstractWriter;
 import org.mycore.restapi.v2.access.MCRRestAPIACLPermission;
 import org.mycore.restapi.v2.annotation.MCRRestRequiredPermission;
 import org.mycore.restapi.v2.model.MCRRestObjectIDDate;
+import org.xml.sax.SAXParseException;
 
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.jakarta.rs.annotation.JacksonFeatures;
@@ -639,9 +640,19 @@ public class MCRRestObjects {
         MCRStreamContent inputContent = new MCRStreamContent(xmlSource, null, MCRObject.ROOT_NAME);
         MCRObject updatedObject;
         try {
-            updatedObject = new MCRObject(inputContent.asXML());
+            updatedObject = new MCRObject(MCRXMLParserFactory.getValidatingParser().parseXML(inputContent));
             updatedObject.validate();
         } catch (JDOMException | MCRException e) {
+            throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
+                .withErrorCode(MCRErrorCodeConstants.MCROBJECT_INVALID)
+                .withMessage("MCRObject " + id + " is not valid")
+                .withDetail(e.getMessage())
+                .withCause(e)
+                .toException();
+        } catch (RuntimeException e) {
+            if (!(e.getCause() instanceof SAXParseException)) {
+                throw e;
+            }
             throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCROBJECT_INVALID)
                 .withMessage("MCRObject " + id + " is not valid")
