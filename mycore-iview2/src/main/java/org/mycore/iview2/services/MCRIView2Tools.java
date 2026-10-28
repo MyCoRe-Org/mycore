@@ -56,6 +56,8 @@ import org.mycore.datamodel.niofs.MCRContentTypes;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.imagetiler.MCRImage;
 import org.mycore.imagetiler.MCRTiledPictureProps;
+import org.mycore.iview2.backend.MCRTileFileProvider;
+import org.mycore.iview2.backend.MCRTileInfo;
 
 import jakarta.activation.FileTypeMap;
 import jakarta.persistence.EntityManager;
@@ -150,6 +152,20 @@ public class MCRIView2Tools {
     public static boolean isFileSupported(String filename) {
         return SUPPORTED_CONTENT_TYPE.contains(FileTypeMap.getDefaultFileTypeMap().getContentType(
             filename.toLowerCase(Locale.ROOT)));
+    }
+
+    /**
+     * Checks whether an iView tile file exists for a file in a derivate.
+     *
+     * @param derivateId the derivate ID
+     * @param path the file path within the derivate
+     * @return true if a regular tile file exists
+     */
+    public static boolean hasTiles(String derivateId, String path) {
+        MCRTileFileProvider provider = MCRConfiguration2
+            .getSingleInstanceOfOrThrow(MCRTileFileProvider.class, "MCR.IIIFImage.Iview.TileFileProvider");
+        return provider.getTileFile(new MCRTileInfo(derivateId, path, null))
+            .filter(Files::isRegularFile).isPresent();
     }
 
     /**

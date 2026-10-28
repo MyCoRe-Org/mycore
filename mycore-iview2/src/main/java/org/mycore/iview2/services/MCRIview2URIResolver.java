@@ -18,6 +18,9 @@
 
 package org.mycore.iview2.services;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
@@ -59,13 +62,26 @@ public class MCRIview2URIResolver implements URIResolver {
      */
     @Override
     public Source resolve(String href, String base) throws TransformerException {
-        String[] params = href.split(":");
+        String[] params = href.split(":", 3);
 
         if (params.length != 3) {
             throw new TransformerException("Invalid href: " + href);
         }
 
         switch (params[1]) {
+            case "hasTiles" -> {
+                int separator = params[2].indexOf('/');
+                if (separator <= 0 || separator == params[2].length() - 1) {
+                    throw new TransformerException("Invalid href: " + href);
+                }
+                String derivateId = params[2].substring(0, separator);
+                try {
+                    String path = URLDecoder.decode(params[2].substring(separator + 1), StandardCharsets.UTF_8);
+                    return new JDOMSource(new Element(String.valueOf(MCRIView2Tools.hasTiles(derivateId, path))));
+                } catch (IllegalArgumentException e) {
+                    throw new TransformerException("Invalid encoded path in href: " + href, e);
+                }
+            }
             case "isCompletelyTiled" -> {
                 boolean completelyTiled = MCRIView2Tools.isCompletelyTiled(params[2]);
                 return new JDOMSource(new Element(String.valueOf(completelyTiled)));
