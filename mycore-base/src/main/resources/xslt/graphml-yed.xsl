@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0"
+<xsl:stylesheet version="3.0"
   xmlns:g="http://graphml.graphdrawing.org/xmlns"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -7,7 +7,7 @@
   exclude-result-prefixes="g xsl"
   xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://www.yworks.com/xml/schema/graphml/1.1/ygraphml.xsd">
 
-  <xsl:include href="copynodes.xsl" />
+  <xsl:mode on-no-match="shallow-copy" />
 
   <xsl:template match="g:graphml">
     <graphml xmlns="http://graphml.graphdrawing.org/xmlns"
@@ -24,9 +24,9 @@
       <xsl:apply-templates select="@*" />
       <g:data key="ng">
         <y:ShapeNode>
-          <y:Fill color="{normalize-space(g:data[@key='color'])}" />
+          <y:Fill color="{normalize-space(g:data[@key='color'][1])}" />
           <y:NodeLabel>
-            <xsl:value-of select="normalize-space(g:data[@key='label'])" />
+            <xsl:value-of select="normalize-space(g:data[@key='label'][1])" />
           </y:NodeLabel>
           <y:Shape type="ellipse" />
         </y:ShapeNode>
@@ -39,7 +39,7 @@
       <g:data key="eg">
         <y:PolyLineEdge>
           <y:EdgeLabel>
-            <xsl:value-of select="normalize-space(g:data[@key='label'])" />
+            <xsl:value-of select="normalize-space(g:data[@key='label'][1])" />
           </y:EdgeLabel>
           <y:Arrows source="none" target="standard" />
         </y:PolyLineEdge>
