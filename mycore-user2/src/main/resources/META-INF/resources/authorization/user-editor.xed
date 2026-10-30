@@ -8,7 +8,7 @@
     <xed:if test="$xed-validation-failed">
       <div class="alert alert-danger">
         <h4>
-          <xed:output i18n="component.user2.admin.inputhints" />
+          <xed:output i18n="component.user2.admin.inputhints" escape-xml="false" />
         </h4>
         <xed:display-validation-messages />
       </div>
