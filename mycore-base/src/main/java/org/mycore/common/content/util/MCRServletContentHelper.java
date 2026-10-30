@@ -301,7 +301,8 @@ public abstract class MCRServletContentHelper {
 
                 // If an If-None-Match header has been specified, if modified since
                 // is ignored.
-                if (request.getHeader("If-None-Match") == null && lastModified < headerValue + 1000) {
+                if (request.getHeader("If-None-Match") == null && lastModified >= 0
+                    && lastModified < headerValue + 1000) {
                     response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
                     response.setHeader("ETag", content.getETag());
 
