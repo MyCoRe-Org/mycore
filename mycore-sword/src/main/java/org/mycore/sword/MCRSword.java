@@ -18,6 +18,8 @@
 
 package org.mycore.sword;
 
+import static org.mycore.common.config.instantiator.MCRInstanceConfiguration.CLASS_SUFFIX;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -61,7 +63,9 @@ public class MCRSword {
             .keySet()
             .stream()
             .filter(prop -> prop.startsWith(MCRSwordConstants.MCR_SWORD_COLLECTION_PREFIX))
-            .map(prop -> prop.substring(lengthOfPropertyPrefix)) // remove MCR_SWORD_COLLECTION_PREFIX
+            .filter(prop -> prop.endsWith(CLASS_SUFFIX))
+            // remove MCR_SWORD_COLLECTION_PREFIX and CLASS_SUFFIX
+            .map(prop -> prop.substring(lengthOfPropertyPrefix, prop.length() - CLASS_SUFFIX.length()))
             .map(prop -> prop.split(Pattern.quote("."), 2)) // split to workspace name and collection name
             .filter(
                 array -> array.length == 2) // remove all with no workspace or collection name
