@@ -28,7 +28,12 @@ import org.mycore.orcid.oauth.MCROAuthClient;
  * This may be another ORCID, another client application or THIS, our MyCoRe application.
  *
  * @author Frank Lützenkirchen *
+ *
+ * @deprecated The module mycore-orcid is deprecated and will be removed.
+ * Use mycore-orcid2 instead.
  */
+@Deprecated(forRemoval = true)
+@SuppressWarnings("removal")
 public final class MCRWorkSource {
 
     private static final Map<String, MCRWorkSource> SOURCES = new ConcurrentHashMap<>();

@@ -18,6 +18,12 @@
 
 package org.mycore.orcid.user;
 
+/**
+ * @deprecated The module mycore-orcid is deprecated and will be removed.
+ * Use mycore-orcid2 instead.
+ */
+@Deprecated(forRemoval = true)
+@SuppressWarnings("removal")
 public class MCRUserStatus {
 
     private boolean isORCIDUser;

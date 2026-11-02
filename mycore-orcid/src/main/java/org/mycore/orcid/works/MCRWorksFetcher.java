@@ -49,7 +49,12 @@ import jakarta.ws.rs.core.Response;
  * from a remote ORCID profile
  *
  * @author Frank Lützenkirchen
+ *
+ * @deprecated The module mycore-orcid is deprecated and will be removed.
+ * Use mycore-orcid2 instead.
  */
+@Deprecated(forRemoval = true)
+@SuppressWarnings("removal")
 public class MCRWorksFetcher {
 
     private static final Logger LOGGER = LogManager.getLogger();

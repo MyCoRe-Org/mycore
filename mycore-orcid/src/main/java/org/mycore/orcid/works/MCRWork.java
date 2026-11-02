@@ -36,7 +36,12 @@ import org.xml.sax.SAXException;
  * from a single source.
  *
  * @author Frank Lützenkirchen
+ *
+ * @deprecated The module mycore-orcid is deprecated and will be removed.
+ * Use mycore-orcid2 instead.
  */
+@Deprecated(forRemoval = true)
+@SuppressWarnings("removal")
 public class MCRWork {
 
     private MCRORCIDProfile orcid;
