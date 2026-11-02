@@ -602,6 +602,28 @@ public class MCRUserServiceTest {
     }
 
     @Test
+    void changePasswordShouldThrowValidationExceptionWhenOldPasswordMissing() {
+        try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class)) {
+            assertThrows(MCRUserValidationException.class,
+                () -> userService.changePassword("alice", new MCRChangePasswordRequest(null, "new-secret")));
+            assertThrows(MCRUserValidationException.class,
+                () -> userService.changePassword("alice", new MCRChangePasswordRequest("", "new-secret")));
+
+            mgr.verifyNoInteractions();
+        }
+    }
+
+    @Test
+    void changePasswordShouldThrowValidationExceptionBeforeCheckingOldPasswordWhenNewPasswordBlank() {
+        try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class)) {
+            assertThrows(MCRUserValidationException.class,
+                () -> userService.changePassword("alice", new MCRChangePasswordRequest("old-secret", " ")));
+
+            mgr.verifyNoInteractions();
+        }
+    }
+
+    @Test
     void changePasswordShouldThrowLockedWhenUserExpired() {
         // checkPassword returns null for expired users; that must not surface as a wrong password
         MCRUser user = mock(MCRUser.class);

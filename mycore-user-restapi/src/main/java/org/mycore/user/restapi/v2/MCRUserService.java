@@ -283,10 +283,17 @@ public class MCRUserService {
      * @throws MCRUserWrongPasswordException if the current password does not match
      * @throws MCRUserPasswordNotAllowedException if the caller is not permitted to write the
      *         password
-     * @throws MCRUserValidationException if the new password is invalid
+     * @throws MCRUserValidationException if the current password is missing or the new password
+     *         is invalid
      */
     public void changePassword(String userId, MCRChangePasswordRequest changePasswordRequest) {
         requireRequest(changePasswordRequest);
+        // validate the request before verifying the old password, so malformed requests are
+        // rejected right away instead of costing the login penalty of a failed password check
+        if (changePasswordRequest.oldPassword() == null || changePasswordRequest.oldPassword().isEmpty()) {
+            throw new MCRUserValidationException("oldPassword is required");
+        }
+        validatePassword(changePasswordRequest.newPassword());
         MCRUser user = getUserOrThrow(userId);
         requireNotLocked(user);
         requireLocalRealm(user);
@@ -301,7 +308,6 @@ public class MCRUserService {
         if (MCRUserManager.checkPassword(user.getUserID(), changePasswordRequest.oldPassword()) == null) {
             throw new MCRUserWrongPasswordException(userId);
         }
-        validatePassword(changePasswordRequest.newPassword());
         writePassword(user, changePasswordRequest.newPassword());
     }
 
