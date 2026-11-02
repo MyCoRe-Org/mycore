@@ -26,6 +26,7 @@ import org.mycore.common.MCRException;
 import org.mycore.user.restapi.exception.MCRUserAlreadyExistsException;
 import org.mycore.user.restapi.exception.MCRUserLockedException;
 import org.mycore.user.restapi.exception.MCRUserNoLocalPasswordException;
+import org.mycore.user.restapi.exception.MCRUserNotLocalException;
 import org.mycore.user.restapi.exception.MCRUserNotFoundException;
 import org.mycore.user.restapi.exception.MCRUserPasswordNotAllowedException;
 import org.mycore.user.restapi.exception.MCRUserValidationException;
@@ -212,12 +213,16 @@ public class MCRUserService {
 
     /**
      * Updates the profile of the user with the given ID.
+     * <p>
+     * This only works for users in the local realm. The profile of a user authenticated via an
+     * external realm (LDAP, Shibboleth, CAS, ...) is managed by that realm.
      *
      * @param userId the ID of the user to update
      * @param updateUserRequest the request containing the updated profile data
      * @return the updated user as a detailed view
      * @throws MCRUserNotFoundException if no user with the given ID exists
      * @throws MCRUserLockedException if the user is locked or disabled
+     * @throws MCRUserNotLocalException if the user is not in the local realm
      * @throws MCRUserValidationException if the updated data is invalid
      * @see MCRUpdateUserProfileRequest
      */
@@ -227,6 +232,9 @@ public class MCRUserService {
         validateEmail(updateUserRequest.email());
         MCRUser user = getUserOrThrow(userId);
         requireNotLocked(user);
+        if (!isInLocalRealm(user)) {
+            throw new MCRUserNotLocalException(user.getUserID());
+        }
         MCRUser updated = userDtoMapper.applyUpdate(user, updateUserRequest);
         try {
             MCRUserManager.updateUser(updated);
@@ -332,9 +340,13 @@ public class MCRUserService {
      * @throws MCRUserNoLocalPasswordException if the user is not in the local realm
      */
     private static void requireLocalRealm(MCRUser user) {
-        if (!MCRRealmFactory.getLocalRealm().equals(user.getRealm())) {
+        if (!isInLocalRealm(user)) {
             throw new MCRUserNoLocalPasswordException(user.getUserID());
         }
+    }
+
+    private static boolean isInLocalRealm(MCRUser user) {
+        return MCRRealmFactory.getLocalRealm().equals(user.getRealm());
     }
 
     /**

@@ -41,6 +41,7 @@ import org.mycore.test.MyCoReTest;
 import org.mycore.user.restapi.exception.MCRUserLockedException;
 import org.mycore.user.restapi.exception.MCRUserNoLocalPasswordException;
 import org.mycore.user.restapi.exception.MCRUserNotFoundException;
+import org.mycore.user.restapi.exception.MCRUserNotLocalException;
 import org.mycore.user.restapi.exception.MCRUserValidationException;
 import org.mycore.user.restapi.exception.MCRUserWrongPasswordException;
 import org.mycore.user.restapi.v2.MCRUserService;
@@ -141,6 +142,15 @@ public class MCRCurrentUserTest {
         MCRUpdateUserProfileRequest dto = new MCRUpdateUserProfileRequest("Alice", "alice@example.com", null);
         setCurrentUser("alice");
         doThrow(new MCRUserNotFoundException("alice")).when(userService).updateUser("alice", dto);
+
+        assertThrows(ForbiddenException.class, () -> resource.updateCurrentUser(dto));
+    }
+
+    @Test
+    void updateCurrentUserShouldThrowForbiddenWhenNotInLocalRealm() {
+        MCRUpdateUserProfileRequest dto = new MCRUpdateUserProfileRequest("Bob", "bob@example.com", null);
+        setCurrentUser("bob@shibboleth");
+        doThrow(new MCRUserNotLocalException("bob@shibboleth")).when(userService).updateUser("bob@shibboleth", dto);
 
         assertThrows(ForbiddenException.class, () -> resource.updateCurrentUser(dto));
     }

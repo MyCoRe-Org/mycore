@@ -31,6 +31,7 @@ import org.mycore.restapi.v2.MCRRestSchemaType;
 import org.mycore.user.restapi.exception.MCRUserLockedException;
 import org.mycore.user.restapi.exception.MCRUserNoLocalPasswordException;
 import org.mycore.user.restapi.exception.MCRUserNotFoundException;
+import org.mycore.user.restapi.exception.MCRUserNotLocalException;
 import org.mycore.user.restapi.exception.MCRUserPasswordNotAllowedException;
 import org.mycore.user.restapi.exception.MCRUserValidationException;
 import org.mycore.user.restapi.exception.MCRUserWrongPasswordException;
@@ -73,7 +74,8 @@ public class MCRCurrentUser {
     private static final String DESC_NO_LOCAL_ACCOUNT = "Caller has no corresponding local user account";
 
     private static final String DESC_NO_LOCAL_ACCOUNT_OR_LOCKED =
-        "Caller has no corresponding local user account, or is locked or disabled";
+        "Caller has no corresponding local user account, is locked or disabled, "
+            + "or is not in the local realm";
 
     @Context
     private ContainerRequestContext request;
@@ -160,8 +162,8 @@ public class MCRCurrentUser {
      * @param updateOwnUserDto the request body containing the updated profile data
      * @return 204 No Content
      * @throws NotAuthorizedException if the caller is not authenticated
-     * @throws ForbiddenException if the caller has no corresponding local user account, or is
-     *         locked or disabled
+     * @throws ForbiddenException if the caller has no corresponding local user account, is
+     *         locked or disabled, or is not in the local realm
      * @throws BadRequestException if the data is invalid
      */
     @Operation(
@@ -196,7 +198,7 @@ public class MCRCurrentUser {
         try {
             userService.updateUser(userId, updateOwnUserDto);
             return Response.noContent().build();
-        } catch (MCRUserNotFoundException | MCRUserLockedException e) {
+        } catch (MCRUserNotFoundException | MCRUserLockedException | MCRUserNotLocalException e) {
             throw new ForbiddenException(e);
         } catch (MCRUserValidationException e) {
             throw new BadRequestException(e);
