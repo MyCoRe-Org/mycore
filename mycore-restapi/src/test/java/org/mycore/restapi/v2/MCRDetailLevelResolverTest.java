@@ -19,7 +19,6 @@
 package org.mycore.restapi.v2;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -29,7 +28,6 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mycore.restapi.converter.MCRDetailLevel;
 
-import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.MediaType;
 
@@ -64,10 +62,10 @@ public class MCRDetailLevelResolverTest {
     }
 
     @Test
-    void resolveShouldThrowBadRequestForUnknownValue() {
+    void resolveShouldFallBackToNormalForUnknownValue() {
         ContainerRequestContext request = requestWithAccept(mediaType("foo"));
 
-        assertThrows(BadRequestException.class, () -> MCRDetailLevelResolver.resolve(request));
+        assertEquals(MCRDetailLevel.NORMAL, MCRDetailLevelResolver.resolve(request));
     }
 
     private MediaType mediaType(String detailLevel) {

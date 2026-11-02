@@ -22,9 +22,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.restapi.converter.MCRDetailLevel;
 
-import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.container.ContainerRequestContext;
 
 /**
@@ -35,10 +36,12 @@ import jakarta.ws.rs.container.ContainerRequestContext;
  * endpoint should use this instead of re-implementing the same header parsing.
  * <p>
  * The requested value is matched case-insensitively, so {@code summary}, {@code Summary}
- * and {@code SUMMARY} are all accepted - there is no reason to reject a request over
- * something as trivial as casing.
+ * and {@code SUMMARY} are equivalent. Unknown values fall back to {@link MCRDetailLevel#NORMAL}
+ * to stay compatible with clients that send values not (yet) supported.
  */
 public final class MCRDetailLevelResolver {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * An example value for the {@code Accept} header's {@code detail} media type parameter,
@@ -63,9 +66,8 @@ public final class MCRDetailLevelResolver {
      * Resolves the detail level requested by the given request's {@code Accept} header.
      *
      * @param request the current request
-     * @return the requested detail level, or {@link MCRDetailLevel#NORMAL} if none was given
-     * @throws BadRequestException if the given detail level is not one of SUMMARY, NORMAL or
-     *         DETAILED (regardless of case)
+     * @return the requested detail level, or {@link MCRDetailLevel#NORMAL} if none or an unknown
+     *         value was given
      */
     public static MCRDetailLevel resolve(ContainerRequestContext request) {
         Optional<String> detailLevelOptional = request.getAcceptableMediaTypes().stream()
@@ -79,7 +81,8 @@ public final class MCRDetailLevelResolver {
         try {
             return MCRDetailLevel.valueOf(detailLevel.toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException e) {
-            throw new BadRequestException("Unknown detail level: " + detailLevel, e);
+            LOGGER.debug("Unknown detail level '{}', falling back to {}", detailLevel, MCRDetailLevel.NORMAL);
+            return MCRDetailLevel.NORMAL;
         }
     }
 

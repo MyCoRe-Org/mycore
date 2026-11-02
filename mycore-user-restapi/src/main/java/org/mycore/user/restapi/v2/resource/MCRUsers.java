@@ -207,7 +207,6 @@ public class MCRUsers {
      * @param userId the ID of the user
      * @return 200 OK with the user data at the requested detail level
      * @throws NotFoundException if no user with the given ID exists
-     * @throws BadRequestException if the detail level is unknown
      */
     @Operation(
         summary = "Returns a single user by ID",

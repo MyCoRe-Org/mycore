@@ -102,7 +102,6 @@ public class MCRCurrentUser {
      * @return 200 OK with the caller's own data at the requested detail level
      * @throws NotAuthorizedException if the caller is not authenticated
      * @throws ForbiddenException if the caller has no corresponding local user account
-     * @throws BadRequestException if the detail level is unknown
      */
     @Operation(
         summary = "Returns the currently authenticated user's own data",
