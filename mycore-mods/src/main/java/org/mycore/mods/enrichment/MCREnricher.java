@@ -36,8 +36,6 @@ import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRSession;
-import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.mods.MCRMODSSorter;
 import org.mycore.mods.merger.MCRMergeTool;
@@ -101,13 +99,13 @@ public class MCREnricher {
      * A value of {@code 0} means one virtual thread per datasource call.
      */
     private static final int MAX_VIRTUAL_THREADS = MCRConfiguration2
-        .getInt(CONFIG_PREFIX + "MaxVirtualThreads").orElse(0);
+        .getInt(CONFIG_PREFIX + "MaxVirtualThreads").orElseThrow();
 
     /**
      * Timeout in milliseconds for resolving all datasource calls. A value of {@code 0} means no timeout.
      */
     private static final long RESOLVE_TIMEOUT_MILLIS = MCRConfiguration2
-        .getLong(CONFIG_PREFIX + "ResolveTimeout").orElse(0L);
+        .getLong(CONFIG_PREFIX + "ResolveTimeout").orElseThrow();
 
     private static final String XPATH_HOST_SERIES = "mods:relatedItem[@type='host' or @type='series']";
 
@@ -175,11 +173,9 @@ public class MCREnricher {
     }
 
     private void resolveExternalData() {
-        MCRSession enricherSession = MCRSessionMgr.getCurrentSession();
-
         Collection<MCRTransactionableCallable<Boolean>> calls = id2call.values()
             .stream()
-            .map(call -> new MCRTransactionableCallable<Boolean>(call, enricherSession))
+            .map(MCRTransactionableCallable::new)
             .collect(Collectors.toList());
 
         ExecutorService executor = MAX_VIRTUAL_THREADS == 0 ?
