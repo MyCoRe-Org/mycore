@@ -211,6 +211,10 @@ public class MCRUserManager {
         if (isInvalidUser(user)) {
             throw new MCRException("User is invalid: " + user.getUserID());
         }
+        if (isLocalUserNameWithAt(user)) {
+            // "@" separates name and realm in user IDs, such a user could never be found by its ID or log in
+            throw new MCRException("The name of a local user must not contain '@': " + user.getUserName());
+        }
 
         if (user instanceof MCRTransientUser transientUser) {
             createUser(transientUser);
@@ -238,6 +242,18 @@ public class MCRUserManager {
         }
 
         createUser(user.clone());
+    }
+
+    /**
+     * Checks whether the given user is a user of the local realm whose name contains "@". Such users cannot be
+     * created, since "@" separates name and realm in user IDs (see {@link MCRUser#getUserID()}).
+     *
+     * @param user the user to check
+     * @return true if the user is a local user whose name contains "@"
+     */
+    public static boolean isLocalUserNameWithAt(MCRUser user) {
+        return MCRRealmFactory.getLocalRealm().getID().equals(user.getRealmID())
+            && user.getUserName() != null && user.getUserName().contains("@");
     }
 
     /**
