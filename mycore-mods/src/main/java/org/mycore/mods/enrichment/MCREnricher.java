@@ -20,11 +20,14 @@ package org.mycore.mods.enrichment;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -89,6 +92,21 @@ import org.mycore.util.concurrent.MCRTransactionableCallable;
 public class MCREnricher {
 
     private static final Logger LOGGER = LogManager.getLogger();
+
+    private static final String CONFIG_PREFIX = "MCR.MODS.EnrichmentResolver.";
+
+    /**
+     * Maximum number of concurrently running virtual threads for datasource resolution.
+     * A value of {@code 0} means one virtual thread per datasource call.
+     */
+    private static final int MAX_VIRTUAL_THREADS = MCRConfiguration2
+        .getInt(CONFIG_PREFIX + "MaxVirtualThreads").orElseThrow();
+
+    /**
+     * Timeout in milliseconds for resolving all datasource calls. A value of {@code 0} means no timeout.
+     */
+    private static final long RESOLVE_TIMEOUT_MILLIS = MCRConfiguration2
+        .getLong(CONFIG_PREFIX + "ResolveTimeout").orElseThrow();
 
     private static final String XPATH_HOST_SERIES = "mods:relatedItem[@type='host' or @type='series']";
 
@@ -160,9 +178,20 @@ public class MCREnricher {
             .stream()
             .map(MCRTransactionableCallable::new)
             .collect(Collectors.toList());
-        ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
+
+        ExecutorService executor = MAX_VIRTUAL_THREADS == 0 ?
+                                   Executors.newVirtualThreadPerTaskExecutor() :
+                                   Executors.newFixedThreadPool(MAX_VIRTUAL_THREADS, Thread.ofVirtual().factory());
         try {
-            executor.invokeAll(calls);
+            if (RESOLVE_TIMEOUT_MILLIS == 0) {
+                executor.invokeAll(calls);
+            } else {
+                List<Future<Boolean>> futures = executor.invokeAll(
+                    calls, RESOLVE_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+                if (futures.stream().anyMatch(Future::isCancelled)) {
+                    LOGGER.warn("Enrichment timed out after {} ms", RESOLVE_TIMEOUT_MILLIS);
+                }
+            }
         } catch (InterruptedException ex) {
             LOGGER.warn(ex);
         } finally {
