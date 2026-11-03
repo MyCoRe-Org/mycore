@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.mycore.user.restapi.v2.dto.MCRCreateUserRequest;
+import org.mycore.user.restapi.v2.dto.MCRUpdateUserProfileRequest;
 import org.mycore.user.restapi.v2.dto.MCRUpdateUserRequest;
 import org.mycore.user.restapi.v2.dto.MCRUserDetail;
 import org.mycore.user.restapi.v2.dto.MCRUserStandard;
@@ -70,6 +71,22 @@ public class MCRUserDtoMapper {
         user.getAttributes().clear();
         applyCommon(user, dto.name(), dto.email(), dto.passwordHint(), dto.locked(), dto.validUntil(), dto.roles(),
             dto.attributes(), owner);
+        return user;
+    }
+
+    /**
+     * Applies the given profile data to an existing {@link MCRUser}, leaving all administrative
+     * fields (roles, lock state, validity period, ownership) untouched.
+     *
+     * @param user the user to update
+     * @param dto the profile data to apply
+     * @return the updated {@link MCRUser}
+     * @see MCRUpdateUserProfileRequest
+     */
+    public MCRUser applyUpdate(MCRUser user, MCRUpdateUserProfileRequest dto) {
+        user.setRealName(dto.name());
+        user.setEMail(dto.email());
+        user.setHint(dto.passwordHint());
         return user;
     }
 
