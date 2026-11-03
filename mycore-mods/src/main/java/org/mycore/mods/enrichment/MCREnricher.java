@@ -20,11 +20,13 @@ package org.mycore.mods.enrichment;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -35,7 +37,6 @@ import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
-import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.mods.MCRMODSSorter;
 import org.mycore.mods.merger.MCRMergeTool;
@@ -185,12 +186,13 @@ public class MCREnricher {
             if (RESOLVE_TIMEOUT_MILLIS == 0) {
                 executor.invokeAll(calls);
             } else {
-                executor.invokeAll(calls, RESOLVE_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+                List<Future<Boolean>> futures = executor.invokeAll(calls, RESOLVE_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+                if (futures.stream().anyMatch(Future::isCancelled)) {
+                    LOGGER.warn("Enrichment timed out after {} ms", RESOLVE_TIMEOUT_MILLIS);
+                }
             }
         } catch (InterruptedException ex) {
             LOGGER.warn(ex);
-            Thread.currentThread().interrupt();
-            throw new MCRException("Enrichment failed with timeout of " + RESOLVE_TIMEOUT_MILLIS + " ms: ", ex);
         } finally {
             executor.shutdown();
         }
