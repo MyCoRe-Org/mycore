@@ -722,8 +722,13 @@ public class MCRUserManager {
 
     /**
      * Sets password of 'user' to 'password'.
-     *
+     * <p>
+     * Allowed for administrators, for the owner of 'user', and for 'user' itself if it has no owner or is not
+     * locked.
+     * <p>
      * Automatically updates the user in database.
+     *
+     * @throws MCRException if the current user is not allowed to change the password of 'user'
      */
     public static void setPassword(MCRUser user, String password) {
         MCRSession session = MCRSessionMgr.getCurrentSession();
@@ -731,7 +736,7 @@ public class MCRUserManager {
         MCRUser myUser = getUser(user.getUserName(), user.getRealmID()); //only update password
         boolean allowed = MCRAccessManager.checkPermission(MCRUser2Constants.USER_ADMIN_PERMISSION)
             || currentUser.equals(myUser.getOwner())
-            || (currentUser.equals(user) && myUser.hasNoOwner() || !myUser.isLocked());
+            || (currentUser.equals(user) && (myUser.hasNoOwner() || !myUser.isLocked()));
         if (!allowed) {
             throw new MCRException("You are not allowed to change password of user: " + user);
         }
