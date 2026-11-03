@@ -44,7 +44,7 @@ public class MCRDeleteDerivateServlet extends MCRPersistenceServlet {
 
     @Override
     void displayResult(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.sendRedirect(response.encodeRedirectURL(getReferer(request).toString()));
+        toReferrer(request, response);
     }
 
 }

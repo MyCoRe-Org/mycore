@@ -28,6 +28,7 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.support.MCRObjectIDLockTable;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -114,7 +115,10 @@ public class MCRLockServlet extends MCRServlet {
         MCRSession lockingSession = MCRObjectIDLockTable.getLocker(objectId);
         if (MCRObjectIDLockTable.isLockedByCurrentSession(objectId) || action == Action.unlock) {
             String url = getProperty(job.getRequest(), PARAM_REDIRECT);
-            if (url.startsWith("/")) {
+            if (url == null || !MCRFrontendUtil.isSafeRedirect(url)) {
+                LOGGER.warn("Unsafe or missing redirect URL \"{}\", returning to the application's base url", url);
+                url = MCRFrontendUtil.getBaseURL();
+            } else if (url.startsWith("/")) {
                 url = req.getContextPath() + url;
             }
             url = addQueryParameter(url, req);
