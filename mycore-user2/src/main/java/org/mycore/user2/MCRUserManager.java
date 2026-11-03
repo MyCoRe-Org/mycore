@@ -121,13 +121,16 @@ public class MCRUserManager {
      * @return the user with the given login name, or null
      */
     public static MCRUser getUser(String userName, String realmId) {
-        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        return getByNaturalID(em, userName, realmId)
-            .map(MCRUserManager::setRoles)
+        return findUser(userName, realmId)
             .orElseGet(() -> {
                 LOGGER.warn("Could not find requested user: {}@{}", userName, realmId);
                 return null;
             });
+    }
+
+    private static Optional<MCRUser> findUser(String userName, String realmId) {
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        return getByNaturalID(em, userName, realmId).map(MCRUserManager::setRoles);
     }
 
     /**
@@ -278,7 +281,27 @@ public class MCRUserManager {
             MCREvent evt = new MCREvent(MCREvent.ObjectType.USER, MCREvent.EventType.UPDATE);
             evt.put(MCREvent.USER_KEY, user);
             MCREventManager.instance().handleEvent(evt);
+            updateCurrentSessionUser(user);
         });
+    }
+
+    /**
+     * Replaces the user of the current session by the given updated user, if the session holds this user, so that
+     * the changes (e.g. attributes like access keys, or roles) take effect in the session immediately. Other user
+     * information (e.g. of a JWT or a login module) is not replaced.
+     *
+     * @param user the updated user
+     */
+    private static void updateCurrentSessionUser(MCRUser user) {
+        if (!MCRSessionMgr.hasCurrentSession()) {
+            return;
+        }
+        MCRSession session = MCRSessionMgr.getCurrentSession();
+        if (session.getUserInformation() instanceof MCRUser sessionUser
+            && sessionUser != user && sessionUser.getUserID().equals(user.getUserID())) {
+            // also renews the login time, which invalidates the permissions cached for the session
+            session.setUserInformation(user);
+        }
     }
 
     /**
@@ -624,16 +647,33 @@ public class MCRUserManager {
     }
 
     /**
-     * Returns instance of MCRUser if current user is present in this user system
-     * @return MCRUser instance or null
+     * Returns the current user as stored in this user system, so it contains the stored attributes and roles and
+     * is up to date: the session may hold other user information (e.g. of a JWT or a login module) or a copy of
+     * the user from the time of the login. For the data of the login itself, use the user information of the
+     * session instead.
+     * <p>
+     * Users that are not stored (e.g. the guest, or users of external realms that are not persisted) and all
+     * users if no database is available are returned as built from the user information of the session. If the
+     * session holds a user that has been deleted since the login, it is returned as well and a warning is logged.
+     *
+     * @return the current user, never null
      */
     public static MCRUser getCurrentUser() {
         MCRUserInformation userInformation = MCRSessionMgr.getCurrentSession().getUserInformation();
-        if (userInformation instanceof MCRUser mcrUser) {
-            return mcrUser;
-        } else {
-            return new MCRTransientUser(userInformation);
+        MCRUser sessionUser = userInformation instanceof MCRUser mcrUser ? mcrUser
+            : new MCRTransientUser(userInformation);
+        if (isInvalidUser(sessionUser) || MCREntityManagerProvider.getEntityManagerFactory() == null) {
+            // guest and system user are never stored
+            return sessionUser;
         }
+        return findUser(sessionUser.getUserName(), sessionUser.getRealmID()).orElseGet(() -> {
+            if (!(sessionUser instanceof MCRTransientUser)) {
+                // the user was stored at the time of the login, but has been deleted since
+                LOGGER.warn("User {} does not exist any more, using the user of the session",
+                    sessionUser::getUserID);
+            }
+            return sessionUser;
+        });
     }
 
     /**
