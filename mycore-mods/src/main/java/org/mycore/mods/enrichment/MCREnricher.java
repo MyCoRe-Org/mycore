@@ -186,7 +186,8 @@ public class MCREnricher {
             if (RESOLVE_TIMEOUT_MILLIS == 0) {
                 executor.invokeAll(calls);
             } else {
-                List<Future<Boolean>> futures = executor.invokeAll(calls, RESOLVE_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+                List<Future<Boolean>> futures = executor.invokeAll(
+                    calls, RESOLVE_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
                 if (futures.stream().anyMatch(Future::isCancelled)) {
                     LOGGER.warn("Enrichment timed out after {} ms", RESOLVE_TIMEOUT_MILLIS);
                 }
