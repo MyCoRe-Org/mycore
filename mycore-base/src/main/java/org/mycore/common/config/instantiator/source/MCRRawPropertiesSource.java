@@ -18,7 +18,6 @@
 
 package org.mycore.common.config.instantiator.source;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -26,6 +25,7 @@ import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRRawProperties;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.common.config.instantiator.MCRInstantiatorUtils;
+import org.mycore.common.config.instantiator.MCRProperTree;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
 /**
@@ -35,17 +35,20 @@ final class MCRRawPropertiesSource implements MCRSource {
 
     private final MCRRawProperties annotation;
 
-    private final String prefix;
+    private final PatternHandler patternHandler;
 
     MCRRawPropertiesSource(MCRRawProperties annotation) {
         this.annotation = annotation;
-        String namePattern = annotation.namePattern();
+        this.patternHandler = toPatternHandler(annotation.namePattern());
+    }
+
+    private static PatternHandler toPatternHandler(String namePattern) {
         if (namePattern.equals("*")) {
-            this.prefix = "";
+            return new RootPatternHandler();
         } else if (namePattern.endsWith(".*")) {
-            this.prefix = namePattern.substring(0, namePattern.length() - 1);
+            return new NestedPatternHandler(namePattern);
         } else {
-            throw new MCRConfigurationException("Unsupported name pattern:" + annotation.namePattern());
+            throw new MCRConfigurationException("Unsupported name pattern:" + namePattern);
         }
     }
 
@@ -72,17 +75,11 @@ final class MCRRawPropertiesSource implements MCRSource {
     @Override
     public Map<String, String> get(MCRInstanceConfiguration<?> configuration, MCRTarget target) {
 
-        Map<String, String> properties =
-            annotation.absolute() ? configuration.fullProperties() : configuration.properties();
+        MCRProperTree properties = annotation.absolute() ? configuration.fullProperties() : configuration.properties();
+        Map<String, String> rawProperties = patternHandler.findTree(properties).toProperties();
+        patternHandler.prepareRawProperties(rawProperties);
 
-        Map<String, String> filteredProperties = new HashMap<>();
-        properties.forEach((key, value) -> {
-            if (key.startsWith(prefix)) {
-                filteredProperties.put(key.substring(prefix.length()), value);
-            }
-        });
-
-        if (filteredProperties.isEmpty() && annotation.required()) {
+        if (rawProperties.isEmpty() && annotation.required()) {
             String property;
             String description;
             if (annotation.absolute()) {
@@ -95,7 +92,48 @@ final class MCRRawPropertiesSource implements MCRSource {
             throw MCRInstantiatorUtils.emptyRawException(property, target, description);
         }
 
-        return filteredProperties;
+        return rawProperties;
+
+    }
+
+    private sealed interface PatternHandler permits RootPatternHandler, NestedPatternHandler {
+
+        MCRProperTree findTree(MCRProperTree properties);
+
+        void prepareRawProperties(Map<String, String> rawProperties);
+
+    }
+
+    private static final class RootPatternHandler implements PatternHandler {
+
+        @Override
+        public MCRProperTree findTree(MCRProperTree properties) {
+            return properties;
+        }
+
+        @Override
+        public void prepareRawProperties(Map<String, String> rawProperties) {
+            rawProperties.remove(MCRInstanceConfiguration.CLASS_KEY);
+        }
+
+    }
+
+    private static final class NestedPatternHandler implements PatternHandler {
+
+        private final String key;
+
+        private NestedPatternHandler(String namePattern) {
+            this.key = namePattern.substring(0, namePattern.length() - 2);
+        }
+
+        @Override
+        public MCRProperTree findTree(MCRProperTree properties) {
+            return properties.deeplyNested(key);
+        }
+
+        @Override
+        public void prepareRawProperties(Map<String, String> rawProperties) {
+        }
 
     }
 
