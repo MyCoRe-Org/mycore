@@ -29,6 +29,7 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.common.SolrInputDocument;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.solr.MCRSolrConstants;
 import org.mycore.solr.MCRSolrIndexType;
 import org.mycore.solr.MCRSolrUtils;
@@ -38,6 +39,8 @@ import org.mycore.solr.index.handlers.MCRSolrAbstractIndexHandler;
 import org.mycore.solr.index.handlers.MCRSolrErrorIndexHandler;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatistic;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatisticCollector;
+
+import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
 
 /**
  * Handles the indexing of a single {@link SolrInputDocument}.
@@ -62,6 +65,8 @@ public class MCRSolrInputDocumentHandler extends MCRSolrAbstractIndexHandler {
 
     private final List<MCRSolrIndexHandler> subHandlers;
 
+    private final MCRSolrInputDocumentExceptionHandler exceptionHandler;
+
     /**
      * Constructs a new handler for a single Solr document.
      *
@@ -76,6 +81,8 @@ public class MCRSolrInputDocumentHandler extends MCRSolrAbstractIndexHandler {
         this.documentSupplier = documentSupplier;
         this.subHandlers = new ArrayList<>();
         this.setIndexType(coreType);
+        this.exceptionHandler = MCRConfiguration2.getInstanceOfOrThrow(
+            MCRSolrInputDocumentExceptionHandler.class, SOLR_CONFIG_PREFIX + "SolrInputDocument.ExceptionHandler");
     }
 
     /**
@@ -99,7 +106,7 @@ public class MCRSolrInputDocumentHandler extends MCRSolrAbstractIndexHandler {
         try {
             document = documentSupplier.get();
         } catch (Exception e) {
-            LOGGER.error(() -> "Error while creating solr document '" + id + "'.", e);
+            exceptionHandler.handleException(id, e);
             this.subHandlers.add(new MCRSolrErrorIndexHandler(id, e, solrClients));
             return;
         }
@@ -115,7 +122,7 @@ public class MCRSolrInputDocumentHandler extends MCRSolrAbstractIndexHandler {
             try {
                 updateRequest.process(solrClient);
             } catch (Exception e) {
-                LOGGER.error(() -> "Error while indexing document '" + docId + "'.", e);
+                exceptionHandler.handleException(id, e);
                 this.subHandlers.add(new MCRSolrMinimalInputDocumentHandler(document, e, solrClient));
             }
         }
