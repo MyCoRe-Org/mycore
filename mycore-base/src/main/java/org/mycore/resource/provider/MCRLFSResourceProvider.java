@@ -79,6 +79,8 @@ import org.mycore.resource.selector.MCRResourceSelector;
 @MCRConfigurationProxy(proxyClass = MCRLFSResourceProvider.Factory.class)
 public class MCRLFSResourceProvider extends MCRResourceProviderBase {
 
+    public static final String DEFAULT_KEY_PREFIX = MCRResourceProviderBase.DEFAULT_KEY_PREFIX + ".LFS";
+
     public static final String LOCATOR_KEY = "Locator";
 
     public static final String FILTER_KEY = "Filter";
@@ -152,7 +154,7 @@ public class MCRLFSResourceProvider extends MCRResourceProviderBase {
 
     public static class Factory implements Supplier<MCRLFSResourceProvider> {
 
-        @MCRProperty(name = COVERAGE_KEY, defaultName = "MCR.Resource.Provider.Default.LFS.Coverage")
+        @MCRProperty(name = COVERAGE_KEY, defaultNamePrefix = DEFAULT_KEY_PREFIX)
         public String coverage;
 
         @MCRInstance(name = LOCATOR_KEY, valueClass = MCRResourceLocator.class)

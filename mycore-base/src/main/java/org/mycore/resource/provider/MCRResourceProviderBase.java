@@ -38,6 +38,8 @@ import org.mycore.resource.common.MCRResourceTracer;
  */
 public abstract class MCRResourceProviderBase implements MCRResourceProvider {
 
+    public static final String DEFAULT_KEY_PREFIX = "MCR.Default.Resource.Provider";
+
     public static final String COVERAGE_KEY = "Coverage";
 
     private final String coverage;

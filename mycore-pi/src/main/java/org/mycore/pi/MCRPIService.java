@@ -81,7 +81,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
 
     protected static final String LINKED_UPDATED_TRIGGER_UPDATE = "LinkedUpdatedTriggerUpdate";
 
-    protected static final String DEFAULT_PROPERTY_PREFIX = "MCR.PI.Default.Service.";
+    protected static final String DEFAULT_PROPERTY_PREFIX = "MCR.PI.Default.Service";
 
     public static final String PI_FLAG = "MyCoRe-PI";
 
@@ -485,8 +485,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         this.ancestorUpdateTriggerUpdate = ancestorUpdateTriggerUpdate;
     }
 
-    @MCRProperty(name = ANCESTOR_UPDATED_TRIGGER_UPDATE, required = false,
-        defaultName = DEFAULT_PROPERTY_PREFIX + ANCESTOR_UPDATED_TRIGGER_UPDATE)
+    @MCRProperty(name = ANCESTOR_UPDATED_TRIGGER_UPDATE, required = false, defaultNamePrefix = DEFAULT_PROPERTY_PREFIX)
     public void setAncestorUpdateTriggerUpdate(String ancestorUpdateTriggerUpdate) {
         this.ancestorUpdateTriggerUpdate = Boolean.parseBoolean(ancestorUpdateTriggerUpdate);
     }
@@ -502,8 +501,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         this.linkedUpdatedTriggerUpdate = linkedUpdatedTriggerUpdate;
     }
 
-    @MCRProperty(name = LINKED_UPDATED_TRIGGER_UPDATE, required = false,
-        defaultName = DEFAULT_PROPERTY_PREFIX + LINKED_UPDATED_TRIGGER_UPDATE)
+    @MCRProperty(name = LINKED_UPDATED_TRIGGER_UPDATE, required = false, defaultNamePrefix = DEFAULT_PROPERTY_PREFIX)
     public void setLinkedUpdatedTriggerUpdate(String linkedUpdatedTriggerUpdate) {
         this.linkedUpdatedTriggerUpdate = Boolean.parseBoolean(linkedUpdatedTriggerUpdate);
     }

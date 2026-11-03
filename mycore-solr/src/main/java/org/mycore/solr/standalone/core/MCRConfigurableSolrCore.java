@@ -35,6 +35,8 @@ import org.mycore.solr.standalone.core.MCRConfigurableSolrCore.ConfigAdapter;
 @MCRConfigurationProxy(proxyClass = ConfigAdapter.class)
 public class MCRConfigurableSolrCore implements MCRSolrIndex {
 
+    public static final String DEFAULT_PROPERTY_PREFIX = "MCR.Solr.Default";
+    
     private final String coreName;
     private final HttpSolrClientBase client;
     private final HttpSolrClientBase baseClient;
@@ -107,7 +109,7 @@ public class MCRConfigurableSolrCore implements MCRSolrIndex {
         }
 
         @MCRProperty(name = "Concurrent.QueueSize", required = false,
-            defaultName = "MCR.Solr.Default.ConcurrentClient.QueueSize")
+            defaultNamePrefix = DEFAULT_PROPERTY_PREFIX, defaultName = "ConcurrentClient.QueueSize")
         public void setConcurrentQueueSize(String concurrentQueueSize) {
             this.concurrentQueueSize = Integer.parseInt(concurrentQueueSize);
         }
@@ -117,7 +119,7 @@ public class MCRConfigurableSolrCore implements MCRSolrIndex {
         }
 
         @MCRProperty(name = "Concurrent.ThreadCount", required = false,
-            defaultName = "MCR.Solr.Default.ConcurrentClient.ThreadCount")
+            defaultNamePrefix = DEFAULT_PROPERTY_PREFIX, defaultName = "ConcurrentClient.ThreadCount")
         public void setConcurrentThreadCount(String concurrentThreadCount) {
             this.concurrentThreadCount = Integer.parseInt(concurrentThreadCount);
         }
@@ -127,7 +129,7 @@ public class MCRConfigurableSolrCore implements MCRSolrIndex {
         }
 
         @MCRProperty(name = "Concurrent.Enabled", required = false,
-            defaultName = "MCR.Solr.Default.ConcurrentClient.Enabled")
+            defaultNamePrefix = DEFAULT_PROPERTY_PREFIX, defaultName = "ConcurrentClient.Enabled")
         public void setConcurrentEnabled(String concurrentEnabled) {
             this.concurrentEnabled = Boolean.parseBoolean(concurrentEnabled);
         }
