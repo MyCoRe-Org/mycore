@@ -21,15 +21,13 @@ package org.mycore.iview.tests.controller;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Locale;
-import java.util.NoSuchElementException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.iview.tests.ViewerTestBase;
 import org.openqa.selenium.By;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 
 /**
@@ -71,7 +69,7 @@ public class ToolBarController extends WebDriverController {
     public void pressButton(String id) {
         By selector = By
             .cssSelector(new MessageFormat(BUTTON_SELECTOR_PATTERN, Locale.ROOT).format(new String[] { id }));
-        WebElement element = this.getDriver().findElement(selector);
+        WebElement element = waitAndFindClickableElement(selector);
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Found ''{}'' with selector :''{}''", element.toString(), selector.toString());
@@ -89,7 +87,7 @@ public class ToolBarController extends WebDriverController {
         By selector = By
             .cssSelector(new MessageFormat(ELEMENT_SELECTOR_PATTERN, Locale.ROOT).format(new String[] { id }));
 
-        WebElement element = getNotStaleElement(selector);
+        WebElement element = waitAndFindClickableElement(selector);
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Found ''{}'' with selector :''{}''", element.toString(), selector.toString());
@@ -103,34 +101,6 @@ public class ToolBarController extends WebDriverController {
         element.click();
     }
 
-    private WebElement getNotStaleElement(By selector) {
-        final int maxTries = 10;
-        if (maxTries <= 0) {
-            throw new IllegalArgumentException("maxTries should be more than 0! [" + maxTries + "]");
-        }
-
-        StaleElementReferenceException lastException = null;
-        for (int attempt = 1; attempt <= maxTries; attempt++) {
-            try {
-                ViewerTestBase.sleep(1000);
-            } catch (InterruptedException e) {
-            }
-            try {
-                WebElement element = this.getDriver().findElement(selector);
-
-                if (element.isEnabled()) {
-                    return element;
-                }
-            } catch (StaleElementReferenceException e) {
-                lastException = e;
-                LOGGER.debug("Stale check failed! [{}]", attempt);
-            }
-        }
-
-        throw new NoSuchElementException("Failed to retrieve a non-stale element after " + maxTries + " attempts.",
-            lastException);
-    }
-
     /**
      * selects the first picture with the label <b>orderLabel</b> in the selectbox
      *
@@ -138,9 +108,19 @@ public class ToolBarController extends WebDriverController {
      */
     public void selectPictureWithOrder(String orderLabel) {
         By selector = By.cssSelector(SELECTBOX_SELECTOR);
-        WebElement element = this.getDriver().findElement(selector);
+        WebElement element = waitAndFindClickableElement(selector);
+        waitFor(ExpectedConditions.presenceOfNestedElementLocatedBy(selector,
+            By.xpath("./option[normalize-space(text())='" + orderLabel + "']")));
         Select select = new Select(element);
         select.selectByVisibleText(orderLabel);
+        awaitImageSelected(orderLabel);
+    }
+
+    /**
+     * Waits until the select box of the tool bar shows <b>orderLabel</b> as the current image.
+     */
+    public void awaitImageSelected(String orderLabel) {
+        waitUntil(orderLabel + " to be selected", () -> isImageSelected(orderLabel));
     }
 
     /**
@@ -151,7 +131,7 @@ public class ToolBarController extends WebDriverController {
      */
     public boolean isImageSelected(String oderLabel) {
         By selector = By.cssSelector(SELECTBOX_SELECTOR);
-        WebElement element = this.getDriver().findElement(selector);
+        WebElement element = waitAndFindElement(selector);
         Select select = new Select(element);
         return select.getFirstSelectedOption() != null
             && select.getFirstSelectedOption().getText().equalsIgnoreCase(oderLabel);
