@@ -90,6 +90,22 @@ public class MCRAccessKeyUtilsTest extends MCRAccessKeyTestCase {
     }
 
     @Test
+    public void testStoredUser() {
+        final MCRUser user = new MCRUser("junit");
+        MCRUserManager.createUser(user);
+        // the session holds the user as of the time of the login, not the stored one
+        MCRSessionMgr.getCurrentSession().setUserInformation(MCRUserManager.getUser("junit").getSafeCopy());
+        startNewTransaction();
+        final MCRAccessKey accessKey = new MCRAccessKey(READ_KEY, PERMISSION_READ);
+        MCRAccessKeyManager.createAccessKey(objectId, accessKey);
+        MCRAccessKeyUtils.addAccessKeySecretToCurrentUser(objectId, READ_KEY);
+        assertNotNull(MCRAccessKeyUtils.getAccessKeySecretFromCurrentUser(objectId));
+        startNewTransaction();
+        MCRAccessKeyUtils.removeAccessKeySecretFromCurrentUser(objectId);
+        assertNull(MCRAccessKeyUtils.getAccessKeySecretFromCurrentUser(objectId));
+    }
+
+    @Test
     public void testSessionOverride() {
         final MCRAccessKey accessKeyRead = new MCRAccessKey(READ_KEY, PERMISSION_READ);
         MCRAccessKeyManager.createAccessKey(objectId, accessKeyRead);

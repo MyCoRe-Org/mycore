@@ -22,6 +22,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -36,6 +37,7 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.junit.Before;
 import org.junit.Test;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.user2.utils.MCRUserTransformer;
 
@@ -278,6 +280,55 @@ public class MCRUserManagerTest extends MCRUserTestCase {
         startNewTransaction();
         assertNull("Should not login user when password is expired",
             MCRUserManager.login(this.user.getUserName(), clearPasswd));
+    }
+
+    @Test
+    public final void testGetCurrentUserReturnsStoredUser() {
+        // the session holds the user as of the time of the login, the user is changed in another session
+        MCRUser loginUser = MCRUserManager.getUser(user.getUserName()).getSafeCopy();
+        MCRUser stored = MCRUserManager.getUser(user.getUserName());
+        stored.setUserAttribute("added", "value");
+        MCRUserManager.updateUser(stored);
+        startNewTransaction();
+        MCRSessionMgr.getCurrentSession().setUserInformation(loginUser);
+
+        assertEquals("value", MCRUserManager.getCurrentUser().getUserAttribute("added"));
+    }
+
+    @Test
+    public final void testUpdateUserUpdatesSessionUser() {
+        // the session holds the user as of the time of the login
+        MCRSessionMgr.getCurrentSession().setUserInformation(MCRUserManager.getUser(user.getUserName()).getSafeCopy());
+        startNewTransaction();
+        MCRUser currentUser = MCRUserManager.getCurrentUser();
+        currentUser.setUserAttribute("added", "value");
+        MCRUserManager.updateUser(currentUser);
+
+        assertEquals("value", MCRSessionMgr.getCurrentSession().getUserInformation().getUserAttribute("added"));
+    }
+
+    @Test
+    public final void testUpdateUserDoesNotChangeSessionOfOtherUser() {
+        MCRUser other = new MCRUser("other");
+        MCRUserManager.createUser(other);
+        MCRUser otherSessionUser = MCRUserManager.getUser("other").getSafeCopy();
+        MCRSessionMgr.getCurrentSession().setUserInformation(otherSessionUser);
+        startNewTransaction();
+        MCRUser stored = MCRUserManager.getUser(user.getUserName());
+        stored.setUserAttribute("added", "value");
+        MCRUserManager.updateUser(stored);
+
+        assertSame(otherSessionUser, MCRSessionMgr.getCurrentSession().getUserInformation());
+    }
+
+    @Test
+    public final void testGetCurrentUserReturnsSessionUserIfDeleted() {
+        MCRUser sessionUser = MCRUserManager.getUser(user.getUserName()).getSafeCopy();
+        MCRSessionMgr.getCurrentSession().setUserInformation(sessionUser);
+        MCRUserManager.deleteUser(user.getUserName());
+        startNewTransaction();
+
+        assertSame(sessionUser, MCRUserManager.getCurrentUser());
     }
 
     @Test
