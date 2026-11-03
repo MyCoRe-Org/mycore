@@ -25,6 +25,7 @@ import java.net.URL;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
+import org.jdom2.Namespace;
 import org.jdom2.output.XMLOutputter;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
@@ -58,5 +59,47 @@ public class MCRORCIDWorkTransformerHelperTest extends MCRTestCase {
         assertEquals(work.getUrl(), result.getUrl());
         assertEquals(work.getLanguageCode(), result.getLanguageCode());
         assertEquals(work.getWorkExternalIdentifiers(), result.getWorkExternalIdentifiers());
+    }
+
+    @Test
+    public void testMcr2WorkWithOneAbstract() {
+        final Work result = transformModsWithAbstracts("First abstract.");
+        LOGGER.info(result);
+        assertEquals("First abstract.", result.getShortDescription());
+    }
+
+    @Test
+    public void testMcr2WorkWithTwoAbstracts() {
+        final Work result = transformModsWithAbstracts(
+            "First abstract.", "Second abstract.");
+        LOGGER.info(result);
+        assertEquals("First abstract.", result.getShortDescription());
+    }
+
+    @Test
+    public void testMcr2WorkWithEmptyFirstAbstract() {
+        final Work result = transformModsWithAbstracts(
+            "", "Second abstract.");
+        LOGGER.info(result);
+        assertEquals("Second abstract.", result.getShortDescription());
+    }
+
+    private Work transformModsWithAbstracts(String... abstracts) {
+        final Namespace modsNamespace = Namespace.getNamespace(
+            "mods", "http://www.loc.gov/mods/v3");
+        final Element mods = new Element("mods", modsNamespace);
+
+        final Element titleInfo = new Element("titleInfo", modsNamespace);
+        final Element title = new Element("title", modsNamespace).setText("A title");
+        titleInfo.addContent(title);
+        mods.addContent(titleInfo);
+
+        for (String abstractText : abstracts) {
+            final Element abstractElement = new Element("abstract", modsNamespace);
+            abstractElement.setText(abstractText);
+            mods.addContent(abstractElement);
+        }
+
+        return MCRORCIDWorkTransformerHelper.transformContent(new MCRJDOMContent(mods));
     }
 }
