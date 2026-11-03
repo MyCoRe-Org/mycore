@@ -26,6 +26,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRUsageException;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.services.queuedjob.MCRJob;
@@ -72,6 +73,9 @@ public class MCRPackerServlet extends MCRServlet {
 
         if (jobParameters.containsKey("redirect")) {
             String redirect = jobParameters.get("redirect");
+            if (redirect == null || !MCRFrontendUtil.isSafeRedirect(redirect)) {
+                redirect = MCRFrontendUtil.getBaseURL();
+            }
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(redirect));
         }
     }

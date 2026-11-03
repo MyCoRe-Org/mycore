@@ -65,11 +65,11 @@ class MCRPersistenceHelper {
 
     static String getCancelUrl(HttpServletRequest request) {
         String cancelURL = request.getParameter("cancelURL");
-        if (cancelURL != null && !cancelURL.isEmpty()) {
+        if (cancelURL != null && !cancelURL.isEmpty() && MCRFrontendUtil.isSafeRedirect(cancelURL)) {
             return cancelURL;
         }
         String referer = request.getHeader("Referer");
-        if (referer == null || referer.equals("")) {
+        if (referer == null || referer.isEmpty() || !MCRFrontendUtil.isSafeRedirect(referer)) {
             referer = MCRFrontendUtil.getBaseURL();
         }
         LOGGER.debug("Referer: {}", referer);
