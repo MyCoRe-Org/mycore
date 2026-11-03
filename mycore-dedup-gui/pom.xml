@@ -29,10 +29,8 @@
   </parent>
   <artifactId>mycore-dedup-gui</artifactId>
   <name>MyCoRe Duplicate Detection GUI</name>
-  <description>
-    Vue front end for the duplicate detection component. It renders the possible duplicates and the
-    no-duplicate markings served by the standard deduplication API of the mycore-dedup component.
-  </description>
+  <description>Vue front end for the duplicate detection component. It renders the possible duplicates and the
+    no-duplicate markings served by the standard deduplication API of the mycore-dedup component.</description>
   <build>
     <plugins>
       <!-- Remove dependencies left behind by the former app-local Vue toolchain. -->

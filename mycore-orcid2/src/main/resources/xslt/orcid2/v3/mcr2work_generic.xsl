@@ -23,7 +23,7 @@
     <work:work xsi:schemaLocation="http://www.orcid.org/ns/work record_3.0/work-3.0.xsd">
       <xsl:call-template name="workTitle" />
       <xsl:call-template name="journal-title" />
-      <xsl:apply-templates select="mods:abstract" />
+      <xsl:call-template name="workShortDescription" />
       <xsl:call-template name="workCitation" />
       <xsl:call-template name="workType" />
       <xsl:variable name="modsDateIssuedXpath">
@@ -89,7 +89,12 @@
     <xsl:value-of select="text()" />
   </xsl:template>
 
-  <xsl:template match="mods:abstract[fn:string-length(text()) &gt; 0]">
+
+  <xsl:template name="workShortDescription">
+    <xsl:apply-templates select="(mods:abstract[normalize-space(.)])[1]" />
+  </xsl:template>
+
+  <xsl:template match="mods:abstract">
     <work:short-description>
       <xsl:value-of select="mcrstringutils:shorten(text(), ($short-description-max-length - 1), '…')"/>
     </work:short-description>
