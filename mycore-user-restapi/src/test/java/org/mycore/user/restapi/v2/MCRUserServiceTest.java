@@ -110,6 +110,23 @@ public class MCRUserServiceTest {
     }
 
     @Test
+    void createUserShouldThrowPasswordNotAllowedWhenPasswordWriteFails() {
+        MCRCreateUserRequest request = buildCreateUserRequest("alice", "foo");
+        MCRUser domainUser = mock(MCRUser.class);
+        when(domainUser.getUserID()).thenReturn("alice");
+
+        try (MockedStatic<MCRUserManager> mgr = mockStatic(MCRUserManager.class)) {
+            mgr.when(() -> MCRUserManager.exists("alice")).thenReturn(false);
+            when(userDtoMapper.toDomain(request, null)).thenReturn(domainUser);
+            mgr.when(() -> MCRUserManager.setPassword(domainUser, "foo")).thenThrow(new MCRException("not allowed"));
+
+            assertThrows(MCRUserPasswordNotAllowedException.class, () -> userService.createUser(request));
+
+            mgr.verify(() -> MCRUserManager.createUser(domainUser));
+        }
+    }
+
+    @Test
     void createUserShouldThrowValidationExceptionWhenMCRExceptionOccurs() {
         MCRCreateUserRequest request = buildCreateUserRequest("alice", "foo");
         MCRUser domainUser = mock(MCRUser.class);
@@ -121,6 +138,7 @@ public class MCRUserServiceTest {
 
             assertThrows(MCRUserValidationException.class, () -> userService.createUser(request));
             mgr.verify(() -> MCRUserManager.createUser(domainUser));
+            mgr.verify(() -> MCRUserManager.setPassword(any(), any()), never());
         }
     }
 

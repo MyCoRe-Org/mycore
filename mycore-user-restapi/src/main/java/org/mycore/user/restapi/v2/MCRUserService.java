@@ -88,6 +88,8 @@ public class MCRUserService {
      * @return the created user as a detailed view
      * @throws MCRUserAlreadyExistsException if a user with the given ID already exists
      * @throws MCRUserValidationException if the user data is invalid
+     * @throws MCRUserPasswordNotAllowedException if the caller is not permitted to write the
+     *         password
      */
     public MCRUserDetail createUser(MCRCreateUserRequest createUserRequest) {
         requireRequest(createUserRequest);
@@ -96,10 +98,10 @@ public class MCRUserService {
         MCRUser user = userDtoMapper.toDomain(createUserRequest, owner);
         try {
             MCRUserManager.createUser(user);
-            MCRUserManager.setPassword(user, createUserRequest.password());
         } catch (MCRException e) {
             throw new MCRUserValidationException(e.getMessage(), e);
         }
+        writePassword(user, createUserRequest.password());
         MCRUser created = getUserOrThrow(createUserRequest.id());
         return userDtoMapper.toDetail(created, getOwns(created));
     }

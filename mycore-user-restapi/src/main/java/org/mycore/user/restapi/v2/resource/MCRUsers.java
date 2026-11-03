@@ -160,6 +160,7 @@ public class MCRUsers {
      * @return 201 Created with the URI of the new user in the {@code Location} header
      * @throws BadRequestException if the user data is invalid
      * @throws ClientErrorException with status 409 if the user already exists
+     * @throws ForbiddenException if the caller is not permitted to set the password
      */
     @Operation(
         summary = "Creates a new user",
@@ -182,7 +183,12 @@ public class MCRUsers {
                 )
             ),
             @ApiResponse(responseCode = BAD_REQUEST, description = DESC_INVALID_BODY_CONTENT),
-            @ApiResponse(responseCode = CONFLICT, description = "User already exists")
+            @ApiResponse(responseCode = CONFLICT, description = "User already exists"),
+            @ApiResponse(
+                responseCode = FORBIDDEN,
+                content = @Content(mediaType = MediaType.TEXT_PLAIN),
+                description = DESC_PASSWORD_NOT_ALLOWED
+            )
         },
         tags = TAG_MCR_USER
     )
@@ -198,6 +204,8 @@ public class MCRUsers {
             throw new BadRequestException(e);
         } catch (MCRUserAlreadyExistsException e) {
             throw new ClientErrorException(Response.Status.CONFLICT, e);
+        } catch (MCRUserPasswordNotAllowedException e) {
+            throw new ForbiddenException(e);
         }
     }
 

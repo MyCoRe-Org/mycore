@@ -120,6 +120,15 @@ public class MCRUsersTest {
     }
 
     @Test
+    void createUserShouldThrowForbiddenWhenPasswordNotAllowed() {
+        MCRCreateUserRequest dto = buildCreateUserRequest("alice");
+        doThrow(new MCRUserPasswordNotAllowedException("alice", new MCRException("not allowed")))
+            .when(userService).createUser(dto);
+
+        assertThrows(ForbiddenException.class, () -> resource.createUser(dto));
+    }
+
+    @Test
     void getUserShouldCallGetStandardWhenNoDetailLevel() {
         MCRUserStandard standard = mock(MCRUserStandard.class);
         when(userService.getUserStandard("alice")).thenReturn(standard);
