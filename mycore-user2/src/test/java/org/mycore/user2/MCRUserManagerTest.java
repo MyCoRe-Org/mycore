@@ -22,6 +22,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -36,6 +37,7 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.junit.Before;
 import org.junit.Test;
+import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.user2.utils.MCRUserTransformer;
 
@@ -278,6 +280,23 @@ public class MCRUserManagerTest extends MCRUserTestCase {
         startNewTransaction();
         assertNull("Should not login user when password is expired",
             MCRUserManager.login(this.user.getUserName(), clearPasswd));
+    }
+
+    @Test
+    public final void testCreateLocalUserWithAtIsRejected() {
+        MCRUser userWithAt = new MCRUser("alice@example.org");
+
+        assertThrows(MCRException.class, () -> MCRUserManager.createUser(userWithAt));
+        assertFalse(MCRUserManager.exists("alice@example.org"));
+    }
+
+    @Test
+    public final void testCreateUserOfOtherRealmWithAtIsAllowed() {
+        MCRUser userWithAt = new MCRUser("alice@example.org", "mycore.de");
+
+        MCRUserManager.createUser(userWithAt);
+
+        assertTrue(MCRUserManager.exists("alice@example.org", "mycore.de"));
     }
 
     @Test
