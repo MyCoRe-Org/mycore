@@ -402,6 +402,23 @@ public class MCRUserManagerTest extends MCRUserTestCase {
     }
 
     @Test
+    public final void testCreateLocalUserWithAtIsRejected() {
+        MCRUser userWithAt = new MCRUser("alice@example.org");
+
+        assertThrows(MCRException.class, () -> MCRUserManager.createUser(userWithAt));
+        assertFalse(MCRUserManager.exists("alice@example.org"));
+    }
+
+    @Test
+    public final void testCreateUserOfOtherRealmWithAtIsAllowed() {
+        MCRUser userWithAt = new MCRUser("alice@example.org", "mycore.de");
+
+        MCRUserManager.createUser(userWithAt);
+
+        assertTrue(MCRUserManager.exists("alice@example.org", "mycore.de"));
+    }
+
+    @Test
     public final void toXML() throws IOException {
         MCRUserManager.updatePasswordHashToSHA256(this.user, this.user.getPassword());
         this.user.setEMail("info@mycore.de");
