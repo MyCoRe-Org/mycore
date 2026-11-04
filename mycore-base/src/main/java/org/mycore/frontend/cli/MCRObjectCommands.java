@@ -208,7 +208,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         order = 20)
     public static List<String> deleteAllObjects(String type) {
         return MCRCommandUtils.getIdsForType(type)
-            .map(id -> "delete object " + id)
+            .map(id -> "delete existing object " + id)
             .collect(Collectors.toList());
     }
 
@@ -231,7 +231,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         if (order != null) {
             //delete in reverse order
             for (int o = order.length - 1; o >= 0; o--) {
-                cmds.add("delete object " + ts.getNodeName(order[o]));
+                cmds.add("delete existing object " + ts.getNodeName(order[o]));
             }
         }
         return cmds;
@@ -266,9 +266,39 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         help = "Removes a MCRObject with the MCRObjectID {0}",
         order = 40)
     public static void delete(String id) throws MCRPersistenceException, MCRActiveLinkException, MCRAccessException {
-        MCRObjectID mcrId = MCRObjectID.getInstance(id);
+        delete(MCRObjectID.getInstance(id));
+    }
+
+    private static void delete(MCRObjectID mcrId)
+        throws MCRPersistenceException, MCRActiveLinkException, MCRAccessException {
         MCRMetadataManager.deleteMCRObject(mcrId);
         LOGGER.info("{} deleted.", mcrId);
+    }
+
+    /**
+     * Delete a MCRObject from the datastore if it exists. Used by commands that build a list of delete commands up
+     * front: children are deleted together with their parent, so their own delete command has to be skipped.
+     * Unlike {@link #delete(String)}, leftovers of objects without metadata are not removed.
+     *
+     * @param id
+     *            the id of the MCRObject that should be deleted
+     * @throws MCRPersistenceException  if a persistence problem is occurred
+     * @throws MCRAccessException see {@link MCRMetadataManager#deleteMCRObject(MCRObjectID)}
+     * @throws MCRActiveLinkException if object is referenced by other objects
+     */
+    @MCRCommand(
+        syntax = "delete existing object {0}",
+        help = "Removes a MCRObject with the MCRObjectID {0}, skips it if it does not exist (anymore). "
+            + "Use 'delete object {0}' to remove leftovers of an object without metadata.",
+        order = 45)
+    public static void deleteExisting(String id)
+        throws MCRPersistenceException, MCRActiveLinkException, MCRAccessException {
+        MCRObjectID mcrId = MCRObjectID.getInstance(id);
+        if (!MCRMetadataManager.exists(mcrId)) {
+            LOGGER.info("{} does not exist (anymore), skipping.", mcrId);
+            return;
+        }
+        delete(mcrId);
     }
 
     /**
@@ -286,7 +316,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         order = 30)
     public static List<String> deleteFromTo(String idFrom, String idTo) {
         return MCRCommandUtils.getIdsFromIdToId(idFrom, idTo)
-            .map(id -> "delete object " + id)
+            .map(id -> "delete existing object " + id)
             .collect(Collectors.toList());
     }
 
