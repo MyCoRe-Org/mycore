@@ -34,7 +34,12 @@ import org.mycore.common.config.MCRConfigurationException;
  * In case that is not set, the token is directly requested from the OAuth2 API and logged.
  *
  * @author Frank Lützenkirchen *
+ *
+ * @deprecated The module mycore-orcid is deprecated and will be removed.
+ * Use mycore-orcid2 instead.
  */
+@Deprecated(forRemoval = true)
+@SuppressWarnings("removal")
 public class MCRReadPublicTokenFactory {
 
     private static final Logger LOGGER = LogManager.getLogger();

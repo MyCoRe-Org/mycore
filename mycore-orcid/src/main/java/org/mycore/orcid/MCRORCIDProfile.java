@@ -32,7 +32,12 @@ import jakarta.ws.rs.client.WebTarget;
  * Represents the profile of a given ORCID ID.
  *
  * @author Frank Lützenkirchen
+ *
+ * @deprecated The module mycore-orcid is deprecated and will be removed.
+ * Use mycore-orcid2 instead.
  */
+@Deprecated(forRemoval = true)
+@SuppressWarnings("removal")
 public class MCRORCIDProfile {
 
     private String orcid;

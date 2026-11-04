@@ -29,7 +29,12 @@ import jakarta.ws.rs.core.MediaType;
  * Utility class to hold constants and namespace representation used in the XML of the ORCID API.
  *
  * @author Frank Lützenkirchen
+ *
+ * @deprecated The module mycore-orcid is deprecated and will be removed.
+ * Use mycore-orcid2 instead.
  */
+@Deprecated(forRemoval = true)
+@SuppressWarnings("removal")
 public final class MCRORCIDConstants {
 
     public static final MediaType ORCID_XML_MEDIA_TYPE = MediaType.valueOf("application/vnd.orcid+xml");

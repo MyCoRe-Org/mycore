@@ -48,7 +48,12 @@ import jakarta.ws.rs.core.Response.StatusType;
  * Provides functionality to create, update and delete works in the remote ORCID profile
  *
  * @author Frank Lützenkirchen
+ *
+ * @deprecated The module mycore-orcid is deprecated and will be removed.
+ * Use mycore-orcid2 instead.
  */
+@Deprecated(forRemoval = true)
+@SuppressWarnings("removal")
 public class MCRWorksPublisher {
 
     private static final Logger LOGGER = LogManager.getLogger();

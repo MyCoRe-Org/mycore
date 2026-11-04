@@ -43,7 +43,12 @@ import org.xml.sax.SAXException;
  * Represents the "works" section of an ORCID profile with grouped works
  *
  * @author Frank Lützenkirchen
+ *
+ * @deprecated The module mycore-orcid is deprecated and will be removed.
+ * Use mycore-orcid2 instead.
  */
+@Deprecated(forRemoval = true)
+@SuppressWarnings("removal")
 public class MCRWorksSection {
 
     private MCRORCIDProfile orcid;
