@@ -2,15 +2,14 @@
 
 <!-- Transforms the response of a HTTP GET request to the ORCID.org works API into MODS -->
 
-<xsl:stylesheet version="1.0"
+<xsl:stylesheet version="3.0"
   xmlns:activities="http://www.orcid.org/ns/activities"
   xmlns:bulk="http://www.orcid.org/ns/bulk"
   xmlns:common="http://www.orcid.org/ns/common"
   xmlns:mods="http://www.loc.gov/mods/v3"
-  xmlns:xalan="http://xml.apache.org/xalan"
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:work="http://www.orcid.org/ns/work"
-  exclude-result-prefixes="xalan xsl">
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  exclude-result-prefixes="#all">
 
   <xsl:template match="activities:works|activities:group|bulk:bulk">
     <xsl:copy>
@@ -132,22 +131,12 @@
   
   <!-- Split "John F. Doe" into mods:namePart -->
   <xsl:template match="work:credit-name[not(contains(.,','))]">
+    <xsl:variable name="tokens" select="tokenize(normalize-space(.), ' ')" />
     <mods:namePart type="family">
-      <xsl:for-each select="xalan:tokenize(.,' ')">
-        <xsl:if test="position() = last()">
-          <xsl:value-of select="." />
-        </xsl:if>
-      </xsl:for-each>
+      <xsl:value-of select="$tokens[last()]" />
     </mods:namePart>
     <mods:namePart type="given">
-      <xsl:for-each select="xalan:tokenize(.,' ')">
-        <xsl:if test="position() != last()">
-          <xsl:if test="position() &gt; 1">
-            <xsl:text> </xsl:text>
-          </xsl:if>
-          <xsl:value-of select="." />
-        </xsl:if>
-      </xsl:for-each>
+      <xsl:value-of select="string-join($tokens[position() != last()], ' ')" />
     </mods:namePart>
   </xsl:template>
   
