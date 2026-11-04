@@ -142,7 +142,7 @@
       </xsl:when>
       <xsl:otherwise>
         <xsl:if test="mods:nonSort">
-          <xsl:value-of select="concat(mods:nonSort, ' ')" />
+          <xsl:value-of select="concat(mods:nonSort[1], ' ')" />
         </xsl:if>
         <xsl:value-of select="mods:title" />
         <xsl:if test="$withSubtitle and mods:subTitle">
@@ -216,11 +216,11 @@
         <xsl:choose>
           <xsl:when test="mods:relatedItem[@type='host']/mods:part/mods:detail[@type='issue']">
             <xsl:value-of
-              select="concat(mods:relatedItem[@type='host']/mods:part/mods:detail[@type='volume'],
+              select="concat((mods:relatedItem[@type='host']/mods:part/mods:detail[@type='volume'])[1],
                                          ', ',
                                          mcri18n:translate('component.mods.metaData.dictionary.issue'),
                                          ' ',
-                                         mods:relatedItem[@type='host']/mods:part/mods:detail[@type='issue'])" />
+                                         (mods:relatedItem[@type='host']/mods:part/mods:detail[@type='issue'])[1])" />
           </xsl:when>
           <xsl:otherwise>
             <xsl:value-of select="mods:relatedItem[@type='host']/mods:part/mods:detail[@type='volume']" />
@@ -532,7 +532,7 @@
       <xsl:choose>
         <xsl:when test="mods:displayForm">
           <xsl:if test="$MCR.MODS.Utils.addTermsOfAddressToDisplayForm='true' and not($queryable) and mods:namePart[@type='termsOfAddress']">
-            <xsl:value-of select="concat(mods:namePart[@type='termsOfAddress'], ' ')" />
+            <xsl:value-of select="concat(mods:namePart[@type='termsOfAddress'][1], ' ')" />
           </xsl:if>
           <xsl:value-of select="mods:displayForm" />
         </xsl:when>
@@ -543,21 +543,21 @@
                 <xsl:value-of select="text()" />
               </xsl:when>
               <xsl:otherwise>
-                <xsl:value-of select="concat(' ', text())" />
+                <xsl:value-of select="concat(' ', .)" />
               </xsl:otherwise>
             </xsl:choose>
           </xsl:for-each>
         </xsl:when>
         <xsl:otherwise>
           <xsl:if test="not($queryable) and mods:namePart[@type='termsOfAddress']">
-            <xsl:value-of select="concat(mods:namePart[@type='termsOfAddress'], ' ')" />
+            <xsl:value-of select="concat(mods:namePart[@type='termsOfAddress'][1], ' ')" />
           </xsl:if>
           <xsl:value-of select="mods:namePart[@type='family']" />
           <xsl:if test="mods:namePart[@type='given']">
-            <xsl:value-of select="concat(', ',mods:namePart[@type='given'])" />
+            <xsl:value-of select="concat(', ', mods:namePart[@type='given'][1])" />
           </xsl:if>
           <xsl:if test="not($queryable) and mods:namePart[@type='date']">
-            <xsl:value-of select="concat(' (',mods:namePart[@type='date'],')')" />
+            <xsl:value-of select="concat(' (', mods:namePart[@type='date'][1], ')')" />
           </xsl:if>
         </xsl:otherwise>
       </xsl:choose>

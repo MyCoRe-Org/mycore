@@ -61,11 +61,11 @@
       <xsl:variable name="titleLang" select="@xml:lang" />
       <xsl:variable name="composedTitle">
         <xsl:if test="mods:nonSort">
-          <xsl:value-of select="concat(mods:nonSort, ' ')" />
+          <xsl:value-of select="concat(mods:nonSort[1], ' ')" />
         </xsl:if>
         <xsl:value-of select="mods:title" />
         <xsl:if test="mods:subTitle">
-          <xsl:value-of select="concat(' : ', mods:subTitle)" />
+          <xsl:value-of select="concat(' : ', mods:subTitle[1])" />
         </xsl:if>
       </xsl:variable>
       <field name="mods.title.lang.{$titleLang}">
@@ -335,7 +335,7 @@
   <xsl:template name="printModsName">
     <xsl:choose>
       <xsl:when test="mods:displayForm">
-        <xsl:value-of select="fn:string-join(fn:normalize-unicode(mods:displayForm), ' ')" />
+        <xsl:value-of select="fn:string-join(mods:displayForm ! fn:normalize-unicode(.), ' ')" />
       </xsl:when>
       <xsl:otherwise>
         <xsl:for-each select="mods:namePart[@type!='date'] | mods:namePart[not(@type)] | text()">
