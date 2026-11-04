@@ -44,6 +44,7 @@
   <xsl:include href="xslInclude:schemaorg" />
 
   <xsl:param name="MCR.Module-iview2.SupportedContentTypes" />
+  <xsl:variable name="objectID" select="/mycoreobject/@ID" />
 
   <xsl:template match="/">
     <xsl:element name="script">
@@ -537,8 +538,11 @@
     <fn:string key="contentUrl">
       <xsl:value-of
         select="concat($WebApplicationBaseURL,
-          'servlets/MCRFileNodeServlet/',
+          'api/v2/objects/',
+           $objectID,
+           '/derivates/',
            /mcr_directory/ownerID/text(),
+           '/contents',
            /mcr_directory/path/text(),
            fn:encode-for-uri(name/text()))" />
     </fn:string>
