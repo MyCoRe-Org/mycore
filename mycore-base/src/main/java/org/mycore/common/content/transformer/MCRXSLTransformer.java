@@ -65,6 +65,8 @@ import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
+import net.sf.saxon.expr.instruct.TerminationException;
+
 /**
  * Transforms XML content using a static XSL stylesheet. The stylesheet is configured via
  * <code>MCR.ContentTransformer.{ID}.Stylesheet</code>. You may choose your own instance of
@@ -273,7 +275,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
             reader.parse(source.getInputSource());
         } catch (TransformerConfigurationException | SAXException | IllegalArgumentException
             | ParserConfigurationException e) {
-            throw new IOException(e);
+            throw new IOException(getErrorMessage(e), e);
         } catch (RuntimeException e) {
             if (el != null && e.getCause() == null && el.getExceptionThrown() != null) {
                 //typically if a RuntimeException has no cause,
@@ -284,6 +286,18 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
             }
             throw e;
         }
+    }
+
+    /**
+     * Returns the message for an exception wrapping the given exception. Saxon does not include the text of a
+     * terminating <code>xsl:message</code> in its exception message, so it is added here.
+     */
+    private static String getErrorMessage(Exception e) {
+        if (e.getCause() instanceof TerminationException terminationException) {
+            return "Error while XSL transformation: " + MCRErrorListener.getMyMessageAndLocation(terminationException);
+        }
+        // same message as for new IOException(e) or new MCRException(e)
+        return e.toString();
     }
 
     protected MCRContent transform(MCRContent source, XMLReader reader, TransformerHandler transformerHandler,
@@ -332,11 +346,11 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         throws TransformerConfigurationException, SAXException, ParserConfigurationException {
         checkTemplateUptodate();
         Deque<TransformerHandler> xslSteps = new ArrayDeque<>();
-        //every transformhandler shares the same ErrorListener instance
+        //every transformhandler gets its own ErrorListener instance
         for (Templates template : templates) {
             TransformerHandler handler = tFactory.newTransformerHandler(template);
             parameterCollector.setParametersTo(handler.getTransformer());
-            handler.getTransformer().setErrorListener(new MCRErrorListener());
+            MCRErrorListener.setTo(handler.getTransformer());
             if (!xslSteps.isEmpty()) {
                 Result result = new SAXResult(handler);
                 xslSteps.getLast().setResult(result);
@@ -436,7 +450,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
                     transformed.setMimeType(mimeType);
                     transformed.setEncoding(encoding);
                 } catch (IOException | SAXException e) {
-                    throw new MCRException(e);
+                    throw new MCRException(getErrorMessage(e), e);
                 } catch (RuntimeException e) {
                     MCRErrorListener el = (MCRErrorListener) transformerHandler.getTransformer().getErrorListener();
                     if (el != null && e.getCause() == null && el.getExceptionThrown() != null) {
