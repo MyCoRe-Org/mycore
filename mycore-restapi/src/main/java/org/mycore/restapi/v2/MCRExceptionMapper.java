@@ -42,11 +42,29 @@ public class MCRExceptionMapper implements ExceptionMapper<Exception> {
     @Context
     Request request;
 
+    /**
+     * Maps the given exception to a response.
+     * <p>
+     * If the client accepts neither JSON nor XML, a {@link WebApplicationException} keeps its own
+     * response and any other exception results in a plain {@code 500 Internal Server Error}.
+     *
+     * @param exception the exception to map
+     * @return the response for the exception
+     */
     @Override
     public Response toResponse(Exception exception) {
         return Optional.ofNullable(request.selectVariant(SUPPORTED_VARIANTS))
             .map(v -> fromException(exception))
-            .orElseGet(() -> (exception instanceof WebApplicationException wae) ? wae.getResponse() : null);
+            .orElseGet(() -> fromExceptionWithoutEntity(exception));
+    }
+
+    private static Response fromExceptionWithoutEntity(Exception exception) {
+        if (exception instanceof WebApplicationException wae) {
+            return wae.getResponse();
+        }
+        // returning null would make Jersey answer with 204 No Content
+        LOGGER.error("Error while processing request", exception);
+        return Response.serverError().build();
     }
 
     public static Response fromWebApplicationException(WebApplicationException wae) {
