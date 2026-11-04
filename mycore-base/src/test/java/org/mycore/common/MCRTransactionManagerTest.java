@@ -206,6 +206,39 @@ public class MCRTransactionManagerTest {
     }
 
     @Test
+    public void onCommitTasks() {
+        MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(WorkingTransaction.class));
+        MCRSession session = MCRSessionMgr.getCurrentSession();
+        AtomicInteger taskCounter = new AtomicInteger();
+
+        // commit executes task
+        MCRTransactionManager.beginTransactions();
+        session.onCommit(taskCounter::incrementAndGet);
+        MCRTransactionManager.commitTransactions();
+        assertEquals(1, taskCounter.get(), "onCommit task should be executed after commit");
+
+        // rollback discards task
+        MCRTransactionManager.beginTransactions();
+        session.onCommit(taskCounter::incrementAndGet);
+        MCRTransactionManager.rollbackTransactions();
+        MCRTransactionManager.beginTransactions();
+        MCRTransactionManager.commitTransactions();
+        assertEquals(1, taskCounter.get(), "onCommit task should be discarded on rollback");
+
+        // failed commit discards task
+        MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(
+            WorkingTransaction.class, FailOnCommitTransaction.class));
+        MCRTransactionManager.beginTransactions();
+        session.onCommit(taskCounter::incrementAndGet);
+        assertThrows(MCRTransactionException.class, MCRTransactionManager::commitTransactions,
+            "Should fail because FailOnCommitTransaction fails on commit");
+        MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(WorkingTransaction.class));
+        MCRTransactionManager.beginTransactions();
+        MCRTransactionManager.commitTransactions();
+        assertEquals(1, taskCounter.get(), "onCommit task should be discarded if commit fails");
+    }
+
+    @Test
     public void rollbackTransactionsWithSpecificClasses() {
         // rollback single transaction
         MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(

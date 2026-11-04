@@ -467,11 +467,23 @@ sealed public class MCRSession implements Cloneable permits MCRScopedSession {
 
     /**
      * Add a task which will be executed after {@link MCRTransactionManager#commitTransactions()} was called.
+     * The task is discarded if the transactions are rolled back instead.
      *
      * @param task thread witch will be executed after an commit
      */
     public void onCommit(Runnable task) {
         this.onCommitTasks.get().offer(Objects.requireNonNull(task));
+    }
+
+    /**
+     * Discards all tasks added by {@link #onCommit(Runnable)} in the current thread without executing them.
+     */
+    void discardOnCommitTasks() {
+        Queue<Runnable> runnables = onCommitTasks.get();
+        onCommitTasks.remove();
+        if (!runnables.isEmpty()) {
+            LOGGER.debug("Discarding {} onCommit task(s) due to transaction rollback.", runnables::size);
+        }
     }
 
     protected void submitOnCommitTasks() {
