@@ -198,7 +198,7 @@ public class MCRDeDupKeyManager {
      * least one deduplication key with it and that are not marked as no-duplicates of it.
      *
      * @param objectId the object to find duplicates for
-     * @return the possible duplicates, one entry per matching criterion, without duplicate entries
+     * @return the possible duplicates, one entry per pair with all criteria the two objects share
      */
     public List<MCRPossibleDuplicate> findDuplicates(MCRObjectID objectId) {
         String id = objectId.toString();
@@ -207,14 +207,18 @@ public class MCRDeDupKeyManager {
                 + "WHERE s.objectId = :id AND o.type = s.type AND o.value = s.value AND o.objectId <> :id "
                 + "AND NOT EXISTS (SELECT 1 FROM MCRDeDupNoDuplicate n "
                 + "  WHERE (n.objectId1 = :id AND n.objectId2 = o.objectId) "
-                + "     OR (n.objectId2 = :id AND n.objectId1 = o.objectId))",
+                + "     OR (n.objectId2 = :id AND n.objectId1 = o.objectId)) "
+                + "ORDER BY o.objectId, o.type, o.value",
             Object[].class)
             .setParameter("id", id)
             .getResultList();
-        return rows.stream()
-            .map(row -> MCRPossibleDuplicate.of(id, (String) row[0],
-                new MCRDeDupCriterion((String) row[1], (String) row[2])))
-            .distinct()
+        Map<String, Set<MCRDeDupCriterion>> criteriaByOtherId = new LinkedHashMap<>();
+        for (Object[] row : rows) {
+            criteriaByOtherId.computeIfAbsent((String) row[0], ignored -> new LinkedHashSet<>())
+                .add(toCriterion(row));
+        }
+        return criteriaByOtherId.entrySet().stream()
+            .map(entry -> MCRPossibleDuplicate.of(id, entry.getKey(), entry.getValue()))
             .toList();
     }
 
@@ -290,9 +294,9 @@ public class MCRDeDupKeyManager {
      * <p>
      * As the query orders the keys by criterion, all objects sharing one criterion form one
      * consecutive block of rows. Each block is read as a whole and then expanded into the pairs of
-     * its members.
+     * its members, collecting the criteria of each pair.
      *
-     * @return the possible duplicate pairs, one entry per pair and matching criterion
+     * @return the possible duplicate pairs, one entry per pair with all criteria the two objects share
      */
     public List<MCRPossibleDuplicate> findAllDuplicates() {
         EntityManager em = getEntityManager();
@@ -305,7 +309,7 @@ public class MCRDeDupKeyManager {
             .getResultList();
 
         Set<ObjectIdPair> noDuplicatePairs = loadNoDuplicatePairs(em);
-        List<MCRPossibleDuplicate> result = new ArrayList<>();
+        Map<ObjectIdPair, Set<MCRDeDupCriterion>> criteriaByPair = new LinkedHashMap<>();
 
         int blockStart = 0;
         while (blockStart < rows.size()) {
@@ -314,10 +318,12 @@ public class MCRDeDupKeyManager {
             List<String> currentCriterionMembers = rows.subList(blockStart, blockEnd).stream()
                 .map(row -> (String) row[0])
                 .toList();
-            addPairs(result, currentCriterionMembers, criterion, noDuplicatePairs);
+            addPairs(criteriaByPair, currentCriterionMembers, criterion, noDuplicatePairs);
             blockStart = blockEnd;
         }
-        return result;
+        return criteriaByPair.entrySet().stream()
+            .map(entry -> MCRPossibleDuplicate.of(entry.getKey().first(), entry.getKey().second(), entry.getValue()))
+            .toList();
     }
 
     /**
@@ -333,17 +339,16 @@ public class MCRDeDupKeyManager {
     }
 
     /**
-     * Adds one entry for each pair of the given objects to the result, leaving out the pairs that are
-     * marked as no-duplicates of each other.
+     * Adds the given criterion to each pair of the given objects, leaving out the pairs that are marked
+     * as no-duplicates of each other.
      */
-    private static void addPairs(List<MCRPossibleDuplicate> result, List<String> objectIds,
+    private static void addPairs(Map<ObjectIdPair, Set<MCRDeDupCriterion>> criteriaByPair, List<String> objectIds,
         MCRDeDupCriterion criterion, Set<ObjectIdPair> noDuplicatePairs) {
         for (int a = 0; a < objectIds.size(); a++) {
             for (int b = a + 1; b < objectIds.size(); b++) {
-                String objectIdA = objectIds.get(a);
-                String objectIdB = objectIds.get(b);
-                if (!noDuplicatePairs.contains(ObjectIdPair.of(objectIdA, objectIdB))) {
-                    result.add(MCRPossibleDuplicate.of(objectIdA, objectIdB, criterion));
+                ObjectIdPair pair = ObjectIdPair.of(objectIds.get(a), objectIds.get(b));
+                if (!noDuplicatePairs.contains(pair)) {
+                    criteriaByPair.computeIfAbsent(pair, ignored -> new LinkedHashSet<>()).add(criterion);
                 }
             }
         }
