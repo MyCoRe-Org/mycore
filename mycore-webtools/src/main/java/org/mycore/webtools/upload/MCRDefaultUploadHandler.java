@@ -155,7 +155,7 @@ public class MCRDefaultUploadHandler implements MCRUploadHandler {
         }
 
         if (!oid.getTypeId().equals(MCRDerivate.OBJECT_TYPE)
-            && !MCRAccessManager.checkPermission(oid, MCRAccessManager.PERMISSION_CREATE_DERIVATE)) {
+            && !MCRAccessManager.checkPermission(oid, MCRAccessManager.PERMISSION_ADD_DERIVATE)) {
             throw new MCRUploadForbiddenException();
         }
 

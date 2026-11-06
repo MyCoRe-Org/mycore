@@ -18,7 +18,7 @@
 
 package org.mycore.frontend.servlets.persistence;
 
-import static org.mycore.access.MCRAccessManager.PERMISSION_CREATE_DERIVATE;
+import static org.mycore.access.MCRAccessManager.PERMISSION_ADD_DERIVATE;
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 import java.io.IOException;
@@ -49,8 +49,8 @@ public class MCRCreateDerivateServlet extends MCRPersistenceServlet {
         if (!MCRAccessManager.checkPermission(objectID, PERMISSION_WRITE)) {
             throw new MCRMissingPermissionException("Add derivate.", objectID, PERMISSION_WRITE);
         }
-        if (!MCRAccessManager.checkPermission(objectID, PERMISSION_CREATE_DERIVATE)) {
-            throw new MCRMissingPermissionException("Add derivate.", objectID, PERMISSION_CREATE_DERIVATE);
+        if (!MCRAccessManager.checkPermission(objectID, PERMISSION_ADD_DERIVATE)) {
+            throw new MCRMissingPermissionException("Add derivate.", objectID, PERMISSION_ADD_DERIVATE);
         }
     }
 
