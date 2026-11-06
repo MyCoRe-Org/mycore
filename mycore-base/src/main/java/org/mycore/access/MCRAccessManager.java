@@ -48,6 +48,8 @@ public class MCRAccessManager {
 
     public static final String PERMISSION_DELETE = "deletedb";
 
+    public static final String PERMISSION_ADD_DERIVATE = "add-derivate";
+
     public static final String PERMISSION_PREVIEW = "preview";
 
     public static final String PERMISSION_VIEW = "view";
