@@ -54,8 +54,14 @@ public class MCRDefaultHTTPClient implements MCRHTTPClient {
         MCRShutdownHandler.getInstance().addCloseable(this::close);
     }
 
+    /**
+     * Rebuilds the underlying HTTP client after all {@link MCRProperty} setters have been applied, so that the
+     * configured cache and timeout values take effect. The constructor already creates a client with default values
+     * so that instances created directly (without the configuration mechanism) are usable as well; that initial
+     * client is closed here.
+     */
     @MCRPostConstruction
-    public void init(String property) {
+    public void init() {
         CloseableHttpClient oldClient = this.restClient;
         this.restClient = createRestClient();
         try {
