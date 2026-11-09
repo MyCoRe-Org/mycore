@@ -735,13 +735,20 @@ public class MCRUserManager {
         MCRUserInformation currentUser = session.getUserInformation();
         MCRUser myUser = getUser(user.getUserName(), user.getRealmID()); //only update password
         boolean allowed = MCRAccessManager.checkPermission(MCRUser2Constants.USER_ADMIN_PERMISSION)
-            || currentUser.equals(myUser.getOwner())
-            || (currentUser.equals(user) && (myUser.hasNoOwner() || !myUser.isLocked()));
+            || isSameUser(currentUser, myUser.getOwner())
+            || (isSameUser(currentUser, myUser) && (myUser.hasNoOwner() || !myUser.isLocked()));
         if (!allowed) {
             throw new MCRException("You are not allowed to change password of user: " + user);
         }
         updatePasswordHashToSHA256(myUser, password);
         updateUser(myUser);
+    }
+
+    /**
+     * Compares by user ID, so that user information that is not a {@link MCRUser} (e.g. from a JWT) also matches.
+     */
+    private static boolean isSameUser(MCRUserInformation userInformation, MCRUser user) {
+        return user != null && user.getUserID().equals(userInformation.getUserID());
     }
 
     static void updatePasswordHashToSHA256(MCRUser user, String password) {

@@ -40,6 +40,7 @@ import org.junit.Test;
 import org.mycore.access.MCRAccessMock;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.user2.utils.MCRUserTransformer;
@@ -330,6 +331,30 @@ public class MCRUserManagerTest extends MCRUserTestCase {
         runAsNonAdministrator(independent, () -> MCRUserManager.setPassword(independent, "new-secret"));
     }
 
+    @Test
+    public final void testSetOwnPasswordIsAllowedWithForeignUserInformation() {
+        MCRUser independent = createUser("junit-independent", null, false);
+
+        runAsNonAdministrator(userInformation(independent.getUserID()),
+            () -> MCRUserManager.setPassword(independent, "new-secret"));
+    }
+
+    @Test
+    public final void testOwnerMaySetPasswordWithForeignUserInformation() {
+        MCRUser owned = createUser("junit-owned", user, true);
+
+        runAsNonAdministrator(userInformation(user.getUserID()),
+            () -> MCRUserManager.setPassword(owned, "new-secret"));
+    }
+
+    @Test
+    public final void testSetPasswordOfOtherUserIsNotAllowedWithForeignUserInformation() {
+        MCRUser other = createUser("junit-other", null, false);
+
+        runAsNonAdministrator(userInformation(user.getUserID()), () -> assertThrows(MCRException.class,
+            () -> MCRUserManager.setPassword(other, "hijacked")));
+    }
+
     private MCRUser createUser(String userName, MCRUser owner, boolean locked) {
         MCRUser newUser = new MCRUser(userName);
         newUser.setOwner(owner);
@@ -340,14 +365,40 @@ public class MCRUserManagerTest extends MCRUserTestCase {
     }
 
     private static void runAsNonAdministrator(MCRUser currentUser, Runnable action) {
+        runAsNonAdministrator((MCRUserInformation) MCRUserManager.getUser(currentUser.getUserName()), action);
+    }
+
+    private static void runAsNonAdministrator(MCRUserInformation currentUser, Runnable action) {
         MCRConfiguration2.set("MCR.Access.Class", MCRAccessMock.class.getName());
         MCRAccessMock.setMethodResult(false);
         try {
-            MCRSessionMgr.getCurrentSession().setUserInformation(MCRUserManager.getUser(currentUser.getUserName()));
+            MCRSessionMgr.getCurrentSession().setUserInformation(currentUser);
             action.run();
         } finally {
             MCRAccessMock.setMethodResult(true);
         }
+    }
+
+    /**
+     * Creates user information that is not a {@link MCRUser}, like the one used for JWT authentication.
+     */
+    private static MCRUserInformation userInformation(String userID) {
+        return new MCRUserInformation() {
+            @Override
+            public String getUserID() {
+                return userID;
+            }
+
+            @Override
+            public boolean isUserInRole(String role) {
+                return false;
+            }
+
+            @Override
+            public String getUserAttribute(String attribute) {
+                return null;
+            }
+        };
     }
 
     @Test
