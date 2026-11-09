@@ -70,11 +70,11 @@
   </xsl:template>
 
   <xsl:template match="mycoreobject/service/servdates/servdate[@type='createdate']" mode="identifier">
-    <xsl:variable name="pattern" select="(mcrproperty:one('MCR.DOI.NISSPattern'), 'yyyyMMdd-HHmmss')[1]" />
+    <xsl:variable name="pattern" select="(mcrproperty:get('MCR.DOI.NISSPattern'), 'yyyyMMdd-HHmmss')[1]" />
     <xsl:variable name="formatISODate"
       select="string-join(('callJava:org.mycore.common.xml.MCRXMLFunctions:formatISODate',
         encode-for-uri(.), encode-for-uri($pattern), encode-for-uri($CurrentLang)), ':')" />
-    <xsl:value-of select="mcrproperty:one('MCR.DOI.Prefix')" />
+    <xsl:value-of select="mcrproperty:get('MCR.DOI.Prefix')" />
     <xsl:text>/</xsl:text>
     <xsl:value-of select="document($formatISODate)" />
   </xsl:template>
@@ -172,7 +172,7 @@
           <xsl:value-of select="(mods:originInfo[not(@eventType) or @eventType='publication']/mods:publisher)[1]" />
         </xsl:when>
         <xsl:otherwise>
-          <xsl:value-of select="mcrproperty:one('MCR.DOI.HostingInstitution')" />
+          <xsl:value-of select="mcrproperty:get('MCR.DOI.HostingInstitution')" />
         </xsl:otherwise>
       </xsl:choose>
     </publisher>
@@ -223,7 +223,7 @@
   <xsl:template name="hostingInstitution">
     <contributor contributorType="HostingInstitution">
       <contributorName>
-        <xsl:value-of select="mcrproperty:one('MCR.DOI.HostingInstitution')" />
+        <xsl:value-of select="mcrproperty:get('MCR.DOI.HostingInstitution')" />
       </contributorName>
     </contributor>
   </xsl:template>
