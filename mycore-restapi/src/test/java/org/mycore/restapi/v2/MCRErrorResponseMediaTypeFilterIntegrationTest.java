@@ -33,6 +33,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jakarta.rs.json.JacksonXmlBindJsonProvider;
 
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.Application;
 import jakarta.ws.rs.core.MediaType;
@@ -80,6 +81,29 @@ public class MCRErrorResponseMediaTypeFilterIntegrationTest {
         }
     }
 
+    @Test
+    public void unexpectedExceptionShouldBeJsonServerErrorIfNeitherJsonNorXmlIsAccepted() throws Exception {
+        try (Response response = jersey.target("error/unexpected").request(APPLICATION_PDF).get()) {
+            assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
+            assertTrue(MediaType.APPLICATION_JSON_TYPE.isCompatible(response.getMediaType()));
+            JsonNode body = new ObjectMapper().readTree(response.readEntity(String.class));
+            assertEquals("boom", body.path("message").asText());
+            assertEquals(IllegalStateException.class.getName(), body.path("detail").asText());
+            assertNotNull(body.get("uuid"));
+        }
+    }
+
+    @Test
+    public void webApplicationExceptionShouldBeJsonIfNeitherJsonNorXmlIsAccepted() throws Exception {
+        try (Response response = jersey.target("error/rollback").request(APPLICATION_PDF).get()) {
+            assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
+            assertTrue(MediaType.APPLICATION_JSON_TYPE.isCompatible(response.getMediaType()));
+            JsonNode body = new ObjectMapper().readTree(response.readEntity(String.class));
+            assertEquals("Transaction rollback was required.", body.path("message").asText());
+            assertNotNull(body.get("uuid"));
+        }
+    }
+
     @Path("error")
     public static class ErrorResource {
 
@@ -89,6 +113,18 @@ public class MCRErrorResponseMediaTypeFilterIntegrationTest {
                 .withErrorCode("TEST_ERROR")
                 .withMessage("not found")
                 .toException();
+        }
+
+        @GET
+        @Path("unexpected")
+        public Response getUnexpected() {
+            throw new IllegalStateException("boom");
+        }
+
+        @GET
+        @Path("rollback")
+        public Response getRollback() {
+            throw new InternalServerErrorException("Transaction rollback was required.");
         }
     }
 
