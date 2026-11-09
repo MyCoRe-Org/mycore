@@ -39,6 +39,8 @@ public class MCRServletContentHelperTest extends MCRTestCase {
 
     private static final long IF_MODIFIED_SINCE = 1_000_000_000L;
 
+    private static final long IF_RANGE = 1_000_000_000L;
+
     @Test
     public void testNotModifiedWithOlderContent() throws IOException {
         HttpServletResponse response = serveIfModifiedSince(IF_MODIFIED_SINCE - 5000);
@@ -55,6 +57,42 @@ public class MCRServletContentHelperTest extends MCRTestCase {
     public void testServedWithUnknownLastModified() throws IOException {
         HttpServletResponse response = serveIfModifiedSince(-1);
         verify(response, never()).setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+    }
+
+    @Test
+    public void testPartialContentWithUnchangedContent() throws IOException {
+        HttpServletResponse response = serveIfRange(IF_RANGE - 5000);
+        verify(response).setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+    }
+
+    @Test
+    public void testFullContentWithChangedContent() throws IOException {
+        HttpServletResponse response = serveIfRange(IF_RANGE + 5000);
+        verify(response, never()).setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+    }
+
+    @Test
+    public void testFullContentWithUnknownLastModified() throws IOException {
+        HttpServletResponse response = serveIfRange(-1);
+        verify(response, never()).setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+    }
+
+    private static HttpServletResponse serveIfRange(long lastModified) throws IOException {
+        MCRContent content = new MCRByteContent("<root />".getBytes(StandardCharsets.UTF_8), lastModified);
+        content.setName("test.xml");
+        content.setMimeType("text/xml");
+
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getDateHeader(anyString())).thenReturn(-1L);
+        when(request.getHeader("Range")).thenReturn("bytes=0-3");
+        when(request.getHeader("If-Range")).thenReturn("Sun, 09 Sep 2001 01:46:40 GMT");
+        when(request.getDateHeader("If-Range")).thenReturn(IF_RANGE);
+        when(request.getMethod()).thenReturn("GET");
+        HttpServletResponse response = mock(HttpServletResponse.class);
+
+        MCRServletContentHelper.serveContent(content, request, response, null, new MCRServletContentHelper.Config(),
+            false);
+        return response;
     }
 
     private static HttpServletResponse serveIfModifiedSince(long lastModified) throws IOException {

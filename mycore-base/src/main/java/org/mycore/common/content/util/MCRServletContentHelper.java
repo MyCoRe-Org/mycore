@@ -438,8 +438,10 @@ public abstract class MCRServletContentHelper {
                     return ContentUtils.FULL;
                 }
             } else {
+                // A date can only be validated against a known lastModified,
+                // otherwise the complete content is served (RFC 9110, section 13.1.5).
                 //add one second buffer to check if the content was modified.
-                if (lastModified > headerValueTime + 1000) {
+                if (lastModified < 0 || lastModified > headerValueTime + 1000) {
                     return ContentUtils.FULL;
                 }
             }
