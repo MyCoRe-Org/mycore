@@ -18,6 +18,7 @@
 
 package org.mycore.pi;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -129,8 +130,10 @@ public class MCRGenericPIGeneratorTest {
 
         String pi = generator.generate(object, "").asString();
 
-        String piWithoutChecksum = pi.substring(0, pi.length() - 1);
+        int checksumIndex = pi.length() - 1;
+        String piWithoutChecksum = pi.substring(0, checksumIndex);
         assertEquals("urn:nbn:de:gbv:xyz:result1-result2-" + MOCK_DATE + "-042-", piWithoutChecksum);
+        assertDoesNotThrow(() -> Integer.parseInt(pi.substring(checksumIndex)));
 
     }
 
@@ -235,8 +238,10 @@ public class MCRGenericPIGeneratorTest {
 
         String pi = generator.generate(object, "").asString();
 
-        String piWithoutChecksum = pi.substring(0, pi.length() - 1);
+        int checksumIndex = pi.length() - 1;
+        String piWithoutChecksum = pi.substring(0, checksumIndex);
         assertEquals("urn:nbn:de:gbv:xyz:result1-result2-" + MOCK_DATE + "-000-", piWithoutChecksum);
+        assertDoesNotThrow(() -> Integer.parseInt(pi.substring(checksumIndex)));
 
     }
 

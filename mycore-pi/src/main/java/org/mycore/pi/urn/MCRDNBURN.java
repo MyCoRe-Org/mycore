@@ -30,8 +30,15 @@ public class MCRDNBURN extends MCRUniformResourceName {
 
     public static final String URN_NID = "nbn:de:";
 
+    private final boolean appendChecksum;
+
     public MCRDNBURN(String subNamespace, String namespaceSpecificString) {
+        this(subNamespace, namespaceSpecificString, true);
+    }
+
+    public MCRDNBURN(String subNamespace, String namespaceSpecificString, boolean appendChecksum) {
         super(subNamespace, namespaceSpecificString);
+        this.appendChecksum = appendChecksum;
     }
 
     /**
@@ -121,15 +128,15 @@ public class MCRDNBURN extends MCRUniformResourceName {
     }
 
     public MCRDNBURN toGranular(String setID, String index) {
-        return new MCRDNBURN(getSubNamespace(), getGranularNamespaceSpecificString(setID, index));
+        return new MCRDNBURN(getSubNamespace(), getGranularNamespaceSpecificString(setID, index), appendChecksum);
     }
 
     public MCRDNBURN withSuffix(String suffix) {
-        return new MCRDNBURN(getSubNamespace(), getNamespaceSpecificString() + suffix);
+        return new MCRDNBURN(getSubNamespace(), getNamespaceSpecificString() + suffix, appendChecksum);
     }
 
     public MCRDNBURN withNamespaceSuffix(String suffix) {
-        return new MCRDNBURN(getSubNamespace() + suffix, getNamespaceSpecificString());
+        return new MCRDNBURN(getSubNamespace() + suffix, getNamespaceSpecificString(), appendChecksum);
     }
 
     public MCRDNBURN toGranular(String setID, int i, int max) {
@@ -142,7 +149,11 @@ public class MCRDNBURN extends MCRUniformResourceName {
 
     @Override
     public String getNamespaceSpecificString() {
-        return super.getNamespaceSpecificString() + calculateChecksum();
+        if (appendChecksum) {
+            return super.getNamespaceSpecificString() + calculateChecksum();
+        } else {
+            return super.getNamespaceSpecificString();
+        }
     }
 
     /**
