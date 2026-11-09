@@ -316,6 +316,20 @@ public class MCRUserManagerTest extends MCRUserTestCase {
         runAsNonAdministrator(user, () -> MCRUserManager.setPassword(owned, "new-secret"));
     }
 
+    @Test
+    public final void testSetOwnPasswordIsAllowedWithoutOwnerIfNotLocked() {
+        MCRUser independent = createUser("junit-independent", null, false);
+
+        runAsNonAdministrator(independent, () -> MCRUserManager.setPassword(independent, "new-secret"));
+    }
+
+    @Test
+    public final void testSetOwnPasswordIsAllowedWithoutOwnerIfLocked() {
+        MCRUser independent = createUser("junit-independent", null, true);
+
+        runAsNonAdministrator(independent, () -> MCRUserManager.setPassword(independent, "new-secret"));
+    }
+
     private MCRUser createUser(String userName, MCRUser owner, boolean locked) {
         MCRUser newUser = new MCRUser(userName);
         newUser.setOwner(owner);
