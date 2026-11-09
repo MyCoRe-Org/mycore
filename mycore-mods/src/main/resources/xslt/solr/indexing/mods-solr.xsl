@@ -65,7 +65,7 @@
         </xsl:if>
         <xsl:value-of select="mods:title" />
         <xsl:if test="mods:subTitle">
-          <xsl:value-of select="concat(' : ', mods:subTitle[1])" />
+          <xsl:value-of select="concat(' : ', string-join(mods:subTitle, ' : '))" />
         </xsl:if>
       </xsl:variable>
       <field name="mods.title.lang.{$titleLang}">
