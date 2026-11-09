@@ -32,7 +32,7 @@
         <xsl:apply-templates select="common:publication-date/common:year" />
         <xsl:apply-templates select="work:short-description" />
         <xsl:apply-templates select="work:url" />
-        <xsl:apply-templates select="common:external-ids/common:external-id[common:external-id-relationship='self']" />
+        <xsl:apply-templates select="common:external-ids/common:external-id[common:external-id-relationship='self'][not(common:external-id-type='source-work-id')]" />
         <xsl:apply-templates select="common:language-code" />
       </mods:mods>
       <xsl:apply-templates select="work:citation[work:citation-type='bibtex']" />
