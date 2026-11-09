@@ -33,7 +33,9 @@ import org.mycore.user2.MCRUserAttributeMapper;
 import org.mycore.user2.MCRUserManager;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  *
@@ -49,6 +51,12 @@ public class MCRShibbolethLoginServlet extends MCRServlet {
         .getBoolean("MCR.user2.Shibboleth.PersistUser")
         .orElseThrow();
 
+    private static final List<String> ALLOWED_REALMS = MCRConfiguration2
+        .getString("MCR.user2.Shibboleth.AllowedRealms")
+        .map(MCRConfiguration2::splitValue)
+        .map(Stream::toList)
+        .orElseGet(List::of);
+
     public void doGetPost(MCRServletJob job) throws Exception {
         HttpServletRequest req = job.getRequest();
         HttpServletResponse res = job.getResponse();
@@ -59,9 +67,10 @@ public class MCRShibbolethLoginServlet extends MCRServlet {
         String userId = uid != null ? uid : req.getRemoteUser();
 
         if (userId != null) {
-            final String realmId = userId.contains("@") ? userId.substring(userId.indexOf("@") + 1) : null;
-            if (realmId != null && MCRRealmFactory.getRealm(realmId) != null) {
-                userId = realmId != null ? userId.replace("@" + realmId, "") : userId;
+            final int realmSeparator = userId.lastIndexOf('@');
+            final String realmId = realmSeparator > 0 ? userId.substring(realmSeparator + 1) : null;
+            if (isRealmAllowed(realmId)) {
+                userId = userId.substring(0, realmSeparator);
 
                 final Map<String, Object> attributes = new HashMap<>();
 
@@ -111,5 +120,21 @@ public class MCRShibbolethLoginServlet extends MCRServlet {
         }
 
         job.getResponse().sendError(HttpServletResponse.SC_UNAUTHORIZED, msg);
+    }
+
+    /**
+     * Checks if a login with the given realm is allowed via Shibboleth.
+     * The local realm is never allowed, as its users must authenticate with their password.
+     * If <code>MCR.user2.Shibboleth.AllowedRealms</code> is set, only the configured realms are allowed.
+     */
+    private static boolean isRealmAllowed(String realmId) {
+        if (realmId == null || realmId.isEmpty() || MCRRealmFactory.getRealm(realmId) == null) {
+            return false;
+        }
+        if (realmId.equals(MCRRealmFactory.getLocalRealm().getID())) {
+            LOGGER.warn("Rejected Shibboleth login for local realm \"{}\".", realmId);
+            return false;
+        }
+        return ALLOWED_REALMS.isEmpty() || ALLOWED_REALMS.contains(realmId);
     }
 }
