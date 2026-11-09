@@ -28,6 +28,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import org.glassfish.jersey.server.ContainerResponse;
 import org.junit.After;
 import org.junit.Before;
@@ -140,9 +143,18 @@ public class MCRTransactionFilterTest extends MCRTestCase {
     }
 
     /**
-     * Minimal persistence transaction for tests without a database.
+     * Minimal persistence transaction for tests without a database. Records begin, commit and rollback of all
+     * instances in {@link #EVENTS}, as requests may run on other threads with their own instances.
      */
     public static class TestTransaction implements MCRPersistenceTransaction {
+
+        static final String BEGIN = "begin";
+
+        static final String COMMIT = "commit";
+
+        static final String ROLLBACK = "rollback";
+
+        static final List<String> EVENTS = new CopyOnWriteArrayList<>();
 
         private boolean active;
 
@@ -155,17 +167,20 @@ public class MCRTransactionFilterTest extends MCRTestCase {
 
         @Override
         public void begin() {
+            EVENTS.add(BEGIN);
             active = true;
             rollbackOnly = false;
         }
 
         @Override
         public void commit() {
+            EVENTS.add(COMMIT);
             active = false;
         }
 
         @Override
         public void rollback() {
+            EVENTS.add(ROLLBACK);
             active = false;
             rollbackOnly = false;
         }
