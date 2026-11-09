@@ -33,9 +33,13 @@ import jakarta.servlet.ServletContext;
  * The target URL is set by <code>&lt;xed:cancel url="..." /&gt;</code> 
  * 
  * When no URL is set, the web application base URL is used.
- * When a complete URL is given, it is used as is.
+ * When a complete URL is given, it is used only if it starts with the web application base URL.
  * When a relative path is given, the URL is calculated relative to the page containing the editor form.
- * When an absolute path is given, the web application base URL is prepended. 
+ * When an absolute path is given, the web application base URL is prepended.
+ *
+ * To prevent open redirects, the resulting URL is checked with {@link MCRFrontendUtil#isSafeRedirect(String)}.
+ * If the check fails, e.g. for a complete URL pointing to another host, port or scheme,
+ * the configured URL is ignored and the web application base URL is used instead.
  */
 public class MCRCancelTarget implements MCREditorTarget {
 
