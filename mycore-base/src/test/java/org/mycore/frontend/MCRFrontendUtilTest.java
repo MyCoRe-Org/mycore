@@ -43,7 +43,11 @@ public class MCRFrontendUtilTest extends MCRTestCase {
 
     @Test
     public void testSafeRedirects() {
+        assertTrue(MCRFrontendUtil.isSafeRedirect("/"));
         assertTrue(MCRFrontendUtil.isSafeRedirect("/foo"));
+        assertTrue(MCRFrontendUtil.isSafeRedirect("/app/receive/junit_test_00000001#frag"));
+        // encoded backslash stays in the path, browsers do not decode it to a separator
+        assertTrue(MCRFrontendUtil.isSafeRedirect("/%5Cevil.com"));
         assertTrue(MCRFrontendUtil.isSafeRedirect("/receive/junit_test_00000001?XSL.a=b"));
         assertTrue(MCRFrontendUtil.isSafeRedirect(BASE_URL));
         assertTrue(MCRFrontendUtil.isSafeRedirect(BASE_URL + "receive/junit_test_00000001"));
@@ -58,6 +62,7 @@ public class MCRFrontendUtilTest extends MCRTestCase {
         assertFalse(MCRFrontendUtil.isSafeRedirect("///evil.com"));
         assertFalse(MCRFrontendUtil.isSafeRedirect("////evil.com"));
         assertFalse(MCRFrontendUtil.isSafeRedirect("/\\evil.com"));
+        assertFalse(MCRFrontendUtil.isSafeRedirect("/%2F/evil.com"));
         assertFalse(MCRFrontendUtil.isSafeRedirect("/\t/evil.com"));
         assertFalse(MCRFrontendUtil.isSafeRedirect("/foo/../../evil"));
         assertFalse(MCRFrontendUtil.isSafeRedirect("javascript:alert(1)"));
