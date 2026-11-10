@@ -132,15 +132,15 @@ public final class MCRMetadataManager {
         MCRObjectID derivateId = mcrDerivate.getId();
         throwPersistenceExceptionIfExists(derivateId, MCRDerivate.OBJECT_TYPE);
 
+        validateDerivate(mcrDerivate, derivateId);
+
+        final MCRObjectID objectId = getObjectIDFromDerivate(mcrDerivate);
+        checkWritePermission(objectId, derivateId);
+        checkAddDerivatePermission(objectId, derivateId);
+
         derivateId = assignNewIdIfNecessary(mcrDerivate);
 
         try (MCRObjectLock ignored = lock(derivateId)) {
-            validateDerivate(mcrDerivate, derivateId);
-
-            final MCRObjectID objectId = getObjectIDFromDerivate(mcrDerivate);
-            checkWritePermission(objectId, derivateId);
-            checkAddDerivatePermission(objectId, derivateId);
-
             byte[] objectBackup = retrieveObjectBackup(objectId);
 
             setDerivateMetadata(mcrDerivate);
