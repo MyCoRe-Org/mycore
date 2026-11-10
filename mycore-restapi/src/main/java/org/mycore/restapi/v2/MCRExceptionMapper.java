@@ -18,35 +18,31 @@
 
 package org.mycore.restapi.v2;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import jakarta.ws.rs.WebApplicationException;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Request;
 import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Variant;
 import jakarta.ws.rs.ext.ExceptionMapper;
 
 public class MCRExceptionMapper implements ExceptionMapper<Exception> {
 
-    private final static List<Variant> SUPPORTED_VARIANTS = Variant
-        .mediaTypes(MediaType.APPLICATION_JSON_TYPE, MediaType.APPLICATION_XML_TYPE).build();
-
     private final static Logger LOGGER = LogManager.getLogger();
 
-    @Context
-    Request request;
-
+    /**
+     * Maps the given exception to an error response with an {@link MCRErrorResponse} entity.
+     * <p>
+     * A {@link WebApplicationException} that already carries an entity keeps its response. If the client accepts
+     * neither JSON nor XML, {@link MCRErrorResponseMediaTypeFilter} delivers the error entity as JSON.
+     *
+     * @param exception the exception to map
+     * @return the response for the exception
+     */
     @Override
     public Response toResponse(Exception exception) {
-        return Optional.ofNullable(request.selectVariant(SUPPORTED_VARIANTS))
-            .map(v -> fromException(exception))
-            .orElseGet(() -> (exception instanceof WebApplicationException wae) ? wae.getResponse() : null);
+        return fromException(exception);
     }
 
     public static Response fromWebApplicationException(WebApplicationException wae) {
