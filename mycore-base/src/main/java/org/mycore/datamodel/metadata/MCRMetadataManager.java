@@ -326,6 +326,14 @@ public final class MCRMetadataManager {
         }
     }
 
+    /**
+     * Checks the pool privileges "create-{base}" and "create-{type}" for creating a new object.
+     * Meant for objects only: creating a derivate is authorized by the permissions "writedb" and
+     * "add-derivate" on its parent object, see {@link #create(MCRDerivate)}.
+     *
+     * @param objectId the ID of the object to create
+     * @throws MCRAccessException if the current user has neither privilege
+     */
     public static void checkCreatePrivilege(MCRObjectID objectId) throws MCRAccessException {
         String createBasePrivilege = "create-" + objectId.getBase();
         String createTypePrivilege = "create-" + objectId.getTypeId();
