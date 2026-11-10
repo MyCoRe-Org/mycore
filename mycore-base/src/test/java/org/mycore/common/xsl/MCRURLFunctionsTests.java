@@ -19,22 +19,28 @@
 package org.mycore.common.xsl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.xml.transform.TransformerException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.jdom2.Element;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mycore.common.util.MCRTestCaseXSLTUtil;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
 public class MCRURLFunctionsTests {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String URL_PARAM_NAME = "url";
     private static final String PAR_PARAM_NAME = "par";
@@ -165,4 +171,140 @@ public class MCRURLFunctionsTests {
         parameters.put("fn-name", name);
         return MCRTestCaseXSLTUtil.transform("/xslt/functions/url-test.xsl", parameters).getRootElement().getText();
     }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "foo", "foo bar", "foo+bar", "foo*bar", "fööbär", "\"foobar\"", "#foobar"
+    })
+    public void decodeFromUriViaEncodeForUri(String value) throws TransformerException {
+
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("value", value);
+        String stylesheet = "/xslt/functions/decode-from-uri.xsl";
+        Element resultElement = MCRTestCaseXSLTUtil.transform(stylesheet, parameters).getRootElement();
+
+        String encoded = resultElement.getChildText("encoded");
+        String decoded = resultElement.getChildText("decoded");
+
+        LOGGER.info("{} -> {} -> {}", value, encoded, decoded);
+
+        assertEquals(value, decoded);
+
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "foo", "foo bar", "foo+bar", "foo*bar", "fööbär", "\"foobar\"", "#foobar"
+    })
+    public void decodeFromUriWithEncodedSpace(String value) throws TransformerException {
+
+        Map<String, Object> parameters = new HashMap<>();
+        String encoded = URLEncoder.encode(value, StandardCharsets.UTF_8).replace("+", "%20");
+        parameters.put("value", encoded);
+        String stylesheet = "/xslt/functions/decode-from-uri-raw.xsl";
+        Element resultElement = MCRTestCaseXSLTUtil.transform(stylesheet, parameters).getRootElement();
+
+        String decoded = resultElement.getChildText("decoded");
+
+        LOGGER.info("{} -> {} -> {}", value, encoded, decoded);
+
+        assertEquals(value, decoded);
+
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "foo", "foo bar", "foo+bar", "foo*bar", "fööbär", "\"foobar\"", "#foobar"
+    })
+    public void decodeFromUriWithPlusForSpace(String value) throws TransformerException {
+
+        Map<String, Object> parameters = new HashMap<>();
+        String encoded = URLEncoder.encode(value, StandardCharsets.UTF_8);
+        parameters.put("value", encoded);
+        String stylesheet = "/xslt/functions/decode-from-uri-raw.xsl";
+        Element resultElement = MCRTestCaseXSLTUtil.transform(stylesheet, parameters).getRootElement();
+
+        String decoded = resultElement.getChildText("decoded");
+
+        LOGGER.info("{} -> {} -> {}", value, encoded, decoded);
+
+        assertEquals(value, decoded);
+
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "\u00E2\u0082", "\u00E2\u0028\u00A1", "\u00C0\u00AF"
+    })
+    public void decodeFromUriIncompleteUnicode(String value) throws TransformerException {
+
+        Map<String, Object> parameters = new HashMap<>();
+        String encoded = URLEncoder.encode(value, StandardCharsets.UTF_8);
+        parameters.put("value", encoded);
+        String stylesheet = "/xslt/functions/decode-from-uri-raw.xsl";
+        Element resultElement = MCRTestCaseXSLTUtil.transform(stylesheet, parameters).getRootElement();
+
+        String decoded = resultElement.getChildText("decoded");
+
+        LOGGER.info("{} -> {} -> {}", value, encoded, decoded);
+
+        assertEquals(value, decoded);
+
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "%ff"
+    })
+    public void decodeFromUriInvalidUnicode(String value) throws TransformerException {
+
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("value", value);
+        String stylesheet = "/xslt/functions/decode-from-uri-raw.xsl";
+        Element resultElement = MCRTestCaseXSLTUtil.transform(stylesheet, parameters).getRootElement();
+
+        String decoded = resultElement.getChildText("decoded");
+
+        LOGGER.info("{} -> {}", value, decoded);
+
+        assertEquals("�", decoded);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "\u0000", "\b"
+    })
+    public void decodeFromUriNonPrintable(String value) {
+
+        Map<String, Object> parameters = new HashMap<>();
+        String encoded = URLEncoder.encode(value, StandardCharsets.UTF_8);
+        parameters.put("value", encoded);
+        String stylesheet = "/xslt/functions/decode-from-uri-raw.xsl";
+
+        TransformerException exception = assertThrows(TransformerException.class, () -> {
+            MCRTestCaseXSLTUtil.transform(stylesheet, parameters).getRootElement();
+        });
+
+        assertEquals("Non-printable decoded value: " + encoded, exception.getMessage());
+
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "%", "foo%", "foo%a", "foo%x", "foo%ax", "foo%xa", "foo%xx"
+    })
+    public void decodeFromUriErrors(String value) {
+
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("value", value);
+        String stylesheet = "/xslt/functions/decode-from-uri-raw.xsl";
+
+        TransformerException exception = assertThrows(TransformerException.class, () -> {
+            MCRTestCaseXSLTUtil.transform(stylesheet, parameters).getRootElement();
+        });
+
+        assertEquals("Not an URL-encoded value: " + value, exception.getMessage());
+
+    }
+
 }
