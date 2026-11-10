@@ -67,8 +67,10 @@ public class MCRShibbolethLoginServlet extends MCRServlet {
         String userId = uid != null ? uid : req.getRemoteUser();
 
         if (userId != null) {
-            final int realmSeparator = userId.lastIndexOf('@');
-            final String realmId = realmSeparator > 0 ? userId.substring(realmSeparator + 1) : null;
+            final int realmSeparator = userId.indexOf('@');
+            final String realmId = realmSeparator > 0 && realmSeparator == userId.lastIndexOf('@')
+                ? userId.substring(realmSeparator + 1)
+                : null;
             if (isRealmAllowed(realmId)) {
                 userId = userId.substring(0, realmSeparator);
 
