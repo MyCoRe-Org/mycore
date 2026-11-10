@@ -20,6 +20,8 @@ package org.mycore.orcid.oauth;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -72,7 +74,8 @@ public class MCROAuthServlet extends MCRServlet {
         String error = job.getRequest().getParameter("error");
 
         if ((error != null) && !error.trim().isEmpty()) {
-            job.getResponse().sendRedirect(userProfileURL + "&XSL.error=" + error);
+            job.getResponse()
+                .sendRedirect(userProfileURL + "&XSL.error=" + URLEncoder.encode(error, StandardCharsets.UTF_8));
         } else if ((code == null) || code.trim().isEmpty()) {
             redirectToGetAuthorization(job);
         } else {
