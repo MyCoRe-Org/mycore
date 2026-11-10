@@ -31,6 +31,7 @@ import org.apache.http.impl.client.cache.CacheConfig;
 import org.apache.http.impl.client.cache.CachingHttpClients;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStreamContent;
@@ -49,6 +50,28 @@ public class MCRDefaultHTTPClient implements MCRHTTPClient {
     private CloseableHttpClient restClient;
 
     public MCRDefaultHTTPClient() {
+        this.restClient = createRestClient();
+        MCRShutdownHandler.getInstance().addCloseable(this::close);
+    }
+
+    /**
+     * Rebuilds the underlying HTTP client after all {@link MCRProperty} setters have been applied, so that the
+     * configured cache and timeout values take effect. The constructor already creates a client with default values
+     * so that instances created directly (without the configuration mechanism) are usable as well; that initial
+     * client is closed here.
+     */
+    @MCRPostConstruction
+    public void init() {
+        CloseableHttpClient oldClient = this.restClient;
+        this.restClient = createRestClient();
+        try {
+            oldClient.close();
+        } catch (IOException e) {
+            logger.warn("Exception while closing http client.", e);
+        }
+    }
+
+    private CloseableHttpClient createRestClient() {
         CacheConfig cacheConfig = CacheConfig.custom()
             .setMaxObjectSize(maxObjectSize)
             .setMaxCacheEntries(maxCacheEntries)
@@ -57,13 +80,12 @@ public class MCRDefaultHTTPClient implements MCRHTTPClient {
             .setConnectTimeout(requestTimeout)
             .setSocketTimeout(requestTimeout)
             .build();
-        this.restClient = CachingHttpClients.custom()
+        return CachingHttpClients.custom()
             .setCacheConfig(cacheConfig)
             .setDefaultRequestConfig(requestConfig)
             .setUserAgent(MCRHttpUtils.getHttpUserAgent())
             .useSystemProperties()
             .build();
-        MCRShutdownHandler.getInstance().addCloseable(this::close);
     }
 
     @MCRProperty(name = "MaxObjectSize")
