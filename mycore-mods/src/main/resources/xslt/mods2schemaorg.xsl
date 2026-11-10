@@ -361,7 +361,7 @@
   <xsl:template name="buildHeadline">
     <xsl:param name="titleInfo" />
     <xsl:if test="$titleInfo/mods:nonSort">
-      <xsl:value-of select="concat($titleInfo/mods:nonSort, ' ')" />
+      <xsl:value-of select="concat($titleInfo/mods:nonSort[1], ' ')" />
     </xsl:if>
     <xsl:value-of select="$titleInfo/mods:title" />
     <xsl:for-each select="$titleInfo/mods:subTitle">
