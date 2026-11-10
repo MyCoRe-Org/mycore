@@ -301,7 +301,8 @@ public abstract class MCRServletContentHelper {
 
                 // If an If-None-Match header has been specified, if modified since
                 // is ignored.
-                if (request.getHeader("If-None-Match") == null && lastModified < headerValue + 1000) {
+                if (request.getHeader("If-None-Match") == null && lastModified >= 0
+                    && lastModified < headerValue + 1000) {
                     response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
                     response.setHeader("ETag", content.getETag());
 
@@ -437,8 +438,10 @@ public abstract class MCRServletContentHelper {
                     return ContentUtils.FULL;
                 }
             } else {
+                // A date can only be validated against a known lastModified,
+                // otherwise the complete content is served (RFC 9110, section 13.1.5).
                 //add one second buffer to check if the content was modified.
-                if (lastModified > headerValueTime + 1000) {
+                if (lastModified < 0 || lastModified > headerValueTime + 1000) {
                     return ContentUtils.FULL;
                 }
             }
