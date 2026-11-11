@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -36,8 +37,13 @@ import org.jdom2.output.XMLOutputter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mycore.access.MCRAccessMock;
+import org.mycore.common.MCRException;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
+import org.mycore.common.MCRUserInformation;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 import org.mycore.test.MCRJPAExtension;
 import org.mycore.test.MCRJPATestHelper;
@@ -287,6 +293,138 @@ public class MCRUserManagerTest {
         MCRJPATestHelper.startNewTransaction();
         assertNull(MCRUserManager.login(this.user.getUserName(), clearPasswd),
                 "Should not login user when password is expired");
+    }
+
+    @Test
+    public final void testSetPasswordOfOtherUserIsNotAllowed() {
+        // the target is not locked, but neither the current user nor its owner
+        MCRUser other = createUser("junit-other", null, false);
+
+        runAsNonAdministrator(user, () -> assertThrows(MCRException.class,
+            () -> MCRUserManager.setPassword(other, "hijacked")));
+    }
+
+    @Test
+    public final void testSetOwnPasswordIsAllowedWithOwnerIfNotLocked() {
+        MCRUser owned = createUser("junit-owned", user, false);
+
+        runAsNonAdministrator(owned, () -> MCRUserManager.setPassword(owned, "new-secret"));
+    }
+
+    @Test
+    public final void testSetOwnPasswordIsNotAllowedWithOwnerIfLocked() {
+        MCRUser owned = createUser("junit-owned", user, true);
+
+        runAsNonAdministrator(owned, () -> assertThrows(MCRException.class,
+            () -> MCRUserManager.setPassword(owned, "new-secret")));
+    }
+
+    @Test
+    public final void testOwnerMaySetPasswordOfLockedOwnedUser() {
+        MCRUser owned = createUser("junit-owned", user, true);
+
+        runAsNonAdministrator(user, () -> MCRUserManager.setPassword(owned, "new-secret"));
+    }
+
+    @Test
+    public final void testSetOwnPasswordIsAllowedWithoutOwnerIfNotLocked() {
+        MCRUser independent = createUser("junit-independent", null, false);
+
+        runAsNonAdministrator(independent, () -> MCRUserManager.setPassword(independent, "new-secret"));
+    }
+
+    @Test
+    public final void testSetOwnPasswordIsAllowedWithoutOwnerIfLocked() {
+        MCRUser independent = createUser("junit-independent", null, true);
+
+        runAsNonAdministrator(independent, () -> MCRUserManager.setPassword(independent, "new-secret"));
+    }
+
+    @Test
+    public final void testSetOwnPasswordIsAllowedWithForeignUserInformation() {
+        MCRUser independent = createUser("junit-independent", null, false);
+
+        runAsNonAdministrator(userInformation(independent.getUserID()),
+            () -> MCRUserManager.setPassword(independent, "new-secret"));
+    }
+
+    @Test
+    public final void testOwnerMaySetPasswordWithForeignUserInformation() {
+        MCRUser owned = createUser("junit-owned", user, true);
+
+        runAsNonAdministrator(userInformation(user.getUserID()),
+            () -> MCRUserManager.setPassword(owned, "new-secret"));
+    }
+
+    @Test
+    public final void testSetPasswordOfOtherUserIsNotAllowedWithForeignUserInformation() {
+        MCRUser other = createUser("junit-other", null, false);
+
+        runAsNonAdministrator(userInformation(user.getUserID()), () -> assertThrows(MCRException.class,
+            () -> MCRUserManager.setPassword(other, "hijacked")));
+    }
+
+    private MCRUser createUser(String userName, MCRUser owner, boolean locked) {
+        MCRUser newUser = new MCRUser(userName);
+        newUser.setOwner(owner);
+        newUser.setLocked(locked);
+        MCRUserManager.createUser(newUser);
+        MCRJPATestHelper.startNewTransaction();
+        return MCRUserManager.getUser(userName);
+    }
+
+    private static void runAsNonAdministrator(MCRUser currentUser, Runnable action) {
+        runAsNonAdministrator((MCRUserInformation) MCRUserManager.getUser(currentUser.getUserName()), action);
+    }
+
+    private static void runAsNonAdministrator(MCRUserInformation currentUser, Runnable action) {
+        MCRConfiguration2.set("MCR.Access.Class", MCRAccessMock.class.getName());
+        MCRAccessMock.setMethodResult(false);
+        try {
+            MCRSessionMgr.getCurrentSession().setUserInformation(currentUser);
+            action.run();
+        } finally {
+            MCRAccessMock.setMethodResult(true);
+        }
+    }
+
+    /**
+     * Creates user information that is not a {@link MCRUser}, like the one used for JWT authentication.
+     */
+    private static MCRUserInformation userInformation(String userID) {
+        return new MCRUserInformation() {
+            @Override
+            public String getUserID() {
+                return userID;
+            }
+
+            @Override
+            public boolean isUserInRole(String role) {
+                return false;
+            }
+
+            @Override
+            public String getUserAttribute(String attribute) {
+                return null;
+            }
+        };
+    }
+
+    @Test
+    public final void testCreateLocalUserWithAtIsRejected() {
+        MCRUser userWithAt = new MCRUser("alice@example.org");
+
+        assertThrows(MCRException.class, () -> MCRUserManager.createUser(userWithAt));
+        assertFalse(MCRUserManager.exists("alice@example.org"));
+    }
+
+    @Test
+    public final void testCreateUserOfOtherRealmWithAtIsAllowed() {
+        MCRUser userWithAt = new MCRUser("alice@example.org", "mycore.de");
+
+        MCRUserManager.createUser(userWithAt);
+
+        assertTrue(MCRUserManager.exists("alice@example.org", "mycore.de"));
     }
 
     @Test

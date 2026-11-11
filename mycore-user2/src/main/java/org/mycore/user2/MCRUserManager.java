@@ -193,6 +193,10 @@ public class MCRUserManager {
         if (isInvalidUser(user)) {
             throw new MCRException("User is invalid: " + user.getUserID());
         }
+        if (isLocalUserNameWithAt(user)) {
+            // "@" separates name and realm in user IDs, such a user could never be found by its ID or log in
+            throw new MCRException("The name of a local user must not contain '@': " + user.getUserName());
+        }
 
         MCRUser persistableUser = user.toPersistableUser();
 
@@ -203,6 +207,18 @@ public class MCRUserManager {
         MCREvent evt = new MCREvent(MCREvent.ObjectType.USER, MCREvent.EventType.CREATE);
         evt.put(MCREvent.USER_KEY, persistableUser);
         MCREventManager.getInstance().handleEvent(evt);
+    }
+
+    /**
+     * Checks whether the given user is a user of the local realm whose name contains "@". Such users cannot be
+     * created, since "@" separates name and realm in user IDs (see {@link MCRUser#getUserID()}).
+     *
+     * @param user the user to check
+     * @return true if the user is a local user whose name contains "@"
+     */
+    public static boolean isLocalUserNameWithAt(MCRUser user) {
+        return MCRRealmFactory.getLocalRealm().getID().equals(user.getRealmID())
+            && user.getUserName() != null && user.getUserName().contains("@");
     }
 
     /**
@@ -627,20 +643,32 @@ public class MCRUserManager {
     /**
      * Sets password of 'user' to 'password'.
      * <p>
+     * Allowed for administrators, for the owner of 'user', and for 'user' itself if it has no owner or is not
+     * locked.
+     * <p>
      * Automatically updates the user in database.
+     *
+     * @throws MCRException if the current user is not allowed to change the password of 'user'
      */
     public static void setPassword(MCRUser user, String password) {
         MCRSession session = MCRSessionMgr.getCurrentSession();
         MCRUserInformation currentUser = session.getUserInformation();
         MCRUser myUser = getUser(user.getUserName(), user.getRealmID()); //only update password
         boolean allowed = MCRAccessManager.checkPermission(MCRUser2Constants.USER_ADMIN_PERMISSION)
-            || currentUser.equals(myUser.getOwner())
-            || (currentUser.equals(user) && myUser.hasNoOwner() || !myUser.isLocked());
+            || isSameUser(currentUser, myUser.getOwner())
+            || (isSameUser(currentUser, myUser) && (myUser.hasNoOwner() || !myUser.isLocked()));
         if (!allowed) {
             throw new MCRException("You are not allowed to change password of user: " + user);
         }
         setUserPassword(myUser, password);
         updateUser(myUser);
+    }
+
+    /**
+     * Compares by user ID, so that user information that is not a {@link MCRUser} (e.g. from a JWT) also matches.
+     */
+    private static boolean isSameUser(MCRUserInformation userInformation, MCRUser user) {
+        return user != null && user.getUserID().equals(userInformation.getUserID());
     }
 
     public static void setUserPassword(MCRUser user, String password) {

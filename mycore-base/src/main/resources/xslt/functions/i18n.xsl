@@ -21,7 +21,7 @@
                 <xsl:value-of select="$translation" />
             </xsl:when>
             <xsl:otherwise>
-                <!-- replace {N} in $translation with {N+1} element of $arguments -->
+                <!-- replace {N} in $translation with {N+1} element of $arguments, literally (flag q) -->
                 <xsl:iterate select="$arguments">
                     <xsl:param name="replTrans" select="$translation" as="xs:string" />
                     <xsl:param name="repl" select="0" as="xs:integer" />
@@ -30,7 +30,7 @@
                     </xsl:on-completion>
                     <xsl:next-iteration>
                         <xsl:with-param name="replTrans"
-                                        select="fn:replace($replTrans, concat('\{',$repl,'\}'), string(.))" />
+                                        select="fn:replace($replTrans, concat('{',$repl,'}'), string(.), 'q')" />
                         <xsl:with-param name="repl" select="($repl + 1)" />
                     </xsl:next-iteration>
                 </xsl:iterate>

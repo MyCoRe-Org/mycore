@@ -76,6 +76,7 @@ public class MCRRestV2App extends MCRJerseyRestApp {
         register(MCRNoFormDataPutFilter.class);
         register(MCRDropSessionFilter.class);
         register(MCRExceptionMapper.class);
+        register(MCRErrorResponseMediaTypeFilter.class);
         register(MCRApiDraftFilter.class);
         //after removing the following line, test if json output from MCRRestClassification is still OK
         register(JacksonXmlBindJsonProvider.class); //jetty >= 2.31, do not use DefaultJacksonJaxbJsonProvider
