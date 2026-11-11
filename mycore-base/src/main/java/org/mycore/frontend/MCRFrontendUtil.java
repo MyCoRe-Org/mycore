@@ -288,7 +288,12 @@ public class MCRFrontendUtil {
 
             String path = uri.getPath();
 
-            return path != null
+            // check the raw input too: callers redirect to the original string and browsers
+            // resolve e.g. "///evil.com" to "https://evil.com/", while URI parses it as path "/evil.com"
+            return uri.getRawAuthority() == null
+                   && url.startsWith("/")
+                   && !url.startsWith("//")
+                   && path != null
                    && path.startsWith("/")
                    && !path.startsWith("//")
                    && !path.contains("..");

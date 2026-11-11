@@ -95,6 +95,7 @@ public class MCRRoleServlet extends MCRServlet {
         if (!MCRAccessManager.checkPermission(MCRUser2Constants.USER_ADMIN_PERMISSION)) {
             final String errorMessage = MCRTranslation.translate("component.user2.message.notAllowedChangeRole");
             job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN, errorMessage);
+            return;
         }
 
         String action = getProperty(request, "action");
@@ -157,6 +158,9 @@ public class MCRRoleServlet extends MCRServlet {
         if (ex != null) {
             //do not handle error here
             throw ex;
+        }
+        if (job.getResponse().isCommitted()) {
+            return;
         }
         getLayoutService().doLayout(job.getRequest(), job.getResponse(),
             new MCRJDOMContent((Document) job.getRequest().getAttribute(LAYOUT_ELEMENT_KEY)));

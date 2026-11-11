@@ -105,7 +105,7 @@ public class MCRShibbolethLoginServlet extends MCRServlet {
                 // MCR-1154
                 req.changeSessionId();
 
-                res.sendRedirect(res.encodeRedirectURL(req.getParameter("url")));
+                res.sendRedirect(res.encodeRedirectURL(MCRLoginServlet.getReturnURL(req)));
                 return;
             } else {
                 msg = "Login from realm \"" + realmId + "\" is not allowed.";
