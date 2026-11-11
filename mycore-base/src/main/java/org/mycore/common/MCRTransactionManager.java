@@ -417,24 +417,42 @@ public final class MCRTransactionManager {
     /**
      * Marks all active {@link MCRPersistenceTransaction} instances so that the only possible outcome
      * of the transaction is for the transaction to be rolled back.
+     * <p>
+     * Calling this method more than once is safe: each transaction is marked only once.
      */
     public static void setRollbackOnly() {
-        getRollbackOnlyTransactions().addAll(getActiveTransactions());
+        markRollbackOnly(getActiveTransactions());
     }
 
     /**
      * Marks the specified types of transactions as rollback-only.
      *
      * <p>This method adds the specified transaction classes to the rollback-only set,
-     * indicating that these transactions should be rolled back and not committed.</p>
+     * indicating that these transactions should be rolled back and not committed.
+     * Calling this method more than once is safe: each transaction is marked only once.</p>
      *
      * @param transactionClasses the classes of the transactions to mark as rollback-only
      */
     @SafeVarargs
     public static void setRollbackOnly(Class<? extends MCRPersistenceTransaction>... transactionClasses) {
-        List<? extends MCRPersistenceTransaction> activeTransactions = getActiveTransactions(transactionClasses);
+        markRollbackOnly(getActiveTransactions(transactionClasses));
+    }
+
+    /**
+     * Adds the given transactions to the rollback-only list unless they are already in it.
+     * <p>
+     * A rollback removes each transaction from that list only once, so duplicates would remain in the
+     * thread local after the rollback and mark every later transaction on this thread as rollback-only.
+     *
+     * @param transactions the transactions to mark as rollback-only
+     */
+    private static void markRollbackOnly(List<? extends MCRPersistenceTransaction> transactions) {
         List<MCRPersistenceTransaction> rollbackOnlyTransactions = getRollbackOnlyTransactions();
-        rollbackOnlyTransactions.addAll(activeTransactions);
+        for (MCRPersistenceTransaction transaction : transactions) {
+            if (!rollbackOnlyTransactions.contains(transaction)) {
+                rollbackOnlyTransactions.add(transaction);
+            }
+        }
     }
 
     /**

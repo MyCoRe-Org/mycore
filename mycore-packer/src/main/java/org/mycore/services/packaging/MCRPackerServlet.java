@@ -27,6 +27,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRUsageException;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.services.queuedjob.MCRJob;
@@ -67,13 +68,16 @@ public class MCRPackerServlet extends MCRServlet {
                 job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, "No packer parameter!");
             }
         } catch (MCRAccessException e) {
-            job.getResponse().sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+            job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN, e.getMessage());
         } catch (MCRUsageException e) {
             job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid Parameters: " + e.getMessage());
         }
 
         if (jobParameters.containsKey("redirect")) {
             String redirect = jobParameters.get("redirect");
+            if (redirect == null || !MCRFrontendUtil.isSafeRedirect(redirect)) {
+                redirect = MCRFrontendUtil.getBaseURL();
+            }
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(redirect));
         }
     }

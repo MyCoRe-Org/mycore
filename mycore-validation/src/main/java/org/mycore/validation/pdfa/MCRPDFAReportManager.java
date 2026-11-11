@@ -183,7 +183,9 @@ public final class MCRPDFAReportManager {
      * page is rendered.
      * <p>
      * If asynchronous validation is not activated, the root element of a derivate with PDF files carries
-     * {@code activated="false"} and lists no files, as no report could become current.
+     * {@code activated="false"} and lists no files, as no report could become current. Likewise, the root element of a
+     * derivate that is not {@link #isEligible(MCRObjectID) eligible} carries {@code eligible="false"} and lists no
+     * files, so that it can be told apart from a derivate without PDF files.
      *
      * @param derivateId the ID of the derivate
      * @return a document with a {@code <derivate>} root element, holding one {@code <file>} element per PDF file
@@ -195,6 +197,7 @@ public final class MCRPDFAReportManager {
         root.setAttribute("id", derivateId.toString());
         summary.appendChild(root);
         if (!isEligible(derivateId)) {
+            root.setAttribute("eligible", "false");
             return summary;
         }
         List<String> files = listPDFFiles(derivateId);
