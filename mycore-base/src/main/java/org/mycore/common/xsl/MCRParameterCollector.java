@@ -108,13 +108,15 @@ public class MCRParameterCollector {
             setFromSession(session);
         }
 
-        if (!MCRSessionMgr.isLocked()) {
-            MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
+        MCRSession mcrSession = MCRSessionMgr.isLocked() ? null : MCRSessionMgr.getCurrentSession();
+        if (mcrSession != null) {
             setFromSession(mcrSession);
-            setUnmodifyableParameters(mcrSession, request);
         }
         setFromRequestParameters(request);
         setFromRequestAttributes(request);
+        if (mcrSession != null) {
+            setUnmodifyableParameters(mcrSession, request);
+        }
         setFromRequestHeader(request);
 
         if (session != null) {
