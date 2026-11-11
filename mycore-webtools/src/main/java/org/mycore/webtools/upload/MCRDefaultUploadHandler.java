@@ -154,20 +154,14 @@ public class MCRDefaultUploadHandler implements MCRUploadHandler {
                 OBJECT_DOES_NOT_EXIST_TRANSLATION_KEY, true);
         }
 
-        if (!oid.getTypeId().equals(MCRDerivate.OBJECT_TYPE)) {
-            try {
-                String derivateId = MCRObjectID.formatID(oid.getProjectId(), MCRDerivate.OBJECT_TYPE, 0);
-                MCRObjectID mcrDerivateId = MCRObjectID.getInstance(derivateId);
-                MCRMetadataManager.checkCreatePrivilege(mcrDerivateId);
-            } catch (MCRAccessException e) {
-                MCRUploadForbiddenException uploadForbiddenException = new MCRUploadForbiddenException(e.getMessage());
-                uploadForbiddenException.initCause(e);
-                throw uploadForbiddenException;
-            }
-        }
-
         if (!MCRAccessManager.checkPermission(oid, MCRAccessManager.PERMISSION_WRITE)) {
             throw new MCRUploadForbiddenException();
+        }
+
+        if (!oid.getTypeId().equals(MCRDerivate.OBJECT_TYPE)
+            && !MCRAccessManager.checkPermission(oid, MCRAccessManager.PERMISSION_ADD_DERIVATE)) {
+            throw new MCRUploadForbiddenException(
+                "missing permission " + MCRAccessManager.PERMISSION_ADD_DERIVATE + " on " + oid);
         }
     }
 

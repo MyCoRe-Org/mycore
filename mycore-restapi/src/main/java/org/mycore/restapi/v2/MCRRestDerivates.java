@@ -380,7 +380,7 @@ public class MCRRestDerivates {
         } catch (MCRAccessException e) {
             throw MCRErrorResponse.ofStatusCode(Response.Status.FORBIDDEN.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_NO_PERMISSION)
-                .withMessage("You may not create MCRDerivate for project " + zeroId.getProjectId() + ".")
+                .withMessage("You may not create MCRDerivate for object " + mcrId + ".")
                 .withDetail(e.getMessage())
                 .withCause(e)
                 .toException();

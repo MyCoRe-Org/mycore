@@ -18,6 +18,7 @@
 
 package org.mycore.datamodel.metadata;
 
+import static org.mycore.access.MCRAccessManager.PERMISSION_ADD_DERIVATE;
 import static org.mycore.access.MCRAccessManager.PERMISSION_DELETE;
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 import static org.mycore.datamodel.metadata.MCRObjectService.DATE_TYPE_CREATEDATE;
@@ -125,21 +126,21 @@ public final class MCRMetadataManager {
      * @throws MCRPersistenceException
      *            if a persistence problem is occurred
      * @throws MCRAccessException
-     *            if write permission to object is missing or create permission to derivate is missing
+     *            if write permission or "add-derivate" permission to object is missing
      */
     public static void create(final MCRDerivate mcrDerivate) throws MCRPersistenceException, MCRAccessException {
         MCRObjectID derivateId = mcrDerivate.getId();
-        checkCreatePrivilege(derivateId);
         throwPersistenceExceptionIfExists(derivateId, MCRDerivate.OBJECT_TYPE);
+
+        validateDerivate(mcrDerivate, derivateId);
+
+        final MCRObjectID objectId = getObjectIDFromDerivate(mcrDerivate);
+        checkWritePermission(objectId, derivateId);
+        checkAddDerivatePermission(objectId, derivateId);
 
         derivateId = assignNewIdIfNecessary(mcrDerivate);
 
         try (MCRObjectLock ignored = lock(derivateId)) {
-            validateDerivate(mcrDerivate, derivateId);
-
-            final MCRObjectID objectId = getObjectIDFromDerivate(mcrDerivate);
-            checkWritePermission(objectId, derivateId);
-
             byte[] objectBackup = retrieveObjectBackup(objectId);
 
             setDerivateMetadata(mcrDerivate);
@@ -181,6 +182,14 @@ public final class MCRMetadataManager {
         if (!MCRAccessManager.checkPermission(objectId, PERMISSION_WRITE)) {
             throw new MCRMissingPermissionException("Add derivate " + derivateId + " to object.",
                 objectId.toString(), PERMISSION_WRITE);
+        }
+    }
+
+    private static void checkAddDerivatePermission(MCRObjectID objectId, MCRObjectID derivateId)
+        throws MCRAccessException {
+        if (!MCRAccessManager.checkPermission(objectId, PERMISSION_ADD_DERIVATE)) {
+            throw new MCRMissingPermissionException("Add derivate " + derivateId + " to object.",
+                objectId.toString(), PERMISSION_ADD_DERIVATE);
         }
     }
 
@@ -308,7 +317,7 @@ public final class MCRMetadataManager {
 
             validateObject(mcrObject);
 
-            if(objectId.getNumberAsInteger() > 0) {
+            if (objectId.getNumberAsInteger() > 0) {
                 recordIDIfTracking(objectId);
             }
 
@@ -317,6 +326,14 @@ public final class MCRMetadataManager {
         }
     }
 
+    /**
+     * Checks the pool privileges "create-{base}" and "create-{type}" for creating a new object.
+     * Meant for objects only: creating a derivate is authorized by the permissions "writedb" and
+     * "add-derivate" on its parent object, see {@link #create(MCRDerivate)}.
+     *
+     * @param objectId the ID of the object to create
+     * @throws MCRAccessException if the current user has neither privilege
+     */
     public static void checkCreatePrivilege(MCRObjectID objectId) throws MCRAccessException {
         String createBasePrivilege = "create-" + objectId.getBase();
         String createTypePrivilege = "create-" + objectId.getTypeId();
