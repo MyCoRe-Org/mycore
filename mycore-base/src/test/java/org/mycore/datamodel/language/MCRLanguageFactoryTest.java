@@ -23,7 +23,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -47,13 +46,6 @@ public class MCRLanguageFactoryTest extends MCRJPATestCase {
     private static final String LANGUAGE_CODE = "tlh";
 
     private static final String LANGUAGE_LABEL = "Klingonisch";
-
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> testProperties = super.getTestProperties();
-        testProperties.put("MCR.LanguageClassification", CLASSIFICATION_ID);
-        return testProperties;
-    }
 
     /**
      * Adds a language to the classification, so the factory reads the classification again on next use.
