@@ -95,6 +95,12 @@
       <label class="col-12 col-md-3 control-label" for="userName">
         <xed:output i18n="component.user2.admin.userAccount" />
       </label>
+      <label class="visually-hidden" for="realmId">
+        <xed:multi-lang>
+          <xed:lang xml:lang="de">Anmeldebereich</xed:lang>
+          <xed:lang xml:lang="en">Realm</xed:lang>
+        </xed:multi-lang>
+      </label>
       <div class="col-12 col-md-9 row">
         <xeduser:template name="textInput" xpath="@name" id="userName" inline="true" colsize="sm" colwidth="9"
           i18n.error="component.user2.admin.inputhints.username" required="true" matches="[a-z0-9\._-]*" maxlength="43" />
@@ -108,6 +114,12 @@
     <div class="mcr-form-group mb-3 row">
       <label class="col-12 col-md-3 control-label" for="userName">
         <xed:output i18n="component.user2.admin.userAccount" />
+      </label>
+      <label class="visually-hidden" for="realmId">
+        <xed:multi-lang>
+          <xed:lang xml:lang="de">Anmeldebereich</xed:lang>
+          <xed:lang xml:lang="en">Realm</xed:lang>
+        </xed:multi-lang>
       </label>
       <div class="col-12 col-md-9 row">
         <xeduser:template name="textInput" xpath="@name" id="userName" disabled="true" inline="true" colsize="sm" colwidth="9"

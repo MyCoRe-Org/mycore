@@ -33,7 +33,8 @@
         <li>
           <xsl:choose>
             <xsl:when test="@children = 'true'">
-              <a href="#0" onclick="toggleClass('{@id}','{$folder.closed}','{$folder.open}');"><i class="{$folder.closed}" id="cbButton_{$id}"><!-- WebKit bugfix: no empty divs please --><xsl:comment/></i></a>
+              <a tabindex="0" role="button" aria-label="Unterkategorien ein- oder ausblenden/Show or hide subcategories" aria-expanded="false" 
+              onclick="toggleClass('{@id}','{$folder.closed}','{$folder.open}');"><i class="{$folder.closed}" id="cbButton_{$id}"><!-- WebKit bugfix: no empty divs please --><xsl:comment/></i></a>
             </xsl:when>
             <xsl:otherwise>
               <i class="{$folder.leaf}" id="cbButton_{$id}"><!-- WebKit bugfix: no empty divs please --><xsl:comment/></i>

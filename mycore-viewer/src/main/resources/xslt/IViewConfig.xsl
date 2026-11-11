@@ -100,7 +100,7 @@
   <xsl:template match="resource" mode="iview.resource">
     <xsl:choose>
       <xsl:when test="@type='script'">
-        <script src="{text()}" type="text/javascript" />
+        <script src="{text()}" />
       </xsl:when>
       <xsl:when test="@type='module'">
           <script src="{text()}" type="module" />

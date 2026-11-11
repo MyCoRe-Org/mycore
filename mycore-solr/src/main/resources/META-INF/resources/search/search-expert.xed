@@ -5,7 +5,7 @@
   <section title="SOLR expert search" xml:lang="en" />
 
   <section xml:lang="all">
-    <script type="text/javascript">
+    <script>
     <![CDATA[
 "use strict";
 (function($) {
@@ -102,19 +102,21 @@ form .optional.expanded .fieldset{
                     <xedsolr:textfield name="sort" title="Sort field or function with asc|desc." />
 
                     <div class="form-group">
-                      <label class="col-{$label-width} control-label" for="start">
+                      <span class="col-{$label-width} control-label" id="start-rows-group-title" aria-hidden="true">
                         start, rows
-                      </label>
-                      <div class="col-{$input-width}">
+                      </span>
+                      <div class="col-{$input-width}" role="group" aria-labelledby="start-rows-group-title">
                         <div class="row">
                           <xed:bind xpath="param[@name='start']">
                             <div class="col-6">
+                              <label class="visually-hidden" for="start">Start (Number of leading documents to skip)</label>
                               <input class="form-control" type="text" title="Number of leading documents to skip. (Integer)" pattern="[0-9]+"
                                 placeholder="0" id="start" />
                             </div>
                           </xed:bind>
                           <xed:bind xpath="param[@name='rows']">
                             <div class="col-6">
+                              <label class="visually-hidden" for="rows">Rows (Number of documents to return)</label>
                               <input class="form-control" type="text" title="Number of documents to return after 'start'. (Integer)"
                                 pattern="[0-9]+" placeholder="10" id="rows" />
                             </div>
@@ -127,31 +129,35 @@ form .optional.expanded .fieldset{
                     <xedsolr:textfield name="df" title="Default search field" />
 
                     <div class="form-group">
-                      <label class="col-{$label-width} control-label" for="custom_parameters">
+                      <span class="col-{$label-width} control-label" id="raw-query-params-title">
                         Raw Query Parameters
-                      </label>
-                      <div class="col-{$input-width}">
+                      </span>
+                      <div class="col-{$input-width}" role="group" aria-labelledby="raw-query-params-title">
                         <xed:repeat xpath="cparam">
                           <div class="row clearfix">
                             <div class="col-4">
                               <xed:bind xpath="@name">
-                                <input class="form-control" type="text" placeholder="key" id="custom_parameters" />
+                                <label class="visually-hidden" for="param_key_{xed:generate-id()}">Parameter Key</label>
+                                <input class="form-control" type="text" placeholder="key" id="param_key_{xed:generate-id()}" />
                               </xed:bind>
                             </div>
                             <div class="col-5">
-                              <input class="form-control" type="text" placeholder="value" />
+                              <label class="visually-hidden" for="param_val_{xed:generate-id()}">Parameter Value</label>
+                              <input class="form-control" type="text" placeholder="value" id="param_val_{xed:generate-id()}" />
                             </div>
+                            
                             <div class="col-3">
-                              <span class="float-end">
+                              <div class="float-end">
                                 <div class="btn-group">
                                   <xed:controls>insert remove</xed:controls>
                                 </div>
-                              </span>
+                              </div>
                             </div>
                           </div>
                         </xed:repeat>
                       </div>
                     </div>
+
 
                     <xed:bind xpath="param[@name='wt']" default="xml">
                       <div class="form-group">

@@ -41,7 +41,7 @@
             <div class="form-check">
               <input id="sessionListingResolveHostname" class="form-check-input" type="checkbox"
                      onchange="mycore.session.listing.onHostnameResolvingChange()"/>
-              <label for="sessionListingFilter" class="form-check-label">
+              <label for="sessionListingResolveHostname" class="form-check-label">
                 <xsl:value-of select="mcri18n:translate('component.session-listing.resolveHostNames')"/>
               </label>
             </div>
@@ -87,7 +87,7 @@
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
-            <h4 class="modal-title"></h4>
+            <h4 class="modal-title">Stack Modal</h4>
           </div>
           <div class="modal-body">
             <pre id="stacktraceModalBody" class="pre-scrollable"></pre>

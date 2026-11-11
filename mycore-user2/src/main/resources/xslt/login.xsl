@@ -52,20 +52,20 @@
     </xsl:template>
 
     <xsl:template match="form">
-        <form action="{@action}" method="post" role="form" class="form-login">
-            <h2 class="form-login-heading">
-                <xsl:value-of select="mcri18n:translate('component.user2.login.heading')" />
-            </h2>
+        <form action="{@action}" method="post" class="form-login">            
             <fieldset>
+                <legend class="form-login-heading">
+                    <xsl:value-of select="mcri18n:translate('component.user2.login.heading')" />
+                </legend>
                 <!-- Here come the input fields... -->
                 <xsl:apply-templates select="input" />
             </fieldset>
             <div class="form-actions">
                 <xsl:choose>
                     <xsl:when test="$direction = 'rtl' ">
-                        <button class="btn btn-secondary" type="button" onClick="self.location.href='{../returnURL}'" tabindex="999">
+                        <a class="btn btn-dark" href="{../returnURL}">
                             <xsl:value-of select="mcri18n:translate('component.user2.button.cancel')" />
-                        </button>
+                        </a>
                         <button class="btn btn-primary ms-3" type="submit" name="LoginSubmit">
                             <xsl:value-of select="mcri18n:translate('component.user2.button.login')" />
                         </button>
@@ -74,9 +74,9 @@
                         <button class="btn btn-primary" type="submit" name="LoginSubmit">
                             <xsl:value-of select="mcri18n:translate('component.user2.button.login')" />
                         </button>
-                        <button class="btn btn-secondary ms-3" type="button" onClick="self.location.href='{../returnURL}'" tabindex="999">
+                        <a class="btn btn-dark ms-3" href="{../returnURL}">
                             <xsl:value-of select="mcri18n:translate('component.user2.button.cancel')" />
-                        </button>
+                        </a>
                     </xsl:otherwise>
                 </xsl:choose>
             </div>
@@ -105,10 +105,17 @@
                                 </xsl:otherwise>
                             </xsl:choose>
                         </xsl:variable>
-                        <input type="{$type}" name="{@name}" class="form-control input-large" placeholder="{@placeholder}" title="{@label}" autocorrect="off"
-                               autocapitalize="off" />
+                        <input id="{@name}" type="{$type}" name="{@name}" class="form-control input-large" placeholder="{@placeholder}" title="{@label}" autocorrect="off" autocapitalize="off">
+                            <xsl:attribute name="autocomplete">
+                                <xsl:choose>
+                                    <xsl:when test="@isPassword='true'">current-password</xsl:when>
+                                    <xsl:otherwise>username</xsl:otherwise>
+                                </xsl:choose>
+                            </xsl:attribute>
+                        </input>
                     </div>
                 </div>
+                
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
