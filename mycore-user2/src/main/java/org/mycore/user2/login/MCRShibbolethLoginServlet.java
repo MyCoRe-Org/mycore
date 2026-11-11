@@ -18,6 +18,7 @@
 
 package org.mycore.user2.login;
 
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
@@ -25,6 +26,7 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.user2.MCRRealmFactory;
@@ -33,7 +35,9 @@ import org.mycore.user2.MCRUserAttributeMapper;
 import org.mycore.user2.MCRUserManager;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  *
@@ -49,6 +53,34 @@ public class MCRShibbolethLoginServlet extends MCRServlet {
         .getBoolean("MCR.user2.Shibboleth.PersistUser")
         .orElseThrow();
 
+    private static final List<String> ALLOWED_REALMS = MCRConfiguration2
+        .getString("MCR.user2.Shibboleth.AllowedRealms")
+        .map(MCRConfiguration2::splitValue)
+        .map(Stream::toList)
+        .orElseGet(List::of);
+
+    /**
+     * Insecure, only for legacy installations that log Shibboleth users into the local realm.
+     */
+    private static final boolean ALLOW_LOCAL_REALM = MCRConfiguration2
+        .getBoolean("MCR.user2.Shibboleth.AllowLocalRealm")
+        .orElseThrow();
+
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        String localRealmId = MCRRealmFactory.getLocalRealm().getID();
+        if (ALLOW_LOCAL_REALM) {
+            LOGGER.warn("MCR.user2.Shibboleth.AllowLocalRealm is enabled. Shibboleth logins into the local realm"
+                + " \"{}\" are allowed, which is insecure. Move Shibboleth users to a separate realm.",
+                localRealmId);
+        } else if (ALLOWED_REALMS.contains(localRealmId)) {
+            throw new MCRConfigurationException("Local realm \"" + localRealmId
+                + "\" must not be listed in MCR.user2.Shibboleth.AllowedRealms"
+                + " unless MCR.user2.Shibboleth.AllowLocalRealm is enabled.");
+        }
+    }
+
     public void doGetPost(MCRServletJob job) throws Exception {
         HttpServletRequest req = job.getRequest();
         HttpServletResponse res = job.getResponse();
@@ -59,9 +91,12 @@ public class MCRShibbolethLoginServlet extends MCRServlet {
         String userId = uid != null ? uid : req.getRemoteUser();
 
         if (userId != null) {
-            final String realmId = userId.contains("@") ? userId.substring(userId.indexOf("@") + 1) : null;
-            if (realmId != null && MCRRealmFactory.getRealm(realmId) != null) {
-                userId = realmId != null ? userId.replace("@" + realmId, "") : userId;
+            final int realmSeparator = userId.indexOf('@');
+            final String realmId = realmSeparator > 0 && realmSeparator == userId.lastIndexOf('@')
+                ? userId.substring(realmSeparator + 1)
+                : null;
+            if (isRealmAllowed(realmId)) {
+                userId = userId.substring(0, realmSeparator);
 
                 final Map<String, Object> attributes = new HashMap<>();
 
@@ -111,5 +146,26 @@ public class MCRShibbolethLoginServlet extends MCRServlet {
         }
 
         job.getResponse().sendError(HttpServletResponse.SC_UNAUTHORIZED, msg);
+    }
+
+    /**
+     * Checks if a login with the given realm is allowed via Shibboleth.
+     * The local realm is not allowed, as its users must authenticate with their password,
+     * unless <code>MCR.user2.Shibboleth.AllowLocalRealm</code> is enabled.
+     * If <code>MCR.user2.Shibboleth.AllowedRealms</code> is set, only the configured realms are allowed.
+     */
+    private static boolean isRealmAllowed(String realmId) {
+        if (realmId == null || realmId.isEmpty() || MCRRealmFactory.getRealm(realmId) == null) {
+            return false;
+        }
+        if (realmId.equals(MCRRealmFactory.getLocalRealm().getID())) {
+            if (!ALLOW_LOCAL_REALM) {
+                LOGGER.warn("Rejected Shibboleth login for local realm \"{}\".", realmId);
+                return false;
+            }
+            LOGGER.warn("Allowed Shibboleth login for local realm \"{}\" via MCR.user2.Shibboleth.AllowLocalRealm.",
+                realmId);
+        }
+        return ALLOWED_REALMS.isEmpty() || ALLOWED_REALMS.contains(realmId);
     }
 }
