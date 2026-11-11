@@ -114,10 +114,10 @@ public class MCRParameterCollector {
         }
         setFromRequestParameters(request);
         setFromRequestAttributes(request);
+        setFromRequestHeader(request);
         if (mcrSession != null) {
             setUnmodifyableParameters(mcrSession, request);
         }
-        setFromRequestHeader(request);
 
         if (session != null) {
             setSessionID(session, request.isRequestedSessionIdFromCookie());
