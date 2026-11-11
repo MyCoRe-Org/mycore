@@ -54,6 +54,10 @@ public class MCRXSLStyleURIResolver implements URIResolver {
 
     private static final String FLAVOR_PARAMETER = "xslStyleFlavor";
 
+    // A Flavor is configured without knowing its own property prefix, so errors name the usual property pattern.
+    private static final String FLAVOR_PROCESSOR_PROPERTY =
+        "MCR.URIResolver.ModuleResolver.xslStyle.Flavor.<flavor>.XSLTProcessor";
+
     private final Flavor defaultFlavor;
 
     private final Map<String, Flavor> flavorMap;
@@ -220,7 +224,7 @@ public class MCRXSLStyleURIResolver implements URIResolver {
 
         @MCRProperty(name = "XSLTProcessor", required = false, order = 1)
         public void setXSLTProcessorId(String xsltProcessorId) {
-            this.xsltProcessorId = MCRXSLTProcessorSelector.getProcessorId(xsltProcessorId);
+            this.xsltProcessorId = MCRXSLTProcessorSelector.getProcessorId(FLAVOR_PROCESSOR_PROPERTY, xsltProcessorId);
         }
 
         /**

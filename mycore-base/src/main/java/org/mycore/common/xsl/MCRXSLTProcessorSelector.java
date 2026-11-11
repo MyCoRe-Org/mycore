@@ -83,25 +83,52 @@ public final class MCRXSLTProcessorSelector {
     private static Optional<String> getConfiguredProcessorId(String property, String legacyProperty) {
         return MCRConfiguration2.<TransformerFactory>getClass(legacyProperty)
             .map(factoryClass -> migrateLegacyProperty(property, legacyProperty, factoryClass))
-            .or(() -> MCRConfiguration2.getString(property).map(MCRXSLTProcessorSelector::getProcessorId));
+            .or(() -> MCRConfiguration2.getString(property).map(value -> getProcessorId(property, value)));
     }
 
-    public static String getProcessorId(String processorIdOrClassName) {
-        if (processorIdOrClassName.indexOf('.') == -1) {
-            return processorIdOrClassName;
+    /**
+     * Converts a configured value to a registered XSLT processor ID.
+     * <p>
+     * Values without a dot are XSLT processor IDs. Values containing a dot are handled as deprecated
+     * {@link TransformerFactory} implementation class names and mapped to an ID.
+     *
+     * @param property name of the property holding the value, used in error messages
+     * @param processorIdOrClassName configured XSLT processor ID or deprecated factory class name
+     * @return registered XSLT processor ID
+     * @throws MCRConfigurationException if the value does not reference a registered XSLT processor or a
+     *     loadable {@link TransformerFactory} implementation
+     */
+    public static String getProcessorId(String property, String processorIdOrClassName) {
+        String value = processorIdOrClassName.trim();
+        if (value.indexOf('.') == -1) {
+            return requireRegisteredProcessorId(property, value);
         }
+        Class<?> factoryClass;
         try {
-            Class<?> factoryClass = MCRClassTools.forName(processorIdOrClassName);
-            if (TransformerFactory.class.isAssignableFrom(factoryClass)) {
-                LOGGER.warn("Transformer factory class value '{}' is deprecated. Configure and reference an XSLT "
-                    + "processor ID instead.", processorIdOrClassName);
-                return MCRLegacyXSLTProcessorProvider
-                    .getProcessorId(factoryClass.asSubclass(TransformerFactory.class));
-            }
+            factoryClass = MCRClassTools.forName(value);
         } catch (ClassNotFoundException e) {
-            // Not a class name, so handle it as an XSLT processor ID.
+            throw new MCRConfigurationException("Property '" + property + "' has value '" + value
+                + "', which is neither an XSLT processor ID nor a loadable class. Set it to one of "
+                + MCRLegacyXSLTProcessorProvider.getConfiguredProcessorIds() + ".", e);
         }
-        return processorIdOrClassName;
+        if (!TransformerFactory.class.isAssignableFrom(factoryClass)) {
+            throw new MCRConfigurationException("Property '" + property + "' has value '" + value
+                + "', which is not a " + TransformerFactory.class.getName() + " implementation. Set it to one of "
+                + MCRLegacyXSLTProcessorProvider.getConfiguredProcessorIds() + ".");
+        }
+        LOGGER.warn("Property '{}' uses the deprecated transformer factory class value '{}'. Set it to an XSLT "
+            + "processor ID instead.", property, value);
+        return MCRLegacyXSLTProcessorProvider.getProcessorId(factoryClass.asSubclass(TransformerFactory.class));
+    }
+
+    private static String requireRegisteredProcessorId(String property, String processorId) {
+        Set<String> registeredIds = MCRLegacyXSLTProcessorProvider.getConfiguredProcessorIds();
+        if (!registeredIds.contains(processorId)) {
+            throw new MCRConfigurationException("Property '" + property + "' references unknown XSLT processor ID '"
+                + processorId + "'. Set it to one of " + registeredIds + " or register the ID under '"
+                + FACTORY_CLASS_PROPERTY_PATTERN.replace("<ID>", processorId) + "'.");
+        }
+        return processorId;
     }
 
     /**

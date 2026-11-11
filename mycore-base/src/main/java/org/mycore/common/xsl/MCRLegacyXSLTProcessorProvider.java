@@ -21,8 +21,12 @@ package org.mycore.common.xsl;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXTransformerFactory;
@@ -72,16 +76,34 @@ final class MCRLegacyXSLTProcessorProvider {
      * This keeps legacy-property migration out of the registry's construction path.
      */
     static String getProcessorId(Class<? extends TransformerFactory> factoryClass) {
+        return resolveProcessorId(getConfiguredFactoryClasses(), factoryClass);
+    }
+
+    /**
+     * Returns the IDs configured under {@code MCR.XSLTProcessorRegistry.Entries.{id}.Factory.Class}, read
+     * directly from properties without initializing the shared registry.
+     */
+    static Set<String> getConfiguredProcessorIds() {
+        return getConfiguredIdStream().collect(Collectors.toCollection(TreeSet::new));
+    }
+
+    private static Map<String, Class<? extends TransformerFactory>> getConfiguredFactoryClasses() {
         String propertyPrefix = MCRXSLTProcessorRegistry.ENTRIES_PROPERTY_PREFIX;
         Map<String, Class<? extends TransformerFactory>> factoryClasses = new HashMap<>();
-        MCRConfiguration2.getSubpropertiesMap(propertyPrefix).keySet().stream()
-            .filter(key -> key.endsWith(CLASS_PROPERTY_SUFFIX))
-            .filter(key -> key.indexOf('.') == key.length() - CLASS_PROPERTY_SUFFIX.length())
-            .map(key -> key.substring(0, key.length() - CLASS_PROPERTY_SUFFIX.length()))
+        getConfiguredIdStream()
             .forEach(id -> MCRConfiguration2.<TransformerFactory>getClass(propertyPrefix + id + CLASS_PROPERTY_SUFFIX)
                 .ifPresent(configuredClass -> factoryClasses.put(id, configuredClass)));
+        return factoryClasses;
+    }
 
-        return resolveProcessorId(factoryClasses, factoryClass);
+    private static Stream<String> getConfiguredIdStream() {
+        return MCRConfiguration2.getSubpropertiesMap(MCRXSLTProcessorRegistry.ENTRIES_PROPERTY_PREFIX)
+            .entrySet().stream()
+            .filter(entry -> entry.getValue() != null && !entry.getValue().isBlank())
+            .map(Map.Entry::getKey)
+            .filter(key -> key.endsWith(CLASS_PROPERTY_SUFFIX))
+            .filter(key -> key.indexOf('.') == key.length() - CLASS_PROPERTY_SUFFIX.length())
+            .map(key -> key.substring(0, key.length() - CLASS_PROPERTY_SUFFIX.length()));
     }
 
     private static String resolveProcessorId(Map<String, Class<? extends TransformerFactory>> factoryClasses,

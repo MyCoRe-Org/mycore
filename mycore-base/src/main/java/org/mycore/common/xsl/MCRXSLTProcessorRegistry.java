@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.TreeSet;
 import java.util.function.Supplier;
 
 import javax.xml.transform.TransformerFactory;
@@ -118,7 +119,8 @@ public final class MCRXSLTProcessorRegistry {
         }
         if (processor == null) {
             throw new MCRConfigurationException("Unknown XSLT processor ID '" + id
-                + "'. Configured IDs: " + processors.keySet());
+                + "'. Use one of " + new TreeSet<>(processors.keySet()) + " or register the ID under '"
+                + ENTRIES_PROPERTY_PREFIX + id + "." + FACTORY_KEY + ".Class'.");
         }
         return processor;
     }
