@@ -183,6 +183,29 @@ public class MCRTransactionManagerTest {
     }
 
     @Test
+    public void setRollbackOnlyTwiceShouldNotLeaveStaleEntriesAfterRollback() {
+        MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(
+            WorkingTransaction.class, AnotherWorkingTransaction.class));
+        MCRTransactionManager.beginTransactions();
+
+        // e.g. exception mapper and transaction filter both mark the same request
+        MCRTransactionManager.setRollbackOnly();
+        MCRTransactionManager.setRollbackOnly();
+        MCRTransactionManager.setRollbackOnly(WorkingTransaction.class);
+        assertEquals(2, MCRTransactionManager.listRollbackOnlyTransactions().size(),
+            "Each transaction should be marked only once");
+
+        MCRTransactionManager.rollbackTransactions();
+        assertFalse(MCRTransactionManager.hasRollbackOnlyTransactions(),
+            "No rollback-only entries should remain after rollback");
+
+        // the next transactions on this thread must be committable
+        MCRTransactionManager.beginTransactions();
+        MCRTransactionManager.commitTransactions();
+        checkCounter(4, 2, 2);
+    }
+
+    @Test
     public void rollbackTransactions() {
         // rollback single transaction
         MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(

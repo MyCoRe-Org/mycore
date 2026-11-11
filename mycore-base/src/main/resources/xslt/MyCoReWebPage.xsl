@@ -15,21 +15,21 @@
   <xsl:variable name="PageTitle">
     <xsl:choose>
       <xsl:when test="/MyCoReWebPage/section/@i18n">
-        <xsl:value-of select="mcri18n:translate(/MyCoReWebPage/section/@i18n)" />
+        <xsl:value-of select="mcri18n:translate((/MyCoReWebPage/section/@i18n)[1])" />
       </xsl:when>
       <xsl:otherwise>
         <xsl:choose>
-          <xsl:when test="string-length(/MyCoReWebPage/section[ lang($CurrentLang)]/@title)&gt;0">
-            <xsl:value-of select="/MyCoReWebPage/section[lang($CurrentLang)]/@title"/>
+          <xsl:when test="string-length((/MyCoReWebPage/section[ lang($CurrentLang)]/@title)[1])&gt;0">
+            <xsl:value-of select="(/MyCoReWebPage/section[lang($CurrentLang)]/@title)[1]"/>
           </xsl:when>
-          <xsl:when test="string-length(/MyCoReWebPage/section[lang('all')]/@title )&gt;0">
-            <xsl:value-of select="/MyCoReWebPage/section[lang('all')]/@title"/>
+          <xsl:when test="string-length((/MyCoReWebPage/section[lang('all')]/@title)[1] )&gt;0">
+            <xsl:value-of select="(/MyCoReWebPage/section[lang('all')]/@title)[1]"/>
           </xsl:when>
-          <xsl:when test="string-length(/MyCoReWebPage/section[@alt and contains(@alt,$CurrentLang)]/@title)&gt;0">
-            <xsl:value-of select="/MyCoReWebPage/section[contains(@alt,$CurrentLang)]/@title"/>
+          <xsl:when test="string-length((/MyCoReWebPage/section[@alt and contains(@alt, $CurrentLang)]/@title)[1])&gt;0">
+            <xsl:value-of select="(/MyCoReWebPage/section[contains(@alt, $CurrentLang)]/@title)[1]"/>
           </xsl:when>
-          <xsl:when test="string-length(/MyCoReWebPage/section[lang($DefaultLang)]/@title)&gt;0">
-            <xsl:value-of select="/MyCoReWebPage/section[lang($DefaultLang)]/@title"/>
+          <xsl:when test="string-length((/MyCoReWebPage/section[lang($DefaultLang)]/@title)[1])&gt;0">
+            <xsl:value-of select="(/MyCoReWebPage/section[lang($DefaultLang)]/@title)[1]"/>
           </xsl:when>
           <xsl:otherwise>
             <xsl:message>no title for page:<xsl:value-of select="$PageID"/></xsl:message>

@@ -53,6 +53,7 @@ import org.mycore.common.content.transformer.MCRParameterizedTransformer;
 import org.mycore.common.content.transformer.MCRXSL2XMLTransformer;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.common.xsl.MCRXSLResourceHelper;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
@@ -120,7 +121,10 @@ public class MCRMailer extends MCRServlet {
             sendMail(input, xsl);
         }
 
-        job.getResponse().sendRedirect(goTo);
+        if (goTo == null || !MCRFrontendUtil.isSafeRedirect(goTo)) {
+            goTo = MCRFrontendUtil.getBaseURL();
+        }
+        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(goTo));
     }
 
     static {

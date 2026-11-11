@@ -18,6 +18,7 @@
 package org.mycore.pi;
 
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
+import static org.mycore.common.config.instantiator.MCRInstanceConfiguration.CLASS_SUFFIX;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -585,7 +586,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
     protected Predicate<MCRBase> getCreationPredicate() {
         final String predicateProperty = MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX +
             getServiceID() + "." + MCRPIJobService.CREATION_PREDICATE;
-        if (MCRConfiguration2.getString(predicateProperty).isEmpty()) {
+        if (MCRConfiguration2.getString(predicateProperty + CLASS_SUFFIX).isEmpty()) {
             return (o) -> false;
         }
         return getPredicateInstance(predicateProperty);
@@ -594,7 +595,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
     protected Predicate<MCRBase> getRegistrationPredicate() {
         final String predicateProperty = MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX +
             getServiceID() + "." + MCRPIJobService.REGISTRATION_PREDICATE;
-        if (MCRConfiguration2.getString(predicateProperty).isEmpty()) {
+        if (MCRConfiguration2.getString(predicateProperty + CLASS_SUFFIX).isEmpty()) {
             return (o) -> true;
         }
         return getPredicateInstance(predicateProperty);

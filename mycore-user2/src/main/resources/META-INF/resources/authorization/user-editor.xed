@@ -8,7 +8,7 @@
     <xed:if test="$xed-validation-failed">
       <div class="alert alert-danger">
         <h4>
-          <xed:output i18n="component.user2.admin.inputhints" />
+          <xed:output i18n="component.user2.admin.inputhints" escape-xml="false" />
         </h4>
         <xed:display-validation-messages />
       </div>
@@ -28,6 +28,8 @@
     <xed:include ref="passwordHint" />
     <xed:include ref="realName" />
 
+    <xed:validate xpath="/user[@realm = 'local']/@name" display="global" test="not(contains(., '@'))"
+      i18n="component.user2.admin.inputhints.usernameAt" />
     <xed:validate xpath="/user[@realm = 'local']/@name" display="global" class="org.mycore.user2.MCRUserServlet" method="checkUserName"
       i18n="component.user2.admin.inputhints.sameUsername" />
   </xed:template>
@@ -49,6 +51,8 @@
 
     <xed:include ref="editor4admins" />
 
+    <xed:validate xpath="/user[@realm = 'local']/@name" display="global" test="not(contains(., '@'))"
+      i18n="component.user2.admin.inputhints.usernameAt" />
     <xed:validate xpath="/user[@realm = 'local']/@name" display="global" class="org.mycore.user2.MCRUserServlet" method="checkUserName"
       i18n="component.user2.admin.inputhints.sameUsername" />
   </xed:template>
