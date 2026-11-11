@@ -21,6 +21,7 @@ package org.mycore.user.restapi.v2.resource;
 import static org.mycore.restapi.v2.MCRRestStatusCode.BAD_REQUEST;
 import static org.mycore.restapi.v2.MCRRestStatusCode.CONFLICT;
 import static org.mycore.restapi.v2.MCRRestStatusCode.CREATED;
+import static org.mycore.restapi.v2.MCRRestStatusCode.FORBIDDEN;
 import static org.mycore.restapi.v2.MCRRestStatusCode.NOT_FOUND;
 import static org.mycore.restapi.v2.MCRRestStatusCode.NO_CONTENT;
 import static org.mycore.restapi.v2.MCRRestStatusCode.OK;
@@ -28,7 +29,6 @@ import static org.mycore.restapi.v2.MCRRestStatusCode.OK;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.mycore.frontend.jersey.MCRCacheControl;
@@ -37,14 +37,18 @@ import org.mycore.restapi.annotations.MCRAccessControlExposeHeaders;
 import org.mycore.restapi.annotations.MCRApiDraft;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.mycore.restapi.converter.MCRDetailLevel;
+import org.mycore.restapi.v2.MCRDetailLevelResolver;
 import org.mycore.restapi.v2.MCRRestSchemaType;
 import org.mycore.restapi.v2.annotation.MCRRestRequiredPermission;
 import org.mycore.user.restapi.exception.MCRUserAlreadyExistsException;
+import org.mycore.user.restapi.exception.MCRUserNoLocalPasswordException;
 import org.mycore.user.restapi.exception.MCRUserNotFoundException;
+import org.mycore.user.restapi.exception.MCRUserPasswordNotAllowedException;
 import org.mycore.user.restapi.exception.MCRUserValidationException;
 import org.mycore.user.restapi.v2.MCRUserObjectMapper;
 import org.mycore.user.restapi.v2.MCRUserService;
 import org.mycore.user.restapi.v2.dto.MCRCreateUserRequest;
+import org.mycore.user.restapi.v2.dto.MCRSetPasswordRequest;
 import org.mycore.user.restapi.v2.dto.MCRUpdateUserRequest;
 import org.mycore.user.restapi.v2.dto.MCRUserDetail;
 import org.mycore.user.restapi.v2.dto.MCRUserStandard;
@@ -71,6 +75,7 @@ import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.PATCH;
@@ -115,13 +120,10 @@ public class MCRUsers {
     private static final String PARAM_EMAIL = "email";
     private static final String DEFAULT_OFFSET_STR = "0";
     private static final String DEFAULT_LIMIT_STR = "100";
-    private static final String TAG_MCR_USER = "mcr_user";
+    static final String TAG_MCR_USER = "mcr_user";
     private static final String DESC_USER_NOT_FOUND = "User not found";
-    private static final String DESC_INVALID_BODY_CONTENT = "Invalid body";
-    private static final String DETAIL_LEVEL_DESCRIPTION =
-        "Controls the level of detail in the response via the detail parameter. "
-            + "Supported values: SUMMARY, NORMAL, DETAILED. "
-            + "Example: application/json; detail=SUMMARY";
+    static final String DESC_INVALID_BODY_CONTENT = "Invalid body";
+    private static final String DESC_PASSWORD_NOT_ALLOWED = "Caller is not permitted to change the password";
 
     @Context
     private UriInfo uriInfo;
@@ -158,6 +160,7 @@ public class MCRUsers {
      * @return 201 Created with the URI of the new user in the {@code Location} header
      * @throws BadRequestException if the user data is invalid
      * @throws ClientErrorException with status 409 if the user already exists
+     * @throws ForbiddenException if the caller is not permitted to set the password
      */
     @Operation(
         summary = "Creates a new user",
@@ -180,7 +183,12 @@ public class MCRUsers {
                 )
             ),
             @ApiResponse(responseCode = BAD_REQUEST, description = DESC_INVALID_BODY_CONTENT),
-            @ApiResponse(responseCode = CONFLICT, description = "User already exists")
+            @ApiResponse(responseCode = CONFLICT, description = "User already exists"),
+            @ApiResponse(
+                responseCode = FORBIDDEN,
+                content = @Content(mediaType = MediaType.TEXT_PLAIN),
+                description = DESC_PASSWORD_NOT_ALLOWED
+            )
         },
         tags = TAG_MCR_USER
     )
@@ -196,6 +204,8 @@ public class MCRUsers {
             throw new BadRequestException(e);
         } catch (MCRUserAlreadyExistsException e) {
             throw new ClientErrorException(Response.Status.CONFLICT, e);
+        } catch (MCRUserPasswordNotAllowedException e) {
+            throw new ForbiddenException(e);
         }
     }
 
@@ -205,7 +215,6 @@ public class MCRUsers {
      * @param userId the ID of the user
      * @return 200 OK with the user data at the requested detail level
      * @throws NotFoundException if no user with the given ID exists
-     * @throws BadRequestException if the detail level is unknown
      */
     @Operation(
         summary = "Returns a single user by ID",
@@ -214,8 +223,8 @@ public class MCRUsers {
             @Parameter(
                 name = "Accept",
                 in = ParameterIn.HEADER,
-                description = DETAIL_LEVEL_DESCRIPTION,
-                example = "application/json; detail=SUMMARY",
+                description = MCRDetailLevelResolver.DETAIL_LEVEL_DESCRIPTION,
+                example = MCRDetailLevelResolver.DETAIL_LEVEL_EXAMPLE,
                 schema = @Schema(type = MCRRestSchemaType.STRING)
             )
         },
@@ -250,7 +259,7 @@ public class MCRUsers {
     @MCRRestRequiredPermission(PERMISSION_MANAGE_USER)
     public Response getUser(@PathParam(PARAM_USER_ID) String userId) {
         try {
-            return switch (getDetailLevel()) {
+            return switch (MCRDetailLevelResolver.resolve(request)) {
                 case SUMMARY -> Response.ok(userService.getUserSummary(userId)).build();
                 case DETAILED -> Response.ok(userService.getUserDetail(userId)).build();
                 default -> Response.ok(userService.getUserStandard(userId)).build();
@@ -279,8 +288,8 @@ public class MCRUsers {
             @Parameter(
                 name = "Accept",
                 in = ParameterIn.HEADER,
-                description = DETAIL_LEVEL_DESCRIPTION,
-                example = "application/json; detail=SUMMARY",
+                description = MCRDetailLevelResolver.DETAIL_LEVEL_DESCRIPTION,
+                example = MCRDetailLevelResolver.DETAIL_LEVEL_EXAMPLE,
                 schema = @Schema(type = MCRRestSchemaType.STRING)
             )
         },
@@ -355,7 +364,7 @@ public class MCRUsers {
         MCRUserService.MCRUserFilter filter
             = new MCRUserService.MCRUserFilter(idPattern, realm, namePattern, mailPattern);
 
-        return switch (getDetailLevel()) {
+        return switch (MCRDetailLevelResolver.resolve(request)) {
             case SUMMARY -> pageResponse(userService.listSummary(filter, offset, limit));
             case DETAILED -> pageResponse(userService.listDetail(filter, offset, limit));
             default -> pageResponse(userService.listStandard(filter, offset, limit));
@@ -369,7 +378,10 @@ public class MCRUsers {
      * @param updateUserDto the request body containing the updated user data
      * @return 204 No Content
      * @throws NotFoundException if no user with the given ID exists
-     * @throws BadRequestException if the user data is invalid
+     * @throws BadRequestException if the user data is invalid, or a password was given and the
+     *         user is not in the local realm
+     * @throws ForbiddenException if a password was given and the caller is not permitted to
+     *         change it
      */
     @Operation(
         summary = "Updates an existing user by ID",
@@ -392,6 +404,11 @@ public class MCRUsers {
                 content = @Content(mediaType = MediaType.TEXT_PLAIN),
                 description = DESC_INVALID_BODY_CONTENT
             ),
+            @ApiResponse(
+                responseCode = FORBIDDEN,
+                content = @Content(mediaType = MediaType.TEXT_PLAIN),
+                description = DESC_PASSWORD_NOT_ALLOWED
+            ),
             @ApiResponse(responseCode = NO_CONTENT, description = "User successfully updated"),
         },
         tags = TAG_MCR_USER
@@ -407,8 +424,10 @@ public class MCRUsers {
             return Response.noContent().build();
         } catch (MCRUserNotFoundException e) {
             throw new NotFoundException(e);
-        } catch (MCRUserValidationException e) {
+        } catch (MCRUserValidationException | MCRUserNoLocalPasswordException e) {
             throw new BadRequestException(e);
+        } catch (MCRUserPasswordNotAllowedException e) {
+            throw new ForbiddenException(e);
         }
     }
 
@@ -455,6 +474,9 @@ public class MCRUsers {
     @MCRRequireTransaction
     @MCRRestRequiredPermission(PERMISSION_MANAGE_USER)
     public Response patchUser(@PathParam(PARAM_USER_ID) String userId, JsonPatch patch) {
+        if (patch == null) {
+            throw new BadRequestException("request body is required");
+        }
         try {
             MCRUserDetail existing = userService.getUserDetail(userId);
             JsonNode userNode = objectMapper.valueToTree(existing);
@@ -471,6 +493,64 @@ public class MCRUsers {
             throw new BadRequestException(e);
         } catch (JsonProcessingException | JsonPatchException e) {
             throw new BadRequestException("Cannot patch user: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Sets the password of an existing user.
+     *
+     * @param userId the ID of the user whose password should be set
+     * @param setPasswordDto the request body containing the new password
+     * @return 204 No Content
+     * @throws NotFoundException if no user with the given ID exists
+     * @throws BadRequestException if the new password is invalid
+     * @throws ForbiddenException if the caller is not permitted to change the password
+     */
+    @Operation(
+        summary = "Sets the password of an existing user",
+        security = @SecurityRequirement(name = PERMISSION_MANAGE_USER),
+        requestBody = @RequestBody(
+            required = true,
+            content = @Content(
+                mediaType = MediaType.APPLICATION_JSON,
+                schema = @Schema(implementation = MCRSetPasswordRequest.class)
+            )
+        ),
+        responses = {
+            @ApiResponse(
+                responseCode = NOT_FOUND,
+                content = @Content(mediaType = MediaType.TEXT_PLAIN),
+                description = DESC_USER_NOT_FOUND
+            ),
+            @ApiResponse(
+                responseCode = BAD_REQUEST,
+                content = @Content(mediaType = MediaType.TEXT_PLAIN),
+                description = DESC_INVALID_BODY_CONTENT
+            ),
+            @ApiResponse(
+                responseCode = FORBIDDEN,
+                content = @Content(mediaType = MediaType.TEXT_PLAIN),
+                description = DESC_PASSWORD_NOT_ALLOWED
+            ),
+            @ApiResponse(responseCode = NO_CONTENT, description = "Password successfully set"),
+        },
+        tags = TAG_MCR_USER
+    )
+    @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/{" + PARAM_USER_ID + "}/password")
+    @MCRRequireTransaction
+    @MCRRestRequiredPermission(PERMISSION_MANAGE_USER)
+    public Response setUserPassword(@PathParam(PARAM_USER_ID) String userId, MCRSetPasswordRequest setPasswordDto) {
+        try {
+            userService.setPassword(userId, setPasswordDto);
+            return Response.noContent().build();
+        } catch (MCRUserNotFoundException e) {
+            throw new NotFoundException(e);
+        } catch (MCRUserValidationException | MCRUserNoLocalPasswordException e) {
+            throw new BadRequestException(e);
+        } catch (MCRUserPasswordNotAllowedException e) {
+            throw new ForbiddenException(e);
         }
     }
 
@@ -511,23 +591,6 @@ public class MCRUsers {
         return Response.ok(page.users())
             .header(MCRRestConstants.HEADER_X_TOTAL_COUNT, page.total())
             .build();
-    }
-
-    // TODO move to MCRRestUtils?
-    // TODO case-sensitive?
-    private MCRDetailLevel getDetailLevel() {
-        Optional<String> detailLevelOptional = request.getAcceptableMediaTypes().stream()
-            .flatMap(m -> m.getParameters().entrySet().stream()
-                .filter(e -> MCRDetailLevel.MEDIA_TYPE_PARAMETER.equals(e.getKey()))).map(Map.Entry::getValue)
-            .findFirst();
-        if (detailLevelOptional.isEmpty()) {
-            return MCRDetailLevel.NORMAL;
-        }
-        try {
-            return MCRDetailLevel.valueOf(detailLevelOptional.get());
-        } catch (IllegalArgumentException e) {
-            throw new BadRequestException("Unknown detail level: " + detailLevelOptional.get(), e);
-        }
     }
 
     /**
