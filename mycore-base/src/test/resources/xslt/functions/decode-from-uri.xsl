@@ -15,9 +15,12 @@
       <encoded>
         <xsl:value-of select="encode-for-uri($value)"/>
       </encoded>
-      <decoded>
+      <url-decoded>
         <xsl:value-of select="mcrurl:decode-from-uri(encode-for-uri($value))"/>
-      </decoded>
+      </url-decoded>
+      <form-decoded>
+        <xsl:value-of select="mcrurl:decode-from-uri(encode-for-uri($value), true())"/>
+      </form-decoded>
     </result>
   </xsl:template>
 

@@ -18,27 +18,29 @@
 
 package org.mycore.common.xsl.uriresolver;
 
-import org.jdom2.CDATA;
-import org.jdom2.IllegalDataException;
-
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.regex.Pattern;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
+
+import org.jdom2.Verifier;
 
 /**
  * A {@link MCRDecodeFromURIURIResolver} is a {@link URIResolver} that accepts an URL-encoded
  * string, reverses what the built-in XSLT-function <code>encode-for-uri</code> does
  * and returns it as a <code>string</code>-element using {@link MCRURIResolverResponse#ofString(String)}.
+ * <p>
+ * Optionally, it also decodes <code>+</code> characters into spaces, so it can be used for form-encoded strings.
  */
-public class MCRDecodeFromURIURIResolver implements URIResolver {
+public final class MCRDecodeFromURIURIResolver implements URIResolver {
 
     /**
      * Resolves the given URI by URL-decoding the provided value
      * <p>URI Syntax:
      * <pre>
-     *   &lt;scheme&gt;:&lt;url-encoded-value&gt;
+     *   &lt;scheme&gt;:&lt;url-encoded-value&gt;[?supportFormEncoding=true]
      * </pre>
      * <p>Example request:
      * <pre>
@@ -58,8 +60,13 @@ public class MCRDecodeFromURIURIResolver implements URIResolver {
     @Override
     public Source resolve(String href, String base) throws TransformerException {
 
-        String encodedValue = href.substring(href.indexOf(':') + 1);
-        String string = decode(encodedValue);
+        String encodedValueAndParameters = href.substring(href.indexOf(':') + 1);
+        String[] parts = encodedValueAndParameters.split(Pattern.quote("?"), 2);
+        String encodedValue = parts[0];
+        String parameters = parts.length > 1 ? parts[1] : "";
+        boolean supportFormEncoding = parameters.contains("supportFormEncoding=true");
+
+        String string = decode(encodedValue, supportFormEncoding);
 
         return MCRURIResolverResponse.ofString(string);
 
@@ -67,16 +74,27 @@ public class MCRDecodeFromURIURIResolver implements URIResolver {
 
     /**
      * Reverses what the built-in XSLT-function <code>encode-for-uri</code> does.
+     * <p>
+     * Optionally, it also decodes <code>+</code> characters into spaces, so it can be used for form-encoded strings.
      * @param encodedValue a URL-encoded value
+     * @param supportFormEncoding whether to support form-decoding
      * @return the URL-decoded value
      */
-    public static String decode(String encodedValue) throws TransformerException {
+    public static String decode(String encodedValue, boolean supportFormEncoding) throws TransformerException {
+        String type = supportFormEncoding ? "form" : "URL";
         try {
-            return new CDATA(URLDecoder.decode(encodedValue, StandardCharsets.UTF_8)).getText();
-        } catch (IllegalDataException e) {
-            throw new TransformerException("Non-printable decoded value: " + encodedValue, e);
+            if (!supportFormEncoding) {
+                encodedValue = encodedValue.replace("+", "%2B");
+            }
+            String decodedValue = URLDecoder.decode(encodedValue, StandardCharsets.UTF_8);
+            String reason = Verifier.checkCharacterData(decodedValue);
+            if (reason != null) {
+                throw new TransformerException(
+                    "Non-printable " + type + "-decoded value (" + reason + "): " + encodedValue);
+            }
+            return decodedValue;
         } catch (IllegalArgumentException e) {
-            throw new TransformerException("Not an URL-encoded value: " + encodedValue, e);
+            throw new TransformerException("Invalid " + type + "-encoded value: " + encodedValue, e);
         }
     }
 
