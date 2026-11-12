@@ -20,7 +20,6 @@ package org.mycore.common.xsl;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TreeSet;
@@ -46,7 +45,7 @@ import org.mycore.common.config.annotation.MCRSentinel;
  * <ul>
  *   <li>{@code Factory.Class} – the {@link SAXTransformerFactory} implementation</li>
  *   <li>{@code SupportsConcurrency} – {@code true} if the factory may be used by several threads at the same
- *   time; otherwise access is serialized (default: {@code false})</li>
+ *   time; otherwise access is serialized (required)</li>
  *   <li>{@code Initializers.{n}.Class} – optional {@link FactoryInitializer} instances applied to the factory
  *   in order</li>
  * </ul>
@@ -119,8 +118,9 @@ public final class MCRXSLTProcessorRegistry {
         }
         if (processor == null) {
             throw new MCRConfigurationException("Unknown XSLT processor ID '" + id
-                + "'. Use one of " + new TreeSet<>(processors.keySet()) + " or register the ID under '"
-                + ENTRIES_PROPERTY_PREFIX + id + "." + FACTORY_KEY + ".Class'.");
+                + "'. Use one of " + new TreeSet<>(processors.keySet()) + " or register the ID by setting '"
+                + ENTRIES_PROPERTY_PREFIX + id + "." + FACTORY_KEY + ".Class' and '"
+                + ENTRIES_PROPERTY_PREFIX + id + "." + SUPPORTS_CONCURRENCY_KEY + "'.");
         }
         return processor;
     }
@@ -187,7 +187,7 @@ public final class MCRXSLTProcessorRegistry {
             @MCRInstance(name = FACTORY_KEY, valueClass = SAXTransformerFactory.class)
             public SAXTransformerFactory factory;
 
-            @MCRProperty(name = SUPPORTS_CONCURRENCY_KEY, required = false)
+            @MCRProperty(name = SUPPORTS_CONCURRENCY_KEY)
             public String supportsConcurrency;
 
             @MCRSentinel
@@ -197,20 +197,7 @@ public final class MCRXSLTProcessorRegistry {
             @Override
             public Entry get() {
                 initializers.forEach(initializer -> initializer.initialize(factory));
-                return new Entry(factory, parseBoolean(supportsConcurrency));
-            }
-
-            private boolean parseBoolean(String value) {
-                if (value == null) {
-                    return false;
-                }
-                return switch (value.trim().toLowerCase(Locale.ROOT)) {
-                    case "true" -> true;
-                    case "false" -> false;
-                    default -> throw new MCRConfigurationException("Invalid value '" + value + "' for property '"
-                        + SUPPORTS_CONCURRENCY_KEY + "' of transformer factory " + factory.getClass().getName()
-                        + ". Use 'true' or 'false'.");
-                };
+                return new Entry(factory, Boolean.parseBoolean(supportsConcurrency));
             }
 
         }

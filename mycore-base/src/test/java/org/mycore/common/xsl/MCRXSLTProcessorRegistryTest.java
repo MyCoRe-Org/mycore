@@ -53,6 +53,7 @@ public class MCRXSLTProcessorRegistryTest {
         @MCRTestProperty(key = ENTRIES_PREFIX + "configured.Initializers.10.Class",
             classNameOf = TestInitializer.class),
         @MCRTestProperty(key = ENTRIES_PREFIX + "configured.Initializers.10.Enabled", string = "true"),
+        @MCRTestProperty(key = ENTRIES_PREFIX + "configured.SupportsConcurrency", string = "false"),
         @MCRTestProperty(key = ENTRIES_PREFIX + "concurrent.Factory.Class",
             classNameOf = MCRXalanTransformerFactory.class),
         @MCRTestProperty(key = ENTRIES_PREFIX + "concurrent.SupportsConcurrency", string = "true")
@@ -69,11 +70,10 @@ public class MCRXSLTProcessorRegistryTest {
 
     @Test
     @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = ENTRIES_PREFIX + "invalid.Factory.Class",
-            classNameOf = MCRXalanTransformerFactory.class),
-        @MCRTestProperty(key = ENTRIES_PREFIX + "invalid.SupportsConcurrency", string = "yes")
+        @MCRTestProperty(key = ENTRIES_PREFIX + "incomplete.Factory.Class",
+            classNameOf = MCRXalanTransformerFactory.class)
     })
-    public void rejectsInvalidSupportsConcurrencyValue() {
+    public void rejectsMissingSupportsConcurrency() {
         assertThrows(MCRConfigurationException.class, () -> MCRConfiguration2.getInstanceOfOrThrow(
             MCRXSLTProcessorRegistry.class, TEST_PREFIX));
     }

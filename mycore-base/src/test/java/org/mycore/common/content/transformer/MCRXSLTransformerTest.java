@@ -29,6 +29,7 @@ import java.util.List;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
 import org.apache.logging.log4j.core.config.Property;
 import org.apache.xalan.processor.TransformerFactoryImpl;
@@ -126,8 +127,7 @@ public class MCRXSLTransformerTest {
     }
 
     private List<String> collectWarnings(Runnable action) {
-        org.apache.logging.log4j.core.Logger logger =
-            (org.apache.logging.log4j.core.Logger) LogManager.getLogger(MCRXSLTProcessorSelector.class);
+        Logger logger = (Logger) LogManager.getLogger(MCRXSLTProcessorSelector.class);
         CollectingAppender appender = new CollectingAppender();
         appender.start();
         logger.addAppender(appender);

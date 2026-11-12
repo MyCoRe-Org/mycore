@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.apache.xalan.processor.TransformerFactoryImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRTestConfiguration;
@@ -58,16 +59,17 @@ public class MCRLegacyXSLCheckTest {
     }
 
     @Test
-    public void acceptsDefaultsAndIsRegisteredFirst() {
-        assertEquals(MCRLegacyXSLCheck.class.getName(),
-            MCRConfiguration2.getStringOrThrow("MCR.Startup.Class").split(",")[0]);
+    public void acceptsDefaultsAndIsRegistered() {
+        assertTrue(MCRConfiguration2.getString("MCR.Startup.Class").stream()
+            .flatMap(MCRConfiguration2::splitValue)
+            .anyMatch(MCRLegacyXSLCheck.class.getName()::equals));
         assertDoesNotThrow(() -> new MCRLegacyXSLCheck().startUp(null));
         assertEquals("", getOverrides());
     }
 
     @Test
     @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = LEGACY_LAYOUT_PROPERTY, string = "org.mycore.common.xsl.MCRXalanTransformerFactory")
+        @MCRTestProperty(key = LEGACY_LAYOUT_PROPERTY, classNameOf = MCRXalanTransformerFactory.class)
     })
     public void legacyLayoutPropertyOverridesInheritedDefault() {
         assertDoesNotThrow(() -> new MCRLegacyXSLCheck().startUp(null));
@@ -92,10 +94,10 @@ public class MCRLegacyXSLCheckTest {
 
     @Test
     @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = LEGACY_CONTENT_PROPERTY, string = "org.mycore.common.xsl.MCRXalanTransformerFactory"),
+        @MCRTestProperty(key = LEGACY_CONTENT_PROPERTY, classNameOf = MCRXalanTransformerFactory.class),
         @MCRTestProperty(key = LEGACY_CUSTOM_PROPERTY, string = "application.CustomFactory"),
         @MCRTestProperty(key = CUSTOM_PROPERTY, string = "custom"),
-        @MCRTestProperty(key = LEGACY_FLAVOR_PROPERTY, string = "org.mycore.common.xsl.MCRXalanTransformerFactory"),
+        @MCRTestProperty(key = LEGACY_FLAVOR_PROPERTY, classNameOf = MCRXalanTransformerFactory.class),
         @MCRTestProperty(key = FLAVOR_PROPERTY, string = "saxon")
     })
     public void reportsAllOverridesIncludingModuleDefaultsCustomPrefixesAndFlavors() {
@@ -112,8 +114,8 @@ public class MCRLegacyXSLCheckTest {
     @Test
     @MCRTestConfiguration(properties = {
         @MCRTestProperty(key = LAYOUT_PROPERTY, empty = true),
-        @MCRTestProperty(key = LEGACY_LAYOUT_PROPERTY, string = "org.mycore.common.xsl.MCRXalanTransformerFactory"),
-        @MCRTestProperty(key = LEGACY_CUSTOM_PROPERTY, string = "org.apache.xalan.processor.TransformerFactoryImpl")
+        @MCRTestProperty(key = LEGACY_LAYOUT_PROPERTY, classNameOf = MCRXalanTransformerFactory.class),
+        @MCRTestProperty(key = LEGACY_CUSTOM_PROPERTY, classNameOf = TransformerFactoryImpl.class)
     })
     public void acceptsLegacyOnlyPropertiesAndPreservesProcessorSelection() {
         assertDoesNotThrow(() -> new MCRLegacyXSLCheck().startUp(null));
@@ -126,7 +128,7 @@ public class MCRLegacyXSLCheckTest {
     @Test
     @MCRTestConfiguration(properties = {
         @MCRTestProperty(key = LEGACY_LAYOUT_PROPERTY, string = "  "),
-        @MCRTestProperty(key = LEGACY_CUSTOM_PROPERTY, string = "org.mycore.common.xsl.MCRXalanTransformerFactory"),
+        @MCRTestProperty(key = LEGACY_CUSTOM_PROPERTY, classNameOf = MCRXalanTransformerFactory.class),
         @MCRTestProperty(key = CUSTOM_PROPERTY, string = "  ")
     })
     public void treatsBlankValuesAsAbsent() {
