@@ -44,6 +44,14 @@ public class ImageOverviewController extends SideBarController {
     public void clickImageByOrder(String orderLabel) {
         clickElementByXpath(
             String.format(Locale.ROOT, "//div[@class=\"caption\" and contains(text(),\"%s\")]", orderLabel));
+        awaitImageSelected(orderLabel);
+    }
+
+    /**
+     * Waits until the image with the given <b>orderLabel</b> is marked as selected.
+     */
+    public void awaitImageSelected(String orderLabel) {
+        waitUntil(orderLabel + " to be selected", () -> isImageSelected(orderLabel));
     }
 
     /**
