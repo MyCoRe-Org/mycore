@@ -19,9 +19,13 @@
 package org.mycore.common.xsl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.security.SecureRandom;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,11 +56,15 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRConstants;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.xsl.uriresolver.MCRURIResolver;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.test.MyCoReTest;
 import org.xml.sax.SAXException;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @MyCoReTest
 public class MCRParameterCollectorTest {
@@ -251,6 +259,33 @@ public class MCRParameterCollectorTest {
         speedTest(randomParameters100, saxonTransformer);
         speedTest(randomParameters1000, saxonTransformer);
         speedTest(randomParameters10000, saxonTransformer);
+    }
+
+    @Test
+    public void unmodifiableParametersNotOverwrittenByRequest() {
+        String baseURL = "https://www.example.com/mir/";
+        MCRSessionMgr.getCurrentSession().put(MCRFrontendUtil.BASE_URL_ATTRIBUTE, baseURL);
+
+        Map<String, String> requestParameters = Map.of(
+            "XSL.WebApplicationBaseURL", "foo",
+            "XSL.ServletsBaseURL", "foo",
+            "XSL.CurrentUser", "foo",
+            "XSL.DefaultLang", "foo",
+            "XSL.Custom", "bar");
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getParameterNames()).thenReturn(Collections.enumeration(requestParameters.keySet()));
+        requestParameters.forEach((name, value) -> when(request.getParameter(name)).thenReturn(value));
+        when(request.getAttributeNames()).thenReturn(Collections.emptyEnumeration());
+        when(request.getRequestURI()).thenReturn("/mir/receive/foo");
+
+        MCRParameterCollector collector = new MCRParameterCollector(request);
+
+        assertEquals(baseURL, collector.getParameter("WebApplicationBaseURL", null));
+        assertEquals(baseURL + "servlets/", collector.getParameter("ServletsBaseURL", null));
+        assertEquals(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID(),
+            collector.getParameter("CurrentUser", null));
+        assertNotEquals("foo", collector.getParameter("DefaultLang", null));
+        assertEquals("bar", collector.getParameter("Custom", null));
     }
 
     @BeforeEach
