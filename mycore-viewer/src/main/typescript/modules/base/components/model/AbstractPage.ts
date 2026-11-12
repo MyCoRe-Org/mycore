@@ -29,9 +29,9 @@ export interface AbstractPage {
   /**
    * Number of asynchronous operations - image loads, render tasks - that still have to complete before this page is
    * completely painted. As long as this is greater than zero the canvas may show nothing or a partial image, even
-   * though it does not change any more.
+   * though it does not change any more. Optional, a page that does not implement it counts as having nothing pending.
    */
-  pendingRenderOperations(): number;
+  pendingRenderOperations?(): number;
 
   toString(): string;
 }

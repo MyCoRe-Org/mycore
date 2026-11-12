@@ -206,6 +206,8 @@ export class PDFPage implements AbstractPage {
     };
 
     const error = (err) => {
+      // the render task is finished, even though it failed, so it must not count as pending any more
+      this._promiseRunning = false;
       console.log("Render Error", err);
     };
 

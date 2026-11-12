@@ -123,7 +123,7 @@ export class PageController {
       pending++;
     }
     this._pageArea.getPagesInViewport(this._viewport).forEach(page => {
-      pending += page.pendingRenderOperations();
+      pending += page.pendingRenderOperations?.() ?? 0;
     });
     return pending;
   }

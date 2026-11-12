@@ -32,6 +32,11 @@ export class TileImagePage implements AbstractPage {
   protected vTilePath: string[];
   protected vTiles: MyCoReMap<Position3D, HTMLImageElement> = new MyCoReMap<Position3D, HTMLImageElement>();
   protected vLoadingTiles: MyCoReMap<Position3D, HTMLImageElement> = new MyCoReMap<Position3D, HTMLImageElement>();
+  /**
+   * Tiles that failed to load. They are not requested again until {@link clear} is called, so a permanently missing
+   * tile does not cause a request on every redraw.
+   */
+  protected vFailedTiles: MyCoReMap<Position3D, boolean> = new MyCoReMap<Position3D, boolean>();
 
   protected vBackBuffer: HTMLCanvasElement = document.createElement('canvas');
   protected vBackBufferArea: Rect = null;
@@ -118,6 +123,7 @@ export class TileImagePage implements AbstractPage {
     }
 
     this.vLoadingTiles.clear();
+    this.vFailedTiles.clear();
   }
 
   protected updateBackbuffer(startX: number, startY: number,
@@ -244,7 +250,7 @@ export class TileImagePage implements AbstractPage {
     if (this.vTiles.has(tilePos)) {
       return this.vTiles.get(tilePos);
     } else {
-      if (!this.vLoadingTiles.has(tilePos)) {
+      if (!this.vLoadingTiles.has(tilePos) && !this.vFailedTiles.has(tilePos)) {
         this._loadTile(tilePos, (img: HTMLImageElement) => {
           this.vTiles.set(tilePos, img);
           if (typeof this.refreshCallback !== 'undefined' && this.refreshCallback !== null) {
@@ -329,6 +335,7 @@ export class TileImagePage implements AbstractPage {
     image.onerror = () => {
       // a tile that failed is no longer loading, so it must not stay in the map of pending loads
       this.vLoadingTiles.remove(tilePos);
+      this.vFailedTiles.set(tilePos, true);
       errorCallback();
     };
 
