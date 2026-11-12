@@ -40,6 +40,7 @@ import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.content.transformer.MCRXSLTransformer;
+import org.mycore.common.xsl.MCRErrorListener;
 import org.mycore.common.xsl.MCRXSLResourceHelper;
 import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
@@ -188,6 +189,8 @@ public class MCRCommandUtils {
         }
         Transformer transformer = cache.get(style);
         if (transformer != null) {
+            // fresh error listener, the old one keeps the exception of a previous transformation
+            MCRErrorListener.setTo(transformer);
             return transformer;
         }
 
@@ -202,6 +205,7 @@ public class MCRCommandUtils {
                 TransformerFactory transformerFactory = MCRXSLTransformer.createDefaultTransformerFactory();
                 transformerFactory.setURIResolver(MCRURIResolver.obtainInstance());
                 transformer = transformerFactory.newTransformer(new JDOMSource(element));
+                MCRErrorListener.setTo(transformer);
                 cache.put(style, transformer);
                 LOGGER.info("Loaded transformer from resource {} for style {}.", xslFilePath, style);
                 return transformer;
