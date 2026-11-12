@@ -33,6 +33,18 @@
     <manifest.priority>65</manifest.priority>
     <pmd.failOnViolation>false</pmd.failOnViolation>
   </properties>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <systemPropertyVariables>
+            <jersey.config.test.container.port>0</jersey.config.test.container.port>
+          </systemPropertyVariables>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
   <dependencies>
     <dependency>
       <groupId>com.auth0</groupId>
