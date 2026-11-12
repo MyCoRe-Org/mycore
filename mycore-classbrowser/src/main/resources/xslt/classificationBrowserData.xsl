@@ -8,6 +8,7 @@
 
 <xsl:stylesheet version="3.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:mcri18n="http://www.mycore.de/xslt/i18n"
   exclude-result-prefixes="#all">
 
 <xsl:output method="xml" omit-xml-declaration="yes" />
@@ -35,7 +36,7 @@
               <xsl:variable name="btnLabel">
                 <xsl:choose>
                   <xsl:when test="label">
-                    <xsl:value-of select="concat('Kategorie ', label, ' aufklappen')" />
+                    <xsl:value-of select="mcri18n:translate-with-params('component.mods.metaData.displayAll',$completeTitle)" />
                   </xsl:when>
                   <xsl:otherwise>Show subcategories</xsl:otherwise>
                 </xsl:choose>

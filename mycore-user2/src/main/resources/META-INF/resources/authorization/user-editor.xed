@@ -96,10 +96,7 @@
         <xed:output i18n="component.user2.admin.userAccount" />
       </label>
       <label class="visually-hidden" for="realmId">
-        <xed:multi-lang>
-          <xed:lang xml:lang="de">Anmeldebereich</xed:lang>
-          <xed:lang xml:lang="en">Realm</xed:lang>
-        </xed:multi-lang>
+        <xed:output i18n="component.user2.admin.user.realm" />
       </label>
       <div class="col-12 col-md-9 row">
         <xeduser:template name="textInput" xpath="@name" id="userName" inline="true" colsize="sm" colwidth="9"
@@ -116,10 +113,7 @@
         <xed:output i18n="component.user2.admin.userAccount" />
       </label>
       <label class="visually-hidden" for="realmId">
-        <xed:multi-lang>
-          <xed:lang xml:lang="de">Anmeldebereich</xed:lang>
-          <xed:lang xml:lang="en">Realm</xed:lang>
-        </xed:multi-lang>
+        <xed:output i18n="component.user2.admin.user.realm" />
       </label>
       <div class="col-12 col-md-9 row">
         <xeduser:template name="textInput" xpath="@name" id="userName" disabled="true" inline="true" colsize="sm" colwidth="9"

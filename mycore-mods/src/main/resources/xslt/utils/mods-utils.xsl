@@ -400,14 +400,14 @@
 
   <xsl:template match="mods:accessCondition" mode="oa-logo">
     <a rel="license" href="https://open-access.net/">
-      <img src="//open-access.net/fileadmin/logos/OpenAccess_Logo.JPG" style="width: 25%;" alt="OpenAccess logo"/>
+      <img src="//open-access.net/fileadmin/logos/OpenAccess_Logo.JPG" style="width: 25%;" alt="Open access logo"/>
     </a>
   </xsl:template>
 
   <xsl:template match="mods:accessCondition" mode="ogl-logo">
     <xsl:variable name="licenseVersion" select="substring-before(substring-after(@xlink:href, '#ogl_'), '.')" />
     <a rel="license" href="http://www.nationalarchives.gov.uk/doc/open-government-licence/version/{$licenseVersion}/">
-      <img src="//upload.wikimedia.org/wikipedia/en/4/46/UKOpenGovernmentLicence.svg" style="width: 50px;" alt="UKOpenGovernmentLicence.svg" />
+      <img src="//upload.wikimedia.org/wikipedia/en/4/46/UKOpenGovernmentLicence.svg" style="width: 50px;" alt="UK Open Government Licence logo" />
     </a>
   </xsl:template>
 

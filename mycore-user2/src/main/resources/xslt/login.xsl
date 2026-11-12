@@ -63,9 +63,9 @@
             <div class="form-actions">
                 <xsl:choose>
                     <xsl:when test="$direction = 'rtl' ">
-                        <a class="btn btn-dark" href="{../returnURL}">
+                         <button class="btn btn-secondary" type="button" onClick="self.location.href='{../returnURL}'">
                             <xsl:value-of select="mcri18n:translate('component.user2.button.cancel')" />
-                        </a>
+                        </button>
                         <button class="btn btn-primary ms-3" type="submit" name="LoginSubmit">
                             <xsl:value-of select="mcri18n:translate('component.user2.button.login')" />
                         </button>

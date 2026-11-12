@@ -32,7 +32,6 @@
       <xsl:apply-templates select="." mode="toolTip" />
     </xsl:variable>
 
-    <!-- Das sichtbare Label vorab in einer Variable speichern, um es vergleichen zu können -->
     <xsl:variable name="displayLabel">
       <xsl:apply-templates select="." mode="label" />
     </xsl:variable>
@@ -40,7 +39,6 @@
     <xsl:choose>
 	    <xsl:when test="label[lang('x-group')] and not($allSelectable='true')">
 		   	<optgroup>
-		   	  <!-- Titel nur hinzufügen, wenn er sich vom sichtbaren Label unterscheidet -->
 		   	  <xsl:if test="normalize-space($toolTip) != normalize-space($displayLabel)">
 		   	    <xsl:attribute name="title"><xsl:value-of select="$toolTip"/></xsl:attribute>
 		   	  </xsl:if>
@@ -56,7 +54,6 @@
 	    </xsl:when>
 	    <xsl:otherwise>
 	        <option>
-	          <!-- Titel nur hinzufügen, wenn er sich vom sichtbaren Label unterscheidet -->
 	          <xsl:if test="normalize-space($toolTip) != normalize-space($displayLabel)">
 	            <xsl:attribute name="title"><xsl:value-of select="$toolTip"/></xsl:attribute>
 	          </xsl:if>
