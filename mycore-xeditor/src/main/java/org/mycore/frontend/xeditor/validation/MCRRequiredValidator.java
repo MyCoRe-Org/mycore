@@ -46,6 +46,10 @@ public class MCRRequiredValidator extends MCRValidator {
         }
 
         String absPath = binding.getAbsoluteXPath();
+        if (isCheckSkipped(results, absPath)) {
+            return true;
+        }
+
         if (!isRelevant(binding)) {
             return true;
         }

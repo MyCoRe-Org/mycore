@@ -62,6 +62,10 @@ public class MCRExternalValidator extends MCRValidator {
         boolean isValid = true; // all nodes must validate
         for (Object node : binding.getBoundNodes()) {
             String absPath = MCRXPathBuilder.buildXPath(node);
+            if (isCheckSkipped(results, absPath)) {
+                continue;
+            }
+
             Boolean result = isValid(node);
             if (result == null) {
                 continue;

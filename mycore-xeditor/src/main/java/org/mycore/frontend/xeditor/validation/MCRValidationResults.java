@@ -52,6 +52,8 @@ public class MCRValidationResults {
 
     private Map<String, String> xPath2Marker = new HashMap<>();
 
+    private SequencedMap<String, MCRValidator> xPath2FailedRule = new LinkedHashMap<>();
+
     private SequencedMap<FailedRuleKey, MCRValidator> failedRules = new LinkedHashMap<>();
 
     private boolean isValid = true;
@@ -69,6 +71,7 @@ public class MCRValidationResults {
             xPath2Marker.put(xPath, MARKER_ERROR);
             Node ruleElement = failedRule == null ? null : failedRule.getRuleElement();
             failedRules.putIfAbsent(new FailedRuleKey(xPath, ruleElement), failedRule);
+            xPath2FailedRule.putIfAbsent(xPath, failedRule);
             this.isValid = false;
         }
     }
@@ -81,12 +84,7 @@ public class MCRValidationResults {
      * Returns the first failed rule for the given absolute XPath, or {@code null} if no rule failed there.
      */
     public MCRValidator getFailedRule(String xPath) {
-        for (Map.Entry<FailedRuleKey, MCRValidator> failedRule : failedRules.entrySet()) {
-            if (xPath.equals(failedRule.getKey().xPath())) {
-                return failedRule.getValue();
-            }
-        }
-        return null;
+        return xPath2FailedRule.get(xPath);
     }
 
     /**
