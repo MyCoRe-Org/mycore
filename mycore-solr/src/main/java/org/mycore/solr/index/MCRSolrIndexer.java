@@ -54,8 +54,8 @@ import org.mycore.common.events.MCRShutdownHandler.Closeable;
 import org.mycore.common.processing.MCRProcessableDefaultCollection;
 import org.mycore.common.processing.MCRProcessableManager;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.datamodel.metadata.MCRExpandedObject;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.solr.MCRSolrCore;
@@ -385,8 +385,7 @@ public class MCRSolrIndexer {
                 LOGGER.debug("Preparing \"{}\" for indexing", id);
                 MCRObjectID objId = MCRObjectID.getInstance(id);
 
-                MCRExpandedObject mcrObject = MCRMetadataManager.retrieveMCRExpandedObject(objId);
-                MCRContent content = new MCRBaseContent(mcrObject);
+                MCRContent content = retrieveIndexContent(objId);
                 contentMap.put(objId, content);
                 if (i % BULK_SIZE == 0 || totalCount == i) {
                     MCRSolrIndexHandler indexHandler = MCRSolrIndexHandlerFactory.obtainInstance()
@@ -410,6 +409,11 @@ public class MCRSolrIndexer {
         if (statistic != null) {
             statistic.addTime(durationInMilliSeconds);
         }
+    }
+
+    static MCRContent retrieveIndexContent(MCRObjectID objId) {
+        MCRBase mcrBase = MCRMetadataManager.retrieveMCRExpandedObject(objId);
+        return new MCRBaseContent(mcrBase);
     }
 
     /**
