@@ -50,26 +50,24 @@
 
         <table id="sessionListingTable" class="table">
           <tr>
-            <th data-criteria="login" role="button" tabindex="0" onclick="mycore.session.listing.sortByLogin()">
+            <th data-criteria="login" onclick="mycore.session.listing.sortByLogin()">
               <xsl:value-of select="mcri18n:translate('component.session-listing.login')"/>
               <i class="fas fa-sort "></i>
             </th>
-            <th data-criteria="ip" role="button" tabindex="0" onclick="mycore.session.listing.sortByIP()">
+            <th data-criteria="ip" onclick="mycore.session.listing.sortByIP()">
               <xsl:value-of select="mcri18n:translate('component.session-listing.ip')"/>
               <i class="fas fa-sort "></i>
             </th>
-            <th data-criteria="createTime" role="button" tabindex="0"
-                onclick="mycore.session.listing.sortByFirstAccess()">
+            <th data-criteria="createTime" onclick="mycore.session.listing.sortByFirstAccess()">
               <xsl:value-of select="mcri18n:translate('component.session-listing.firstAccess')"/>
               <i class="fas fa-sort "></i>
             </th>
-            <th data-criteria="lastAccess" role="button" tabindex="0"
+            <th data-criteria="lastAccess" 
                 onclick="mycore.session.listing.sortByLastAccess()">
               <xsl:value-of select="mcri18n:translate('component.session-listing.lastAccess')"/>
               <i class="fas fa-sort "></i>
             </th>
-            <th data-criteria="stackTrace" role="button" tabindex="0"
-                onclick="mycore.session.listing.sortByStacktrace()">
+            <th data-criteria="stackTrace" onclick="mycore.session.listing.sortByStacktrace()">
               Stacktrace
               <i class="fas fa-sort "></i>
             </th>
