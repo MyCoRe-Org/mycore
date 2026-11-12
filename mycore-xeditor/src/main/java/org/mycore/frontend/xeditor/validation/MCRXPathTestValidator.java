@@ -56,7 +56,7 @@ public class MCRXPathTestValidator extends MCRValidator {
             Object node = boundNodes.get(i);
 
             String absPath = MCRXPathBuilder.buildXPath(node);
-            if (results.hasError(absPath)) {
+            if (isCheckSkipped(results, absPath)) {
                 continue;
             }
 
