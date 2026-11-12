@@ -412,7 +412,9 @@ public class MCRSolrIndexer {
     }
 
     static MCRContent retrieveIndexContent(MCRObjectID objId) {
-        MCRBase mcrBase = MCRMetadataManager.retrieveMCRExpandedObject(objId);
+        MCRBase mcrBase = MCRDerivate.OBJECT_TYPE.equals(objId.getTypeId())
+            ? MCRMetadataManager.retrieveMCRDerivate(objId)
+            : MCRMetadataManager.retrieveMCRExpandedObject(objId);
         return new MCRBaseContent(mcrBase);
     }
 
