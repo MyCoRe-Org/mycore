@@ -324,24 +324,24 @@ public final class MCRMetadataManager {
         if (!MCRAccessManager.checkDerivateContentPermission(id, PERMISSION_DELETE)) {
             throw new MCRMissingPermissionException("Delete derivate", id.toString(), PERMISSION_DELETE);
         }
-        // mark for deletion
-        MCRMarkManager.getInstance().mark(id, Operation.DELETE);
-
-        // delete data from IFS
-        if (mcrDerivate.getDerivate().getInternals() != null) {
-            try {
-                deleteDerivate(id.toString());
-                LOGGER.info("IFS entries for MCRDerivate {} are deleted.", id);
-            } catch (final Exception e) {
-                throw new MCRPersistenceException("Error while delete MCRDerivate " + id + " in IFS", e);
+        markForDeletion(id);
+        try {
+            // delete data from IFS
+            if (mcrDerivate.getDerivate().getInternals() != null) {
+                try {
+                    deleteDerivate(id.toString());
+                    LOGGER.info("IFS entries for MCRDerivate {} are deleted.", id);
+                } catch (final Exception e) {
+                    throw new MCRPersistenceException("Error while delete MCRDerivate " + id + " in IFS", e);
+                }
             }
+
+            // handle events
+            fireEvent(mcrDerivate, null, MCREvent.EventType.DELETE);
+        } finally {
+            // remove mark even if deletion failed, otherwise all further updates would be ignored
+            removeMark(id);
         }
-
-        // handle events
-        fireEvent(mcrDerivate, null, MCREvent.EventType.DELETE);
-
-        // remove mark
-        MCRMarkManager.getInstance().remove(id);
     }
 
     /**
@@ -402,24 +402,26 @@ public final class MCRMetadataManager {
         checkForActiveLinks(id);
 
         markForDeletion(id);
+        try {
+            removeAllChildren(id);
 
-        removeAllChildren(id);
+            removeAllDerivates(id);
 
-        removeAllDerivates(id);
-
-        if (mcrObject == null) {
-            try {
-                mcrObject = retrieveMCRObject(id);
-            } catch (MCRPersistenceException e) {
-                LOGGER.error(() -> "Error while deleting " + id + ". Unable to retrieve MCRObject from disk. Create " +
-                    "empty mycoreobject for event handling as fallback.", e);
-                mcrObject = new MCRObject();
-                mcrObject.setId(id);
+            if (mcrObject == null) {
+                try {
+                    mcrObject = retrieveMCRObject(id);
+                } catch (MCRPersistenceException e) {
+                    LOGGER.error(() -> "Error while deleting " + id + ". Unable to retrieve MCRObject from disk. " +
+                        "Create empty mycoreobject for event handling as fallback.", e);
+                    mcrObject = new MCRObject();
+                    mcrObject.setId(id);
+                }
             }
+            fireEvent(mcrObject, null, MCREvent.EventType.DELETE);
+        } finally {
+            // remove mark even if deletion failed, otherwise all further updates would be ignored
+            removeMark(id);
         }
-        fireEvent(mcrObject, null, MCREvent.EventType.DELETE);
-
-        removeMark(id);
     }
 
     private static void removeAllChildren(MCRObjectID id)
