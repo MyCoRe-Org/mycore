@@ -70,7 +70,7 @@
   </xsl:template>
 
   <xsl:template match="mycoreobject/service/servdates/servdate[@type='createdate']" mode="identifier">
-    <xsl:variable name="pattern" select="(mcrproperty:get('MCR.DOI.NISSPattern'), 'yyyyMMdd-HHmmss')[1]" />
+    <xsl:variable name="pattern" select="mcrproperty:get-or-else('MCR.DOI.NISSPattern', 'yyyyMMdd-HHmmss')" />
     <xsl:variable name="formatISODate"
       select="string-join(('callJava:org.mycore.common.xml.MCRXMLFunctions:formatISODate',
         encode-for-uri(.), encode-for-uri($pattern), encode-for-uri($CurrentLang)), ':')" />
