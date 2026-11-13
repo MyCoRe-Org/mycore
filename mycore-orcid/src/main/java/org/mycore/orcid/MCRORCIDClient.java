@@ -31,7 +31,12 @@ import org.mycore.common.config.annotation.MCRFactory;
  * against the production registry or the sandbox of orcid.org.
  *
  * @author Frank Lützenkirchen
+ *
+ * @deprecated The module mycore-orcid is deprecated and will be removed.
+ * Use mycore-orcid2 instead.
  */
+@Deprecated(forRemoval = true)
+@SuppressWarnings("removal")
 public final class MCRORCIDClient {
 
     private final WebTarget baseTarget;

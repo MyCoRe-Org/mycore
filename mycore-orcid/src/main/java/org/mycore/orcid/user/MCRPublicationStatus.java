@@ -26,6 +26,12 @@ import org.mycore.orcid.MCRORCIDProfile;
 import org.mycore.orcid.works.MCRWorksSection;
 import org.xml.sax.SAXException;
 
+/**
+ * @deprecated The module mycore-orcid is deprecated and will be removed.
+ * Use mycore-orcid2 instead.
+ */
+@Deprecated(forRemoval = true)
+@SuppressWarnings("removal")
 public class MCRPublicationStatus {
 
     private MCRUserStatus user;

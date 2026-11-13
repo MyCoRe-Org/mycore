@@ -52,8 +52,13 @@ import jakarta.ws.rs.client.ClientBuilder;
  * </ul>
  *
  * @author Frank Lützenkirchen
+ *
+ * @deprecated The module mycore-orcid is deprecated and will be removed.
+ * Use mycore-orcid2 instead.
  */
 @MCRConfigurationProxy(proxyClass = MCROAuthClient.Factory.class)
+@Deprecated(forRemoval = true)
+@SuppressWarnings("removal")
 public final class MCROAuthClient {
 
     private static final String CLIENT_PROPERTY = "MCR.ORCID.OAuth";
