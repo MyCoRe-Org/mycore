@@ -28,11 +28,13 @@ import org.mycore.util.concurrent.MCRFixedUserRunnable;
 
 public class MCRCommandCronJob extends MCRCronjob {
 
+    public static final String DEFAULT_PROPERTY_PREFIX = "MCR.CronJob.Default.Command";
+
     private String user;
 
     private String command;
 
-    @MCRProperty(name = "User", defaultName = "MCR.CronJob.Default.Command.User")
+    @MCRProperty(name = "User", defaultNamePrefix = DEFAULT_PROPERTY_PREFIX)
     public void setUser(String user) {
         this.user = user;
     }

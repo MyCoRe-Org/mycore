@@ -42,6 +42,7 @@ import jakarta.persistence.ValidationMode;
 
 public class MCRPersistenceUnitDescriptor implements PersistenceUnitDescriptor {
 
+    public static final String DEFAULT_PROPERTY_PREFIX = "MCR.JPA";
     public static final String MCR_PERSISTENCE_PROPERTIES_PREFIX = "Properties.";
     private static final Logger LOGGER = LogManager.getLogger();
     private String persistenceProviderClassName;
@@ -64,32 +65,33 @@ public class MCRPersistenceUnitDescriptor implements PersistenceUnitDescriptor {
         LOGGER.info("Initialized persistence unit {}", this.name);
     }
 
-    @MCRProperty(name = "PersistenceProviderClassName", required = false, defaultName = "MCR.JPA.ProviderClassName")
+    @MCRProperty(name = "PersistenceProviderClassName", required = false, defaultNamePrefix = DEFAULT_PROPERTY_PREFIX,
+        defaultName = "ProviderClassName")
     public void setPersistenceProviderClassName(String persistenceProviderClassName) {
         this.persistenceProviderClassName = persistenceProviderClassName;
     }
 
-    @MCRProperty(name = "UseQuotedIdentifiers", required = false, defaultName = "MCR.JPA.UseQuotedIdentifiers")
+    @MCRProperty(name = "UseQuotedIdentifiers", required = false, defaultNamePrefix = DEFAULT_PROPERTY_PREFIX)
     public void setUseQuotedIdentifiersString(String useQuotedIdentifiersString) {
         setUseQuotedIdentifiers(Boolean.parseBoolean(useQuotedIdentifiersString));
     }
 
-    @MCRProperty(name = "ExcludeUnlistedClasses", required = false, defaultName = "MCR.JPA.ExcludeUnlistedClasses")
+    @MCRProperty(name = "ExcludeUnlistedClasses", required = false, defaultNamePrefix = DEFAULT_PROPERTY_PREFIX)
     public void setExcludeUnlistedClassesString(String excludeUnlistedClassesString) {
         setExcludeUnlistedClasses(Boolean.parseBoolean(excludeUnlistedClassesString));
     }
 
-    @MCRProperty(name = "TransactionType", required = false, defaultName = "MCR.JPA.TransactionType")
+    @MCRProperty(name = "TransactionType", required = false, defaultNamePrefix = DEFAULT_PROPERTY_PREFIX)
     public void setTransactionTypeString(String transactionTypeString) {
         setTransactionType(PersistenceUnitTransactionType.valueOf(transactionTypeString));
     }
 
-    @MCRProperty(name = "ValidationMode", required = false, defaultName = "MCR.JPA.ValidationMode")
+    @MCRProperty(name = "ValidationMode", required = false, defaultNamePrefix = DEFAULT_PROPERTY_PREFIX)
     public void setValidationModeString(String validationModeString) {
         setValidationMode(ValidationMode.valueOf(validationModeString));
     }
 
-    @MCRProperty(name = "SharedCacheMode", required = false, defaultName = "MCR.JPA.SharedCacheMode")
+    @MCRProperty(name = "SharedCacheMode", required = false, defaultNamePrefix = DEFAULT_PROPERTY_PREFIX)
     public void setSharedCacheModeString(String sharedCacheModeString) {
         setSharedCacheMode(SharedCacheMode.valueOf(sharedCacheModeString));
     }
@@ -174,7 +176,7 @@ public class MCRPersistenceUnitDescriptor implements PersistenceUnitDescriptor {
         return managedClassNames;
     }
 
-    @MCRPropertyList(name = "ManagedClassNames", required = false, defaultName = "MCR.JPA.ManagedClassNames")
+    @MCRPropertyList(name = "ManagedClassNames", required = false, defaultNamePrefix = DEFAULT_PROPERTY_PREFIX)
     public void setManagedClassNames(List<String> managedClassNames) {
         this.managedClassNames = managedClassNames;
     }
@@ -184,7 +186,7 @@ public class MCRPersistenceUnitDescriptor implements PersistenceUnitDescriptor {
         return mappingFileNames;
     }
 
-    @MCRPropertyList(name = "MappingFileNames", required = false, defaultName = "MCR.JPA.MappingFileNames")
+    @MCRPropertyList(name = "MappingFileNames", required = false, defaultNamePrefix = DEFAULT_PROPERTY_PREFIX)
     public void setMappingFileNames(List<String> mappingFileNames) {
         this.mappingFileNames = mappingFileNames;
     }
