@@ -21,6 +21,7 @@ package org.mycore.pi.urn.rest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -112,6 +113,11 @@ public class MCRURNGranularRESTServiceTest {
         MCRMetadataManager.create(object);
         MCRMetadataManager.create(derivate);
 
+        MCRPath derivateRoot = MCRPath.getPath(derivate.getId().toString(), "/");
+        try (Stream<Path> content = Files.list(derivateRoot)) {
+            Assert.assertTrue("Derivate should be empty after creation", content.findAny().isEmpty());
+        }
+
         List<MCRPath> fileList = new ArrayList<>();
 
         for (int j = 0; j < numOfDerivFiles; j++) {
@@ -170,7 +176,7 @@ public class MCRURNGranularRESTServiceTest {
         derivate.setSchema("datamodel-derivate.xsd");
         MCRMetaIFS ifs = new MCRMetaIFS();
         ifs.setSubTag("internal");
-        ifs.setSourcePath("");
+        ifs.setSourcePath(null);
         derivate.getDerivate().setInternals(ifs);
         MCRMetaLinkID mcrMetaLinkID = new MCRMetaLinkID();
         mcrMetaLinkID.setReference(objectHrefId.toString(), null, null);
