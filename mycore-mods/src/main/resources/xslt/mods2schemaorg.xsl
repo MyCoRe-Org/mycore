@@ -29,7 +29,7 @@
   Define a transformer
   MCR.ContentTransformer.schemaOrg.Class=org.mycore.common.content.transformer.MCRXSLTransformer
   MCR.ContentTransformer.schemaOrg.Stylesheet=xsl/mods2schemaorg.xsl
-  MCR.ContentTransformer.schemaOrg.TransformerFactoryClass=net.sf.saxon.TransformerFactoryImpl
+  MCR.ContentTransformer.schemaOrg.XSLTProcessor=saxon
 
   Prevent the layout for the transformer
   MCR.LayoutTransformerFactory.Default.Ignore=%MCR.LayoutTransformerFactory.Default.Ignore%,schemaOrg
