@@ -19,6 +19,7 @@
 package org.mycore.pi.urn.rest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -115,7 +116,7 @@ public class MCRURNGranularRESTServiceTest {
 
         MCRPath derivateRoot = MCRPath.getPath(derivate.getId().toString(), "/");
         try (Stream<Path> content = Files.list(derivateRoot)) {
-            Assert.assertTrue("Derivate should be empty after creation", content.findAny().isEmpty());
+            assertTrue(content.findAny().isEmpty(), "Derivate should be empty after creation");
         }
 
         List<MCRPath> fileList = new ArrayList<>();
