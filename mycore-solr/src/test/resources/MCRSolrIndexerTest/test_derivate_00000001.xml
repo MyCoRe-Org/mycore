@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mycorederivate xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="datamodel-derivate.xsd" ID="test_derivate_00000001" version="2025.12" order="1">
+  <derivate>
+    <linkmetas class="MCRMetaLinkID" heritable="false">
+      <linkmeta inherited="0" xlink:type="locator" xlink:href="test_document_00000001" />
+    </linkmetas>
+    <internals class="MCRMetaIFS" heritable="false">
+      <internal inherited="0" maindoc="document.pdf" />
+    </internals>
+  </derivate>
+  <service>
+    <servdates class="MCRMetaISO8601Date">
+      <servdate type="createdate" inherited="0">2026-11-12T00:00:00.000Z</servdate>
+      <servdate type="modifydate" inherited="0">2026-11-12T00:00:00.000Z</servdate>
+    </servdates>
+  </service>
+</mycorederivate>
