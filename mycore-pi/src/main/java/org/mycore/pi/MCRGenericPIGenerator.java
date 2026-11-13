@@ -52,6 +52,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.pi.urn.MCRDNBURN;
+import org.mycore.pi.urn.MCRDNBURNParser;
 import org.mycore.pi.util.MCRPIGeneratorUtils;
 
 /**
@@ -284,7 +285,7 @@ public class MCRGenericPIGenerator implements MCRPIGenerator<MCRPersistentIdenti
         result = applyCount(resultingPI);
 
         if (MCRDNBURN.TYPE.equals(type)) {
-            result = result + "C"; // will be replaced by the URN-Parser
+            result = result + MCRDNBURNParser.APPEND_CHECKSUM_MARKER;
         }
 
         String finalResult = result;
