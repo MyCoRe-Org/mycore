@@ -19,6 +19,7 @@
 package org.mycore.pi.urn.rest;
 
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -80,6 +81,11 @@ public class MCRURNGranularRESTServiceTest extends MCRStoreTestCase {
         derivate = createDerivate(object.getId());
         MCRMetadataManager.create(object);
         MCRMetadataManager.create(derivate);
+
+        MCRPath derivateRoot = MCRPath.getPath(derivate.getId().toString(), "/");
+        try (Stream<Path> content = Files.list(derivateRoot)) {
+            Assert.assertTrue("Derivate should be empty after creation", content.findAny().isEmpty());
+        }
 
         List<MCRPath> fileList = new ArrayList<>();
 
@@ -167,7 +173,7 @@ public class MCRURNGranularRESTServiceTest extends MCRStoreTestCase {
         derivate.setSchema("datamodel-derivate.xsd");
         MCRMetaIFS ifs = new MCRMetaIFS();
         ifs.setSubTag("internal");
-        ifs.setSourcePath("");
+        ifs.setSourcePath(null);
         derivate.getDerivate().setInternals(ifs);
         MCRMetaLinkID mcrMetaLinkID = new MCRMetaLinkID();
         mcrMetaLinkID.setReference(objectHrefId.toString(), null, null);
