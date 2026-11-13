@@ -99,6 +99,9 @@
       <label class="col-12 col-md-3 control-label" for="userName">
         <xed:output i18n="component.user2.admin.userAccount" />
       </label>
+      <label class="visually-hidden" for="realmId">
+        <xed:output i18n="component.user2.admin.user.realm" />
+      </label>
       <div class="col-12 col-md-9 row">
         <xeduser:template name="textInput" xpath="@name" id="userName" inline="true" colsize="sm" colwidth="9"
           i18n.error="component.user2.admin.inputhints.username" required="true" matches="[a-z0-9\._-]*" maxlength="43" />
@@ -112,6 +115,9 @@
     <div class="mcr-form-group mb-3 row">
       <label class="col-12 col-md-3 control-label" for="userName">
         <xed:output i18n="component.user2.admin.userAccount" />
+      </label>
+      <label class="visually-hidden" for="realmId">
+        <xed:output i18n="component.user2.admin.user.realm" />
       </label>
       <div class="col-12 col-md-9 row">
         <xeduser:template name="textInput" xpath="@name" id="userName" disabled="true" inline="true" colsize="sm" colwidth="9"
@@ -186,10 +192,7 @@
                   <xed:output value="@realm" />
                 </xed:when>
                 <xed:otherwise>
-                  <xed:multi-lang>
-                    <xed:lang xml:lang="de">bitte wählen</xed:lang>
-                    <xed:lang xml:lang="en">please select</xed:lang>
-                  </xed:multi-lang>
+                  <xed:output i18n="component.user2.login.select" />
                 </xed:otherwise>
               </xed:choose>
               <xed:output value="']'" />
@@ -207,13 +210,13 @@
     <xed:bind xpath="roles">
       <xed:repeat xpath="role" min="0" max="20">
         <div class="mcr-form-group mb-3 row">
-          <label class="col-12 col-md-3 control-label" for="roleSelect">
+          <label class="col-12 col-md-3 control-label" for="roleSelect_{xed:generate-id()}">
             <xed:output i18n="component.user2.admin.roles" />
           </label>
           <div class="col-12 col-md-9">
             <div class="row">
               <div class="col-8">
-                <xeduser:template name="submitButton" id="roleSelect" i18n="component.user2.button.select" target="subselect" href="MCRRoleServlet" />
+                <xeduser:template name="submitButton" id="roleSelect_{xed:generate-id()}" i18n="component.user2.button.select" target="subselect" href="MCRRoleServlet" />
                 <xed:output value="@name" />
                 <xed:output value="' ['" />
                 <xed:choose>
@@ -221,10 +224,7 @@
                     <xed:output value="label/@text" />
                   </xed:when>
                   <xed:otherwise>
-                    <xed:multi-lang>
-                      <xed:lang xml:lang="de">bitte wählen</xed:lang>
-                      <xed:lang xml:lang="en">please select</xed:lang>
-                    </xed:multi-lang>
+                    <xed:output i18n="component.user2.login.select" />
                   </xed:otherwise>
                 </xed:choose>
                 <xed:output value="']'" />
@@ -253,10 +253,7 @@
               <xed:bind xpath="@name">
                 <select class="form-control">
                   <option value="">
-                    <xed:multi-lang>
-                      <xed:lang xml:lang="de">bitte wählen</xed:lang>
-                      <xed:lang xml:lang="en">please select</xed:lang>
-                    </xed:multi-lang>
+                    <xed:output i18n="component.user2.login.select" />
                   </option>
                   <xed:include uri="xslStyle:items2options:classification:editor:-1:children:user_attributes"/>
                 </select>

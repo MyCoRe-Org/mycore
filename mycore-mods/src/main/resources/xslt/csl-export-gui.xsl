@@ -43,7 +43,7 @@
     </script>
     <script src="{$WebApplicationBaseURL}js/csl-export.js"/>
     <div class="input-group mb-3 flex-wrap" data-export="{$type}">
-      <select name="format" class="form-select">
+      <select aria-label="{mcri18n:translate('component.mods.csl.export.format.select')}" name="format" class="form-select">
         <option value="">
           <xsl:value-of select="mcri18n:translate('component.mods.csl.export.format')"/>
         </option>
@@ -62,7 +62,7 @@
           </xsl:for-each>
         </xsl:if>
       </select>
-      <select name="style">
+      <select aria-label="{mcri18n:translate('component.mods.csl.export.style.select')}" name="style">
         <xsl:attribute name="class">
           <xsl:text>form-select</xsl:text>
           <xsl:if test="$type = 'basket'">

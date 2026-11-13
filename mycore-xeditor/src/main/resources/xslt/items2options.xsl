@@ -25,19 +25,26 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="item">
+    <xsl:template match="item">
     <xsl:param name="indent" select="''" />
 
     <xsl:variable name="toolTip">
       <xsl:apply-templates select="." mode="toolTip" />
     </xsl:variable>
 
+    <xsl:variable name="displayLabel">
+      <xsl:apply-templates select="." mode="label" />
+    </xsl:variable>
+
     <xsl:choose>
 	    <xsl:when test="label[lang('x-group')] and not($allSelectable='true')">
-		   	<optgroup title="{$toolTip}">
+		   	<optgroup>
+		   	  <xsl:if test="normalize-space($toolTip) != normalize-space($displayLabel)">
+		   	    <xsl:attribute name="title"><xsl:value-of select="$toolTip"/></xsl:attribute>
+		   	  </xsl:if>
 		   	  <xsl:attribute name="label">
 		   	  	<xsl:value-of select="$indent" disable-output-escaping="yes" />
-		      	<xsl:apply-templates select="." mode="label" />
+		      	<xsl:value-of select="$displayLabel" />
 		   	  </xsl:attribute>
 		      <xsl:copy-of select="@*" />
 		      <xsl:apply-templates select="item">
@@ -46,13 +53,16 @@
 		    </optgroup>
 	    </xsl:when>
 	    <xsl:otherwise>
-	        <option title="{$toolTip}">
+	        <option>
+	          <xsl:if test="normalize-space($toolTip) != normalize-space($displayLabel)">
+	            <xsl:attribute name="title"><xsl:value-of select="$toolTip"/></xsl:attribute>
+	          </xsl:if>
 	          <xsl:if test="label[lang('x-disable')] and not($allSelectable='true')">
 		   	  	<xsl:attribute name="disabled"/>
 		   	  </xsl:if>
 		      <xsl:copy-of select="@*" />
 		      <xsl:value-of select="$indent" disable-output-escaping="yes" />
-		      <xsl:apply-templates select="." mode="label" />
+		      <xsl:value-of select="$displayLabel" />
 		    </option>
 		    <xsl:apply-templates select="item">
 		      <xsl:with-param name="indent" select="concat($editor.list.indent,$indent)" />
@@ -61,6 +71,7 @@
 	</xsl:choose>
 
   </xsl:template>
+
 
   <xsl:template match="item" mode="label">
     <xsl:variable name="onDisplay">

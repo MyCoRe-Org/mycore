@@ -41,7 +41,7 @@
             <div class="form-check">
               <input id="sessionListingResolveHostname" class="form-check-input" type="checkbox"
                      onchange="mycore.session.listing.onHostnameResolvingChange()"/>
-              <label for="sessionListingFilter" class="form-check-label">
+              <label for="sessionListingResolveHostname" class="form-check-label">
                 <xsl:value-of select="mcri18n:translate('component.session-listing.resolveHostNames')"/>
               </label>
             </div>
@@ -50,26 +50,24 @@
 
         <table id="sessionListingTable" class="table">
           <tr>
-            <th data-criteria="login" role="button" tabindex="0" onclick="mycore.session.listing.sortByLogin()">
+            <th data-criteria="login" onclick="mycore.session.listing.sortByLogin()">
               <xsl:value-of select="mcri18n:translate('component.session-listing.login')"/>
               <i class="fas fa-sort "></i>
             </th>
-            <th data-criteria="ip" role="button" tabindex="0" onclick="mycore.session.listing.sortByIP()">
+            <th data-criteria="ip" onclick="mycore.session.listing.sortByIP()">
               <xsl:value-of select="mcri18n:translate('component.session-listing.ip')"/>
               <i class="fas fa-sort "></i>
             </th>
-            <th data-criteria="createTime" role="button" tabindex="0"
-                onclick="mycore.session.listing.sortByFirstAccess()">
+            <th data-criteria="createTime" onclick="mycore.session.listing.sortByFirstAccess()">
               <xsl:value-of select="mcri18n:translate('component.session-listing.firstAccess')"/>
               <i class="fas fa-sort "></i>
             </th>
-            <th data-criteria="lastAccess" role="button" tabindex="0"
+            <th data-criteria="lastAccess" 
                 onclick="mycore.session.listing.sortByLastAccess()">
               <xsl:value-of select="mcri18n:translate('component.session-listing.lastAccess')"/>
               <i class="fas fa-sort "></i>
             </th>
-            <th data-criteria="stackTrace" role="button" tabindex="0"
-                onclick="mycore.session.listing.sortByStacktrace()">
+            <th data-criteria="stackTrace" onclick="mycore.session.listing.sortByStacktrace()">
               Stacktrace
               <i class="fas fa-sort "></i>
             </th>
@@ -87,7 +85,7 @@
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
-            <h4 class="modal-title"></h4>
+            <h4 class="modal-title">Stack Modal</h4>
           </div>
           <div class="modal-body">
             <pre id="stacktraceModalBody" class="pre-scrollable"></pre>

@@ -219,6 +219,11 @@
 
     <xsl:template match="xeduser:template[@name='selectInput']" mode="widget">
         <select class="form-control input-{$input-size} {@class}" id="{@id}">
+            <xsl:if test="@aria-labelledby">
+                <xsl:attribute name="aria-labelledby">
+                    <xsl:value-of select="@aria-labelledby" />
+                </xsl:attribute>
+            </xsl:if>
             <xsl:apply-templates select="." mode="inputOptions" />
             <option value="">
                 <xed:multi-lang>

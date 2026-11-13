@@ -90,7 +90,7 @@
       <xsl:variable name="loadingImage" select="mcrproperty:get('MCR.Ajax.LoadingImage')"/>
 
       <!-- jQuery -->
-      <script type="text/javascript">
+      <script>
         /* &lt;![CDATA[ */
 
         var openCategs=[];
@@ -209,7 +209,7 @@
 
       <xsl:variable name="id" select="generate-id(.)" />
       <div id="{$id}" class="cbVisible">
-        <script type="text/javascript">
+        <script>
           update('<xsl:value-of select="$id" />','<xsl:value-of select="$category" />', loadState);
         </script>
       </div>
