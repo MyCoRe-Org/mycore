@@ -36,7 +36,7 @@
               <xsl:variable name="btnLabel">
                 <xsl:choose>
                   <xsl:when test="label">
-                    <xsl:value-of select="mcri18n:translate-with-params('component.mods.metaData.displayAll',$completeTitle)" />
+                    <xsl:value-of select="mcri18n:translate('component.mods.metaData.displayAll')" />
                   </xsl:when>
                   <xsl:otherwise>Show subcategories</xsl:otherwise>
                 </xsl:choose>
