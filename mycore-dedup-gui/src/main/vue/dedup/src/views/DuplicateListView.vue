@@ -1,6 +1,16 @@
 <template>
   <main>
     <p class="text-muted">{{ i18n["dedup.gui.duplicates.description"] }}</p>
+    <div v-if="filterId != null" class="alert alert-secondary d-flex align-items-center" role="status">
+      <span>{{ i18n["dedup.gui.duplicates.filter"] }} <strong>{{ filterId }}</strong></span>
+      <a v-if="showReturn" :href="getObjectURL(filterId)" class="btn btn-outline-secondary btn-sm ms-auto">
+        {{ i18n["dedup.gui.duplicates.filter.return"] }}
+      </a>
+      <RouterLink :to="{ name: 'duplicates' }" class="btn btn-outline-secondary btn-sm"
+                  :class="showReturn ? 'ms-2' : 'ms-auto'">
+        {{ i18n["dedup.gui.duplicates.filter.reset"] }}
+      </RouterLink>
+    </div>
     <div v-if="model.loading" class="text-center">
       <div class="spinner-border" role="status">
         <span class="visually-hidden">Loading...</span>
@@ -13,7 +23,13 @@
     <div v-else-if="model.list.length == 0" class="alert alert-info" role="alert">
       {{ i18n["dedup.gui.duplicates.empty"] }}
     </div>
-    <table v-else class="table table-hover">
+    <table v-else class="table table-hover duplicate-table">
+      <colgroup>
+        <col class="col-content">
+        <col class="col-content">
+        <col class="col-content">
+        <col class="col-action">
+      </colgroup>
       <thead>
       <tr>
         <th class="pointer nobreak" v-on:click="toggleSort('criterion')">
@@ -32,10 +48,20 @@
       </tr>
       </thead>
       <tbody>
-      <tr v-for="entry in sortedList"
-          :key="entry.criterionType + '-' + entry.criterionValue + '-' + entry.objectId1 + '-' + entry.objectId2">
+      <tr v-for="entry in sortedList" :key="entry.objectId1 + '-' + entry.objectId2">
         <td>
-          <strong>{{ entry.criterionType }}</strong>: {{ entry.criterionValue }}
+          <button v-if="entry.criteria.length > 1" type="button"
+                  class="btn btn-link btn-sm p-0 text-decoration-none nobreak"
+                  :aria-expanded="isExpanded(entry)" v-on:click="toggleExpanded(entry)">
+            <span class="fas fa-fw" :class="isExpanded(entry) ? 'fa-chevron-down' : 'fa-chevron-right'"></span>
+            {{ entry.criteria.length }} {{ i18n["dedup.gui.duplicates.criteria"] }}
+          </button>
+          <ul v-if="entry.criteria.length == 1 || isExpanded(entry)" class="list-unstyled mb-0"
+              :class="{ 'mt-1': entry.criteria.length > 1 }">
+            <li v-for="criterion in entry.criteria" :key="criterion.type + '-' + criterion.value">
+              <strong>{{ criterion.type }}</strong>: {{ criterion.value }}
+            </li>
+          </ul>
         </td>
         <td>
           <PublicationDisplay :mcr-id="entry.objectId1" :title="entry.title1"/>
@@ -76,11 +102,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, useTemplateRef } from "vue";
+import { computed, onMounted, reactive, useTemplateRef, watch } from "vue";
+import { RouterLink, useRoute } from "vue-router";
 import type { DuplicateEntry, DuplicateList } from "@/api/Model";
 import { getWebApplicationBaseURL } from "@/api/BaseURL";
 import { getAuthorizationHeader } from "@/api/Auth";
 import { resolveI18N } from "@/api/I18N";
+import { getObjectURL } from "@/api/Utils";
 import SortArrow from "@/components/SortArrow.vue";
 import PublicationDisplay from "@/components/PublicationDisplay.vue";
 import Modal from "@/components/Modal.vue";
@@ -89,6 +117,15 @@ type SortField = "criterion" | "object1" | "object2";
 
 const markModal = useTemplateRef("markModalRef");
 
+const route = useRoute();
+
+/** The object id given as query parameter `?id=...`, restricting the list to its duplicates. */
+const filterId = computed(() =>
+  typeof route.query.id === "string" && route.query.id.length > 0 ? route.query.id : null);
+
+/** Whether to offer a link back to the filtered object, requested with the query parameter `showReturn=true`. */
+const showReturn = computed(() => filterId.value != null && route.query.showReturn === "true");
+
 const model = reactive({
   loading: true,
   list: [] as DuplicateList,
@@ -96,6 +133,7 @@ const model = reactive({
   sortDir: "asc" as "asc" | "desc",
   error: null as number | string | null,
   selected: null as DuplicateEntry | null,
+  expanded: new Set<string>(),
 });
 
 const i18n = reactive<{ [key: string]: string }>({
@@ -104,12 +142,27 @@ const i18n = reactive<{ [key: string]: string }>({
   "dedup.gui.duplicates.table.object1": "dedup.gui.duplicates.table.object1",
   "dedup.gui.duplicates.table.object2": "dedup.gui.duplicates.table.object2",
   "dedup.gui.duplicates.empty": "dedup.gui.duplicates.empty",
+  "dedup.gui.duplicates.criteria": "dedup.gui.duplicates.criteria",
+  "dedup.gui.duplicates.filter": "dedup.gui.duplicates.filter",
+  "dedup.gui.duplicates.filter.reset": "dedup.gui.duplicates.filter.reset",
+  "dedup.gui.duplicates.filter.return": "dedup.gui.duplicates.filter.return",
   "dedup.gui.action.markNoDuplicate": "dedup.gui.action.markNoDuplicate",
   "dedup.gui.action.markNoDuplicateConfirm": "dedup.gui.action.markNoDuplicateConfirm",
   "dedup.gui.action.markNoDuplicateYes": "dedup.gui.action.markNoDuplicateYes",
   "dedup.gui.action.cancel": "dedup.gui.action.cancel",
   "dedup.gui.notAllowed": "dedup.gui.notAllowed",
 });
+
+const pairKey = (entry: DuplicateEntry): string => entry.objectId1 + " " + entry.objectId2;
+
+const isExpanded = (entry: DuplicateEntry): boolean => model.expanded.has(pairKey(entry));
+
+const toggleExpanded = (entry: DuplicateEntry) => {
+  const key = pairKey(entry);
+  if (!model.expanded.delete(key)) {
+    model.expanded.add(key);
+  }
+};
 
 const sortKey = (entry: DuplicateEntry): string => {
   switch (model.sortField) {
@@ -118,7 +171,7 @@ const sortKey = (entry: DuplicateEntry): string => {
     case "object2":
       return entry.objectId2;
     default:
-      return entry.criterionType + " " + entry.criterionValue;
+      return entry.criteria.map(criterion => criterion.type + " " + criterion.value).join(" ");
   }
 };
 
@@ -140,7 +193,10 @@ const resolveList = async () => {
   model.loading = true;
   model.error = null;
   try {
-    const response = await fetch(`${getWebApplicationBaseURL()}api/dedup/duplicates`, {
+    const path = filterId.value != null
+      ? `api/dedup/duplicates/${encodeURIComponent(filterId.value)}`
+      : "api/dedup/duplicates";
+    const response = await fetch(`${getWebApplicationBaseURL()}${path}`, {
       cache: "no-store",
       headers: {
         authorization: await getAuthorizationHeader()
@@ -190,6 +246,8 @@ const confirmMark = async () => {
   }
 };
 
+watch(filterId, resolveList);
+
 onMounted(() => {
   resolveList();
   resolveI18N(i18n);
@@ -203,5 +261,20 @@ onMounted(() => {
 
 .nobreak {
   white-space: nowrap;
+}
+
+/* The three content columns share the width equally and keep it when criteria are expanded. */
+.col-content {
+  width: 33.33%;
+}
+
+/* The action column only takes the width of its button. */
+.col-action {
+  width: 1%;
+}
+
+/* Long values may wrap anywhere, so they never widen their column. */
+.duplicate-table td {
+  overflow-wrap: anywhere;
 }
 </style>
