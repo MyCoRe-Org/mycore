@@ -33,8 +33,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRTestConfiguration;
-import org.mycore.common.MCRTestProperty;
 import org.mycore.common.MCRTransactionManager;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
@@ -46,12 +44,9 @@ import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
 @ExtendWith(MCRJPAExtension.class)
-@MCRTestConfiguration(properties = {
-    @MCRTestProperty(key = "MCR.LanguageClassification", string = MCRLanguageFactoryTest.CLASSIFICATION_ID)
-})
 public class MCRLanguageFactoryTest {
 
-    static final String CLASSIFICATION_ID = "rfc5646";
+    private static final String CLASSIFICATION_ID = "rfc5646";
 
     private static final String LANGUAGE_CODE = "tlh";
 
