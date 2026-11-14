@@ -167,4 +167,23 @@
     <xsl:sequence select="replace(replace(replace(encode-for-uri($value), '%20', '+'), '%2A', '*'), '~', '%7E')" />
   </xsl:function>
 
+  <xsl:function name="mcrurl:decode-from-uri" as="xs:string">
+    <xsl:param name="encodedValue" as="xs:string"/>
+    <xsl:sequence select="string(document(concat(
+      'decodeFromUri:',
+      $encodedValue)))"
+    />
+  </xsl:function>
+
+  <xsl:function name="mcrurl:decode-from-uri" as="xs:string">
+    <xsl:param name="encodedValue" as="xs:string"/>
+    <xsl:param name="supportFormEncoding" as="xs:boolean"/>
+    <xsl:sequence select="string(document(concat(
+      'decodeFromUri:',
+       $encodedValue,
+      '?supportFormEncoding=',
+       $supportFormEncoding)))"
+    />
+  </xsl:function>
+
 </xsl:stylesheet>
