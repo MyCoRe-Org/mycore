@@ -20,6 +20,7 @@ package org.mycore.solr.index.handlers.document;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.SolrClient;
 
 /**
  * Implementation for logging SOLR errors (see <code>MCR.Solr.SolrInputDocument.ExceptionHandler.Class</code>).
@@ -30,7 +31,9 @@ public class MCRSolrInputDocumentExceptionLoggingHandler implements MCRSolrInput
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
-    public void handleException(String id, Throwable exc) {
-        LOGGER.error(() -> "Error while indexing document '" + id + "'.", exc);
+    public void handleException(String id, String docId, SolrClient solrClient, Throwable exc) {
+        LOGGER.error(() ->
+                "Error while indexing document '" + id + "' for docID '" + docId + "' in Solr client '" + solrClient + "'.",
+            exc);
     }
 }

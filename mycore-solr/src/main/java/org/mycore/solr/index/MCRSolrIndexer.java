@@ -98,6 +98,10 @@ public class MCRSolrIndexer {
      */
     static final int BULK_SIZE = MCRConfiguration2.getInt(SOLR_CONFIG_PREFIX + "Indexer.BulkSize").orElse(100);
 
+    private static final MCRSolrIndexExceptionHandler SOLR_EXCEPTION_HANDLER = MCRConfiguration2
+        .getSingleInstanceOfOrThrow(MCRSolrIndexExceptionHandler.class, SOLR_CONFIG_PREFIX + "Indexer.ExceptionHandler");
+
+
     static final MCRProcessableExecutor SOLR_EXECUTOR;
 
     static final ExecutorService SOLR_SUB_EXECUTOR;
@@ -498,11 +502,7 @@ public class MCRSolrIndexer {
         final MCRSolrIndexHandler indexHandler, final int priority) {
         return (handlerList, exc) -> {
             if (exc != null) {
-                final MCRSolrIndexExceptionHandler exceptionHandler = MCRConfiguration2
-                    .getInstanceOfOrThrow(
-                        MCRSolrIndexExceptionHandler.class, SOLR_CONFIG_PREFIX + "Indexer.ExceptionHandler");
-
-                exceptionHandler.handleException(indexHandler, exc);
+                SOLR_EXCEPTION_HANDLER.handleException(indexHandler, exc);
                 return;
             }
             if (handlerList == null || handlerList.isEmpty()) {

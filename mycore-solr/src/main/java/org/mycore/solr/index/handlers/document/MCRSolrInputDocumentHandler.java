@@ -65,7 +65,9 @@ public class MCRSolrInputDocumentHandler extends MCRSolrAbstractIndexHandler {
 
     private final List<MCRSolrIndexHandler> subHandlers;
 
-    private final MCRSolrInputDocumentExceptionHandler exceptionHandler;
+    private static final MCRSolrInputDocumentExceptionHandler SOLR_EXCEPTION_HANDLER = MCRConfiguration2
+        .getSingleInstanceOfOrThrow(MCRSolrInputDocumentExceptionHandler.class,
+            SOLR_CONFIG_PREFIX + "SolrInputDocument.ExceptionHandler");
 
     /**
      * Constructs a new handler for a single Solr document.
@@ -81,8 +83,6 @@ public class MCRSolrInputDocumentHandler extends MCRSolrAbstractIndexHandler {
         this.documentSupplier = documentSupplier;
         this.subHandlers = new ArrayList<>();
         this.setIndexType(coreType);
-        this.exceptionHandler = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRSolrInputDocumentExceptionHandler.class, SOLR_CONFIG_PREFIX + "SolrInputDocument.ExceptionHandler");
     }
 
     /**
@@ -106,7 +106,7 @@ public class MCRSolrInputDocumentHandler extends MCRSolrAbstractIndexHandler {
         try {
             document = documentSupplier.get();
         } catch (Exception e) {
-            exceptionHandler.handleException(id, e);
+            SOLR_EXCEPTION_HANDLER.handleException(id, null, null, e);
             this.subHandlers.add(new MCRSolrErrorIndexHandler(id, e, solrClients));
             return;
         }
@@ -122,7 +122,7 @@ public class MCRSolrInputDocumentHandler extends MCRSolrAbstractIndexHandler {
             try {
                 updateRequest.process(solrClient);
             } catch (Exception e) {
-                exceptionHandler.handleException(id, e);
+                SOLR_EXCEPTION_HANDLER.handleException(id, docId, solrClient, e);
                 this.subHandlers.add(new MCRSolrMinimalInputDocumentHandler(document, e, solrClient));
             }
         }

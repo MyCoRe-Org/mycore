@@ -18,6 +18,8 @@
 
 package org.mycore.solr.index.handlers.document;
 
+import org.apache.solr.client.solrj.SolrClient;
+
 /**
  * Interface for handling exceptions that occur during the processing of Solr input documents. The specific
  * implementation of the handler is defined using the MyCoRe configuration property
@@ -26,5 +28,13 @@ package org.mycore.solr.index.handlers.document;
  * @author Michael Becker
  */
 public interface MCRSolrInputDocumentExceptionHandler {
-    void handleException(String id, Throwable exc);
+    /**
+     * This method is called from {@link MCRSolrInputDocumentHandler#index()} in case of errors.
+     *
+     * @param id         unique identifier of the MyCoRe object being indexed
+     * @param docId      the SOLR document ID (can be null)
+     * @param solrClient the SOLR client raising the exception (can be null)
+     * @param exc        the indexing exception
+     */
+    void handleException(String id, String docId, SolrClient solrClient, Throwable exc);
 }

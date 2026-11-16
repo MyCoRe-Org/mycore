@@ -29,5 +29,11 @@ import org.mycore.solr.index.MCRSolrIndexHandler;
  * @author Michael Becker
  */
 public interface MCRSolrIndexExceptionHandler {
+    /**
+     * This method is called in {@link MCRSolrIndexHandler} in case of errors during indexing.
+     *
+     * @param indexHandler the index handler containing the given exception
+     * @param exc          the indexing exception
+     */
     void handleException(MCRSolrIndexHandler indexHandler, Throwable exc);
 }
