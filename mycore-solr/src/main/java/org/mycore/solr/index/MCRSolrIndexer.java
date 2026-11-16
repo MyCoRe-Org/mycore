@@ -99,7 +99,8 @@ public class MCRSolrIndexer {
     static final int BULK_SIZE = MCRConfiguration2.getInt(SOLR_CONFIG_PREFIX + "Indexer.BulkSize").orElse(100);
 
     private static final MCRSolrIndexExceptionHandler SOLR_EXCEPTION_HANDLER = MCRConfiguration2
-        .getSingleInstanceOfOrThrow(MCRSolrIndexExceptionHandler.class, SOLR_CONFIG_PREFIX + "Indexer.ExceptionHandler");
+        .getSingleInstanceOfOrThrow(
+            MCRSolrIndexExceptionHandler.class, SOLR_CONFIG_PREFIX + "Indexer.ExceptionHandler");
 
 
     static final MCRProcessableExecutor SOLR_EXECUTOR;

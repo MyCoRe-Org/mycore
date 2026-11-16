@@ -33,7 +33,9 @@ public class MCRSolrInputDocumentExceptionLoggingHandler implements MCRSolrInput
     @Override
     public void handleException(String id, String docId, SolrClient solrClient, Throwable exc) {
         LOGGER.error(() ->
-                "Error while indexing document '" + id + "' for docID '" + docId + "' in Solr client '" + solrClient + "'.",
+                "Error while indexing document '" + id
+                    + "' for docID '" + docId
+                    + "' in Solr client '" + solrClient + "'.",
             exc);
     }
 }
