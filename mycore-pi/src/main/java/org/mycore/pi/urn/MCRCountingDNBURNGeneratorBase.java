@@ -31,7 +31,7 @@ public abstract class MCRCountingDNBURNGeneratorBase extends MCRDNBURNGeneratorB
     private final MCRPIGeneratorUtils.Counter counter;
 
     MCRCountingDNBURNGeneratorBase(MCRPIGeneratorUtils.Counter counter, String namespace, String delimiter) {
-        super(namespace, delimiter);
+        super(namespace, true, delimiter);
         this.counter = Objects.requireNonNull(counter, "Counter must not be null");
     }
 

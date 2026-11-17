@@ -30,19 +30,22 @@ public abstract class MCRDNBURNGeneratorBase implements MCRPIGenerator<MCRDNBURN
 
     private final String namespace;
 
-    private final String delimiter;
-
     private final boolean appendChecksum;
 
+    private final String delimiter;
 
+    /**
+     * @deprecated Use {@link MCRDNBURNGeneratorBase(String, boolean, String)} instead.
+     */
+    @Deprecated(forRemoval = true)
     public MCRDNBURNGeneratorBase(String namespace, String delimiter) {
-        this(namespace, delimiter, true);
+        this(namespace, true, delimiter);
     }
 
-    public MCRDNBURNGeneratorBase(String namespace, String delimiter, boolean appendChecksum) {
+    public MCRDNBURNGeneratorBase(String namespace, boolean appendChecksum, String delimiter) {
         this.namespace = checkNamespace(Objects.requireNonNull(namespace, "Namespace must not be null"));
-        this.delimiter = Objects.requireNonNull(delimiter, "Delimiter must not be null");
         this.appendChecksum = appendChecksum;
+        this.delimiter = Objects.requireNonNull(delimiter, "Delimiter must not be null");
     }
 
     private static String checkNamespace(String namespace) {

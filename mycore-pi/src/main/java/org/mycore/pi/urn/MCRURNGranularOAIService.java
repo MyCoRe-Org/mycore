@@ -104,7 +104,7 @@ public class MCRURNGranularOAIService extends MCRPIService<MCRDNBURN> {
             .findFirst().get();
 
         String setID = obj.getId().getNumberAsString();
-        MCRDNBURN urntoAssign = newURN.toGranular(setID, count + 1, count + 1);
+        MCRDNBURN urntoAssign = newURN.toGranular(setID, count + 1, count + 1, true, "");
         derivate.getOrCreateFileMetadata(filePath, urntoAssign.asString()).setUrn(urntoAssign.asString());
         MCRPI databaseEntry = new MCRPI(urntoAssign.asString(), getType(), obj.getId().toString(), additional,
             this.getServiceID(), new MCRPIServiceDates(new Date(), null));
@@ -148,7 +148,7 @@ public class MCRURNGranularOAIService extends MCRPIService<MCRDNBURN> {
         String setID = obj.getId().getNumberAsString();
 
         for (int pathListIndex = 0; pathListIndex < pathList.size(); pathListIndex++) {
-            MCRDNBURN subURN = newURN.toGranular(setID, pathListIndex + 1, pathList.size());
+            MCRDNBURN subURN = newURN.toGranular(setID, pathListIndex + 1, pathList.size(), true, "");
             derivate.getOrCreateFileMetadata(pathList.get(pathListIndex), subURN.asString()).setUrn(subURN.asString());
             MCRPI databaseEntry = new MCRPI(subURN.asString(), getType(), obj.getId().toString(),
                 pathList.get(pathListIndex).getOwnerRelativePath(),

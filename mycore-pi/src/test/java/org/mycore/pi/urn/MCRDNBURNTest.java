@@ -33,7 +33,7 @@ public class MCRDNBURNTest {
     public static final String NAMESPACE = NAMESPACE_PREFIX + SUB_NAMESPACE;
 
     @Test
-    public void testWithoutChecksum() {
+    public void testUrnWithoutChecksum() {
 
         MCRDNBURN mcrdnburn = new MCRDNBURN(SUB_NAMESPACE, "foo-bar", false);
 
@@ -45,7 +45,7 @@ public class MCRDNBURNTest {
     }
 
     @Test
-    public void testWithChecksum() {
+    public void testUrnWithChecksum() {
 
         MCRDNBURN mcrdnburn = new MCRDNBURN(SUB_NAMESPACE, "foo-bar-", true);
 
@@ -53,6 +53,162 @@ public class MCRDNBURNTest {
         assertEquals(NAMESPACE_PREFIX, mcrdnburn.getPREFIX());
         assertEquals(SUB_NAMESPACE, mcrdnburn.getSubNamespace());
         assertEquals("foo-bar-2", mcrdnburn.getNamespaceSpecificString());
+
+    }
+
+    @Test
+    public void testUrnWithoutChecksumGranularWithoutChecksum() {
+
+        MCRDNBURN mcrdnburn = new MCRDNBURN(SUB_NAMESPACE, "foo-bar", false);
+        mcrdnburn = mcrdnburn.toGranular("idx", 42, 100, false, "");
+
+        assertEquals(NAMESPACE + "foo-bar-idx-042", mcrdnburn.asString());
+        assertEquals(NAMESPACE_PREFIX, mcrdnburn.getPREFIX());
+        assertEquals(SUB_NAMESPACE, mcrdnburn.getSubNamespace());
+        assertEquals("foo-bar-idx-042", mcrdnburn.getNamespaceSpecificString());
+
+    }
+
+    @Test
+    public void testUrnWithoutChecksumGranularWithChecksum() {
+
+        MCRDNBURN mcrdnburn = new MCRDNBURN(SUB_NAMESPACE, "foo-bar", false);
+        mcrdnburn = mcrdnburn.toGranular("idx", 42, 100, true, "-");
+
+        assertEquals(NAMESPACE + "foo-bar-idx-042-3", mcrdnburn.asString());
+        assertEquals(NAMESPACE_PREFIX, mcrdnburn.getPREFIX());
+        assertEquals(SUB_NAMESPACE, mcrdnburn.getSubNamespace());
+        assertEquals("foo-bar-idx-042-3", mcrdnburn.getNamespaceSpecificString());
+
+    }
+
+    @Test
+    public void testUrnWithChecksumGranularWithoutChecksum() {
+
+        MCRDNBURN mcrdnburn = new MCRDNBURN(SUB_NAMESPACE, "foo-bar-", true);
+        mcrdnburn = mcrdnburn.toGranular("idx", 42, 100, false, "");
+
+        assertEquals(NAMESPACE + "foo-bar-2-idx-042", mcrdnburn.asString());
+        assertEquals(NAMESPACE_PREFIX, mcrdnburn.getPREFIX());
+        assertEquals(SUB_NAMESPACE, mcrdnburn.getSubNamespace());
+        assertEquals("foo-bar-2-idx-042", mcrdnburn.getNamespaceSpecificString());
+
+    }
+
+    @Test
+    public void testUrnWithChecksumGranularWithChecksum() {
+
+        MCRDNBURN mcrdnburn = new MCRDNBURN(SUB_NAMESPACE, "foo-bar-", true);
+        mcrdnburn = mcrdnburn.toGranular("idx", 42, 100, true, "-");
+
+        assertEquals(NAMESPACE + "foo-bar-2-idx-042-5", mcrdnburn.asString());
+        assertEquals(NAMESPACE_PREFIX, mcrdnburn.getPREFIX());
+        assertEquals(SUB_NAMESPACE, mcrdnburn.getSubNamespace());
+        assertEquals("foo-bar-2-idx-042-5", mcrdnburn.getNamespaceSpecificString());
+
+    }
+
+    @Test
+    public void testUrnWithoutChecksumSuffixWithoutChecksum() {
+
+        MCRDNBURN mcrdnburn = new MCRDNBURN(SUB_NAMESPACE, "foo-bar", false);
+        mcrdnburn = mcrdnburn.withSuffix("-sfx", false, "");
+
+        assertEquals(NAMESPACE + "foo-bar-sfx", mcrdnburn.asString());
+        assertEquals(NAMESPACE_PREFIX, mcrdnburn.getPREFIX());
+        assertEquals(SUB_NAMESPACE, mcrdnburn.getSubNamespace());
+        assertEquals("foo-bar-sfx", mcrdnburn.getNamespaceSpecificString());
+
+    }
+
+    @Test
+    public void testUrnWithoutChecksumSuffixWithChecksum() {
+
+        MCRDNBURN mcrdnburn = new MCRDNBURN(SUB_NAMESPACE, "foo-bar", false);
+        mcrdnburn = mcrdnburn.withSuffix("-sfx", true, "-");
+
+        assertEquals(NAMESPACE + "foo-bar-sfx-4", mcrdnburn.asString());
+        assertEquals(NAMESPACE_PREFIX, mcrdnburn.getPREFIX());
+        assertEquals(SUB_NAMESPACE, mcrdnburn.getSubNamespace());
+        assertEquals("foo-bar-sfx-4", mcrdnburn.getNamespaceSpecificString());
+
+    }
+
+    @Test
+    public void testUrnWithChecksumSuffixWithoutChecksum() {
+
+        MCRDNBURN mcrdnburn = new MCRDNBURN(SUB_NAMESPACE, "foo-bar-", true);
+        mcrdnburn = mcrdnburn.withSuffix("-sfx", false, "");
+
+        assertEquals(NAMESPACE + "foo-bar-2-sfx", mcrdnburn.asString());
+        assertEquals(NAMESPACE_PREFIX, mcrdnburn.getPREFIX());
+        assertEquals(SUB_NAMESPACE, mcrdnburn.getSubNamespace());
+        assertEquals("foo-bar-2-sfx", mcrdnburn.getNamespaceSpecificString());
+
+    }
+
+    @Test
+    public void testUrnWithChecksumSuffixWithChecksum() {
+
+        MCRDNBURN mcrdnburn = new MCRDNBURN(SUB_NAMESPACE, "foo-bar-", true);
+        mcrdnburn = mcrdnburn.withSuffix("-sfx", true, "-");
+
+        assertEquals(NAMESPACE + "foo-bar-2-sfx-8", mcrdnburn.asString());
+        assertEquals(NAMESPACE_PREFIX, mcrdnburn.getPREFIX());
+        assertEquals(SUB_NAMESPACE, mcrdnburn.getSubNamespace());
+        assertEquals("foo-bar-2-sfx-8", mcrdnburn.getNamespaceSpecificString());
+
+    }
+
+    @Test
+    public void testUrnWithoutChecksumNamespaceSuffixWithoutChecksum() {
+
+        MCRDNBURN mcrdnburn = new MCRDNBURN(SUB_NAMESPACE, "foo-bar", false);
+        mcrdnburn = mcrdnburn.withNamespaceSuffix("sfx:", false, "");
+
+        assertEquals(NAMESPACE + "sfx:foo-bar", mcrdnburn.asString());
+        assertEquals(NAMESPACE_PREFIX, mcrdnburn.getPREFIX());
+        assertEquals(SUB_NAMESPACE + "sfx:", mcrdnburn.getSubNamespace());
+        assertEquals("foo-bar", mcrdnburn.getNamespaceSpecificString());
+
+    }
+
+    @Test
+    public void testUrnWithoutChecksumNamespaceSuffixWithChecksum() {
+
+        MCRDNBURN mcrdnburn = new MCRDNBURN(SUB_NAMESPACE, "foo-bar", false);
+        mcrdnburn = mcrdnburn.withNamespaceSuffix("sfx:", true, "-");
+
+        assertEquals(NAMESPACE + "sfx:foo-bar-9", mcrdnburn.asString());
+        assertEquals(NAMESPACE_PREFIX, mcrdnburn.getPREFIX());
+        assertEquals(SUB_NAMESPACE + "sfx:", mcrdnburn.getSubNamespace());
+        assertEquals("foo-bar-9", mcrdnburn.getNamespaceSpecificString());
+
+    }
+
+    @Test
+    public void testUrnWithChecksumNamespaceSuffixWithoutChecksum() {
+
+        MCRDNBURN mcrdnburn = new MCRDNBURN(SUB_NAMESPACE, "foo-bar-", true);
+        mcrdnburn = mcrdnburn.withNamespaceSuffix("sfx:", false, "");
+
+        assertEquals(NAMESPACE + "sfx:foo-bar-2", mcrdnburn.asString());
+        assertEquals(NAMESPACE_PREFIX, mcrdnburn.getPREFIX());
+        assertEquals(SUB_NAMESPACE + "sfx:", mcrdnburn.getSubNamespace());
+        assertEquals("foo-bar-2", mcrdnburn.getNamespaceSpecificString());
+
+    }
+
+    @Test
+    public void testUrnWithChecksumNamespaceSuffixWithChecksum() {
+
+        MCRDNBURN mcrdnburn = new MCRDNBURN(SUB_NAMESPACE, "foo-bar-", true);
+        mcrdnburn = mcrdnburn.withNamespaceSuffix("sfx:", true, "-");
+
+        assertEquals(NAMESPACE + "sfx:foo-bar-2-7", mcrdnburn.asString());
+        assertEquals(NAMESPACE_PREFIX, mcrdnburn.getPREFIX());
+        assertEquals(SUB_NAMESPACE + "sfx:", mcrdnburn.getSubNamespace());
+        assertEquals("foo-bar-2-7", mcrdnburn.getNamespaceSpecificString());
 
     }
 
