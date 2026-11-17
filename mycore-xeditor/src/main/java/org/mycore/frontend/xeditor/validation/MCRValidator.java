@@ -31,11 +31,15 @@ public abstract class MCRValidator {
 
     private static final String ATTR_RELEVANT_IF = "relevant-if";
 
+    private static final String ATTR_FORCE_CHECK = "force-check";
+
     private Node ruleElement;
 
     protected String xPath;
 
     protected String relevantIfXPath;
+
+    private boolean forceCheck;
 
     public void init(String baseXPath, Node ruleElement) {
         Node relativeXPath = ruleElement.getAttributes().getNamedItem("xpath");
@@ -44,6 +48,7 @@ public abstract class MCRValidator {
 
         if (hasRequiredAttributes()) {
             relevantIfXPath = getAttributeValue(ATTR_RELEVANT_IF);
+            forceCheck = Boolean.parseBoolean(getAttributeValue(ATTR_FORCE_CHECK));
             configure();
         }
     }
@@ -69,6 +74,15 @@ public abstract class MCRValidator {
         return (getAttributeValue(name) != null);
     }
 
+    /**
+     * Returns {@code true} if validation of the given absolute XPath must be skipped because an earlier rule already
+     * failed there. By default, a failed rule acts as a guard for all following rules on the same XPath. A rule
+     * declared with {@code force-check="true"} is evaluated anyway and may report its own failure.
+     */
+    protected boolean isCheckSkipped(MCRValidationResults results, String absPath) {
+        return !forceCheck && results.hasError(absPath);
+    }
+
     public boolean validate(MCRValidationResults results, MCRBinding root) throws JaxenException {
         MCRBinding binding = new MCRBinding(xPath, false, root);
         boolean isValid = validateBinding(results, binding);
@@ -84,7 +98,7 @@ public abstract class MCRValidator {
             Object node = boundNodes.get(i);
 
             String absPath = MCRXPathBuilder.buildXPath(node);
-            if (results.hasError(absPath)) {
+            if (isCheckSkipped(results, absPath)) {
                 continue;
             }
 
