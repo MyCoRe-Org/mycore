@@ -27,12 +27,12 @@ import org.mycore.pi.MCRPIParser;
 
 /**
  * A {@link MCRDNBURNParser} is a {@link MCRPIParser} for {@link MCRDNBURN} identifier,
- * i.e. URNs in the <code>urn:nbn:de</code> namespace, which ara managed by the DNB.
+ * i.e. URNs in the <code>urn:nbn:de</code> namespace, which are managed by the DNB.
  * <p>
- * While the DNB does no longer incudes checksums to URNs they create, MyCoRe
- * still supports adding checksums, using the algorithm formally used by the DNB.
+ * While the DNB does no longer include checksums when generating URNs, MyCoRe
+ * still supports adding checksums, using the algorithm formerly used by the DNB.
  * <p>
- * If a parsed values ends with {@link MCRDNBURNParser#APPEND_CHECKSUM_MARKER},
+ * If a parsed value ends with {@link MCRDNBURNParser#APPEND_CHECKSUM_MARKER},
  * that marker is replaced by a calculated checksum; otherwise parsed values are not modified.
  * This allows importing of URNs with and without checksums without modifications
  * (when no marker is added), and with automatic addition of the checksum.

@@ -58,7 +58,8 @@ public class MCRFLURNGeneratorTest {
         assertEquals('-', urn.charAt(urn.length() - 2));
 
         String value = urn.substring(NAMESPACE.length() + 1, urn.length() - 2);
-        char checksum = Character.forDigit(new MCRDNBURN("gbv:xyz", "-" + value + "-").calculateChecksum(), 10);
+        MCRDNBURN referenceUrn = new MCRDNBURN("gbv:xyz", "-" + value + "-", true);
+        char checksum = Character.forDigit(referenceUrn.calculateChecksum(), 10);
 
         assertEquals(checksum, urn.charAt(urn.length() - 1));
 
@@ -104,7 +105,8 @@ public class MCRFLURNGeneratorTest {
         assertEquals('-', pi.charAt(pi.length() - 2));
 
         String value = pi.substring(NAMESPACE.length() + 1, pi.length() - 2);
-        char checksum = Character.forDigit(new MCRDNBURN("gbv:xyz", "-" + value + "-").calculateChecksum(), 10);
+        MCRDNBURN referenceUrn = new MCRDNBURN("gbv:xyz", "-" + value + "-", true);
+        char checksum = Character.forDigit(referenceUrn.calculateChecksum(), 10);
 
         assertEquals(checksum, pi.charAt(pi.length() - 1));
 

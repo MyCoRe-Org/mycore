@@ -25,7 +25,7 @@ package org.mycore.pi.urn;
 public abstract class MCRDNBURNGenerator extends MCRDNBURNGeneratorBase {
 
     public MCRDNBURNGenerator(String namespace) {
-        super(namespace, "");
+        super(namespace, true, "");
     }
 
 }
