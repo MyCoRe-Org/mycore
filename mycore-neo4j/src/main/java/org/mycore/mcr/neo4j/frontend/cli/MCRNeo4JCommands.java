@@ -83,6 +83,10 @@ public class MCRNeo4JCommands extends MCRAbstractCommands {
         order = 50)
     public static void synchronizeForMCRID(final String id) {
         LOGGER.info("Synchronize Neo4J with metadata for MCRID");
+        if (isDerivate(id)) {
+            LOGGER.error("{} is a derivate, Neo4J only supports objects", id);
+            return;
+        }
         MCRNeo4JManager clazz = MCRConfiguration2.getOrThrow(NEO4J_MANAGER_CLASS_PROPERTY,
             MCRConfiguration2::instantiateClass);
         MCRObject mcrObject = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(id));
@@ -99,6 +103,9 @@ public class MCRNeo4JCommands extends MCRAbstractCommands {
         List<String> selectedObjectIds = MCRXMLMetadataManager
             .instance().listIDsForBase(baseId);
         for (String objectId : selectedObjectIds) {
+            if (isDerivate(objectId)) {
+                continue;
+            }
             MCRObject mcrObject = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(objectId));
             clazz.updateNodeByMCRObject(mcrObject);
         }
@@ -114,6 +121,9 @@ public class MCRNeo4JCommands extends MCRAbstractCommands {
         List<String> selectedObjectIds = MCRXMLMetadataManager
             .instance().listIDsOfType(type);
         for (String objectId : selectedObjectIds) {
+            if (isDerivate(objectId)) {
+                continue;
+            }
             MCRObject mcrObject = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(objectId));
             clazz.updateNodeByMCRObject(mcrObject);
         }
@@ -128,6 +138,9 @@ public class MCRNeo4JCommands extends MCRAbstractCommands {
             .instance()
             .listIDs();
         for (String objectId : selectedObjectIds) {
+            if (isDerivate(objectId)) {
+                continue;
+            }
             MCRObject mcrObject = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(objectId));
             clazz.updateNodeByMCRObject(mcrObject);
         }
@@ -146,12 +159,20 @@ public class MCRNeo4JCommands extends MCRAbstractCommands {
         order = 90)
     public static void test(final String id) {
         LOGGER.info("Test Query for Neo4J with metadata for MCRID");
+        if (isDerivate(id)) {
+            LOGGER.error("{} is a derivate, Neo4J only supports objects", id);
+            return;
+        }
 
         MCRObject mcrObject = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(id));
         MCRNeo4JParser parser = new MCRNeo4JParser();
         String neo4JQuery = parser.createNeo4JQuery(mcrObject);
 
         LOGGER.info(neo4JQuery);
+    }
+
+    private static boolean isDerivate(String id) {
+        return "derivate".equals(MCRObjectID.getInstance(id).getTypeId());
     }
 
 }
