@@ -29,7 +29,12 @@ import org.mycore.mods.merger.MCRMergeTool;
  * ORCID groups multiple works from different sources that are assumed to represent the same publication.
  *
  * @author Frank Lützenkirchen
+ *
+ * @deprecated The module mycore-orcid is deprecated and will be removed.
+ * Use mycore-orcid2 instead.
  */
+@Deprecated(forRemoval = true)
+@SuppressWarnings("removal")
 public class MCRGroupOfWorks {
 
     private List<MCRWork> works = new ArrayList<>();

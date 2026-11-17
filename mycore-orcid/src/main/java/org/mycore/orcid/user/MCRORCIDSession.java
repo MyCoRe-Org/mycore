@@ -27,6 +27,12 @@ import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 import org.xml.sax.SAXException;
 
+/**
+ * @deprecated The module mycore-orcid is deprecated and will be removed.
+ * Use mycore-orcid2 instead.
+ */
+@Deprecated(forRemoval = true)
+@SuppressWarnings("removal")
 public class MCRORCIDSession {
 
     private static final String KEY_ORCID_USER = "ORCID_USER";

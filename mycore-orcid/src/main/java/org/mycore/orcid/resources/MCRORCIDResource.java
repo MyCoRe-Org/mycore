@@ -45,7 +45,13 @@ import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response.Status;
 
+/**
+ * @deprecated The module mycore-orcid is deprecated and will be removed.
+ * Use mycore-orcid2 instead.
+ */
 @Path("orcid")
+@Deprecated(forRemoval = true)
+@SuppressWarnings("removal")
 public class MCRORCIDResource {
 
     private static final Logger LOGGER = LogManager.getLogger();

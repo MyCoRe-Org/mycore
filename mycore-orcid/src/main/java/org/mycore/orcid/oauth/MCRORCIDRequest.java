@@ -32,7 +32,12 @@ import jakarta.ws.rs.core.Response;
  *
  * @author Frank Lützenkirchen
  * @author Kai Brandhorst
+ *
+ * @deprecated The module mycore-orcid is deprecated and will be removed.
+ * Use mycore-orcid2 instead.
  */
+@Deprecated(forRemoval = true)
+@SuppressWarnings("removal")
 class MCRORCIDRequest {
 
     private Form form = new Form();

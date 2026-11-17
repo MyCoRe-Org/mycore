@@ -31,7 +31,12 @@ import jakarta.ws.rs.core.Response.StatusType;
  * Represents the error information returned from ORCID's REST API in case request was not successful
  *
  * @author Frank Lützenkirchen
+ *
+ * @deprecated The module mycore-orcid is deprecated and will be removed.
+ * Use mycore-orcid2 instead.
  */
+@Deprecated(forRemoval = true)
+@SuppressWarnings("removal")
 public class MCRORCIDException extends IOException {
 
     @Serial

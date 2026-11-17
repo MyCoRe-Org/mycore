@@ -44,7 +44,12 @@ import org.xml.sax.SAXException;
  * The user's ORCID iD and access token are stored as attributes.
  *
  * @author Frank Lützenkirchen
+ *
+ * @deprecated The module mycore-orcid is deprecated and will be removed.
+ * Use mycore-orcid2 instead.
  */
+@Deprecated(forRemoval = true)
+@SuppressWarnings("removal")
 public class MCRORCIDUser {
 
     private static final Logger LOGGER = LogManager.getLogger();

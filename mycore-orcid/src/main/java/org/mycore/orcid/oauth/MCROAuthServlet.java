@@ -51,7 +51,12 @@ import jakarta.servlet.http.HttpServletResponse;
  * See https://members.orcid.org/api/oauth/3legged-oauth
  *
  * @author Frank Lützenkirchen
+ *
+ * @deprecated The module mycore-orcid is deprecated and will be removed.
+ * Use mycore-orcid2 instead.
  */
+@Deprecated(forRemoval = true)
+@SuppressWarnings("removal")
 public class MCROAuthServlet extends MCRServlet {
 
     @Serial
