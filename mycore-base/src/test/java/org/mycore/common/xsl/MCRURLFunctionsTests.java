@@ -49,9 +49,9 @@ public class MCRURLFunctionsTests {
     private static final String VALUE_PARAM_NAME = "value";
     private static final String URL_PREFIX = "http://mycore.org";
 
-    public static final List<DecodingConfiguration> DECODING_CONFIGURATIONS =        Arrays.asList(
-            new DecodingConfiguration("URL", "suppress-form"), 
-            new DecodingConfiguration("form", "suppress-url"));
+    private static final List<DecodingConfiguration> DECODING_CONFIGURATIONS = Arrays.asList(
+        new DecodingConfiguration("URL", "suppress-form"),
+        new DecodingConfiguration("form", "suppress-url"));
 
     public static final String UNICODE_REPLACEMENT_CHARACTER = "�";
 

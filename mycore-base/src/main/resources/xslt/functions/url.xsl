@@ -169,10 +169,7 @@
 
   <xsl:function name="mcrurl:decode-from-uri" as="xs:string">
     <xsl:param name="encodedValue" as="xs:string"/>
-    <xsl:sequence select="string(document(concat(
-      'decodeFromUri:',
-      $encodedValue)))"
-    />
+    <xsl:sequence select="mcrurl:decode-from-uri($encodedValue, false())"/>
   </xsl:function>
 
   <xsl:function name="mcrurl:decode-from-uri" as="xs:string">

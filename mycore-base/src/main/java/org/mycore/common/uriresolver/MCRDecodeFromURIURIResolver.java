@@ -16,16 +16,19 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.common.xsl.uriresolver;
+package org.mycore.common.uriresolver;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.regex.Pattern;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 
 import org.jdom2.Verifier;
+import org.mycore.common.xsl.uriresolver.MCRURIResolverHelper;
+import org.mycore.common.xsl.uriresolver.MCRURIResolverResponse;
 
 /**
  * A {@link MCRDecodeFromURIURIResolver} is a {@link URIResolver} that accepts an URL-encoded
@@ -62,11 +65,14 @@ public final class MCRDecodeFromURIURIResolver implements URIResolver {
 
         String encodedValueAndParameters = href.substring(href.indexOf(':') + 1);
         String[] parts = encodedValueAndParameters.split(Pattern.quote("?"), 2);
-        String encodedValue = parts[0];
-        String parameters = parts.length > 1 ? parts[1] : "";
-        boolean supportFormEncoding = parameters.contains("supportFormEncoding=true");
 
-        String string = decode(encodedValue, supportFormEncoding);
+        String encodedValue = parts[0];
+        String query = parts.length > 1 ? parts[1] : "";
+
+        Map<String, String> queryParameters = MCRURIResolverHelper.parseQueryParameters(query);
+        String supportFormEncoding = queryParameters.getOrDefault("supportFormEncoding", "false");
+
+        String string = decode(encodedValue, Boolean.parseBoolean(supportFormEncoding));
 
         return MCRURIResolverResponse.ofString(string);
 
@@ -82,6 +88,7 @@ public final class MCRDecodeFromURIURIResolver implements URIResolver {
      */
     public static String decode(String encodedValue, boolean supportFormEncoding) throws TransformerException {
         String type = supportFormEncoding ? "form" : "URL";
+        String originalEncodedValue = encodedValue;
         try {
             if (!supportFormEncoding) {
                 encodedValue = encodedValue.replace("+", "%2B");
@@ -90,11 +97,11 @@ public final class MCRDecodeFromURIURIResolver implements URIResolver {
             String reason = Verifier.checkCharacterData(decodedValue);
             if (reason != null) {
                 throw new TransformerException(
-                    "Non-printable " + type + "-decoded value (" + reason + "): " + encodedValue);
+                    "Non-printable " + type + "-decoded value (" + reason + "): " + originalEncodedValue);
             }
             return decodedValue;
         } catch (IllegalArgumentException e) {
-            throw new TransformerException("Invalid " + type + "-encoded value: " + encodedValue, e);
+            throw new TransformerException("Invalid " + type + "-encoded value: " + originalEncodedValue, e);
         }
     }
 
