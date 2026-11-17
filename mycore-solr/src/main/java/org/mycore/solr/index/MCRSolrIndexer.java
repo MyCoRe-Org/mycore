@@ -378,37 +378,44 @@ public class MCRSolrIndexer {
 
         MCRSolrIndexStatistic statistic = null;
         Map<MCRObjectID, MCRContent> contentMap = new HashMap<>((int) (BULK_SIZE * 1.4));
-        int i = 0;
         for (String id : list) {
-            i++;
             try {
                 LOGGER.debug("Preparing \"{}\" for indexing", id);
                 MCRObjectID objId = MCRObjectID.getInstance(id);
-
-                MCRContent content = retrieveIndexContent(objId);
-                contentMap.put(objId, content);
-                if (i % BULK_SIZE == 0 || totalCount == i) {
-                    MCRSolrIndexHandler indexHandler = MCRSolrIndexHandlerFactory.obtainInstance()
-                        .getIndexHandler(contentMap);
-                    if (indexHandler instanceof MCRSolrAbstractIndexHandler aie) {
-                        aie.setDestinationCores(solrCores);
-                    } else {
-                        throw new MCRException("indexHandler " + indexHandler.getClass().getName()
-                            + " does not support indexing with cores");
-                    }
-                    indexHandler.setCommitWithin(BATCH_AUTO_COMMIT_WITHIN_MS);
-                    statistic = indexHandler.getStatistic();
-                    submitIndexHandler(indexHandler);
+                contentMap.put(objId, retrieveIndexContent(objId));
+                if (contentMap.size() >= BULK_SIZE) {
+                    statistic = submitMetadataBulk(contentMap, solrCores);
                     contentMap = new HashMap<>((int) (BULK_SIZE * 1.4));
                 }
             } catch (Exception ex) {
                 LOGGER.error("Error creating index thread for object {}", id, ex);
             }
         }
+        if (!contentMap.isEmpty()) {
+            try {
+                statistic = submitMetadataBulk(contentMap, solrCores);
+            } catch (Exception ex) {
+                LOGGER.error("Error creating index thread for last bulk", ex);
+            }
+        }
         long durationInMilliSeconds = swatch.getDuration().toMillis();
         if (statistic != null) {
             statistic.addTime(durationInMilliSeconds);
         }
+    }
+
+    private static MCRSolrIndexStatistic submitMetadataBulk(Map<MCRObjectID, MCRContent> contentMap,
+        List<MCRSolrCore> solrCores) {
+        MCRSolrIndexHandler indexHandler = MCRSolrIndexHandlerFactory.obtainInstance().getIndexHandler(contentMap);
+        if (indexHandler instanceof MCRSolrAbstractIndexHandler aie) {
+            aie.setDestinationCores(solrCores);
+        } else {
+            throw new MCRException("indexHandler " + indexHandler.getClass().getName()
+                + " does not support indexing with cores");
+        }
+        indexHandler.setCommitWithin(BATCH_AUTO_COMMIT_WITHIN_MS);
+        submitIndexHandler(indexHandler);
+        return indexHandler.getStatistic();
     }
 
     static MCRContent retrieveIndexContent(MCRObjectID objId) {

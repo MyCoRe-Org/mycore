@@ -19,6 +19,7 @@
 package org.mycore.solr.index;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.InputStream;
 import java.util.Date;
@@ -33,10 +34,13 @@ import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRObjectService;
+import org.mycore.test.MCRJPAExtension;
 import org.mycore.test.MCRMetadataExtension;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
+@ExtendWith(MCRJPAExtension.class)
 @ExtendWith(MCRMetadataExtension.class)
 @MCRTestConfiguration(properties = {
     @MCRTestProperty(key = "MCR.Metadata.Type.derivate", string = "true"),
@@ -45,12 +49,21 @@ import org.mycore.test.MyCoReTest;
 public class MCRSolrIndexerTest {
 
     @Test
+    public void retrieveIndexContentExpandsObject() throws Exception {
+        MCRObjectID objectId = MCRObjectID.getInstance("test_document_00000001");
+        store(objectId);
+
+        Element root = MCRSolrIndexer.retrieveIndexContent(objectId).asXML().getRootElement();
+
+        assertEquals("mycoreobject", root.getName());
+        assertTrue(root.getChild("service").getChild("servdates").getChildren("servdate").stream()
+            .anyMatch(e -> MCRObjectService.DATE_TYPE_EFFECTIVE_MODIFIED_DATE.equals(e.getAttributeValue("type"))));
+    }
+
+    @Test
     public void retrieveIndexContentKeepsDerivateData() throws Exception {
         MCRObjectID derivateId = MCRObjectID.getInstance("test_derivate_00000001");
-        try (InputStream is = getClass().getResourceAsStream("/MCRSolrIndexerTest/test_derivate_00000001.xml")) {
-            Document xml = new SAXBuilder().build(is);
-            MCRXMLMetadataManager.getInstance().create(derivateId, xml, new Date());
-        }
+        store(derivateId);
 
         Element root = MCRSolrIndexer.retrieveIndexContent(derivateId).asXML().getRootElement();
 
@@ -60,5 +73,12 @@ public class MCRSolrIndexerTest {
                 .getAttributeValue("href", MCRConstants.XLINK_NAMESPACE));
         assertEquals("document.pdf",
             root.getChild("derivate").getChild("internals").getChild("internal").getAttributeValue("maindoc"));
+    }
+
+    private void store(MCRObjectID id) throws Exception {
+        try (InputStream is = getClass().getResourceAsStream("/MCRSolrIndexerTest/" + id + ".xml")) {
+            Document xml = new SAXBuilder().build(is);
+            MCRXMLMetadataManager.getInstance().create(id, xml, new Date());
+        }
     }
 }
