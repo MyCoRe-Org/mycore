@@ -36,10 +36,10 @@ public class MCRIIIFRegionParserTest {
 
         validCoords.put("0,0,100,100", new MCRIIIFImageSourceRegion(0, 0, 100, 100));
         validCoords.put("100,100,200,200", new MCRIIIFImageSourceRegion(100, 100, 300, 300));
-        validCoords.put("0,0,500,400", new MCRIIIFImageSourceRegion(0, 0, 499, 399));
-        validCoords.put("0,0,1,400", new MCRIIIFImageSourceRegion(0, 0, 1, 399));
-        validCoords.put("pct:10,10,90,90", new MCRIIIFImageSourceRegion(50, 40, 499, 399));
-        validCoords.put("pct:0,0,100,100", new MCRIIIFImageSourceRegion(0, 0, 499, 399));
+        validCoords.put("0,0,500,400", new MCRIIIFImageSourceRegion(0, 0, 500, 400));
+        validCoords.put("0,0,1,400", new MCRIIIFImageSourceRegion(0, 0, 1, 400));
+        validCoords.put("pct:10,10,90,90", new MCRIIIFImageSourceRegion(50, 40, 500, 400));
+        validCoords.put("pct:0,0,100,100", new MCRIIIFImageSourceRegion(0, 0, 500, 400));
 
         for (Map.Entry<String, MCRIIIFImageSourceRegion> entry : validCoords.entrySet()) {
             MCRIIIFImageSourceRegion result = new MCRIIIFRegionParser(entry.getKey(), IMAGE_WIDTH, IMAGE_HEIGHT)
@@ -47,5 +47,23 @@ public class MCRIIIFRegionParserTest {
             Assert.assertEquals(entry.getValue(), result);
         }
 
+    }
+
+    @org.junit.Test
+    public void testRegionAtImageBorder() {
+        Map<String, MCRIIIFImageSourceRegion> validCoords = new Hashtable<>();
+
+        // x2 and y2 are exclusive: a region that reaches the image border must keep its last pixel column and row
+        validCoords.put("full", new MCRIIIFImageSourceRegion(0, 0, 500, 400));
+        validCoords.put("0,0,500,400", new MCRIIIFImageSourceRegion(0, 0, 500, 400));
+        validCoords.put("400,300,100,100", new MCRIIIFImageSourceRegion(400, 300, 500, 400));
+        validCoords.put("400,300,200,200", new MCRIIIFImageSourceRegion(400, 300, 500, 400));
+        validCoords.put("pct:0,0,100,100", new MCRIIIFImageSourceRegion(0, 0, 500, 400));
+
+        for (Map.Entry<String, MCRIIIFImageSourceRegion> entry : validCoords.entrySet()) {
+            MCRIIIFImageSourceRegion result = new MCRIIIFRegionParser(entry.getKey(), IMAGE_WIDTH, IMAGE_HEIGHT)
+                .parseImageRegion();
+            Assert.assertEquals(entry.getKey(), entry.getValue(), result);
+        }
     }
 }

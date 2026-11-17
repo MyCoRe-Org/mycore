@@ -66,7 +66,7 @@ public class MCRIIIFRegionParser {
         if (isPercent()) {
             return parsePercentImageRegion();
         } else if (isFull()) {
-            return new MCRIIIFImageSourceRegion(0, 0, w - 1, h - 1);
+            return new MCRIIIFImageSourceRegion(0, 0, w, h);
         } else if (isSquare()) {
             final int shorterDimension = Math.min(w, h);
             final int x1 = (int) Math.floor(w / 2.0 - shorterDimension / 2.0);
@@ -113,8 +113,8 @@ public class MCRIIIFRegionParser {
         int ny1 = Math.max(0, y1);
 
         // end values bigger then image become as big as image
-        int nx2 = Math.min(w - 1, x2);
-        int ny2 = Math.min(h - 1, y2);
+        int nx2 = Math.min(w, x2);
+        int ny2 = Math.min(h, y2);
 
         return new MCRIIIFImageSourceRegion(nx1, ny1, nx2, ny2);
     }
