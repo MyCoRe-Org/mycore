@@ -102,12 +102,6 @@ public class MCREnricher {
     private static final int MAX_VIRTUAL_THREADS = MCRConfiguration2
         .getInt(CONFIG_PREFIX + "MaxVirtualThreads").orElseThrow();
 
-    /**
-     * Timeout in milliseconds for resolving all datasource calls. A value of {@code 0} means no timeout.
-     */
-    private static final long RESOLVE_TIMEOUT_MILLIS = MCRConfiguration2
-        .getLong(CONFIG_PREFIX + "ResolveTimeout").orElseThrow();
-
     private static final String XPATH_HOST_SERIES = "mods:relatedItem[@type='host' or @type='series']";
 
     private static final String DELIMITERS = " ()";
@@ -183,15 +177,7 @@ public class MCREnricher {
                                    Executors.newVirtualThreadPerTaskExecutor() :
                                    Executors.newFixedThreadPool(MAX_VIRTUAL_THREADS, Thread.ofVirtual().factory());
         try {
-            if (RESOLVE_TIMEOUT_MILLIS == 0) {
-                executor.invokeAll(calls);
-            } else {
-                List<Future<Boolean>> futures = executor.invokeAll(
-                    calls, RESOLVE_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
-                if (futures.stream().anyMatch(Future::isCancelled)) {
-                    LOGGER.warn("Enrichment timed out after {} ms", RESOLVE_TIMEOUT_MILLIS);
-                }
-            }
+            executor.invokeAll(calls);
         } catch (InterruptedException ex) {
             LOGGER.warn(ex);
         } finally {
