@@ -31,6 +31,21 @@ public class MCRIIIFRegionParserTest {
     public static final int IMAGE_HEIGHT = 400;
 
     @org.junit.Test
+    public void testPercentRegionUsesImageHeight() {
+        Map<String, MCRIIIFImageSourceRegion> validCoords = new Hashtable<>();
+
+        // the height of a percent region has to be calculated from the image height, not from the image width
+        validCoords.put("pct:0,0,50,50", new MCRIIIFImageSourceRegion(0, 0, 250, 200));
+        validCoords.put("pct:10,10,20,20", new MCRIIIFImageSourceRegion(50, 40, 150, 120));
+
+        for (Map.Entry<String, MCRIIIFImageSourceRegion> entry : validCoords.entrySet()) {
+            MCRIIIFImageSourceRegion result = new MCRIIIFRegionParser(entry.getKey(), IMAGE_WIDTH, IMAGE_HEIGHT)
+                .parseImageRegion();
+            Assert.assertEquals(entry.getKey(), entry.getValue(), result);
+        }
+    }
+
+    @org.junit.Test
     public void testParseImageRegion() {
         Map<String, MCRIIIFImageSourceRegion> validCoords = new Hashtable<>();
 
