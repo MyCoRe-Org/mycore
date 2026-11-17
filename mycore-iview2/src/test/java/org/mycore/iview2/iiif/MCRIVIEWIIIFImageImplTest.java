@@ -122,15 +122,6 @@ public class MCRIVIEWIIIFImageImplTest extends MCRTestCase {
             countingSpi.disposed.get());
     }
 
-    public static class TestTileFileProvider implements MCRTileFileProvider {
-
-        @Override
-        public Optional<Path> getTileFile(MCRTileInfo tileInfo) {
-            return Optional.of(MCRImage.getTiledFile(tileDir, tileInfo.getDerivate(), tileInfo.getImagePath()));
-        }
-
-    }
-
     private static ImageReaderSpi getJpegReaderSpi() {
         Iterator<ImageReaderSpi> providers = IIORegistry.getDefaultInstance()
             .getServiceProviders(ImageReaderSpi.class, true);
@@ -142,6 +133,15 @@ public class MCRIVIEWIIIFImageImplTest extends MCRTestCase {
             }
         }
         throw new IllegalStateException("No JPEG ImageReader available.");
+    }
+
+    public static class TestTileFileProvider implements MCRTileFileProvider {
+
+        @Override
+        public Optional<Path> getTileFile(MCRTileInfo tileInfo) {
+            return Optional.of(MCRImage.getTiledFile(tileDir, tileInfo.getDerivate(), tileInfo.getImagePath()));
+        }
+
     }
 
     /**
