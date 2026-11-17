@@ -29,6 +29,7 @@ import java.awt.image.BufferedImage;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -177,7 +178,7 @@ public class MCRIIIFImageResource {
                 .header("Access-Control-Allow-Origin", "*")
                 .header("Link", buildCanonicalURL(impl, identifier))
                 .header("Profile", buildProfileURL())
-                .type("image/" + format)
+                .type(getMediaType(format))
                 .lastModified(new Date(information.lastModified))
                 .entity((StreamingOutput) outputStream -> ImageIO.write(provide, format, outputStream)).build();
         } catch (MCRIIIFImageNotFoundException e) {
@@ -192,6 +193,17 @@ public class MCRIIIFImageResource {
                 format, e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
+    }
+
+    /**
+     * Returns the media type for the given image format (file extension of the request).
+     */
+    private static String getMediaType(String format) {
+        return switch (format.toLowerCase(Locale.ROOT)) {
+            case "jpg", "jpeg" -> "image/jpeg";
+            case "tif", "tiff" -> "image/tiff";
+            default -> "image/" + format;
+        };
     }
 
     @GET
