@@ -99,6 +99,16 @@ public class MCRJSONSubscriber implements Flow.Subscriber<JsonObject> {
         completion.complete(null);
     }
 
+    /**
+     * Blocks until this subscriber has completed, which happens on {@link #onComplete()},
+     * {@link #onError(Throwable)} or {@link #cancel()}.
+     * <p>
+     * If the timeout elapses first, the method returns silently and only logs a warning.
+     * If the waiting thread is interrupted, the interrupt flag is restored and the method returns.
+     *
+     * @param timeout the maximum time to wait
+     * @param unit the time unit of the {@code timeout} argument
+     */
     public void awaitCompletion(long timeout, TimeUnit unit) {
         try {
             completion.get(timeout, unit);
