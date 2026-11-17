@@ -211,12 +211,16 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
             LOGGER.info(String.format(Locale.ROOT, "Using zoom-level: %d and scales %s/%s!", sourceZoomLevel,
                 drawScaleX, drawScaleY));
 
-            for (int x = x1Tile; x < x2Tile; x++) {
-                for (int y = y1Tile; y < y2Tile; y++) {
-                    ImageReader imageReader = MCRIView2Tools.getTileImageReader();
-                    BufferedImage tile = MCRIView2Tools.readTile(rootPath, imageReader, sourceZoomLevel, x, y);
-                    graphics.drawImage(tile, x * 256, y * 256, null);
+            ImageReader imageReader = MCRIView2Tools.getTileImageReader();
+            try {
+                for (int x = x1Tile; x < x2Tile; x++) {
+                    for (int y = y1Tile; y < y2Tile; y++) {
+                        BufferedImage tile = MCRIView2Tools.readTile(rootPath, imageReader, sourceZoomLevel, x, y);
+                        graphics.drawImage(tile, x * 256, y * 256, null);
+                    }
                 }
+            } finally {
+                imageReader.dispose();
             }
 
         } catch (IOException e) {
