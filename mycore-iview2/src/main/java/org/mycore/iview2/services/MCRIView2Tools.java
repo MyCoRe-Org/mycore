@@ -22,12 +22,9 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.net.URI;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.FileStore;
 import java.nio.file.FileSystem;
-import java.nio.file.FileSystemAlreadyExistsException;
-import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -243,27 +240,7 @@ public class MCRIView2Tools {
     }
 
     public static FileSystem getFileSystem(Path iviewFile) throws IOException {
-        URI uri = URI.create("jar:" + iviewFile.toUri());
-        try {
-            return FileSystems.newFileSystem(uri, Collections.emptyMap(), MCRClassTools.getClassLoader());
-        } catch (FileSystemAlreadyExistsException exc) {
-            // block until file system is closed
-            try {
-                FileSystem fileSystem = FileSystems.getFileSystem(uri);
-                while (fileSystem.isOpen()) {
-                    try {
-                        Thread.sleep(10);
-                    } catch (InterruptedException ie) {
-                        // get out of here
-                        throw new IOException(ie);
-                    }
-                }
-            } catch (FileSystemNotFoundException fsnfe) {
-                // seems closed now -> do nothing and try to return the file system again
-                LOGGER.debug("Filesystem not found", fsnfe);
-            }
-            return getFileSystem(iviewFile);
-        }
+        return FileSystems.newFileSystem(iviewFile, Collections.emptyMap(), MCRClassTools.getClassLoader());
     }
 
     public static ImageReader getTileImageReader() {
