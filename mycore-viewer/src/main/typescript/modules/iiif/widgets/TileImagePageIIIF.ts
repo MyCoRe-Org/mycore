@@ -27,7 +27,7 @@ export class TileImagePageIIIF extends TileImagePage {
     if (this.vTiles.has(tilePos)) {
       return this.vTiles.get(tilePos);
     } else {
-      if (!this.vLoadingTiles.has(tilePos)) {
+      if (!this.vLoadingTiles.has(tilePos) && !this.vFailedTiles.has(tilePos)) {
         this._loadTileIIIF(tilePos, iiifPos, (img: HTMLImageElement) => {
           this.vTiles.set(tilePos, img);
           if (typeof this.refreshCallback !== 'undefined' && this.refreshCallback !== null) {
@@ -72,6 +72,9 @@ export class TileImagePageIIIF extends TileImagePage {
     };
 
     image.onerror = () => {
+      // a tile that failed is no longer loading, so it must not stay in the map of pending loads
+      this.vLoadingTiles.remove(tilePos);
+      this.vFailedTiles.set(tilePos, true);
       errorCallback();
     };
     image.src = ViewerFormatString(path, iiifPos);

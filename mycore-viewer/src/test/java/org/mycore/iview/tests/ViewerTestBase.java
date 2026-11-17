@@ -57,13 +57,16 @@ public abstract class ViewerTestBase extends MCRSeleniumTestBase {
         WAIT_TIME.remove();
     }
 
-    public static void sleep(long millis) throws InterruptedException {
-        WAIT_TIME.get().addAndGet(millis);
-        Thread.sleep(millis);
+    /**
+     * Records the time spent in an explicit wait, so that {@link #printWaitTime()} can report how long a test class
+     * was blocked waiting for the viewer.
+     */
+    public static void addWaitTime(Duration waited) {
+        WAIT_TIME.get().addAndGet(waited.toMillis());
     }
 
     @Before
-    public void setUp() throws InterruptedException {
+    public void setUp() {
         InetSocketAddress serverAddress = new InetSocketAddress(0);
         Path baseDir = Path.of("target").toAbsolutePath();
         httpServer = SimpleFileServer.createFileServer(serverAddress, baseDir, SimpleFileServer.OutputLevel.INFO);

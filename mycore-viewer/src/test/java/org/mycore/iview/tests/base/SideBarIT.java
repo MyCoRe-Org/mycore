@@ -90,7 +90,7 @@ public class SideBarIT extends ViewerTestBase {
     }
 
     @Test
-    public void testOverviewLayout() throws InterruptedException {
+    public void testOverviewLayout() {
         this.setTestName(getClassname() + "-testOvervieLayout");
         this.getDriver();
         this.getAppController().openViewer(this.getDriver(), getBaseURL(), getTestDerivate());
@@ -104,6 +104,7 @@ public class SideBarIT extends ViewerTestBase {
         tbController.clickElementById(ImageOverviewController.IMAGE_OVERVIEW_SELECTOR);
 
         int before = sbController.countThumbnails();
+        int widthBefore = sbController.getSideBarWidth();
 
         try {
             sbController.dragAndDropByXpath("//div[contains(@class,'sidebar')]/span[@class='resizer']", 300, 0);
@@ -112,7 +113,7 @@ public class SideBarIT extends ViewerTestBase {
             return;
         }
 
-        sleep(1000);
+        sbController.awaitSideBarWidthOtherThan(widthBefore);
         int after = sbController.countThumbnails();
 
         // this test does not really work, because there are only 4 thumbnails left
