@@ -364,18 +364,6 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <url>https://www.mycore.de/maven-repo/</url>
     </repository>
   </repositories>
-  <pluginRepositories>
-    <pluginRepository>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-    </pluginRepository>
-  </pluginRepositories>
   <distributionManagement>
     <site>
       <id>MyCoRe HQ</id>

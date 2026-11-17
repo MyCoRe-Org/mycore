@@ -56,12 +56,11 @@ public class MCRContainerLoginServlet extends MCRServlet {
      */
     @Override
     protected void render(MCRServletJob job, Exception ex) throws Exception {
-        String backToUrl = getProperty(job.getRequest(), "url");
-
-        if (backToUrl == null) {
-            String referer = job.getRequest().getHeader("Referer");
-            backToUrl = (referer != null) ? referer : MCRFrontendUtil.getBaseURL();
-        }
+        String backToUrl = Optional.ofNullable(getProperty(job.getRequest(), "url"))
+            .filter(MCRFrontendUtil::isSafeRedirect)
+            .or(() -> Optional.ofNullable(job.getRequest().getHeader("Referer"))
+                .filter(MCRFrontendUtil::isSafeRedirect))
+            .orElseGet(MCRFrontendUtil::getBaseURL);
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(backToUrl));
     }
 

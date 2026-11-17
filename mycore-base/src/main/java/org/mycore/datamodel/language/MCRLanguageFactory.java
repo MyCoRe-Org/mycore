@@ -27,7 +27,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRConstants;
-import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRTransactionHelper;
 import org.mycore.common.config.MCRConfiguration2;
@@ -36,6 +35,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
+import org.mycore.util.concurrent.MCRTransactionableRunnable;
 
 /**
  * Returns MCRLanguage instances. The languages most commonly used, English and German,
@@ -218,13 +218,14 @@ public class MCRLanguageFactory {
      * Reads in the language classification and builds language objects from its categories
      */
     private void readLanguageClassification() {
-        MCRSession session = MCRSessionMgr.getCurrentSession();
-        if (!MCRTransactionHelper.isTransactionActive()) {
+        if (MCRTransactionHelper.isTransactionActive()) {
+            buildLanguagesFromClassification();
+        } else if (MCRSessionMgr.isLocked()) {
+            new MCRTransactionableRunnable(this::buildLanguagesFromClassification).run();
+        } else {
             MCRTransactionHelper.beginTransaction();
             buildLanguagesFromClassification();
             MCRTransactionHelper.commitTransaction();
-        } else {
-            buildLanguagesFromClassification();
         }
     }
 
