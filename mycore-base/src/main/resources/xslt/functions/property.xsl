@@ -12,15 +12,17 @@
     <xsl:sequence select="$entryDoc/entry/text()"/>
   </xsl:function>
 
-  <xsl:function name="mcrproperty:get-or-else" as="xs:string?">
+  <xsl:function name="mcrproperty:get-or-else" as="xs:string">
     <xsl:param name="key" as="xs:string"/>
     <xsl:param name="fallback" as="xs:string"/>
-    <xsl:sequence select="(mcrproperty:get($key), $fallback)[1]"/>
+    <xsl:variable name="value" select="mcrproperty:get($key)"/>
+    <xsl:sequence select="if (empty($value)) then $fallback else $value"/>
   </xsl:function>
 
   <xsl:function name="mcrproperty:get-boolean" as="xs:boolean">
     <xsl:param name="key" as="xs:string"/>
-    <xsl:sequence select="lower-case(mcrproperty:get($key))='true'"/>
+    <xsl:variable name="value" select="mcrproperty:get($key) "/>
+    <xsl:sequence select="if (empty($value)) then false() else lower-case($value)='true'"/>
   </xsl:function>
 
   <xsl:function name="mcrproperty:one" as="xs:string?">

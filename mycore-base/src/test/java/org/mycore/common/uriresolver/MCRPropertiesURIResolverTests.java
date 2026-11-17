@@ -16,77 +16,85 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.common.xsl;
+package org.mycore.common.uriresolver;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import javax.xml.transform.TransformerException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jdom2.Content;
 import org.jdom2.Element;
+import org.jdom2.Text;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
-import org.mycore.common.util.MCRTestCaseXSLTUtil;
+import org.mycore.common.xsl.uriresolver.MCRURIResolver;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
-public class MCRPropertyFunctionsTests {
+public class MCRPropertiesURIResolverTests {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Test
     @MCRTestConfiguration(properties = {
         @MCRTestProperty(key = "MCR.PropertyTest.Present", string = "present"),
-        @MCRTestProperty(key = "MCR.PropertyTest.False", string = "FaLsE"),
-        @MCRTestProperty(key = "MCR.PropertyTest.True", string = "TruE"),
         @MCRTestProperty(key = "MCR.PropertyTest.Sub.Foo", string = "foo"),
         @MCRTestProperty(key = "MCR.PropertyTest.Sub.Bar", string = "bar"),
         @MCRTestProperty(key = "MCR.PropertyTest.Sub.Baz", string = "baz")
     })
     public void test() throws TransformerException {
-        Map<String, Object> parameters = new HashMap<>();
-        String style = "/xslt/functions/property-test.xsl";
-        Element results = MCRTestCaseXSLTUtil.transform(style, parameters).getRootElement();
 
-        LOGGER.info(new XMLOutputter(Format.getPrettyFormat()).outputString(results));
+        Element absentEntryElement = MCRURIResolver.obtainInstance().resolve("property:MCR.PropertyTest.Absent");
+        LOGGER.info("Absent\n{}", new XMLOutputter(Format.getPrettyFormat()).outputString(absentEntryElement));
 
-        assertEquals("", results.getChildTextNormalize("get-absent"));
-        assertEquals("fallback", results.getChildTextNormalize("get-absent-with-fallback"));
+        assertEquals("entry", absentEntryElement.getName());
+        assertTrue(absentEntryElement.getContent().isEmpty());
 
-        assertEquals("present", results.getChildTextNormalize("get-present"));
-        assertEquals("present", results.getChildTextNormalize("get-present-with-fallback"));
+        Element presentEntryElement = MCRURIResolver.obtainInstance().resolve("property:MCR.PropertyTest.Present");
+        LOGGER.info("Present\n{}", new XMLOutputter(Format.getPrettyFormat()).outputString(presentEntryElement));
 
-        assertEquals("false", results.getChildTextNormalize("get-boolean-absent"));
-        assertEquals("false", results.getChildTextNormalize("get-boolean-present"));
-        assertEquals("false", results.getChildTextNormalize("get-boolean-false"));
-        assertEquals("true", results.getChildTextNormalize("get-boolean-true"));
+        assertEquals("entry", presentEntryElement.getName());
+        assertFalse(presentEntryElement.getContent().isEmpty());
+        assertEquals(1, presentEntryElement.getContent().size());
+        assertEquals(Text.class, presentEntryElement.getContent().getFirst().getClass());
+        assertEquals("present", ((Text) presentEntryElement.getContent().getFirst()).getText());
 
-        Element sub = results.getChild("sub");
-        assertEquals(3, sub.getChildren().size());
+        Element subPropertiesElement = MCRURIResolver.obtainInstance().resolve("property:MCR.PropertyTest.Sub*");
+        LOGGER.info("Sub*\n{}", new XMLOutputter(Format.getPrettyFormat()).outputString(subPropertiesElement));
+
+        assertEquals("properties", subPropertiesElement.getName());
+        assertFalse(subPropertiesElement.getContent().isEmpty());
+        assertEquals(3, subPropertiesElement.getContent().size());
 
         Set<String> values = new HashSet<>(List.of("foo", "bar", "baz"));
-        for (Element item : sub.getChildren()) {
+        for (Content entryContent : subPropertiesElement.getContent()) {
+
+            assertEquals(Element.class, entryContent.getClass());
+            Element entryElement = (Element) entryContent;
+
+            assertEquals("present", ((Text) presentEntryElement.getContent().getFirst()).getText());
 
             // value is one of the values
-            String value = item.getAttributeValue("value");
+            String value = entryElement.getText();
             assertTrue(values.remove(value));
 
             // correct key for the value
-            String key = item.getAttributeValue("key");
+            String key = entryElement.getAttributeValue("key");
             value = Character.toUpperCase(value.charAt(0)) + value.substring(1);
             assertEquals("MCR.PropertyTest.Sub." + value, key);
 
         }
 
     }
+
 }

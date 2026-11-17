@@ -17,6 +17,9 @@
       <get-absent-with-fallback>
         <xsl:value-of select="mcrproperty:get-or-else('MCR.PropertyTest.Absent', 'fallback')"/>
       </get-absent-with-fallback>
+      <get-absent-with-empty-fallback>
+        <xsl:value-of select="mcrproperty:get-or-else('MCR.PropertyTest.Absent', '')"/>
+      </get-absent-with-empty-fallback>
 
       <get-present>
         <xsl:value-of select="mcrproperty:get('MCR.PropertyTest.Present')"/>
@@ -24,6 +27,9 @@
       <get-present-with-fallback>
         <xsl:value-of select="mcrproperty:get-or-else('MCR.PropertyTest.Present', 'fallback')"/>
       </get-present-with-fallback>
+      <get-present-with-empty-fallback>
+        <xsl:value-of select="mcrproperty:get-or-else('MCR.PropertyTest.Present', '')"/>
+      </get-present-with-empty-fallback>
 
       <get-boolean-absent>
         <xsl:value-of select="mcrproperty:get-boolean('MCR.PropertyTest.Absent')"/>
