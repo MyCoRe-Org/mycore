@@ -35,7 +35,7 @@ import org.mycore.dedup.MCRPossibleDuplicate;
  * @param title1    the display title of {@code objectId1}, or {@code null} if unknown
  * @param objectId2 the lexicographically larger object id of the pair
  * @param title2    the display title of {@code objectId2}, or {@code null} if unknown
- * @param criteria  all criteria the two objects have in common
+ * @param criteria  all criteria the two objects have in common, stored as an unmodifiable copy
  */
 public record MCRDuplicateDto(String objectId1, String title1, String objectId2, String title2,
     List<CriterionDto> criteria) {
@@ -51,6 +51,7 @@ public record MCRDuplicateDto(String objectId1, String title1, String objectId2,
             title1 = title2;
             title2 = swappedTitle;
         }
+        criteria = List.copyOf(criteria);
     }
 
     public static MCRDuplicateDto of(MCRPossibleDuplicate duplicate, Map<String, String> titles) {

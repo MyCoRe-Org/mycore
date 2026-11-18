@@ -19,7 +19,9 @@
 package org.mycore.dedup.resources;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -49,5 +51,18 @@ public class MCRDuplicateDtoTest {
         assertEquals("first", dto.title1());
         assertEquals("mcr_test_00000002", dto.objectId2());
         assertEquals("second", dto.title2());
+    }
+
+    @Test
+    public void criteriaAreCopiedAndUnmodifiable() {
+        List<MCRDuplicateDto.CriterionDto> criteria = new ArrayList<>(CRITERIA);
+        MCRDuplicateDto dto = new MCRDuplicateDto("mcr_test_00000001", "first", "mcr_test_00000002", "second",
+            criteria);
+
+        criteria.add(new MCRDuplicateDto.CriterionDto("title-author", "meier: a title"));
+
+        assertEquals(CRITERIA, dto.criteria());
+        assertThrows(UnsupportedOperationException.class,
+            () -> dto.criteria().add(new MCRDuplicateDto.CriterionDto("title-author", "meier: a title")));
     }
 }
