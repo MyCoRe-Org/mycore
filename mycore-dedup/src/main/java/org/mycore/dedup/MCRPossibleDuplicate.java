@@ -44,9 +44,7 @@ public record MCRPossibleDuplicate(String objectId1, String objectId2, Sequenced
         if (copy.isEmpty()) {
             throw new IllegalArgumentException("criteria must not be empty");
         }
-        if (copy.contains(null)) {
-            throw new NullPointerException("criteria must not contain null");
-        }
+        copy.forEach(criterion -> Objects.requireNonNull(criterion, "criteria must not contain null"));
         criteria = Collections.unmodifiableSequencedSet(copy);
     }
 
