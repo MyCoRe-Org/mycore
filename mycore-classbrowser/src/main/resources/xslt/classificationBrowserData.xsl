@@ -9,37 +9,22 @@
 <xsl:stylesheet version="3.0"
   xmlns:mcri18n="http://www.mycore.de/xslt/i18n"
   xmlns:mcrproperty="http://www.mycore.de/xslt/property"
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"  
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   exclude-result-prefixes="#all">
 
 <xsl:output method="xml" omit-xml-declaration="yes" />
 
   <xsl:include href="default-parameters.xsl" />
   <xsl:include href="xslInclude:functions" />
+
   <xsl:template match="/classificationBrowserData">
-    <xsl:variable name="folder.closed" select="mcrproperty:get('MCR.classbrowser.folder.closed')" />
-    <xsl:variable name="folder.open" select="mcrproperty:get('MCR.classbrowser.folder.open')" />
-    <xsl:variable name="folder.leaf" select="mcrproperty:get('MCR.classbrowser.folder.leaf')" />
     <ul class="cbList">
-      <xsl:for-each select="category">
+    <xsl:for-each select="category">
         <xsl:variable name="id" select="translate(concat(../@classification,'_',@id),'+/()[]','ABCDEF')" />
         <li>
-          <xsl:choose>
-            <xsl:when test="@children = 'true'">
-              <button
-                type="button"
-                class="cbToggleBtn"
-                aria-label="{mcri18n:translate('component.classbrowser.toggle')}"
-                aria-expanded="false"
-                aria-controls="cbChildren_{$id}"
-                onclick="toggleClass('{@id}','{$folder.closed}','{$folder.open}');">
-                  <i class="{$folder.closed}" id="cbButton_{$id}" aria-hidden="true"></i>
-              </button>
-            </xsl:when>
-            <xsl:otherwise>
-              <i class="{$folder.leaf}" id="cbButton_{$id}" aria-hidden="true"></i>
-            </xsl:otherwise>
-          </xsl:choose>
+          <xsl:if test="@children = 'true'">
+            <input id="cbButton_{$id}" type="button" value="+" aria-label="{mcri18n:translate('component.classbrowser.toggle')}" aria-expanded="false" onclick="toogle('{@id}');" />
+          </xsl:if>
           <xsl:text> </xsl:text>
           <span class="cbID"><xsl:value-of select="@id" /></span>
           <xsl:if test="@numResults">
@@ -51,7 +36,8 @@
             <span class="cbNum"><xsl:value-of select="@numLinks" /></span>
           </xsl:if>
           <xsl:text> </xsl:text>        
-          <a onclick="return startSearch('{$ServletsBaseURL}solr/select?','{@query}','{../@webpage}','{../@parameters}');" href="{$ServletsBaseURL}solr/select?{@query}&amp;mask={../@webpage}&amp;{../@parameters}">
+           <a onclick="return startSearch('{$ServletsBaseURL}solr/select?','{@query}','{../@webpage}','{../@parameters}');"
+            href="{$ServletsBaseURL}solr/select?{@query}&amp;mask={../@webpage}&amp;{../@parameters}">
             <xsl:value-of select="label" />
           </a>
           <xsl:if test="uri">
@@ -68,6 +54,5 @@
       </xsl:for-each>
     </ul>
   </xsl:template>
-
 
 </xsl:stylesheet>

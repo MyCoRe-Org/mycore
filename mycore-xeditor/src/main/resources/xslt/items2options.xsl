@@ -25,7 +25,7 @@
     </xsl:choose>
   </xsl:template>
 
-    <xsl:template match="item">
+  <xsl:template match="item">
     <xsl:param name="indent" select="''" />
 
     <xsl:variable name="toolTip">
@@ -71,7 +71,6 @@
 	</xsl:choose>
 
   </xsl:template>
-
 
   <xsl:template match="item" mode="label">
     <xsl:variable name="onDisplay">
