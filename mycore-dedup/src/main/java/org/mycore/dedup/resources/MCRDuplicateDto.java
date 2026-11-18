@@ -20,13 +20,16 @@ package org.mycore.dedup.resources;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.mycore.dedup.MCRDeDupCriterion;
 import org.mycore.dedup.MCRPossibleDuplicate;
 
 /**
  * JSON representation of a possible duplicate pair enriched with the display titles of both objects, so
- * that clients can render the pair without loading the object metadata per row.
+ * that clients can render the pair without loading the object metadata per row. The two object ids are
+ * kept in a normalized order ({@code objectId1 <= objectId2}): if they are given the other way round,
+ * they are swapped together with their titles.
  *
  * @param objectId1 the lexicographically smaller object id of the pair
  * @param title1    the display title of {@code objectId1}, or {@code null} if unknown
@@ -36,6 +39,19 @@ import org.mycore.dedup.MCRPossibleDuplicate;
  */
 public record MCRDuplicateDto(String objectId1, String title1, String objectId2, String title2,
     List<CriterionDto> criteria) {
+
+    public MCRDuplicateDto {
+        Objects.requireNonNull(objectId1, "objectId1 must not be null");
+        Objects.requireNonNull(objectId2, "objectId2 must not be null");
+        if (objectId1.compareTo(objectId2) > 0) {
+            String swappedObjectId = objectId1;
+            objectId1 = objectId2;
+            objectId2 = swappedObjectId;
+            String swappedTitle = title1;
+            title1 = title2;
+            title2 = swappedTitle;
+        }
+    }
 
     public static MCRDuplicateDto of(MCRPossibleDuplicate duplicate, Map<String, String> titles) {
         return new MCRDuplicateDto(
