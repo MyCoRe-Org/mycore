@@ -44,6 +44,8 @@ import org.mycore.test.MyCoReTest;
 @MCRTestConfiguration(properties = {
     @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true"),
 })
+@SuppressWarnings("removal")
+@Deprecated(forRemoval = true)
 public class MCRCreateDateDOIGeneratorTest {
 
     public static final String DATE_FORMAT = "yyyyMMdd";

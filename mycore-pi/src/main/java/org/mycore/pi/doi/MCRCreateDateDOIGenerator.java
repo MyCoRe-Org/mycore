@@ -52,7 +52,18 @@ import org.mycore.pi.util.MCRPIGeneratorUtils;
  * [...].Prefix=10.1234
  * [...].CountPrecision=6
  * </code></pre>
+ *
+ * @deprecated Use {@link MCRGenericPIGenerator} with
+ * <ul>
+ * <li>the currently used {@link org.mycore.pi.util.MCRPIGeneratorUtils.Counter},
+ * <li>pattern <code>{PREFIX}/$ObjectDate-$Count</code> (where <code>{PREFIX}</code> is the currently used prefix)
+ * <li>formatter {@link MCRISO8601DateFormatter} (with the currently used date format and locale {@link Locale#ENGLISH})
+ * <li>the currently used counter precision and
+ * <li>type {@link MCRDigitalObjectIdentifier#TEST_DOI_PREFIX}
+ * </ul>
+ * instead.
  */
+@Deprecated(forRemoval = true)
 @MCRConfigurationProxy(proxyClass = MCRCreateDateDOIGenerator.Factory.class)
 public class MCRCreateDateDOIGenerator extends MCRGenericPIGenerator {
 
