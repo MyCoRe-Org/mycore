@@ -161,6 +161,7 @@
           var button = document.getElementById( 'cbButton_<xsl:value-of select="$classification" />_' + categID );
           var children = document.getElementById( childrenID );
           var jButton=jQuery(button);
+          var jToggleButton=jButton.closest('button');
           jButton.toggleClass(closedClass);
           jButton.toggleClass(openClass);
           if (jButton.data("open")==true){
@@ -169,12 +170,14 @@
             openCategs=jQuery.grep(openCategs,function(value){
               return value != categID;
             });
+            jToggleButton.attr('aria-expanded', 'false');
             jButton.data("open", false);
           } else {
             children.className='cbVisible';
             update( childrenID, categID );
             openCategs.push(categID);
             jButton.data("open", true);
+            jToggleButton.attr('aria-expanded', 'true');
           }
         }
 

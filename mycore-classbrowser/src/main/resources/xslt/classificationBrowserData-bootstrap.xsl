@@ -7,8 +7,8 @@
   -->
 
 <xsl:stylesheet version="3.0"
-  xmlns:mcrproperty="http://www.mycore.de/xslt/property"
   xmlns:mcri18n="http://www.mycore.de/xslt/i18n"
+  xmlns:mcrproperty="http://www.mycore.de/xslt/property"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   exclude-result-prefixes="#all">
 
@@ -34,8 +34,12 @@
         <li>
           <xsl:choose>
             <xsl:when test="@children = 'true'">
-              <a tabindex="0" role="button" aria-label="{mcri18n:translate('component.mods.metaData.displayAll')}" aria-expanded="false" 
-              onclick="toggleClass('{@id}','{$folder.closed}','{$folder.open}');"><i class="{$folder.closed}" id="cbButton_{$id}"><!-- WebKit bugfix: no empty divs please --><xsl:comment/></i></a>
+              <button type="button" class="btn btn-link p-0 border-0" aria-label="{mcri18n:translate('component.classbrowser.toggle')}"
+                  aria-expanded="false" 
+                  aria-controls="cbChildren_{$id}"
+                  onclick="toggleClass('{@id}','{$folder.closed}','{$folder.open}');">
+                <i class="{$folder.closed}" id="cbButton_{$id}"><!-- WebKit bugfix: no empty divs please --><xsl:comment/></i>
+              </button>
             </xsl:when>
             <xsl:otherwise>
               <i class="{$folder.leaf}" id="cbButton_{$id}"><!-- WebKit bugfix: no empty divs please --><xsl:comment/></i>

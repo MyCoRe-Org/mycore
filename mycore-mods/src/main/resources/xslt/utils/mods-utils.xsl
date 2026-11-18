@@ -379,8 +379,21 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
+    <xsl:variable name="licenseName">
+      <xsl:choose>
+        <xsl:when test="$license/label[lang($CurrentLang)]/@text">
+          <xsl:value-of select="$license/label[lang($CurrentLang)]/@text" />
+        </xsl:when>
+        <xsl:when test="$license/label[lang($DefaultLang)]/@text">
+          <xsl:value-of select="$license/label[lang($DefaultLang)]/@text" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$licenseId" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
     <a class="cc-logo" rel="license" href="{$aHref}">
-      <img src="{$imgSrc}" alt="licence logo" />
+      <img src="{$imgSrc}" alt="{mcri18n:translate-with-params('component.mods.metaData.dictionary.licenseLogo', string($licenseName))}" />
     </a>
     <xsl:variable name="ccTextLink" select="$MCR.MODS.Utils.ccTextLink" />
     <xsl:if test="$ccTextLink='text' or $ccTextLink='description'">

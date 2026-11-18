@@ -10,6 +10,8 @@
       window["component.session-listing.firstURI"] = &quot;<xsl:value-of select="mcri18n:translate('component.session-listing.firstURI')"/>&quot;;
       window["component.session-listing.firstUserAgent"] = &quot;<xsl:value-of select="mcri18n:translate('component.session-listing.firstUserAgent')"/>&quot;;
       window["component.session-listing.lastURI"] = &quot;<xsl:value-of select="mcri18n:translate('component.session-listing.lastURI')"/>&quot;;
+      window["component.session-listing.showStacktrace"] = "<xsl:value-of select="mcri18n:translate('component.session-listing.showStacktrace')"/>";
+      window["component.session-listing.killSession"] = "<xsl:value-of select="mcri18n:translate('component.session-listing.killSession')"/>";
     </script>
 
     <div id="sessionListingContainer" style="margin-top: 16px;">
@@ -50,26 +52,38 @@
 
         <table id="sessionListingTable" class="table">
           <tr>
-            <th data-criteria="login" onclick="mycore.session.listing.sortByLogin()">
-              <xsl:value-of select="mcri18n:translate('component.session-listing.login')"/>
-              <i class="fas fa-sort "></i>
+            <th data-criteria="login" aria-sort="none">
+              <button type="button" class="btn btn-link p-0 border-0 fw-bold text-reset text-decoration-none" onclick="mycore.session.listing.sortByLogin()">
+                <xsl:value-of select="mcri18n:translate('component.session-listing.login')"/>
+                <xsl:text> </xsl:text>
+                <i class="fas fa-sort" aria-hidden="true"><xsl:comment/></i>
+              </button>
             </th>
-            <th data-criteria="ip" onclick="mycore.session.listing.sortByIP()">
-              <xsl:value-of select="mcri18n:translate('component.session-listing.ip')"/>
-              <i class="fas fa-sort "></i>
+            <th data-criteria="ip" aria-sort="none">
+              <button type="button" class="btn btn-link p-0 border-0 fw-bold text-reset text-decoration-none" onclick="mycore.session.listing.sortByIP()">
+                <xsl:value-of select="mcri18n:translate('component.session-listing.ip')"/>
+                <xsl:text> </xsl:text>
+                <i class="fas fa-sort" aria-hidden="true"><xsl:comment/></i>
+              </button>
             </th>
-            <th data-criteria="createTime" onclick="mycore.session.listing.sortByFirstAccess()">
-              <xsl:value-of select="mcri18n:translate('component.session-listing.firstAccess')"/>
-              <i class="fas fa-sort "></i>
+            <th data-criteria="createTime" aria-sort="none">
+              <button type="button" class="btn btn-link p-0 border-0 fw-bold text-reset text-decoration-none" onclick="mycore.session.listing.sortByFirstAccess()">
+                <xsl:value-of select="mcri18n:translate('component.session-listing.firstAccess')"/>
+                <xsl:text> </xsl:text>
+                <i class="fas fa-sort" aria-hidden="true"><xsl:comment/></i>
+              </button>
+            </th><th data-criteria="lastAccess" aria-sort="none">
+              <button type="button" class="btn btn-link p-0 border-0 fw-bold text-reset text-decoration-none" onclick="mycore.session.listing.sortByLastAccess()">
+                <xsl:value-of select="mcri18n:translate('component.session-listing.lastAccess')"/>
+                <xsl:text> </xsl:text>
+                <i class="fas fa-sort" aria-hidden="true"><xsl:comment/></i>
+              </button>
             </th>
-            <th data-criteria="lastAccess" 
-                onclick="mycore.session.listing.sortByLastAccess()">
-              <xsl:value-of select="mcri18n:translate('component.session-listing.lastAccess')"/>
-              <i class="fas fa-sort "></i>
-            </th>
-            <th data-criteria="stackTrace" onclick="mycore.session.listing.sortByStacktrace()">
-              Stacktrace
-              <i class="fas fa-sort "></i>
+            <th data-criteria="stackTrace" aria-sort="none">
+              <button type="button" class="btn btn-link p-0 border-0 fw-bold text-reset text-decoration-none" onclick="mycore.session.listing.sortByStacktrace()">
+                <xsl:text>Stacktrace </xsl:text>
+                <i class="fas fa-sort" aria-hidden="true"><xsl:comment/></i>
+              </button>
             </th>
             <th>
               <span id="i18n-kill-question" style="display: none;">
