@@ -43,11 +43,21 @@ import jakarta.persistence.UniqueConstraint;
     })
 @NamedQueries({
     @NamedQuery(name = MCRDeDupTitle.DELETE_BY_OBJECT_ID,
-        query = "DELETE FROM MCRDeDupTitle t WHERE t.objectId = :objectId")
+        query = "DELETE FROM MCRDeDupTitle t WHERE t.objectId = :objectId"),
+    @NamedQuery(name = MCRDeDupTitle.FIND_BY_OBJECT_ID,
+        query = "SELECT t FROM MCRDeDupTitle t WHERE t.objectId = :objectId"),
+    @NamedQuery(name = MCRDeDupTitle.FIND_TITLES_BY_OBJECT_IDS,
+        query = "SELECT t.objectId, t.title FROM MCRDeDupTitle t WHERE t.objectId IN (:objectIds)")
 })
 public class MCRDeDupTitle {
 
     public static final String DELETE_BY_OBJECT_ID = "MCRDeDupTitle.deleteByObjectId";
+
+    /** Selects the title entity of the object given as {@code objectId}. */
+    public static final String FIND_BY_OBJECT_ID = "MCRDeDupTitle.findByObjectId";
+
+    /** Selects {@code objectId, title} of all objects given as {@code objectIds}. */
+    public static final String FIND_TITLES_BY_OBJECT_IDS = "MCRDeDupTitle.findTitlesByObjectIds";
 
     /** Maximum number of characters stored for a title; longer titles are truncated. */
     public static final int MAX_TITLE_LENGTH = 1024;

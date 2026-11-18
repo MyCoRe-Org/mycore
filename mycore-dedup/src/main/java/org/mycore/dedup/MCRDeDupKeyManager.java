@@ -128,8 +128,8 @@ public class MCRDeDupKeyManager {
             return Map.of();
         }
         List<Object[]> rows = getEntityManager()
-            .createQuery("SELECT t.objectId, t.title FROM MCRDeDupTitle t WHERE t.objectId IN (:ids)", Object[].class)
-            .setParameter("ids", objectIds)
+            .createNamedQuery(MCRDeDupTitle.FIND_TITLES_BY_OBJECT_IDS, Object[].class)
+            .setParameter("objectIds", objectIds)
             .getResultList();
         Map<String, String> titles = new LinkedHashMap<>();
         for (Object[] row : rows) {
@@ -159,13 +159,9 @@ public class MCRDeDupKeyManager {
      */
     public void addNoDuplicate(MCRObjectID objectIdA, MCRObjectID objectIdB, String creator) {
         ObjectIdPair pair = ObjectIdPair.of(objectIdA.toString(), objectIdB.toString());
-        getEntityManager().createQuery("""
-            insert into MCRDeDupNoDuplicate (objectId1, objectId2, creator, created)
-            values (:id1, :id2, :creator, :created)
-            on conflict do nothing
-            """)
-            .setParameter("id1", pair.first())
-            .setParameter("id2", pair.second())
+        getEntityManager().createNamedQuery(MCRDeDupNoDuplicate.INSERT_IF_ABSENT)
+            .setParameter("objectId1", pair.first())
+            .setParameter("objectId2", pair.second())
             .setParameter("creator", creator)
             .setParameter("created", Instant.now())
             .executeUpdate();
@@ -189,7 +185,7 @@ public class MCRDeDupKeyManager {
      */
     public List<MCRDeDupNoDuplicate> listNoDuplicates() {
         return getEntityManager()
-            .createQuery("SELECT n FROM MCRDeDupNoDuplicate n", MCRDeDupNoDuplicate.class)
+            .createNamedQuery(MCRDeDupNoDuplicate.FIND_ALL, MCRDeDupNoDuplicate.class)
             .getResultList();
     }
 
@@ -202,15 +198,9 @@ public class MCRDeDupKeyManager {
      */
     public List<MCRPossibleDuplicate> findDuplicates(MCRObjectID objectId) {
         String id = objectId.toString();
-        List<Object[]> rows = getEntityManager().createQuery(
-            "SELECT o.objectId, o.type, o.value FROM MCRDeDupKey o, MCRDeDupKey s "
-                + "WHERE s.objectId = :id AND o.type = s.type AND o.value = s.value AND o.objectId <> :id "
-                + "AND NOT EXISTS (SELECT 1 FROM MCRDeDupNoDuplicate n "
-                + "  WHERE (n.objectId1 = :id AND n.objectId2 = o.objectId) "
-                + "     OR (n.objectId2 = :id AND n.objectId1 = o.objectId)) "
-                + "ORDER BY o.objectId, o.type, o.value",
-            Object[].class)
-            .setParameter("id", id)
+        List<Object[]> rows = getEntityManager()
+            .createNamedQuery(MCRDeDupKey.FIND_DUPLICATE_KEYS_OF_OBJECT, Object[].class)
+            .setParameter(PARAM_OBJECT_ID, id)
             .getResultList();
         Map<String, Set<MCRDeDupCriterion>> criteriaByOtherId = new LinkedHashMap<>();
         for (Object[] row : rows) {
@@ -300,12 +290,7 @@ public class MCRDeDupKeyManager {
      */
     public List<MCRPossibleDuplicate> findAllDuplicates() {
         EntityManager em = getEntityManager();
-        List<Object[]> rows = em.createQuery(
-            "SELECT k.objectId, k.type, k.value FROM MCRDeDupKey k "
-                + "WHERE EXISTS (SELECT 1 FROM MCRDeDupKey o "
-                + "  WHERE o.type = k.type AND o.value = k.value AND o.objectId <> k.objectId) "
-                + "ORDER BY k.type, k.value, k.objectId",
-            Object[].class)
+        List<Object[]> rows = em.createNamedQuery(MCRDeDupKey.FIND_SHARED_KEYS, Object[].class)
             .getResultList();
 
         Set<ObjectIdPair> noDuplicatePairs = loadNoDuplicatePairs(em);
@@ -362,14 +347,14 @@ public class MCRDeDupKeyManager {
     }
 
     private Set<ObjectIdPair> loadNoDuplicatePairs(EntityManager em) {
-        return em.createQuery("SELECT n.objectId1, n.objectId2 FROM MCRDeDupNoDuplicate n", Object[].class)
+        return em.createNamedQuery(MCRDeDupNoDuplicate.FIND_ALL_PAIRS, Object[].class)
             .getResultList().stream()
             .map(row -> ObjectIdPair.of((String) row[0], (String) row[1]))
             .collect(Collectors.toSet());
     }
 
     private void removeManagedKeys(EntityManager em, String objectId) {
-        em.createQuery("SELECT k FROM MCRDeDupKey k WHERE k.objectId = :objectId", MCRDeDupKey.class)
+        em.createNamedQuery(MCRDeDupKey.FIND_BY_OBJECT_ID, MCRDeDupKey.class)
             .setParameter(PARAM_OBJECT_ID, objectId)
             .getResultList()
             .forEach(em::remove);
@@ -394,7 +379,7 @@ public class MCRDeDupKeyManager {
     }
 
     private static Optional<MCRDeDupTitle> findTitle(EntityManager em, String objectId) {
-        return em.createQuery("SELECT t FROM MCRDeDupTitle t WHERE t.objectId = :objectId", MCRDeDupTitle.class)
+        return em.createNamedQuery(MCRDeDupTitle.FIND_BY_OBJECT_ID, MCRDeDupTitle.class)
             .setParameter(PARAM_OBJECT_ID, objectId)
             .getResultList().stream()
             .findFirst();
