@@ -40,7 +40,9 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  *     <li><b>Automatic Timeouts:</b> Locks expire automatically after a specified duration, preventing
  *         indefinite locks from crashed or misbehaving clients.</li>
  *     <li><b>Automatic Session Cleanup:</b> As a {@link MCRSessionListener}, it automatically
- *         clears all locks held by a user when their session is destroyed.</li>
+ *         clears the locks held by a session ({@link #lock(MCRObjectID)}) when it is destroyed. Locks with
+ *         another id - e.g. the user's, by the REST API - are not bound to a session: they last until they are
+ *         unlocked or time out.</li>
  *     <li><b>Thread-Safety:</b> Uses a {@link ConcurrentMap} to ensure safe concurrent access
  *         from multiple threads.</li>
  * </ul>
@@ -64,19 +66,16 @@ public final class MCRObjectIDLockTable implements MCRSessionListener {
     }
 
     /**
-     * Removes all locks associated with a given session. This is typically called
-     * automatically when a session is destroyed.
+     * Removes the locks held by a given session, i.e. whose id is the session's. This is typically called
+     * automatically when a session is destroyed. Other locks of the same user stay: every request of the REST API
+     * runs in a session of its own, which ends with the request.
      *
      * @param session The session whose locks should be cleared.
      */
     public void clearTable(MCRSession session) {
         String sessionId = session.getID();
-        String userId = session.getUserInformation().getUserID();
         List<MCRObjectID> toRemoveList = lockMap.entrySet().stream()
-            .filter(entry -> {
-                MCRObjectLock objectLock = entry.getValue();
-                return objectLock.id.equals(sessionId) || objectLock.createdBy.equals(userId);
-            })
+            .filter(entry -> entry.getValue().id.equals(sessionId))
             .map(ConcurrentMap.Entry::getKey)
             .toList();
         for (MCRObjectID objectId : toRemoveList) {
