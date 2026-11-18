@@ -601,6 +601,23 @@ public class MCRCategoryDAOImplTest {
     }
 
     @Test
+    public void lastModifiedIncreasesOnEveryChange() {
+        addWorldClassification();
+        String rootID = category.getId().getRootID();
+        long lastModified = DAO.getLastModified();
+        long rootLastModified = DAO.getLastModified(rootID);
+        // changes within the same millisecond must be detectable, too
+        for (int i = 0; i < 10; i++) {
+            DAO.setLabel(category.getId(), new MCRLabel("ju", "JUnit-Test " + i, null));
+            assertTrue(DAO.getLastModified() > lastModified, "Last modified timestamp did not increase.");
+            assertTrue(DAO.getLastModified(rootID) > rootLastModified,
+                "Last modified timestamp of " + rootID + " did not increase.");
+            lastModified = DAO.getLastModified();
+            rootLastModified = DAO.getLastModified(rootID);
+        }
+    }
+
+    @Test
     public void setLabels() {
         addWorldClassification();
         startNewTransaction();

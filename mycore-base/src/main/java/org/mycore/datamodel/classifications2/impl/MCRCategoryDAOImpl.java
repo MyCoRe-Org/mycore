@@ -32,11 +32,12 @@ import java.net.URI;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.SortedSet;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -73,13 +74,13 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
 
     private static final int LEFT_START_VALUE = 0;
 
-    private static long lastModified = System.currentTimeMillis();
+    private static final AtomicLong LAST_MODIFIED = new AtomicLong(System.currentTimeMillis());
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String NAMED_QUERY_NAMESPACE = "MCRCategory.";
 
-    private static final Map<String, Long> LAST_MODIFIED_MAP = new HashMap<>();
+    private static final Map<String, Long> LAST_MODIFIED_MAP = new ConcurrentHashMap<>();
 
     @Override
     public MCRCategory addCategory(MCRCategoryID parentID, MCRCategory category) {
@@ -575,11 +576,19 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
 
     @Override
     public long getLastModified() {
-        return lastModified;
+        return LAST_MODIFIED.get();
     }
 
     private static void updateTimeStamp() {
-        lastModified = System.currentTimeMillis();
+        LAST_MODIFIED.accumulateAndGet(System.currentTimeMillis(), MCRCategoryDAOImpl::nextTimestamp);
+    }
+
+    /**
+     * Returns the current time, but at least <code>last + 1</code>. Caches like <code>MCRRoleManager</code> compare
+     * timestamps for equality and would miss a second change within the same millisecond otherwise.
+     */
+    private static long nextTimestamp(long last, long now) {
+        return Math.max(last + 1, now);
     }
 
     private static MCRCategoryImpl buildCategoryFromPrefetchedList(List<MCRCategoryDTO> list, MCRCategoryID returnID) {
@@ -697,8 +706,8 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
      * Method updates the last modified timestamp, for the given root id.
      *
      */
-    protected synchronized void updateLastModified(String root) {
-        LAST_MODIFIED_MAP.put(root, System.currentTimeMillis());
+    protected void updateLastModified(String root) {
+        LAST_MODIFIED_MAP.merge(root, System.currentTimeMillis(), MCRCategoryDAOImpl::nextTimestamp);
     }
 
     /**
@@ -708,11 +717,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
      */
     @Override
     public long getLastModified(String root) {
-        Long long1 = LAST_MODIFIED_MAP.get(root);
-        if (long1 != null) {
-            return long1;
-        }
-        return -1;
+        return LAST_MODIFIED_MAP.getOrDefault(root, -1L);
     }
 
     @SuppressWarnings("unchecked")
