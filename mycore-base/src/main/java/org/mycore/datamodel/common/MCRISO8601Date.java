@@ -270,7 +270,7 @@ public class MCRISO8601Date {
 
     @Override
     public int hashCode() {
-        return Objects.hash(dateTimeFormatter, dt, isoFormat);
+        return Objects.hash(isoFormat, getISOString());
     }
 
     @Override
@@ -285,9 +285,10 @@ public class MCRISO8601Date {
             return false;
         }
         final MCRISO8601Date other = (MCRISO8601Date) obj;
-        return Objects.equals(dateTimeFormatter, other.dateTimeFormatter)
-            && Objects.equals(dt, other.dt)
-            && isoFormat == other.isoFormat;
+        // compare the ISO 8601 representation, as DateTimeFormatter does not implement equals()
+        // and the same date may be represented by different TemporalAccessor types (e.g. Instant, ZonedDateTime)
+        return isoFormat == other.isoFormat
+            && Objects.equals(getISOString(), other.getISOString());
     }
 
 }
