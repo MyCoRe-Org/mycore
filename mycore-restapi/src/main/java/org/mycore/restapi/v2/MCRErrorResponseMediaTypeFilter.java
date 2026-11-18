@@ -27,14 +27,17 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Variant;
 
 /**
- * Delivers an {@link MCRErrorResponse} as JSON if the client accepts neither JSON nor XML.
+ * Delivers an {@link MCRErrorResponse} as JSON or XML.
  * <p>
  * An error response carries an {@link MCRErrorResponse} entity without an explicit media type, so Jersey picks
  * the media type from the {@code Accept} header. If the client only accepts e.g. {@code application/zip} or
  * {@code application/pdf}, there is no writer for the error entity in that type, and Jersey answers with an
  * empty {@code 500 Internal Server Error} instead of the original status (e.g. 404). This filter sets JSON as
- * media type in that case, so status, {@code X-Error-*} headers and error body reach the client. Clients that
- * accept JSON or XML keep the negotiated format.
+ * media type in that case, so status, {@code X-Error-*} headers and error body reach the client.
+ * <p>
+ * If the client accepts JSON or XML, but the media type was taken from the {@code @Produces} of the matched resource
+ * method (e.g. {@code image/png}), because the error was raised by a request filter after resource matching, the
+ * media type is set to the accepted one of JSON and XML. Otherwise the negotiated format is kept.
  */
 public class MCRErrorResponseMediaTypeFilter implements ContainerResponseFilter {
 
@@ -45,10 +48,20 @@ public class MCRErrorResponseMediaTypeFilter implements ContainerResponseFilter 
 
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
-        if (responseContext.getEntity() instanceof MCRErrorResponse
-            && requestContext.getRequest().selectVariant(SUPPORTED_VARIANTS) == null) {
+        if (!(responseContext.getEntity() instanceof MCRErrorResponse)) {
+            return;
+        }
+        Variant variant = requestContext.getRequest().selectVariant(SUPPORTED_VARIANTS);
+        if (variant == null) {
             responseContext.setEntity(responseContext.getEntity(), responseContext.getEntityAnnotations(),
                 FALLBACK_MEDIA_TYPE);
+        } else if (responseContext.getMediaType() != null && !isSupported(responseContext.getMediaType())) {
+            responseContext.setEntity(responseContext.getEntity(), responseContext.getEntityAnnotations(),
+                variant.getMediaType());
         }
+    }
+
+    private static boolean isSupported(MediaType mediaType) {
+        return SUPPORTED_VARIANTS.stream().map(Variant::getMediaType).anyMatch(mediaType::isCompatible);
     }
 }
