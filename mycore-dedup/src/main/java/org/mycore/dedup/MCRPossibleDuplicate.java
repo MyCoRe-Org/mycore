@@ -32,7 +32,7 @@ import java.util.SequencedSet;
  *
  * @param objectId1 the lexicographically smaller object id of the pair
  * @param objectId2 the lexicographically larger object id of the pair
- * @param criteria  all criteria the two objects have in common, never empty
+ * @param criteria  all criteria the two objects have in common, never empty and without {@code null}
  */
 public record MCRPossibleDuplicate(String objectId1, String objectId2, SequencedSet<MCRDeDupCriterion> criteria) {
 
@@ -40,10 +40,14 @@ public record MCRPossibleDuplicate(String objectId1, String objectId2, Sequenced
         Objects.requireNonNull(objectId1, "objectId1 must not be null");
         Objects.requireNonNull(objectId2, "objectId2 must not be null");
         Objects.requireNonNull(criteria, "criteria must not be null");
-        if (criteria.isEmpty()) {
+        SequencedSet<MCRDeDupCriterion> copy = new LinkedHashSet<>(criteria);
+        if (copy.isEmpty()) {
             throw new IllegalArgumentException("criteria must not be empty");
         }
-        criteria = Collections.unmodifiableSequencedSet(new LinkedHashSet<>(criteria));
+        if (copy.contains(null)) {
+            throw new NullPointerException("criteria must not contain null");
+        }
+        criteria = Collections.unmodifiableSequencedSet(copy);
     }
 
     /**
