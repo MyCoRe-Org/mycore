@@ -135,6 +135,7 @@
 
           if( button.value == '-' ) {
             button.value = '+';
+            button.setAttribute('aria-expanded', 'false');
             if (button.type == 'image' &amp;&amp; closedImageURL.length > 0){
               button.src=closedImageURL;
             }
@@ -146,6 +147,7 @@
           }
           else {
             button.value = '-';
+            button.setAttribute('aria-expanded', 'true');
             if (button.type == 'image' &amp;&amp; openImageURL.length > 0){
               button.src=openImageURL;
             }
