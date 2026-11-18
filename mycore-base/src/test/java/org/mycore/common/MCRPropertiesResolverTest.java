@@ -16,16 +16,17 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.common.config;
+package org.mycore.common;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
-import org.mycore.common.MCRPropertiesResolver;
+import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationBase;
 
-public class MCRPropertiesURIResolverTest {
+public class MCRPropertiesResolverTest {
 
     @Test
     public void resolve() {
