@@ -19,6 +19,7 @@
 package org.mycore.restapi.v2;
 
 import static org.junit.Assert.assertEquals;
+import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_DERID;
 import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_MCRID;
 
 import java.util.Map;
@@ -69,7 +70,7 @@ public class MCRRejectDerivateIDsFilterTest extends MCRTestCase {
 
     @Test
     public void objectIdIsAccepted() {
-        try (Response response = jersey.target("objects/" + OBJECT_ID).request().get()) {
+        try (Response response = jersey.target("objects/" + OBJECT_ID).request(MediaType.TEXT_PLAIN).get()) {
             assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
             assertEquals(OBJECT_ID, response.readEntity(String.class));
         }
@@ -77,7 +78,7 @@ public class MCRRejectDerivateIDsFilterTest extends MCRTestCase {
 
     @Test
     public void derivateIdIsRejected() {
-        try (Response response = jersey.target("objects/" + DERIVATE_ID).request().get()) {
+        try (Response response = jersey.target("objects/" + DERIVATE_ID).request(MediaType.APPLICATION_JSON).get()) {
             assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
             assertEquals(MCRErrorCodeConstants.MCROBJECT_NOT_FOUND, response.getHeaderString("X-Error-Code"));
         }
@@ -85,9 +86,19 @@ public class MCRRejectDerivateIDsFilterTest extends MCRTestCase {
 
     @Test
     public void derivateIdIsRejectedInSubPath() {
-        try (Response response = jersey.target("objects/" + DERIVATE_ID + "/derivates").request().get()) {
+        try (Response response = jersey.target("objects/" + DERIVATE_ID + "/derivates")
+            .request(MediaType.APPLICATION_JSON).get()) {
             assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
             assertEquals(MCRErrorCodeConstants.MCROBJECT_NOT_FOUND, response.getHeaderString("X-Error-Code"));
+        }
+    }
+
+    @Test
+    public void derivateIdIsAcceptedAsDerid() {
+        try (Response response = jersey.target("objects/" + OBJECT_ID + "/derivates/" + DERIVATE_ID)
+            .request(MediaType.TEXT_PLAIN).get()) {
+            assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+            assertEquals(DERIVATE_ID, response.readEntity(String.class));
         }
     }
 
@@ -95,16 +106,23 @@ public class MCRRejectDerivateIDsFilterTest extends MCRTestCase {
     public static class ObjectResource {
 
         @GET
-        @Produces(MediaType.TEXT_PLAIN)
+        @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
         public String getObject(@PathParam(PARAM_MCRID) String id) {
             return id;
         }
 
         @GET
         @Path("derivates")
-        @Produces(MediaType.TEXT_PLAIN)
+        @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
         public String getDerivates(@PathParam(PARAM_MCRID) String id) {
             return id;
+        }
+
+        @GET
+        @Path("derivates/{" + PARAM_DERID + "}")
+        @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
+        public String getDerivate(@PathParam(PARAM_DERID) String derId) {
+            return derId;
         }
     }
 

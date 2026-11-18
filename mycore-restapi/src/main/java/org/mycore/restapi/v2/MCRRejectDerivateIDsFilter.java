@@ -20,23 +20,29 @@ package org.mycore.restapi.v2;
 
 import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_MCRID;
 
-import java.util.List;
-
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 import jakarta.annotation.Priority;
 import jakarta.ws.rs.Priorities;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
-import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Variant;
 
+/**
+ * Rejects requests whose {@value MCRRestAuthorizationFilter#PARAM_MCRID} path parameter is a derivate ID.
+ * <p>
+ * All v2 resources use {@value MCRRestAuthorizationFilter#PARAM_MCRID} for the ID of an {@code MCRObject}.
+ * Without this filter a derivate ID is accepted there, so e.g. {@code GET /objects/{derid}} returns the derivate
+ * XML, {@code PUT} stores an object document under the derivate ID and {@code DELETE} runs the object delete path.
+ * Derivates are addressed via {@value MCRRestAuthorizationFilter#PARAM_DERID} below their owner object, which is
+ * not checked here.
+ * <p>
+ * The response is {@code 404} with {@link MCRErrorCodeConstants#MCROBJECT_NOT_FOUND}, as for a missing object.
+ * The filter runs after resource matching, so the path parameter is resolved exactly as for the resource method,
+ * and before {@link MCRRestAuthorizationFilter}, so the answer does not depend on permissions on the derivate.
+ */
 @Priority(Priorities.AUTHORIZATION - 1)
 public class MCRRejectDerivateIDsFilter implements ContainerRequestFilter {
-
-    private static final List<Variant> ERROR_VARIANTS = Variant
-        .mediaTypes(MediaType.APPLICATION_JSON_TYPE, MediaType.APPLICATION_XML_TYPE).build();
 
     @Override
     public void filter(ContainerRequestContext requestContext) {
@@ -45,14 +51,9 @@ public class MCRRejectDerivateIDsFilter implements ContainerRequestFilter {
             || !"derivate".equals(MCRObjectID.getInstance(mcrId).getTypeId())) {
             return;
         }
-        Response response = MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
+        throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
             .withErrorCode(MCRErrorCodeConstants.MCROBJECT_NOT_FOUND)
             .withMessage("MCRObject " + mcrId + " not found")
-            .toException()
-            .getResponse();
-        Variant variant = requestContext.getRequest().selectVariant(ERROR_VARIANTS);
-        requestContext.abortWith(Response.fromResponse(response)
-            .type(variant != null ? variant.getMediaType() : MediaType.APPLICATION_JSON_TYPE)
-            .build());
+            .toException();
     }
 }
