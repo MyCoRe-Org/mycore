@@ -27,6 +27,7 @@ import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRTransactionHelper;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyException;
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
@@ -99,10 +100,17 @@ public class MCRAccessKeyUtilsTest extends MCRAccessKeyTestCase {
         final MCRAccessKey accessKey = new MCRAccessKey(READ_KEY, PERMISSION_READ);
         MCRAccessKeyManager.createAccessKey(objectId, accessKey);
         MCRAccessKeyUtils.addAccessKeySecretToCurrentUser(objectId, READ_KEY);
+        commitTransaction();
         assertNotNull(MCRAccessKeyUtils.getAccessKeySecretFromCurrentUser(objectId));
-        startNewTransaction();
         MCRAccessKeyUtils.removeAccessKeySecretFromCurrentUser(objectId);
+        commitTransaction();
         assertNull(MCRAccessKeyUtils.getAccessKeySecretFromCurrentUser(objectId));
+    }
+
+    private void commitTransaction() {
+        endTransaction();
+        MCRTransactionHelper.commitTransaction();
+        beginTransaction();
     }
 
     @Test

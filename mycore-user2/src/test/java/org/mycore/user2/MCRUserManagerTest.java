@@ -41,6 +41,7 @@ import org.junit.Test;
 import org.mycore.access.MCRAccessMock;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRTransactionHelper;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.xml.MCRURIResolver;
@@ -308,8 +309,24 @@ public class MCRUserManagerTest extends MCRUserTestCase {
         MCRUser currentUser = MCRUserManager.getCurrentUser();
         currentUser.setUserAttribute("added", "value");
         MCRUserManager.updateUser(currentUser);
+        commitTransaction();
 
         assertEquals("value", MCRSessionMgr.getCurrentSession().getUserInformation().getUserAttribute("added"));
+    }
+
+    @Test
+    public final void testUpdateUserDoesNotChangeSessionUserOnRollback() {
+        MCRUser sessionUser = MCRUserManager.getUser(user.getUserName()).getSafeCopy();
+        MCRSessionMgr.getCurrentSession().setUserInformation(sessionUser);
+        startNewTransaction();
+        MCRUser currentUser = MCRUserManager.getCurrentUser();
+        currentUser.setUserAttribute("added", "value");
+        MCRUserManager.updateUser(currentUser);
+        getEntityManager().ifPresent(em -> em.getTransaction().setRollbackOnly());
+        startNewTransaction();
+
+        assertSame(sessionUser, MCRSessionMgr.getCurrentSession().getUserInformation());
+        assertNull(MCRUserManager.getCurrentUser().getUserAttribute("added"));
     }
 
     @Test
@@ -322,8 +339,51 @@ public class MCRUserManagerTest extends MCRUserTestCase {
         MCRUser stored = MCRUserManager.getUser(user.getUserName());
         stored.setUserAttribute("added", "value");
         MCRUserManager.updateUser(stored);
+        commitTransaction();
 
         assertSame(otherSessionUser, MCRSessionMgr.getCurrentSession().getUserInformation());
+    }
+
+    @Test
+    public final void testGetCurrentUserDoesNotMapOtherUserInformationToStoredUser() {
+        MCRSessionMgr.getCurrentSession().setUserInformation(new MCRUserInformation() {
+            @Override
+            public String getUserID() {
+                return user.getUserName();
+            }
+
+            @Override
+            public boolean isUserInRole(String role) {
+                return false;
+            }
+
+            @Override
+            public String getUserAttribute(String attribute) {
+                return null;
+            }
+        });
+        startNewTransaction();
+        MCRUser currentUser = MCRUserManager.getCurrentUser();
+
+        assertTrue(currentUser instanceof MCRTransientUser);
+        assertTrue(currentUser.isLocked());
+        assertNull(currentUser.getUserAttribute("junit"));
+    }
+
+    @Test
+    public final void testGetCurrentUserReturnsTransientSessionUser() {
+        MCRSessionMgr.getCurrentSession().setUserInformation(MCRUserManager.getUser(user.getUserName()).getSafeCopy());
+        MCRTransientUser transientUser = new MCRTransientUser(MCRSessionMgr.getCurrentSession().getUserInformation());
+        MCRSessionMgr.getCurrentSession().setUserInformation(transientUser);
+        startNewTransaction();
+
+        assertSame(transientUser, MCRUserManager.getCurrentUser());
+    }
+
+    private void commitTransaction() {
+        endTransaction();
+        MCRTransactionHelper.commitTransaction();
+        beginTransaction();
     }
 
     @Test

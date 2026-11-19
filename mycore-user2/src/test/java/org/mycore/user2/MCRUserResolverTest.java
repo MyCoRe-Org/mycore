@@ -45,7 +45,7 @@ public class MCRUserResolverTest extends MCRUserTestCase {
     }
 
     @Test
-    public void currentUserContainsStoredAttributesForOtherUserInformation() {
+    public void currentUserDoesNotContainStoredAttributesForOtherUserInformation() {
         // e.g. a JWT on the REST API or a login module: the session does not hold an MCRUser
         MCRSessionMgr.getCurrentSession().setUserInformation(new MCRUserInformation() {
             @Override
@@ -64,7 +64,7 @@ public class MCRUserResolverTest extends MCRUserTestCase {
             }
         });
 
-        assertEquals(List.of("existing"), resolveAttributeNames("user:current"));
+        assertEquals(List.of(), resolveAttributeNames("user:current"));
     }
 
     @Test

@@ -302,9 +302,10 @@ public class MCRUserManager {
     }
 
     /**
-     * Replaces the user of the current session by the given updated user, if the session holds this user, so that
-     * the changes (e.g. attributes like access keys, or roles) take effect in the session immediately. Other user
-     * information (e.g. of a JWT or a login module) is not replaced.
+     * Replaces the user of the current session by the given updated user after the transaction has been committed,
+     * if the session holds this stored user, so that the changes (e.g. attributes like access keys, or roles) take
+     * effect in the session. If the transaction is rolled back, the session is not changed. Other user information
+     * (e.g. of a JWT or a login module) and transient users are not replaced.
      *
      * @param user the updated user
      */
@@ -313,11 +314,20 @@ public class MCRUserManager {
             return;
         }
         MCRSession session = MCRSessionMgr.getCurrentSession();
-        if (session.getUserInformation() instanceof MCRUser sessionUser
-            && sessionUser != user && sessionUser.getUserID().equals(user.getUserID())) {
-            // also renews the login time, which invalidates the permissions cached for the session
-            session.setUserInformation(user);
+        if (holdsStoredUser(session, user)) {
+            session.onCommit(() -> {
+                if (holdsStoredUser(session, user)) {
+                    // also renews the login time, which invalidates the permissions cached for the session
+                    session.setUserInformation(user);
+                }
+            });
         }
+    }
+
+    private static boolean holdsStoredUser(MCRSession session, MCRUser user) {
+        return session.getUserInformation() instanceof MCRUser sessionUser
+            && !(sessionUser instanceof MCRTransientUser)
+            && sessionUser != user && sessionUser.getUserID().equals(user.getUserID());
     }
 
     /**
@@ -663,31 +673,29 @@ public class MCRUserManager {
     }
 
     /**
-     * Returns the current user as stored in this user system, so it contains the stored attributes and roles and
-     * is up to date: the session may hold other user information (e.g. of a JWT or a login module) or a copy of
-     * the user from the time of the login. For the data of the login itself, use the user information of the
-     * session instead.
+     * Returns the current user. If the session holds a stored {@link MCRUser}, which is the object from the time of
+     * the login, the user is loaded again, so it contains the attributes and roles stored since the login. The
+     * returned user is then managed by the current entity manager, so changes to it are stored on commit.
      * <p>
-     * Users that are not stored (e.g. the guest, or users of external realms that are not persisted) and all
-     * users if no database is available are returned as built from the user information of the session. If the
-     * session holds a user that has been deleted since the login, it is returned as well and a warning is logged.
+     * Other user information (e.g. of a JWT, a container or a login module, the guest, the super user or other
+     * system users) is never mapped to a stored user, since it only grants what it carries itself: a
+     * {@link MCRTransientUser} is built from it, as are transient users held by the session returned unchanged.
+     * If no database is available, or the user of the session has been deleted since the login, the user of the
+     * session is returned and, in the latter case, a warning is logged.
      *
      * @return the current user, never null
      */
     public static MCRUser getCurrentUser() {
         MCRUserInformation userInformation = MCRSessionMgr.getCurrentSession().getUserInformation();
-        MCRUser sessionUser = userInformation instanceof MCRUser mcrUser ? mcrUser
-            : new MCRTransientUser(userInformation);
-        if (isInvalidUser(sessionUser) || MCREntityManagerProvider.getEntityManagerFactory() == null) {
-            // guest and system user are never stored
+        if (!(userInformation instanceof MCRUser sessionUser)) {
+            return new MCRTransientUser(userInformation);
+        }
+        if (sessionUser instanceof MCRTransientUser || isInvalidUser(sessionUser)
+            || MCREntityManagerProvider.getEntityManagerFactory() == null) {
             return sessionUser;
         }
         return findUser(sessionUser.getUserName(), sessionUser.getRealmID()).orElseGet(() -> {
-            if (!(sessionUser instanceof MCRTransientUser)) {
-                // the user was stored at the time of the login, but has been deleted since
-                LOGGER.warn("User {} does not exist any more, using the user of the session",
-                    sessionUser::getUserID);
-            }
+            LOGGER.warn("User {} does not exist any more, using the user of the session", sessionUser::getUserID);
             return sessionUser;
         });
     }
