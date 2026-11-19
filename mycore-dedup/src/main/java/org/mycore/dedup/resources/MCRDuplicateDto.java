@@ -18,28 +18,59 @@
 
 package org.mycore.dedup.resources;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
+import org.mycore.dedup.MCRDeDupCriterion;
 import org.mycore.dedup.MCRPossibleDuplicate;
 
 /**
  * JSON representation of a possible duplicate pair enriched with the display titles of both objects, so
- * that clients can render the pair without loading the object metadata per row.
+ * that clients can render the pair without loading the object metadata per row. The two object ids are
+ * kept in a normalized order ({@code objectId1 <= objectId2}): if they are given the other way round,
+ * they are swapped together with their titles.
  *
- * @param objectId1      the lexicographically smaller object id of the pair
- * @param title1         the display title of {@code objectId1}, or {@code null} if unknown
- * @param objectId2      the lexicographically larger object id of the pair
- * @param title2         the display title of {@code objectId2}, or {@code null} if unknown
- * @param criterionType  the type of the criterion the two objects have in common
- * @param criterionValue the value of the criterion the two objects have in common
+ * @param objectId1 the lexicographically smaller object id of the pair
+ * @param title1    the display title of {@code objectId1}, or {@code null} if unknown
+ * @param objectId2 the lexicographically larger object id of the pair
+ * @param title2    the display title of {@code objectId2}, or {@code null} if unknown
+ * @param criteria  all criteria the two objects have in common, stored as an unmodifiable copy
  */
 public record MCRDuplicateDto(String objectId1, String title1, String objectId2, String title2,
-    String criterionType, String criterionValue) {
+    List<CriterionDto> criteria) {
+
+    public MCRDuplicateDto {
+        Objects.requireNonNull(objectId1, "objectId1 must not be null");
+        Objects.requireNonNull(objectId2, "objectId2 must not be null");
+        if (objectId1.compareTo(objectId2) > 0) {
+            String swappedObjectId = objectId1;
+            objectId1 = objectId2;
+            objectId2 = swappedObjectId;
+            String swappedTitle = title1;
+            title1 = title2;
+            title2 = swappedTitle;
+        }
+        criteria = List.copyOf(criteria);
+    }
 
     public static MCRDuplicateDto of(MCRPossibleDuplicate duplicate, Map<String, String> titles) {
         return new MCRDuplicateDto(
             duplicate.objectId1(), titles.get(duplicate.objectId1()),
             duplicate.objectId2(), titles.get(duplicate.objectId2()),
-            duplicate.criterion().type(), duplicate.criterion().value());
+            duplicate.criteria().stream().map(CriterionDto::of).toList());
+    }
+
+    /**
+     * JSON representation of a criterion two objects have in common.
+     *
+     * @param type  the type of the criterion
+     * @param value the value of the criterion
+     */
+    public record CriterionDto(String type, String value) {
+
+        public static CriterionDto of(MCRDeDupCriterion criterion) {
+            return new CriterionDto(criterion.type(), criterion.value());
+        }
     }
 }

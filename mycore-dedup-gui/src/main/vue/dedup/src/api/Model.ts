@@ -16,13 +16,20 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+export interface DuplicateCriterion {
+  type: string;
+  value: string;
+}
+
+/**
+ * A pair of possible duplicates together with all criteria the two objects have in common.
+ */
 export interface DuplicateEntry {
   objectId1: string;
   title1: string | null;
   objectId2: string;
   title2: string | null;
-  criterionType: string;
-  criterionValue: string;
+  criteria: DuplicateCriterion[];
 }
 
 export type DuplicateList = DuplicateEntry[];

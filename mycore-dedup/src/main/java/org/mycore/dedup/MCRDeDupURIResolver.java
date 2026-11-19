@@ -20,7 +20,6 @@ package org.mycore.dedup;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -133,8 +132,8 @@ public class MCRDeDupURIResolver implements URIResolver {
     private static Map<String, Set<MCRDeDupCriterion>> groupDuplicates(String objectIdString,
         List<MCRPossibleDuplicate> duplicates) {
         return duplicates.stream()
-            .collect(Collectors.groupingBy(duplicate -> otherId(objectIdString, duplicate), LinkedHashMap::new,
-                Collectors.mapping(MCRPossibleDuplicate::criterion, Collectors.toCollection(LinkedHashSet::new))));
+            .collect(Collectors.toMap(duplicate -> duplicate.otherObjectId(objectIdString),
+                MCRPossibleDuplicate::criteria, (left, right) -> left, LinkedHashMap::new));
     }
 
     private Element buildResult(String forValue, Map<String, ? extends Collection<MCRDeDupCriterion>> duplicates) {
@@ -153,10 +152,6 @@ public class MCRDeDupURIResolver implements URIResolver {
         });
 
         return result;
-    }
-
-    private static String otherId(String objectIdString, MCRPossibleDuplicate duplicate) {
-        return objectIdString.equals(duplicate.objectId1()) ? duplicate.objectId2() : duplicate.objectId1();
     }
 
     /**

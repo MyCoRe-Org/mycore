@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -67,7 +68,7 @@ public class MCRDeDupKeyManagerTest {
         List<MCRPossibleDuplicate> duplicatesOf1 = manager.findDuplicates(id(1));
         assertEquals(1, duplicatesOf1.size());
         assertPair(duplicatesOf1.get(0), id(1), id(2));
-        assertEquals(criterion("identifier", "doi:1"), duplicatesOf1.get(0).criterion());
+        assertEquals(List.of(criterion("identifier", "doi:1")), List.copyOf(duplicatesOf1.get(0).criteria()));
 
         List<MCRPossibleDuplicate> all = manager.findAllDuplicates();
         assertEquals(1, all.size());
@@ -90,20 +91,44 @@ public class MCRDeDupKeyManagerTest {
     }
 
     @Test
-    public void twoSharedCriteriaProduceTwoEntriesForTheSamePair() {
+    public void twoSharedCriteriaAreGroupedIntoOneEntryForThePair() {
         Set<MCRDeDupCriterion> criteria = Set.of(
             criterion("identifier", "doi:1"),
             criterion("title-author", "meier: a title"));
         manager.storeKeys(id(1), criteria);
         manager.storeKeys(id(2), criteria);
 
-        List<MCRPossibleDuplicate> all = manager.findAllDuplicates();
-        assertEquals(2, all.size(), "expected one entry per matching criterion");
-        all.forEach(pair -> assertPair(pair, id(1), id(2)));
-        assertEquals(Set.of(criterion("identifier", "doi:1"), criterion("title-author", "meier: a title")),
-            Set.of(all.get(0).criterion(), all.get(1).criterion()));
+        List<MCRDeDupCriterion> expected = List.of(
+            criterion("identifier", "doi:1"),
+            criterion("title-author", "meier: a title"));
 
-        assertEquals(2, manager.findDuplicates(id(1)).size());
+        List<MCRPossibleDuplicate> all = manager.findAllDuplicates();
+        assertEquals(1, all.size(), "expected one entry per pair");
+        assertPair(all.get(0), id(1), id(2));
+        assertEquals(expected, List.copyOf(all.get(0).criteria()), "criteria must be complete and ordered");
+
+        List<MCRPossibleDuplicate> duplicatesOf1 = manager.findDuplicates(id(1));
+        assertEquals(1, duplicatesOf1.size(), "expected one entry per pair");
+        assertPair(duplicatesOf1.get(0), id(1), id(2));
+        assertEquals(expected, List.copyOf(duplicatesOf1.get(0).criteria()), "criteria must be complete and ordered");
+    }
+
+    @Test
+    public void criteriaOfDifferentBlocksAreCollectedPerPair() {
+        MCRDeDupCriterion identifier = criterion("identifier", "doi:1");
+        MCRDeDupCriterion title = criterion("title-author", "meier: a title");
+        manager.storeKeys(id(1), Set.of(identifier, title));
+        manager.storeKeys(id(2), Set.of(identifier, title));
+        manager.storeKeys(id(3), Set.of(identifier));
+
+        Map<Set<String>, List<MCRDeDupCriterion>> criteriaByPair = manager.findAllDuplicates().stream()
+            .collect(Collectors.toMap(pair -> Set.of(pair.objectId1(), pair.objectId2()),
+                pair -> List.copyOf(pair.criteria())));
+
+        assertEquals(Map.of(
+            Set.of(id(1).toString(), id(2).toString()), List.of(identifier, title),
+            Set.of(id(1).toString(), id(3).toString()), List.of(identifier),
+            Set.of(id(2).toString(), id(3).toString()), List.of(identifier)), criteriaByPair);
     }
 
     @Test
