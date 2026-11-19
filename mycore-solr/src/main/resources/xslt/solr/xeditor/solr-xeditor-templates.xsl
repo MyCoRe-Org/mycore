@@ -36,6 +36,16 @@
       </xsl:choose>
     </xsl:variable>
     <fieldset class="optional col-9">
+        <legend class="visually-hidden">
+          <xsl:choose>
+            <xsl:when test="xedsolr:label">
+              <xsl:value-of select="xedsolr:label" />
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="@name" />
+            </xsl:otherwise>
+          </xsl:choose>
+        </legend>
       <xed:bind xpath="param[@name='{$paraname}']">
         <label class="checkbox-inline" for="{@name}">
           <input type="checkbox" value="{$value}" id="{@name}">
@@ -64,7 +74,7 @@
     <xsl:choose>
       <xsl:when test="@repeatable='true'">
         <div class="form-group">
-          <label class="col-{$xedsolr-label-width} control-label" for="{id}">
+          <label class="col-{$xedsolr-label-width} control-label" for="{$id}">
             <xsl:value-of select="@name" />
           </label>
           <div class="col-{$xedsolr-input-width}">
@@ -80,11 +90,11 @@
                     </input>
                   </div>
                   <div class="col-3">
-                    <span class="float-end">
+                    <div class="float-end">
                       <div class="btn-group">
                         <xed:controls>insert remove</xed:controls>
                       </div>
-                    </span>
+                    </div>
                   </div>
                 </xed:repeat>
               </div>

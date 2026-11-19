@@ -90,7 +90,7 @@
       <xsl:variable name="loadingImage" select="mcrproperty:get('MCR.Ajax.LoadingImage')"/>
 
       <!-- jQuery -->
-      <script type="text/javascript">
+      <script>
         /* &lt;![CDATA[ */
 
         var openCategs=[];
@@ -135,6 +135,7 @@
 
           if( button.value == '-' ) {
             button.value = '+';
+            button.setAttribute('aria-expanded', 'false');
             if (button.type == 'image' &amp;&amp; closedImageURL.length > 0){
               button.src=closedImageURL;
             }
@@ -146,6 +147,7 @@
           }
           else {
             button.value = '-';
+            button.setAttribute('aria-expanded', 'true');
             if (button.type == 'image' &amp;&amp; openImageURL.length > 0){
               button.src=openImageURL;
             }
@@ -161,6 +163,7 @@
           var button = document.getElementById( 'cbButton_<xsl:value-of select="$classification" />_' + categID );
           var children = document.getElementById( childrenID );
           var jButton=jQuery(button);
+          var jToggleButton=jButton.closest('button');
           jButton.toggleClass(closedClass);
           jButton.toggleClass(openClass);
           if (jButton.data("open")==true){
@@ -169,12 +172,14 @@
             openCategs=jQuery.grep(openCategs,function(value){
               return value != categID;
             });
+            jToggleButton.attr('aria-expanded', 'false');
             jButton.data("open", false);
           } else {
             children.className='cbVisible';
             update( childrenID, categID );
             openCategs.push(categID);
             jButton.data("open", true);
+            jToggleButton.attr('aria-expanded', 'true');
           }
         }
 
@@ -209,7 +214,7 @@
 
       <xsl:variable name="id" select="generate-id(.)" />
       <div id="{$id}" class="cbVisible">
-        <script type="text/javascript">
+        <script>
           update('<xsl:value-of select="$id" />','<xsl:value-of select="$category" />', loadState);
         </script>
       </div>

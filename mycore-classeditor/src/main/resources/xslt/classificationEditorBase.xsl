@@ -28,7 +28,7 @@
     <xsl:param name="classeditor.class" select="''"/>
     <xsl:param name="classeditor.categ" select="''"/>
     <xsl:param name="classeditor.showId" select="false()"/>
-    <script type="text/javascript">
+    <script>
       var classeditor = classeditor || {
         dojoVersion: "<xsl:value-of select='$classeditor.dojoVersion' />",
         settings: {

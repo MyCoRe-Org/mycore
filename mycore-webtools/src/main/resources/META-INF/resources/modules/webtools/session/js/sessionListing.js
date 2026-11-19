@@ -45,7 +45,7 @@ mycore.session.listing = {
       const sc = mycore.session.listing.sortCriteria;
       if (sc.criteria !== null) {
         sc.asc = !sc.asc;
-        $("#sessionListingTable th[data-criteria='" + sc.criteria + "']").click();
+        $("#sessionListingTable th[data-criteria='" + sc.criteria + "'] button").click();
       } else {
         mycore.session.listing.render();
       }
@@ -113,6 +113,12 @@ mycore.session.listing = {
     };
     const locale = "de-DE";
     const sc = mycore.session.listing.sortCriteria;
+    $("#sessionListingTable th[data-criteria]").attr("aria-sort", function() {
+      if ($(this).data("criteria") === sc.criteria) {
+        return sc.asc ? "ascending" : "descending";
+      }
+      return "none";
+    });
     $("#sessionListingTable th i")
       .removeClass("fa-sort fa-sort-asc fa-sort-desc")
       .addClass(function() {
@@ -133,10 +139,12 @@ mycore.session.listing = {
         "<td>" + new Date(session.createTime).toLocaleDateString(locale, dateOptions) + "</td>" +
         "<td>" + new Date(session.lastAccessTime).toLocaleDateString(locale, dateOptions) + "</td>" +
         "<td align='center'>" +
-        "<div style='height: 15px; width: 15px; background-color: " + session.constructingStacktrace.color + "; border: 1px solid #999; cursor: pointer;'" +
-        " onclick='mycore.session.listing.showStacktrace(\"" + escapeHtml(session.id) + "\");'></div>" +
+        "<button type='button' class='btn p-0' aria-label='" + escapeHtml(window["component.session-listing.showStacktrace"]) + "'" +
+        " style='height: 15px; width: 15px; background-color: " + session.constructingStacktrace.color + "; border: 1px solid #999;'" +
+        " onclick='mycore.session.listing.showStacktrace(\"" + escapeHtml(session.id) + "\");'></button>" +
         "</td>" +
-        "<td><i href='javascript:void(0)' onclick='mycore.session.listing.kill(`" + escapeHtml(session.id) + "`)' class='fas fa-times' style='cursor: pointer;'></i></td>" +
+        "<td><button type='button' class='btn btn-link p-0 border-0 text-reset' aria-label='" + escapeHtml(window["component.session-listing.killSession"]) + "'" +
+        " onclick='mycore.session.listing.kill(\"" + escapeHtml(session.id) + "\")'><i class='fas fa-times' aria-hidden='true'></i></button></td>" +
         "</tr>"
       );
       table.append(tr);

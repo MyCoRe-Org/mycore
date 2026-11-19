@@ -49,7 +49,7 @@
                 <xsl:text>&#160;</xsl:text>
               </label>
               <div class="col-12 col-md-6 col-lg-8">
-                <input class="form-control" type="text" name="search" value="{@search}" />
+                <input id="search" class="form-control" type="text" name="search" value="{@search}" />
               </div>
             </div>
             <xsl:apply-templates select="." mode="searchFormAdditional" />

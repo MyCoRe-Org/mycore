@@ -7,6 +7,7 @@
  -->
 
 <xsl:stylesheet version="3.0"
+  xmlns:mcri18n="http://www.mycore.de/xslt/i18n"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   exclude-result-prefixes="#all">
 
@@ -21,7 +22,7 @@
       <xsl:variable name="id" select="translate(concat(../@classification,'_',@id),'+/()[]','ABCDEF')" />
       <li>
         <xsl:if test="@children = 'true'">
-          <input id="cbButton_{$id}" type="button" value="+" onclick="toogle('{@id}');" />
+          <input id="cbButton_{$id}" type="button" value="+" aria-label="{mcri18n:translate('component.classbrowser.toggle')}" aria-expanded="false" onclick="toogle('{@id}');" />
         </xsl:if>
         <xsl:text> </xsl:text>
         <span class="cbID"><xsl:value-of select="@id" /></span>
