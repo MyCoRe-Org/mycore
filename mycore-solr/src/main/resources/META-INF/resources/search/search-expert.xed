@@ -145,7 +145,6 @@ form .optional.expanded .fieldset{
                               <label class="visually-hidden" for="param_val_{xed:generate-id()}">Parameter Value</label>
                               <input class="form-control" type="text" placeholder="value" id="param_val_{xed:generate-id()}" />
                             </div>
-                            
                             <div class="col-3">
                               <div class="float-end">
                                 <div class="btn-group">

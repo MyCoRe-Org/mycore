@@ -35,7 +35,7 @@
           <xsl:choose>
             <xsl:when test="@children = 'true'">
               <button type="button" class="btn btn-link p-0 border-0" aria-label="{mcri18n:translate('component.classbrowser.toggle')}"
-                  aria-expanded="false" 
+                  aria-expanded="false"
                   aria-controls="cbChildren_{$id}"
                   onclick="toggleClass('{@id}','{$folder.closed}','{$folder.open}');">
                 <i class="{$folder.closed}" id="cbButton_{$id}"><!-- WebKit bugfix: no empty divs please --><xsl:comment/></i>
