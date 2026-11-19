@@ -8,7 +8,6 @@
 
 <xsl:stylesheet version="3.0"
   xmlns:mcri18n="http://www.mycore.de/xslt/i18n"
-  xmlns:mcrproperty="http://www.mycore.de/xslt/property"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   exclude-result-prefixes="#all">
 
