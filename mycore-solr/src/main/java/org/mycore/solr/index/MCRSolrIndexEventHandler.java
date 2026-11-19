@@ -35,7 +35,6 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
@@ -131,12 +130,12 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
     @Override
     protected synchronized void handleObjectCreated(MCREvent evt, MCRObject obj) {
-        addObject(obj);
+        addById(obj.getId());
     }
 
     @Override
     protected synchronized void handleObjectUpdated(MCREvent evt, MCRObject obj) {
-        addObject(obj);
+        addById(obj.getId());
     }
 
     @Override
@@ -155,7 +154,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void handleAncestorUpdated(MCREvent evt, MCRObject obj) {
-        addObject(obj);
+        addById(obj.getId());
     }
 
     @Override
@@ -169,7 +168,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void handleObjectRepaired(MCREvent evt, MCRObject obj) {
-        addObject(obj);
+        addById(obj.getId());
     }
 
     @Override
@@ -179,35 +178,21 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void handleDerivateCreated(MCREvent evt, MCRDerivate derivate) {
-        addDerivate(derivate);
+        addById(derivate.getId());
     }
 
     @Override
     protected void handleDerivateUpdated(MCREvent evt, MCRDerivate derivate) {
-        addDerivate(derivate);
+        addById(derivate.getId());
     }
 
     @Override
     protected void handleDerivateRepaired(MCREvent evt, MCRDerivate derivate) {
-        addDerivate(derivate);
+        addById(derivate.getId());
     }
 
     private void addById(MCRObjectID id) {
-        if (id.getTypeId().equals(MCRDerivate.OBJECT_TYPE)) {
-            addDerivate(MCRMetadataManager.retrieveMCRDerivate(id));
-        } else {
-            addObject(MCRMetadataManager.retrieveMCRExpandedObject(id));
-        }
-    }
-
-    private void addObject(MCRObject obj) {
-        MCRObjectID id = obj.getId();
-        addContent(id, () -> new MCRBaseContent(MCRMetadataManager.retrieveMCRExpandedObject(id)));
-    }
-
-    private void addDerivate(MCRDerivate derivate) {
-        final MCRObjectID id = derivate.getId();
-        addContent(id, () -> new MCRBaseContent(MCRMetadataManager.retrieveMCRDerivate(id)));
+        addContent(id, () -> MCRSolrIndexer.retrieveIndexContent(id));
     }
 
     @Override

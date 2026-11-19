@@ -54,8 +54,8 @@ import org.mycore.common.events.MCRShutdownHandler.Closeable;
 import org.mycore.common.processing.MCRProcessableDefaultCollection;
 import org.mycore.common.processing.MCRProcessableManager;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.datamodel.metadata.MCRExpandedObject;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.solr.MCRSolrCore;
@@ -378,38 +378,51 @@ public class MCRSolrIndexer {
 
         MCRSolrIndexStatistic statistic = null;
         Map<MCRObjectID, MCRContent> contentMap = new HashMap<>((int) (BULK_SIZE * 1.4));
-        int i = 0;
         for (String id : list) {
-            i++;
             try {
                 LOGGER.debug("Preparing \"{}\" for indexing", id);
                 MCRObjectID objId = MCRObjectID.getInstance(id);
-
-                MCRExpandedObject mcrObject = MCRMetadataManager.retrieveMCRExpandedObject(objId);
-                MCRContent content = new MCRBaseContent(mcrObject);
-                contentMap.put(objId, content);
-                if (i % BULK_SIZE == 0 || totalCount == i) {
-                    MCRSolrIndexHandler indexHandler = MCRSolrIndexHandlerFactory.obtainInstance()
-                        .getIndexHandler(contentMap);
-                    if (indexHandler instanceof MCRSolrAbstractIndexHandler aie) {
-                        aie.setDestinationCores(solrCores);
-                    } else {
-                        throw new MCRException("indexHandler " + indexHandler.getClass().getName()
-                            + " does not support indexing with cores");
-                    }
-                    indexHandler.setCommitWithin(BATCH_AUTO_COMMIT_WITHIN_MS);
-                    statistic = indexHandler.getStatistic();
-                    submitIndexHandler(indexHandler);
+                contentMap.put(objId, retrieveIndexContent(objId));
+                if (contentMap.size() >= BULK_SIZE) {
+                    statistic = submitMetadataBulk(contentMap, solrCores);
                     contentMap = new HashMap<>((int) (BULK_SIZE * 1.4));
                 }
             } catch (Exception ex) {
                 LOGGER.error("Error creating index thread for object {}", id, ex);
             }
         }
+        if (!contentMap.isEmpty()) {
+            try {
+                statistic = submitMetadataBulk(contentMap, solrCores);
+            } catch (Exception ex) {
+                LOGGER.error("Error creating index thread for last bulk", ex);
+            }
+        }
         long durationInMilliSeconds = swatch.getDuration().toMillis();
         if (statistic != null) {
             statistic.addTime(durationInMilliSeconds);
         }
+    }
+
+    private static MCRSolrIndexStatistic submitMetadataBulk(Map<MCRObjectID, MCRContent> contentMap,
+        List<MCRSolrCore> solrCores) {
+        MCRSolrIndexHandler indexHandler = MCRSolrIndexHandlerFactory.obtainInstance().getIndexHandler(contentMap);
+        if (indexHandler instanceof MCRSolrAbstractIndexHandler aie) {
+            aie.setDestinationCores(solrCores);
+        } else {
+            throw new MCRException("indexHandler " + indexHandler.getClass().getName()
+                + " does not support indexing with cores");
+        }
+        indexHandler.setCommitWithin(BATCH_AUTO_COMMIT_WITHIN_MS);
+        submitIndexHandler(indexHandler);
+        return indexHandler.getStatistic();
+    }
+
+    static MCRContent retrieveIndexContent(MCRObjectID objId) {
+        MCRBase mcrBase = MCRDerivate.OBJECT_TYPE.equals(objId.getTypeId())
+            ? MCRMetadataManager.retrieveMCRDerivate(objId)
+            : MCRMetadataManager.retrieveMCRExpandedObject(objId);
+        return new MCRBaseContent(mcrBase);
     }
 
     /**
