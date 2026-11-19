@@ -65,6 +65,7 @@ import org.mycore.solr.MCRSolrUtils;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.index.handlers.MCRSolrAbstractIndexHandler;
+import org.mycore.solr.index.handlers.MCRSolrIndexExceptionHandler;
 import org.mycore.solr.index.handlers.MCRSolrIndexHandlerFactory;
 import org.mycore.solr.index.handlers.MCRSolrOptimizeIndexHandler;
 import org.mycore.solr.index.handlers.stream.MCRSolrFilesIndexHandler;
@@ -96,6 +97,11 @@ public class MCRSolrIndexer {
      * 100.
      */
     static final int BULK_SIZE = MCRConfiguration2.getInt(SOLR_CONFIG_PREFIX + "Indexer.BulkSize").orElse(100);
+
+    private static final MCRSolrIndexExceptionHandler SOLR_EXCEPTION_HANDLER = MCRConfiguration2
+        .getSingleInstanceOfOrThrow(
+            MCRSolrIndexExceptionHandler.class, SOLR_CONFIG_PREFIX + "Indexer.ExceptionHandler");
+
 
     static final MCRProcessableExecutor SOLR_EXECUTOR;
 
@@ -497,7 +503,7 @@ public class MCRSolrIndexer {
         final MCRSolrIndexHandler indexHandler, final int priority) {
         return (handlerList, exc) -> {
             if (exc != null) {
-                LOGGER.error(() -> "Error while submitting index handler: " + indexHandler, exc);
+                SOLR_EXCEPTION_HANDLER.handleException(indexHandler, exc);
                 return;
             }
             if (handlerList == null || handlerList.isEmpty()) {
