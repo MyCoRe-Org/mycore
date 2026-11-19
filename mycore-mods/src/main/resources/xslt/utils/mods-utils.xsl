@@ -413,7 +413,7 @@
 
   <xsl:template match="mods:accessCondition" mode="oa-logo">
     <a rel="license" href="https://open-access.net/">
-      <img src="//open-access.net/fileadmin/logos/OpenAccess_Logo.JPG" style="width: 25%;" alt="Open access logo"/>
+      <img src="//open-access.net/fileadmin/logos/OpenAccess_Logo.JPG" style="width: 25%;" alt="Open Access logo"/>
     </a>
   </xsl:template>
 

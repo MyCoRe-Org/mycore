@@ -52,7 +52,7 @@
     </xsl:template>
 
     <xsl:template match="form">
-        <form action="{@action}" method="post" class="form-login">            
+        <form action="{@action}" method="post" class="form-login">
             <fieldset>
                 <legend class="form-login-heading">
                     <xsl:value-of select="mcri18n:translate('component.user2.login.heading')" />
@@ -76,7 +76,7 @@
                         </button>
                         <button class="btn btn-secondary ms-3" type="button" onClick="self.location.href='{../returnURL}'">
                             <xsl:value-of select="mcri18n:translate('component.user2.button.cancel')" />
-                         </button>
+                        </button>
                     </xsl:otherwise>
                 </xsl:choose>
             </div>
@@ -114,8 +114,7 @@
                             </xsl:attribute>
                         </input>
                     </div>
-                </div>
-                
+                </div>                
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>

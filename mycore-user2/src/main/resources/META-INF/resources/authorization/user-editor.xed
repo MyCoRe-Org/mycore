@@ -188,7 +188,7 @@
                   <xed:output value="@realm" />
                 </xed:when>
                 <xed:otherwise>
-                  <xed:output i18n="component.user2.login.select2" />
+                  <xed:output i18n="component.user2.login.pleaseSelect" />
                 </xed:otherwise>
               </xed:choose>
               <xed:output value="']'" />
@@ -220,7 +220,7 @@
                     <xed:output value="label/@text" />
                   </xed:when>
                   <xed:otherwise>
-                    <xed:output i18n="component.user2.login.select2" />
+                    <xed:output i18n="component.user2.login.pleaseSelect" />
                   </xed:otherwise>
                 </xed:choose>
                 <xed:output value="']'" />
@@ -249,7 +249,7 @@
               <xed:bind xpath="@name">
                 <select class="form-control">
                   <option value="">
-                    <xed:output i18n="component.user2.login.select2" />
+                    <xed:output i18n="component.user2.login.pleaseSelect" />
                   </option>
                   <xed:include uri="xslStyle:items2options:classification:editor:-1:children:user_attributes"/>
                 </select>

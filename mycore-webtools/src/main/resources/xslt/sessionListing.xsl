@@ -72,7 +72,8 @@
                 <xsl:text> </xsl:text>
                 <i class="fas fa-sort" aria-hidden="true"><xsl:comment/></i>
               </button>
-            </th><th data-criteria="lastAccess" aria-sort="none">
+            </th>
+            <th data-criteria="lastAccess" aria-sort="none">
               <button type="button" class="btn btn-link p-0 border-0 fw-bold text-reset text-decoration-none" onclick="mycore.session.listing.sortByLastAccess()">
                 <xsl:value-of select="mcri18n:translate('component.session-listing.lastAccess')"/>
                 <xsl:text> </xsl:text>
