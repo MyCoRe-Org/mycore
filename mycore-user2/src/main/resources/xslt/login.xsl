@@ -114,7 +114,7 @@
                             </xsl:attribute>
                         </input>
                     </div>
-                </div>                
+                </div>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
