@@ -139,7 +139,7 @@ mycore.session.listing = {
         "<td>" + new Date(session.createTime).toLocaleDateString(locale, dateOptions) + "</td>" +
         "<td>" + new Date(session.lastAccessTime).toLocaleDateString(locale, dateOptions) + "</td>" +
         "<td align='center'>" +
-        "<button type='button' class='btn p-0 border-0' aria-label='" + escapeHtml(window["component.session-listing.showStacktrace"]) + "'" +
+        "<button type='button' class='btn p-0' aria-label='" + escapeHtml(window["component.session-listing.showStacktrace"]) + "'" +
         " style='height: 15px; width: 15px; background-color: " + session.constructingStacktrace.color + "; border: 1px solid #999;'" +
         " onclick='mycore.session.listing.showStacktrace(\"" + escapeHtml(session.id) + "\");'></button>" +
         "</td>" +
