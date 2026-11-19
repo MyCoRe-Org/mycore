@@ -118,7 +118,7 @@ public class MCRTilingAction implements Runnable {
                 mergeTransaction.rollback();
             }
             try {
-                Files.deleteIfExists(MCRImage.getTiledFile(tileDir, tileJob.getDerivate(), tileJob.getPath()));
+                Files.deleteIfExists(MCRImage.getTiledPath(tileDir, tileJob.getDerivate(), tileJob.getPath()));
             } catch (IOException e1) {
                 LOGGER.error("Could not delete tile file after error!", e);
             }

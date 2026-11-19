@@ -105,7 +105,7 @@ public class MCRIViewZipResource {
                         Objects.requireNonNull(attrs);
                         MCRPath mcrPath = MCRPath.ofPath(file);
                         if (MCRIView2Tools.isFileSupported(file)) {
-                            java.nio.file.Path iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(),
+                            java.nio.file.Path iviewFile = MCRImage.getTiledPath(MCRIView2Tools.getTileDir(),
                                 mcrPath.getOwner(), mcrPath.getOwnerRelativePath());
                             if (!Files.exists(iviewFile)) {
                                 return super.visitFile(iviewFile, attrs);

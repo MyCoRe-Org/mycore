@@ -84,7 +84,11 @@ public class MCRThumbnailForPdfEventHandler extends MCREventHandlerBase {
         deleteThumbnail(der);
     }
 
-    private void updateThumbnail(MCRDerivate der) {
+    /**
+     * Deletes the thumbnail of the derivate's main document and creates a new one, if the derivate qualifies.
+     * @param der the derivate
+     */
+    public void updateThumbnail(MCRDerivate der) {
         deleteThumbnail(der);
         if (isQualifyingDerivate(der)) {
             final MCRJob job = new MCRJob(MCRPDFThumbnailJobAction.class);
