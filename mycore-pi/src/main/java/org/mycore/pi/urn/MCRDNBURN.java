@@ -30,8 +30,19 @@ public class MCRDNBURN extends MCRUniformResourceName {
 
     public static final String URN_NID = "nbn:de:";
 
+    private final boolean appendChecksum;
+
+    /**
+     * @deprecated Use {@link MCRDNBURN(String, String, boolean)} instead.
+     */
+    @Deprecated(forRemoval = true)
     public MCRDNBURN(String subNamespace, String namespaceSpecificString) {
+        this(subNamespace, namespaceSpecificString, true);
+    }
+
+    public MCRDNBURN(String subNamespace, String namespaceSpecificString, boolean appendChecksum) {
         super(subNamespace, namespaceSpecificString);
+        this.appendChecksum = appendChecksum;
     }
 
     /**
@@ -113,27 +124,75 @@ public class MCRDNBURN extends MCRUniformResourceName {
         /* in this case we must add zeroes */
         if (valueSLen < maxSLen) {
             int zeroesToAdd = maxSLen - valueSLen;
-            builder.append("0".repeat(zeroesToAdd));
+            builder.repeat("0", zeroesToAdd);
             return builder.append(valueS).toString();
         }
         /* no need to add zeroes at all */
         return valueS;
     }
 
+    /**
+     * @deprecated Use {@link MCRDNBURN#toGranular(String, String, boolean, String)} instead.
+     */
+    @Deprecated(forRemoval = true)
     public MCRDNBURN toGranular(String setID, String index) {
-        return new MCRDNBURN(getSubNamespace(), getGranularNamespaceSpecificString(setID, index));
+        return toGranular(setID, index, true, "");
     }
 
-    public MCRDNBURN withSuffix(String suffix) {
-        return new MCRDNBURN(getSubNamespace(), getNamespaceSpecificString() + suffix);
+    public MCRDNBURN toGranular(String setID, String index, boolean appendChecksum, String checksumDelimiter) {
+        String granularNsss = getGranularNamespaceSpecificString(setID, index);
+        if (appendChecksum) {
+            return new MCRDNBURN(getSubNamespace(), granularNsss + checksumDelimiter, true);
+        } else {
+            return new MCRDNBURN(getSubNamespace(), granularNsss, false);
+        }
     }
 
-    public MCRDNBURN withNamespaceSuffix(String suffix) {
-        return new MCRDNBURN(getSubNamespace() + suffix, getNamespaceSpecificString());
-    }
-
+    /**
+     * @deprecated Use {@link MCRDNBURN#toGranular(String, int, int, boolean, String)} instead.
+     */
+    @Deprecated(forRemoval = true)
     public MCRDNBURN toGranular(String setID, int i, int max) {
-        return toGranular(setID, addLeadingZeroes(max, i));
+        return toGranular(setID, i, max, true, "");
+    }
+
+    public MCRDNBURN toGranular(String setID, int i, int max, boolean appendChecksum, String checksumDelimiter) {
+        return toGranular(setID, addLeadingZeroes(max, i), appendChecksum, checksumDelimiter);
+    }
+
+    /**
+     * @deprecated Use {@link MCRDNBURN#withSuffix(String, boolean, String)} instead.
+     */
+    @Deprecated(forRemoval = true)
+    public MCRDNBURN withSuffix(String suffix) {
+        return withSuffix(suffix, true, "");
+    }
+
+    public MCRDNBURN withSuffix(String suffix, boolean appendChecksum, String checksumDelimiter) {
+        String nsss = getNamespaceSpecificString() + suffix;
+        if (appendChecksum) {
+            return new MCRDNBURN(getSubNamespace(), nsss + checksumDelimiter, true);
+        } else {
+            return new MCRDNBURN(getSubNamespace(), nsss, false);
+        }
+    }
+
+    /**
+     * @deprecated Use {@link MCRDNBURN#withNamespaceSuffix(String, boolean, String)} instead.
+     */
+    @Deprecated(forRemoval = true)
+    public MCRDNBURN withNamespaceSuffix(String suffix) {
+        return withNamespaceSuffix(suffix, true, "");
+    }
+
+    public MCRDNBURN withNamespaceSuffix(String suffix, boolean appendChecksum, String checksumDelimiter) {
+        String subNamespace = getSubNamespace() + suffix;
+        String nsss = getNamespaceSpecificString();
+        if (appendChecksum) {
+            return new MCRDNBURN(subNamespace, nsss + checksumDelimiter, true);
+        } else {
+            return new MCRDNBURN(subNamespace, nsss, false);
+        }
     }
 
     private String getGranularNamespaceSpecificString(String setID, String index) {
@@ -142,7 +201,11 @@ public class MCRDNBURN extends MCRUniformResourceName {
 
     @Override
     public String getNamespaceSpecificString() {
-        return super.getNamespaceSpecificString() + calculateChecksum();
+        if (appendChecksum) {
+            return super.getNamespaceSpecificString() + calculateChecksum();
+        } else {
+            return super.getNamespaceSpecificString();
+        }
     }
 
     /**

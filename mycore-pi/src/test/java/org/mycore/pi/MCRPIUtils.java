@@ -58,7 +58,7 @@ public class MCRPIUtils {
 
     private static MCRDNBURN generateURNFor(MCRObjectID mycoreID, String namespace)
         throws MCRPersistentIdentifierException {
-        MCRUUIDURNGenerator generator = new MCRUUIDURNGenerator(namespace, "");
+        MCRUUIDURNGenerator generator = new MCRUUIDURNGenerator(namespace, true, "");
         MCRObject mcrObject1 = new MCRObject();
         mcrObject1.setId(mycoreID);
         return generator.generate(mcrObject1, "");
