@@ -29,10 +29,12 @@ import java.awt.image.BufferedImage;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
+import javax.imageio.ImageTypeSpecifier;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -170,6 +172,11 @@ public class MCRIIIFImageResource {
             BufferedImage provide = impl
                 .provide(identifier, sourceRegion, targetSize, parsedRotation, imageQuality, format);
 
+            if (!ImageIO.getImageWriters(ImageTypeSpecifier.createFromRenderedImage(provide), format).hasNext()) {
+                // ImageIO.write() would silently write nothing
+                throw new MCRIIIFUnsupportedFormatException(format + " (quality: " + quality + ")");
+            }
+
             Response.Status status = rp.isCompleteValid() ? Response.Status.OK : Response.Status.BAD_REQUEST;
 
             Response.ResponseBuilder responseBuilder = Response.status(status);
@@ -177,7 +184,7 @@ public class MCRIIIFImageResource {
                 .header("Access-Control-Allow-Origin", "*")
                 .header("Link", buildCanonicalURL(impl, identifier))
                 .header("Profile", buildProfileURL())
-                .type("image/" + format)
+                .type(getMediaType(format))
                 .lastModified(new Date(information.lastModified))
                 .entity((StreamingOutput) outputStream -> ImageIO.write(provide, format, outputStream)).build();
         } catch (MCRIIIFImageNotFoundException e) {
@@ -192,6 +199,25 @@ public class MCRIIIFImageResource {
                 format, e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
+    }
+
+    /**
+     * Returns the media type for the given image format (file extension of the request).
+     *
+     * @see <a href="https://iiif.io/api/image/3.0/#45-format">IIIF Image API 3.0, 4.5 Format</a>
+     */
+    static String getMediaType(String format) {
+        return switch (format.toLowerCase(Locale.ROOT)) {
+            case "jpg", "jpeg" -> "image/jpeg";
+            case "tif", "tiff" -> "image/tiff";
+            case "png" -> "image/png";
+            case "gif" -> "image/gif";
+            case "jp2" -> "image/jp2";
+            case "pdf" -> "application/pdf";
+            case "webp" -> "image/webp";
+            case "wbmp" -> "image/vnd.wap.wbmp";
+            default -> "image/" + format;
+        };
     }
 
     @GET
