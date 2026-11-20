@@ -45,7 +45,8 @@ public interface MCRRestObjectLockService {
      * @param id          the object ID
      * @param requestBody lock request object (must not be {@code null})
      * @return the updated or newly created lock
-     * @throws jakarta.ws.rs.WebApplicationException 409 if a lock exists but is owned by another user
+     * @throws jakarta.ws.rs.WebApplicationException 400 if the requested timeout is not positive;
+     *                                               409 if a lock exists but is owned by another user
      */
     MCRObjectLock putLock(@PathParam(PARAM_MCRID) MCRObjectID id, MCRObjectLock requestBody);
 

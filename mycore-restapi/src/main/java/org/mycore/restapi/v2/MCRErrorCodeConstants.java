@@ -48,6 +48,8 @@ public final class MCRErrorCodeConstants {
 
     public static final String MCROBJECT_LOCKED_BY_DIFFERENT_USER = "MCROBJECT_LOCKED_BY_DIFFERENT_USER";
 
+    public static final String MCROBJECT_INVALID_LOCK_TIMEOUT = "MCROBJECT_INVALID_LOCK_TIMEOUT";
+
     //MCRDerivate
     public static final String MCRDERIVATE_NO_PERMISSION = "MCRDERIVATE_NO_PERMISSION";
 
