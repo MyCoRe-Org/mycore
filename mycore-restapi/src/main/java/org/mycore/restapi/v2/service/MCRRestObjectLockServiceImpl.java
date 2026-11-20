@@ -122,11 +122,14 @@ public class MCRRestObjectLockServiceImpl implements MCRRestObjectLockService {
      * @param id      the object ID
      * @param timeout the timeout in milliseconds (maybe {@code null})
      * @return the created lock
+     * @throws jakarta.ws.rs.WebApplicationException 409 if another user locked the object in the meantime
      */
     private static MCRObjectLock createLock(MCRObjectID id, Integer timeout) {
         String userId = MCRSessionMgr.getCurrentSession().getUserInformation().getUserID();
         int lockTimeout = timeout != null ? timeout : Math.min(TIMEOUT_DEFAULT, TIMEOUT_MAX);
-        return MCRObjectIDLockTable.lock(id, userId, userId, lockTimeout);
+        MCRObjectLock lock = MCRObjectIDLockTable.lock(id, userId, userId, lockTimeout);
+        checkLockIdsAreEqual(userId, lock.getId());
+        return lock;
     }
 
     /**
