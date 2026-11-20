@@ -46,6 +46,32 @@ public class MCRIIIFRegionParserTest {
     }
 
     @org.junit.Test
+    public void testPercentRegionUpToImageBorderIsValid() {
+        // percent * (size / 100.0) can be slightly bigger than the exact value, e.g. 100 * (1005 / 100.0) =
+        // 1005.0000000000001, which was rounded up to 1006 and marked the region as invalid
+        MCRIIIFRegionParser parser = new MCRIIIFRegionParser("pct:0,0,100,100", 1005, 1005);
+        parser.parseImageRegion();
+        Assert.assertTrue("pct:0,0,100,100 (1005x1005)", parser.isCompleteValid());
+
+        for (int size = 1; size <= 2000; size++) {
+            for (int pct = 0; pct < 100; pct++) {
+                String region = "pct:" + pct + "," + pct + "," + (100 - pct) + "," + (100 - pct);
+                // landscape and portrait, so that width and height are both checked with every size
+                assertCompleteValid(region, size, 2001);
+                assertCompleteValid(region, 2001, size);
+            }
+        }
+    }
+
+    private static void assertCompleteValid(String region, int width, int height) {
+        MCRIIIFRegionParser parser = new MCRIIIFRegionParser(region, width, height);
+        parser.parseImageRegion();
+        if (!parser.isCompleteValid()) {
+            Assert.fail(region + " (" + width + "x" + height + ") is not valid");
+        }
+    }
+
+    @org.junit.Test
     public void testParseImageRegion() {
         Map<String, MCRIIIFImageSourceRegion> validCoords = new Hashtable<>();
 

@@ -80,10 +80,11 @@ public class MCRIIIFRegionParser {
     private MCRIIIFImageSourceRegion parsePercentImageRegion() {
         List<Double> doubles = parseNumbers();
 
-        double x = Math.floor(doubles.get(0) * (w / 100.0));
-        double y = Math.floor(doubles.get(1) * (h / 100.0));
-        double x2 = Math.ceil(x + (doubles.get(2) * (w / 100.0)));
-        double y2 = Math.ceil(y + (doubles.get(3) * (h / 100.0)));
+        // multiply before dividing: percent * (size / 100.0) may exceed the exact value (rounding error)
+        double x = Math.floor(doubles.get(0) * w / 100.0);
+        double y = Math.floor(doubles.get(1) * h / 100.0);
+        double x2 = Math.ceil(x + doubles.get(2) * w / 100.0);
+        double y2 = Math.ceil(y + doubles.get(3) * h / 100.0);
 
         return parseImageRegion((int) x, (int) y, (int) x2, (int) y2);
     }
