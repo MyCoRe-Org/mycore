@@ -25,6 +25,7 @@ import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Semaphore;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -89,6 +90,22 @@ import org.mycore.util.concurrent.MCRTransactionableCallable;
 public class MCREnricher {
 
     private static final Logger LOGGER = LogManager.getLogger();
+
+    private static final String CONFIG_PREFIX = "MCR.MODS.EnrichmentResolver.";
+
+    /**
+     * Maximum number of datasource calls that may run concurrently across all MCREnricher instances.
+     * A value of {@code 0} disables the limit.
+     */
+    private static final int MAX_PARALLEL_CALLS = MCRConfiguration2
+        .getInt(CONFIG_PREFIX + "MaxParallelCalls").orElseThrow();
+
+    /**
+     * Global limit for concurrent datasource calls. A {@code null} value means
+     * that datasource calls are not limited.
+     */
+    private static final Semaphore DATASOURCE_CALL_SEMAPHORE =
+        MAX_PARALLEL_CALLS > 0 ? new Semaphore(MAX_PARALLEL_CALLS, true) : null;
 
     private static final String XPATH_HOST_SERIES = "mods:relatedItem[@type='host' or @type='series']";
 
@@ -158,8 +175,9 @@ public class MCREnricher {
     private void resolveExternalData() {
         Collection<MCRTransactionableCallable<Boolean>> calls = id2call.values()
             .stream()
-            .map(MCRTransactionableCallable::new)
+            .map(this::createLimitedCall)
             .collect(Collectors.toList());
+
         ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
         try {
             executor.invokeAll(calls);
@@ -168,6 +186,21 @@ public class MCREnricher {
         } finally {
             executor.shutdown();
         }
+    }
+
+    private MCRTransactionableCallable<Boolean> createLimitedCall(MCRDataSourceCall dataSourceCall) {
+        return new MCRTransactionableCallable<>(() -> {
+            if (DATASOURCE_CALL_SEMAPHORE == null) {
+                return dataSourceCall.call();
+            }
+
+            DATASOURCE_CALL_SEMAPHORE.acquire();
+            try {
+                return dataSourceCall.call();
+            } finally {
+                DATASOURCE_CALL_SEMAPHORE.release();
+            }
+        });
     }
 
     private void mergeExternalData(Element publication) {
