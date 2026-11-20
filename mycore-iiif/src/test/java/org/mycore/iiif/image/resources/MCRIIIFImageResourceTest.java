@@ -55,14 +55,45 @@ public class MCRIIIFImageResourceTest extends MCRTestCase {
         Assert.assertEquals("image/tiff", getImageMediaType("tiff"));
         Assert.assertEquals("image/png", getImageMediaType("png"));
         Assert.assertEquals("image/gif", getImageMediaType("gif"));
+        Assert.assertEquals("image/bmp", getImageMediaType("bmp"));
+        Assert.assertEquals("image/vnd.wap.wbmp", getImageMediaType("wbmp", "bitonal"));
+    }
+
+    @Test
+    public void testSpecificationMediaTypes() {
+        Assert.assertEquals("image/jp2", MCRIIIFImageResource.getMediaType("jp2"));
+        Assert.assertEquals("application/pdf", MCRIIIFImageResource.getMediaType("pdf"));
+        Assert.assertEquals("image/webp", MCRIIIFImageResource.getMediaType("webp"));
+    }
+
+    @Test
+    public void testFormatWithoutImageWriter() {
+        // no writer available: must not return an empty image with status 200
+        Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), getImageStatus("pdf", "default"));
+        // the JDK WBMP writer supports bitonal images only
+        Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), getImageStatus("wbmp", "default"));
+        Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), getImageStatus("wbmp", "gray"));
     }
 
     private static String getImageMediaType(String format) {
-        try (Response response = new MCRIIIFImageResource()
-            .getImage(IMPL, "image", "full", "full", "0", "default", format)) {
+        return getImageMediaType(format, "default");
+    }
+
+    private static String getImageMediaType(String format, String quality) {
+        try (Response response = getImage(format, quality)) {
             Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
             return response.getMediaType().toString();
         }
+    }
+
+    private static int getImageStatus(String format, String quality) {
+        try (Response response = getImage(format, quality)) {
+            return response.getStatus();
+        }
+    }
+
+    private static Response getImage(String format, String quality) {
+        return new MCRIIIFImageResource().getImage(IMPL, "image", "full", "full", "0", quality, format);
     }
 
     public static class TestImageImpl extends MCRIIIFImageImpl {
@@ -75,7 +106,12 @@ public class MCRIIIFImageResourceTest extends MCRTestCase {
         public BufferedImage provide(String identifier, MCRIIIFImageSourceRegion region,
             MCRIIIFImageTargetSize targetSize, MCRIIIFImageTargetRotation rotation,
             MCRIIIFImageQuality imageQuality, String format) {
-            return new BufferedImage(targetSize.width(), targetSize.height(), BufferedImage.TYPE_3BYTE_BGR);
+            int imageType = switch (imageQuality) {
+                case bitonal -> BufferedImage.TYPE_BYTE_BINARY;
+                case gray -> BufferedImage.TYPE_BYTE_GRAY;
+                default -> BufferedImage.TYPE_3BYTE_BGR;
+            };
+            return new BufferedImage(targetSize.width(), targetSize.height(), imageType);
         }
 
         @Override
