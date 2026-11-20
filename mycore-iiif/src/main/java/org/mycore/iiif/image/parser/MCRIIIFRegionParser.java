@@ -66,7 +66,7 @@ public class MCRIIIFRegionParser {
         if (isPercent()) {
             return parsePercentImageRegion();
         } else if (isFull()) {
-            return new MCRIIIFImageSourceRegion(0, 0, w - 1, h - 1);
+            return new MCRIIIFImageSourceRegion(0, 0, w, h);
         } else if (isSquare()) {
             final int shorterDimension = Math.min(w, h);
             final int x1 = (int) Math.floor(w / 2.0 - shorterDimension / 2.0);
@@ -98,25 +98,27 @@ public class MCRIIIFRegionParser {
     }
 
     private MCRIIIFImageSourceRegion parseImageRegion(int x1, int y1, int x2, int y2) {
+        if (x1 < 0 || y1 < 0) {
+            completeValid = false;
+            throw new IllegalArgumentException("x[" + x1 + "] or y[" + y1 + "] cant be negative!");
+        }
+
         if (x1 >= w || y1 >= h) {
             completeValid = false;
             throw new IllegalArgumentException(
                 "x[" + x1 + "] or y[" + y1 + "] cant be bigger then or equal image size[" + w + "x" + h + "]!");
         }
 
-        if (!(y1 < y2 && x1 < x2 && x1 >= 0 && y1 >= 0 && x2 <= w && y2 <= h)) {
+        if (x2 <= x1 || y2 <= y1) {
             completeValid = false;
+            throw new IllegalArgumentException("width and height of the region must be greater than zero!");
         }
 
-        // negative values become 0
-        int nx1 = Math.max(0, x1);
-        int ny1 = Math.max(0, y1);
+        // a region that extends beyond the image is cropped at the image border (IIIF Image API 2.1, 4.1)
+        int nx2 = Math.min(w, x2);
+        int ny2 = Math.min(h, y2);
 
-        // end values bigger then image become as big as image
-        int nx2 = Math.min(w - 1, x2);
-        int ny2 = Math.min(h - 1, y2);
-
-        return new MCRIIIFImageSourceRegion(nx1, ny1, nx2, ny2);
+        return new MCRIIIFImageSourceRegion(x1, y1, nx2, ny2);
     }
 
     private boolean isPercent() {
