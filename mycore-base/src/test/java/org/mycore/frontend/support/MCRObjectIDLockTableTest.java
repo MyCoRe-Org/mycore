@@ -25,6 +25,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.concurrent.FutureTask;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -57,13 +59,16 @@ public class MCRObjectIDLockTableTest {
         testId = MCRObjectID.getInstance("junit_object_00000001");
     }
 
-    private static void endSessionOf(String userId) {
-        MCRSessionMgr.releaseCurrentSession();
-        MCRSessionMgr.unlock();
-        MCRSession session = MCRSessionMgr.getCurrentSession();
-        session.setUserInformation(user(userId));
-        MCRSessionMgr.releaseCurrentSession();
-        session.close();
+    private static void endSessionOf(String userId) throws Exception {
+        FutureTask<Void> task = new FutureTask<>(() -> {
+            MCRSessionMgr.unlock();
+            MCRSession session = MCRSessionMgr.getCurrentSession();
+            session.setUserInformation(user(userId));
+            MCRSessionMgr.releaseCurrentSession();
+            session.close();
+        }, null);
+        new Thread(task).start();
+        task.get();
     }
 
     private static MCRUserInformation user(String userId) {
@@ -195,14 +200,13 @@ public class MCRObjectIDLockTableTest {
 
     @Test
     @DisplayName("The end of a session releases its own locks only")
-    void sessionEndReleasesOnlyItsOwnLocks() {
+    void sessionEndReleasesOnlyItsOwnLocks() throws Exception {
         MCRObjectID restLocked = MCRObjectID.getInstance("junit_object_00000002");
         MCRObjectIDLockTable.lock(restLocked, USER_A, USER_A, 60_000);
         MCRObjectIDLockTable.lock(testId);
         MCRSession current = MCRSessionMgr.getCurrentSession();
 
         endSessionOf(USER_A);
-        MCRSessionMgr.setCurrentSession(current);
 
         assertTrue(MCRObjectIDLockTable.isLocked(restLocked), "The REST API's lock must outlast the request");
         assertTrue(MCRObjectIDLockTable.isLocked(testId), "The lock of the other session must stay");
@@ -218,16 +222,13 @@ public class MCRObjectIDLockTableTest {
 
     @Test
     @DisplayName("The end of a session of the user releases the user's locks without timeout")
-    void sessionEndReleasesUserLocksWithoutTimeout() {
+    void sessionEndReleasesUserLocksWithoutTimeout() throws Exception {
         MCRObjectIDLockTable.lock(testId, USER_A, USER_A, null);
-        MCRSession current = MCRSessionMgr.getCurrentSession();
 
         endSessionOf(USER_B);
-        MCRSessionMgr.setCurrentSession(current);
         assertTrue(MCRObjectIDLockTable.isLocked(testId), "The lock of another user must stay");
 
         endSessionOf(USER_A);
-        MCRSessionMgr.setCurrentSession(current);
         assertFalse(MCRObjectIDLockTable.isLocked(testId), "The user's lock without timeout is released");
     }
 
