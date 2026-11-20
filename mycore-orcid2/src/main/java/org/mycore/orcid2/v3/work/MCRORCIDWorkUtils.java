@@ -94,17 +94,18 @@ public class MCRORCIDWorkUtils {
     }
 
     /**
-     * Converts {@link ExternalIDs} to a Set of {@link MCRIdentifier}.
+     * Converts {@link ExternalIDs} with relationship 'self' to a Set of {@link MCRIdentifier}.
      * A work may have no external identifiers at all, in which case ORCID returns {@code null}.
      *
      * @param externalIDs the ExternalIDs, may be {@code null}
      * @return Set of MCRIdentifier, empty if externalIDs is {@code null}
      */
-    static Set<MCRIdentifier> toMCRIdentifiers(ExternalIDs externalIDs) {
+    static Set<MCRIdentifier> listSelfIdentifiers(ExternalIDs externalIDs) {
         if (externalIDs == null) {
             return new HashSet<>();
         }
         return externalIDs.getExternalIdentifier().stream()
+            .filter(i -> Objects.equals(i.getRelationship(), Relationship.SELF))
             .map(i -> new MCRIdentifier(i.getType(), i.getValue())).collect(Collectors.toSet());
     }
 

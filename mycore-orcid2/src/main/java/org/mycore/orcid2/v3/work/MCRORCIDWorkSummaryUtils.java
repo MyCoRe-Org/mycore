@@ -21,9 +21,11 @@ package org.mycore.orcid2.v3.work;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jdom2.Element;
@@ -60,10 +62,9 @@ public class MCRORCIDWorkSummaryUtils {
         return modsElements;
     }
 
-    // TODO ignore case for identifiers/values
-    // TODO identifiers may be case sensitive?
     /**
      * Returns a Stream of WorkSummaries matching a Set of MCRIdentifiers.
+     * Only external identifiers with relationship 'self' are considered, compared case-insensitively.
      *
      * @param identifiers the Set of MCRIdentifiers
      * @param workSummaries List of WorkSummaries
@@ -71,11 +72,13 @@ public class MCRORCIDWorkSummaryUtils {
      */
     public static Stream<WorkSummary> findMatchingSummariesByIdentifiers(Set<MCRIdentifier> identifiers,
         List<WorkSummary> workSummaries) {
-        if (identifiers.isEmpty()) {
+        final Set<MCRIdentifier> normalizedIdentifiers = normalizeIdentifiers(identifiers);
+        if (normalizedIdentifiers.isEmpty()) {
             return Stream.empty();
         }
-        return workSummaries.stream()
-            .filter(w -> hasMatch(MCRORCIDWorkUtils.toMCRIdentifiers(w.getExternalIdentifiers()), identifiers));
+        return workSummaries.stream().filter(w -> hasMatch(
+            normalizeIdentifiers(MCRORCIDWorkUtils.listSelfIdentifiers(w.getExternalIdentifiers())),
+            normalizedIdentifiers));
     }
 
     /**
@@ -131,7 +134,16 @@ public class MCRORCIDWorkSummaryUtils {
      * @return true if there is an element of A in B
      */
     private static boolean hasMatch(Set<MCRIdentifier> a, Set<MCRIdentifier> b) {
-        a.retainAll(b);
-        return !a.isEmpty();
+        return a.stream().anyMatch(b::contains);
+    }
+
+    private static Set<MCRIdentifier> normalizeIdentifiers(Set<MCRIdentifier> identifiers) {
+        return identifiers.stream().filter(i -> i.getType() != null && i.getValue() != null)
+            .map(i -> new MCRIdentifier(normalize(i.getType()), normalize(i.getValue())))
+            .collect(Collectors.toSet());
+    }
+
+    private static String normalize(String value) {
+        return value.trim().toLowerCase(Locale.ROOT);
     }
 }
