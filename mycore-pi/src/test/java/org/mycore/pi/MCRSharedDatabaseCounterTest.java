@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.common.MCRTestConfiguration;
@@ -32,7 +34,6 @@ import org.mycore.common.MCRTestProperty;
 import org.mycore.common.date.MCRISO8601DateFormatter;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.pi.doi.MCRCreateDateDOIGenerator;
 import org.mycore.pi.doi.MCRDigitalObjectIdentifier;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.pi.util.MCRPIGeneratorUtils;
@@ -48,6 +49,8 @@ import org.mycore.test.MyCoReTest;
     @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true")
 })
 public class MCRSharedDatabaseCounterTest {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public static final String DATE_FORMAT = "ddMMyyyy";
 
@@ -65,19 +68,24 @@ public class MCRSharedDatabaseCounterTest {
         object1.setSchema("http://www.w3.org/2001/XMLSchema");
         object1.setId(MCRObjectID.getInstance("my_test_00000123"));
 
-        MCRCreateDateDOIGenerator generator1 = new MCRCreateDateDOIGenerator(
+        MCRPIGenerator<?> generator1 = new MCRGenericPIGenerator(
             MCRPIGeneratorUtils.SHARED_COUNTER,
-            DATE_FORMAT,
-            PREFIX,
-            3);
+            PREFIX + "/$ObjectDate-$Count",
+            new MCRISO8601DateFormatter(DATE_FORMAT, Locale.ENGLISH),
+            Map.of(),
+            Map.of(),
+            3,
+            MCRDigitalObjectIdentifier.TYPE,
+            List.of());
 
         String doi1 = generator1.generate(object1, "").asString();
+        LOGGER.info("DOI 1: {}", doi1);
 
         MCRObject object2 = new MCRObject();
         object2.setSchema("http://www.w3.org/2001/XMLSchema");
         object2.setId(MCRObjectID.getInstance("my_test_00000234"));
 
-        MCRGenericPIGenerator generator2 = new MCRGenericPIGenerator(
+        MCRPIGenerator<?> generator2 = new MCRGenericPIGenerator(
             MCRPIGeneratorUtils.SHARED_COUNTER,
             PREFIX + "/$ObjectDate-$Count",
             new MCRISO8601DateFormatter(DATE_FORMAT, Locale.ENGLISH),
@@ -88,6 +96,7 @@ public class MCRSharedDatabaseCounterTest {
             List.of());
 
         String doi2 = generator2.generate(object2, "").asString();
+        LOGGER.info("DOI 2: {}", doi2);
 
         assertEquals(doi1.length(), doi2.length());
         assertEquals(doi1.substring(0, doi1.indexOf("-")), doi2.substring(0, doi2.indexOf("-")));
