@@ -31,8 +31,10 @@ import java.util.stream.Collectors;
 import org.mycore.mcr.acl.accesskey.access.MCRAccessKeyPermissionChecker;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyPartialUpdateDto;
+import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyNotFoundException;
 import org.mycore.mcr.acl.accesskey.restapi.v2.MCRAccessKeyRestConstants;
 import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyService;
+import org.mycore.restapi.v2.MCRErrorResponse;
 import org.mycore.restapi.v2.access.MCRRestAccessCheckStrategy;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -46,6 +48,7 @@ import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
 
 /**
  * The {@code MCRRestAccessKeyAccessCheckStrategy} class implements the
@@ -132,8 +135,7 @@ public class MCRAccessKeyRestAccessCheckStrategy implements MCRRestAccessCheckSt
 
     private void handleUpdateRequest(ContainerRequestContext requestContext) {
         ensureJsonContentType(requestContext);
-        final MCRAccessKeyDto accessKeyDto
-            = Optional.ofNullable(getAccessKeyDtoByPath(requestContext)).orElseThrow(BadRequestException::new);
+        final MCRAccessKeyDto accessKeyDto = getAccessKeyDtoByPath(requestContext);
         ensureHasManagePermission(accessKeyDto);
         final byte[] requestBody = getRequestBody(requestContext);
         if (checkPutRequest(requestContext)) {
@@ -200,9 +202,30 @@ public class MCRAccessKeyRestAccessCheckStrategy implements MCRRestAccessCheckSt
     }
 
     private MCRAccessKeyDto getAccessKeyDtoByPath(ContainerRequestContext requestContext) {
-        final MultivaluedMap<String, String> pathParameters = requestContext.getUriInfo().getPathParameters();
-        return Optional.ofNullable(pathParameters.getFirst(MCRAccessKeyRestConstants.PATH_PARAM_ACCESS_KEY_ID))
-            .map(UUID::fromString).map(accessKeyService::findAccessKey).get();
+        final UUID id = getAccessKeyIdByPath(requestContext);
+        try {
+            return accessKeyService.findAccessKey(id);
+        } catch (MCRAccessKeyNotFoundException e) {
+            throw MCRErrorResponse.ofStatusCode(Response.Status.NOT_FOUND.getStatusCode())
+                .withCause(e)
+                .withMessage(e.getMessage())
+                .withDetail(e.getClass().getName())
+                .withErrorCode(e.getErrorCode())
+                .toException();
+        }
+    }
+
+    private UUID getAccessKeyIdByPath(ContainerRequestContext requestContext) {
+        final String idString = requestContext.getUriInfo().getPathParameters()
+            .getFirst(MCRAccessKeyRestConstants.PATH_PARAM_ACCESS_KEY_ID);
+        try {
+            return UUID.fromString(idString);
+        } catch (IllegalArgumentException e) {
+            throw MCRErrorResponse.ofStatusCode(Response.Status.NOT_FOUND.getStatusCode())
+                .withCause(e)
+                .withMessage("Invalid access key id")
+                .toException();
+        }
     }
 
     private byte[] readRequestBody(ContainerRequestContext requestContext) throws IOException {

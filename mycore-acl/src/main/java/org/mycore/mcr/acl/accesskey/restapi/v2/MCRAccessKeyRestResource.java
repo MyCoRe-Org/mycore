@@ -25,11 +25,16 @@ import java.util.UUID;
 
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyPartialUpdateDto;
+import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyCollisionException;
+import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyException;
+import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyNotFoundException;
+import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyValidationException;
 import org.mycore.mcr.acl.accesskey.restapi.v2.access.MCRAccessKeyRestAccessCheckStrategy;
 import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyService;
 import org.mycore.restapi.MCRRestConstants;
 import org.mycore.restapi.annotations.MCRAccessControlExposeHeaders;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
+import org.mycore.restapi.v2.MCRErrorResponse;
 import org.mycore.restapi.v2.MCRRestSchemaType;
 import org.mycore.restapi.v2.annotation.MCRRestAccessCheck;
 import org.mycore.restapi.v2.annotation.MCRRestRequiredPermission;
@@ -56,6 +61,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
@@ -63,6 +69,7 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
 
 import static org.mycore.restapi.v2.MCRRestStatusCode.BAD_REQUEST;
+import static org.mycore.restapi.v2.MCRRestStatusCode.CONFLICT;
 import static org.mycore.restapi.v2.MCRRestStatusCode.CREATED;
 import static org.mycore.restapi.v2.MCRRestStatusCode.NOT_FOUND;
 import static org.mycore.restapi.v2.MCRRestStatusCode.NO_CONTENT;
@@ -81,6 +88,8 @@ public class MCRAccessKeyRestResource {
     private static final String DESCRIPTION_ACCESS_KEY_NOT_FOUND = "Access key not found";
 
     private static final String DESCRIPTION_INVALID_INPUT = "Invalid input data";
+
+    private static final String DESCRIPTION_SECRET_COLLISION = "Access key secret collides with another access key";
 
     private static final String DESCRIPTION_ACCESS_KEY_ID = "The access key id";
 
@@ -194,7 +203,11 @@ public class MCRAccessKeyRestResource {
         @Parameter(in = ParameterIn.PATH, description = DESCRIPTION_ACCESS_KEY_ID, required = true,
             schema = @Schema(type = MCRRestSchemaType.STRING, implementation = UUID.class))
         @PathParam(MCRAccessKeyRestConstants.PATH_PARAM_ACCESS_KEY_ID) UUID id) {
-        return accessKeyService.findAccessKey(id);
+        try {
+            return accessKeyService.findAccessKey(id);
+        } catch (MCRAccessKeyNotFoundException e) {
+            throw toWebApplicationException(Response.Status.NOT_FOUND, e);
+        }
     }
 
     /**
@@ -211,6 +224,8 @@ public class MCRAccessKeyRestResource {
                 description = "Location of the new access key")),
         @ApiResponse(responseCode = BAD_REQUEST, description = DESCRIPTION_INVALID_INPUT,
             content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
+        @ApiResponse(responseCode = CONFLICT, description = DESCRIPTION_SECRET_COLLISION,
+            content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
         @ApiResponse(responseCode = UNAUTHORIZED, description = DESCRIPTION_UNAUTHORIZED,
             content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
     })
@@ -223,7 +238,14 @@ public class MCRAccessKeyRestResource {
     public Response addAccessKey(
         @RequestBody(content = @Content(mediaType = MediaType.APPLICATION_JSON,
             schema = @Schema(implementation = MCRAccessKeyDto.class))) MCRAccessKeyDto accessKeyDto) {
-        final MCRAccessKeyDto createdAccessKey = accessKeyService.addAccessKey(accessKeyDto);
+        final MCRAccessKeyDto createdAccessKey;
+        try {
+            createdAccessKey = accessKeyService.addAccessKey(accessKeyDto);
+        } catch (MCRAccessKeyValidationException e) {
+            throw toWebApplicationException(Response.Status.BAD_REQUEST, e);
+        } catch (MCRAccessKeyCollisionException e) {
+            throw toWebApplicationException(Response.Status.CONFLICT, e);
+        }
         return Response.created(uriInfo.getAbsolutePathBuilder().path(createdAccessKey.getId().toString()).build())
             .build();
     }
@@ -239,6 +261,8 @@ public class MCRAccessKeyRestResource {
     @ApiResponses({
         @ApiResponse(responseCode = NO_CONTENT, description = "Access key update successfully"),
         @ApiResponse(responseCode = BAD_REQUEST, description = DESCRIPTION_INVALID_INPUT,
+            content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
+        @ApiResponse(responseCode = CONFLICT, description = DESCRIPTION_SECRET_COLLISION,
             content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
         @ApiResponse(responseCode = UNAUTHORIZED, description = DESCRIPTION_UNAUTHORIZED,
             content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
@@ -257,7 +281,15 @@ public class MCRAccessKeyRestResource {
         @PathParam(MCRAccessKeyRestConstants.PATH_PARAM_ACCESS_KEY_ID) UUID id,
         @RequestBody(content = @Content(mediaType = MediaType.APPLICATION_JSON,
             schema = @Schema(implementation = MCRAccessKeyDto.class))) MCRAccessKeyDto accessKeyDto) {
-        accessKeyService.updateAccessKey(id, accessKeyDto);
+        try {
+            accessKeyService.updateAccessKey(id, accessKeyDto);
+        } catch (MCRAccessKeyNotFoundException e) {
+            throw toWebApplicationException(Response.Status.NOT_FOUND, e);
+        } catch (MCRAccessKeyValidationException e) {
+            throw toWebApplicationException(Response.Status.BAD_REQUEST, e);
+        } catch (MCRAccessKeyCollisionException e) {
+            throw toWebApplicationException(Response.Status.CONFLICT, e);
+        }
         return Response.noContent().build();
     }
 
@@ -273,6 +305,8 @@ public class MCRAccessKeyRestResource {
     @ApiResponses({
         @ApiResponse(responseCode = NO_CONTENT, description = "Access key update sucessfully"),
         @ApiResponse(responseCode = BAD_REQUEST, description = DESCRIPTION_INVALID_INPUT,
+            content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
+        @ApiResponse(responseCode = CONFLICT, description = DESCRIPTION_SECRET_COLLISION,
             content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
         @ApiResponse(responseCode = UNAUTHORIZED, description = DESCRIPTION_UNAUTHORIZED,
             content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
@@ -291,7 +325,15 @@ public class MCRAccessKeyRestResource {
         @PathParam(MCRAccessKeyRestConstants.PATH_PARAM_ACCESS_KEY_ID) UUID id,
         @RequestBody(content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(
             implementation = MCRAccessKeyPartialUpdateDto.class))) MCRAccessKeyPartialUpdateDto accessKeyDto) {
-        accessKeyService.partialUpdateAccessKey(id, accessKeyDto);
+        try {
+            accessKeyService.partialUpdateAccessKey(id, accessKeyDto);
+        } catch (MCRAccessKeyNotFoundException e) {
+            throw toWebApplicationException(Response.Status.NOT_FOUND, e);
+        } catch (MCRAccessKeyValidationException e) {
+            throw toWebApplicationException(Response.Status.BAD_REQUEST, e);
+        } catch (MCRAccessKeyCollisionException e) {
+            throw toWebApplicationException(Response.Status.CONFLICT, e);
+        }
         return Response.noContent().build();
     }
 
@@ -318,8 +360,22 @@ public class MCRAccessKeyRestResource {
         @Parameter(in = ParameterIn.PATH, description = DESCRIPTION_ACCESS_KEY_ID, required = true,
             schema = @Schema(type = MCRRestSchemaType.STRING, implementation = UUID.class))
         @PathParam(MCRAccessKeyRestConstants.PATH_PARAM_ACCESS_KEY_ID) UUID id) {
-        accessKeyService.removeAccessKey(id);
+        try {
+            accessKeyService.removeAccessKey(id);
+        } catch (MCRAccessKeyNotFoundException e) {
+            throw toWebApplicationException(Response.Status.NOT_FOUND, e);
+        }
         return Response.noContent().build();
+    }
+
+    private static WebApplicationException toWebApplicationException(Response.Status status,
+        MCRAccessKeyException exception) {
+        return MCRErrorResponse.ofStatusCode(status.getStatusCode())
+            .withCause(exception)
+            .withMessage(exception.getMessage())
+            .withDetail(exception.getClass().getName())
+            .withErrorCode(exception.getErrorCode())
+            .toException();
     }
 
 }
