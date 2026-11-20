@@ -28,8 +28,9 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.mycore.common.MCRTestCase;
 
-public class MCRIView2ToolsReadTileTest {
+public class MCRIView2ToolsReadTileTest extends MCRTestCase {
 
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();

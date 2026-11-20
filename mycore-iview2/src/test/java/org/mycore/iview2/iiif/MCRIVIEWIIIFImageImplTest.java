@@ -21,6 +21,10 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -28,6 +32,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReadParam;
@@ -42,6 +47,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
+import org.mycore.iiif.image.impl.MCRIIIFImageProvidingException;
 import org.mycore.iiif.image.model.MCRIIIFImageQuality;
 import org.mycore.iiif.image.model.MCRIIIFImageSourceRegion;
 import org.mycore.iiif.image.model.MCRIIIFImageTargetRotation;
@@ -120,6 +126,31 @@ public class MCRIVIEWIIIFImageImplTest extends MCRTestCase {
         Assert.assertTrue("No ImageReader was created.", countingSpi.created.get() > 0);
         Assert.assertEquals("Every ImageReader has to be disposed.", countingSpi.created.get(),
             countingSpi.disposed.get());
+    }
+
+    @Test
+    public void testProvideDisposesImageReadersOnError() throws Exception {
+        corruptAllTiles();
+        MCRIVIEWIIIFImageImpl impl = new MCRIVIEWIIIFImageImpl(IMPL);
+
+        Assert.assertThrows(MCRIIIFImageProvidingException.class, () -> impl.provide(IMAGE_PATH,
+            new MCRIIIFImageSourceRegion(0, 0, IMAGE_WIDTH, IMAGE_HEIGHT),
+            new MCRIIIFImageTargetSize(IMAGE_WIDTH, IMAGE_HEIGHT),
+            new MCRIIIFImageTargetRotation(false, 0), MCRIIIFImageQuality.color, "jpg"));
+
+        Assert.assertTrue("No ImageReader was created.", countingSpi.created.get() > 0);
+        Assert.assertEquals("Every ImageReader has to be disposed.", countingSpi.created.get(),
+            countingSpi.disposed.get());
+    }
+
+    private static void corruptAllTiles() throws IOException {
+        Path tiledFile = MCRImage.getTiledFile(tileDir, null, IMAGE_PATH);
+        try (FileSystem zipFileSystem = FileSystems.newFileSystem(tiledFile);
+            Stream<Path> files = Files.walk(zipFileSystem.getPath("/"))) {
+            for (Path tile : files.filter(path -> path.toString().endsWith(".jpg")).toList()) {
+                Files.write(tile, "this is not a JPEG file".getBytes(StandardCharsets.UTF_8));
+            }
+        }
     }
 
     private static ImageReaderSpi getJpegReaderSpi() {
