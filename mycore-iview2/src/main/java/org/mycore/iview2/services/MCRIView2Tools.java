@@ -275,16 +275,17 @@ public class MCRIView2Tools {
         String tileName = new MessageFormat("{0}/{1}/{2}.jpg", Locale.ROOT).format(new Object[] { zoomLevel, y, x });
         Path tile = iviewFileRoot.resolve(tileName);
         if (Files.exists(tile)) {
-            try (SeekableByteChannel fileChannel = Files.newByteChannel(tile)) {
-                ImageInputStream iis = ImageIO.createImageInputStream(fileChannel);
+            try (SeekableByteChannel fileChannel = Files.newByteChannel(tile);
+                ImageInputStream iis = ImageIO.createImageInputStream(fileChannel)) {
                 if (iis == null) {
                     throw new IOException("Could not acquire ImageInputStream from SeekableByteChannel: " + tile);
                 }
                 imageReader.setInput(iis, true);
-                BufferedImage image = imageReader.read(0);
-                imageReader.reset();
-                iis.close();
-                return image;
+                try {
+                    return imageReader.read(0);
+                } finally {
+                    imageReader.reset();
+                }
             }
         } else {
             throw new NoSuchFileException(iviewFileRoot.toString(), tileName, null);
@@ -296,16 +297,17 @@ public class MCRIView2Tools {
         String tileName = new MessageFormat("{0}/{1}/{2}.jpg", Locale.ROOT).format(new Object[] { zoomLevel, y, x });
         Path tile = iviewFileRoot.resolve(tileName);
         if (Files.exists(tile)) {
-            try (SeekableByteChannel fileChannel = Files.newByteChannel(tile)) {
-                ImageInputStream iis = ImageIO.createImageInputStream(fileChannel);
+            try (SeekableByteChannel fileChannel = Files.newByteChannel(tile);
+                ImageInputStream iis = ImageIO.createImageInputStream(fileChannel)) {
                 if (iis == null) {
                     throw new IOException("Could not acquire ImageInputStream from SeekableByteChannel: " + tile);
                 }
                 imageReader.setInput(iis, true);
-                int imageType = MCRImage.getImageType(imageReader);
-                imageReader.reset();
-                iis.close();
-                return imageType;
+                try {
+                    return MCRImage.getImageType(imageReader);
+                } finally {
+                    imageReader.reset();
+                }
             }
         } else {
             throw new NoSuchFileException(iviewFileRoot.toString(), tileName, null);
