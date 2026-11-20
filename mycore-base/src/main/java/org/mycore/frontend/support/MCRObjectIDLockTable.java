@@ -19,7 +19,7 @@
 package org.mycore.frontend.support;
 
 import java.time.Instant;
-import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -40,9 +40,10 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  *     <li><b>Automatic Timeouts:</b> Locks expire automatically after a specified duration, preventing
  *         indefinite locks from crashed or misbehaving clients.</li>
  *     <li><b>Automatic Session Cleanup:</b> As a {@link MCRSessionListener}, it automatically
- *         clears the locks held by a session ({@link #lock(MCRObjectID)}) when it is destroyed. Locks with
- *         another id - e.g. the user's, by the REST API - are not bound to a session: they last until they are
- *         unlocked or time out.</li>
+ *         clears the locks held by a session ({@link #lock(MCRObjectID)}) when it is destroyed, as well as the
+ *         locks without timeout whose id is the session's user. Other locks - e.g. the user's, by the REST API,
+ *         which always have a timeout - are not bound to a session: they last until they are unlocked or time
+ *         out.</li>
  *     <li><b>Thread-Safety:</b> Uses a {@link ConcurrentMap} to ensure safe concurrent access
  *         from multiple threads.</li>
  * </ul>
@@ -66,21 +67,18 @@ public final class MCRObjectIDLockTable implements MCRSessionListener {
     }
 
     /**
-     * Removes the locks held by a given session, i.e. whose id is the session's. This is typically called
-     * automatically when a session is destroyed. Other locks of the same user stay: every request of the REST API
-     * runs in a session of its own, which ends with the request.
+     * Removes the locks held by a given session, i.e. whose id is the session's, and the locks without timeout
+     * whose id is the session's user. This is typically called automatically when a session is destroyed. Locks of
+     * the user with a timeout stay: every request of the REST API runs in a session of its own, which ends with the
+     * request.
      *
      * @param session The session whose locks should be cleared.
      */
     public void clearTable(MCRSession session) {
         String sessionId = session.getID();
-        List<MCRObjectID> toRemoveList = lockMap.entrySet().stream()
-            .filter(entry -> entry.getValue().id.equals(sessionId))
-            .map(ConcurrentMap.Entry::getKey)
-            .toList();
-        for (MCRObjectID objectId : toRemoveList) {
-            lockMap.remove(objectId);
-        }
+        String userId = session.getUserInformation().getUserID();
+        lockMap.values().removeIf(objectLock -> sessionId.equals(objectLock.getId())
+            || (objectLock.getTimeout() == null && userId.equals(objectLock.getId())));
     }
 
     /**
@@ -123,7 +121,8 @@ public final class MCRObjectIDLockTable implements MCRSessionListener {
      * @param objectId The ID of the object to lock.
      * @param lockId   The internal ID for the lock (e.g., a session ID or user ID).
      * @param userId   The user acquiring the lock.
-     * @param timeout  The lock duration in milliseconds. If null, the lock may be infinite.
+     * @param timeout  The lock duration in milliseconds. If null, the lock does not expire: it lasts until it is
+     *                 unlocked or a session ends whose id or user id is {@code lockId}.
      * @return         The new {@link MCRObjectLock} if the lock was acquired, or the existing lock if the object was
      *                 already locked.
      */
@@ -193,11 +192,9 @@ public final class MCRObjectIDLockTable implements MCRSessionListener {
      * @return {@code true} if the object is locked and the lock's ID matches the current session ID.
      */
     public static boolean isLockedByCurrentSession(MCRObjectID objectId) {
-        MCRSession session = MCRSessionMgr.getCurrentSession();
-        String sessionId = session.getID();
-        String userId = session.getUserInformation().getUserID();
+        String sessionId = MCRSessionMgr.getCurrentSession().getID();
         MCRObjectLock objectLock = getInstance().lockMap.get(objectId);
-        return objectLock != null && (sessionId.equals(objectLock.id) || userId.equals(objectLock.createdBy));
+        return objectLock != null && sessionId.equals(objectLock.getId());
     }
 
     /**
@@ -233,7 +230,7 @@ public final class MCRObjectIDLockTable implements MCRSessionListener {
             }
             // A lock is only unlocked if its original id matches the one we are checking.
             // This prevents a new, unrelated lock on the same objectId from being prematurely removed.
-            if (!currentLock.getId().equals(objectLock.getId())) {
+            if (!Objects.equals(currentLock.getId(), objectLock.getId())) {
                 return;
             }
             // Check if expiration time is reached

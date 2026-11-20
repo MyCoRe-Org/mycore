@@ -216,4 +216,48 @@ public class MCRObjectIDLockTableTest {
         assertTrue(MCRObjectIDLockTable.isLocked(restLocked), "Locks not bound to a session stay");
     }
 
+    @Test
+    @DisplayName("The end of a session of the user releases the user's locks without timeout")
+    void sessionEndReleasesUserLocksWithoutTimeout() {
+        MCRObjectIDLockTable.lock(testId, USER_A, USER_A, null);
+        MCRSession current = MCRSessionMgr.getCurrentSession();
+
+        endSessionOf(USER_B);
+        MCRSessionMgr.setCurrentSession(current);
+        assertTrue(MCRObjectIDLockTable.isLocked(testId), "The lock of another user must stay");
+
+        endSessionOf(USER_A);
+        MCRSessionMgr.setCurrentSession(current);
+        assertFalse(MCRObjectIDLockTable.isLocked(testId), "The user's lock without timeout is released");
+    }
+
+    @Test
+    @DisplayName("Only a lock of the current session counts as locked by it")
+    void lockedByCurrentSessionIsSessionOnly() {
+        MCRObjectID restLocked = MCRObjectID.getInstance("junit_object_00000002");
+        MCRObjectIDLockTable.lock(restLocked, USER_A, USER_A, 60_000);
+        MCRObjectIDLockTable.lock(testId);
+
+        assertTrue(MCRObjectIDLockTable.isLockedByCurrentSession(testId), "The session's own lock");
+        assertFalse(MCRObjectIDLockTable.isLockedByCurrentSession(restLocked),
+            "A lock of the same user, but not of the session");
+    }
+
+    @Test
+    @DisplayName("A lock without id does not break the end of a session")
+    void lockWithoutIdDoesNotBreakSessionEnd() {
+        MCRObjectID unnamed = MCRObjectID.getInstance("junit_object_00000002");
+        MCRObjectIDLockTable.lock(unnamed, null, USER_B, 60_000);
+        MCRObjectIDLockTable.lock(testId);
+        MCRSession current = MCRSessionMgr.getCurrentSession();
+
+        MCRSessionMgr.releaseCurrentSession();
+        current.close();
+        MCRSessionMgr.unlock();
+        MCRSessionMgr.getCurrentSession().setUserInformation(user(USER_A));
+
+        assertFalse(MCRObjectIDLockTable.isLocked(testId), "The session's own lock is released");
+        assertTrue(MCRObjectIDLockTable.isLocked(unnamed), "The lock without id stays");
+    }
+
 }
