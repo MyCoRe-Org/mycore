@@ -910,6 +910,7 @@ public class MCRRestObjects {
         tags = MCRRestUtils.TAG_MYCORE_OBJECT,
         requestBody = @RequestBody(content = @Content(schema = @Schema(implementation = MCRObjectLock.class))),
         responses = {
+            @ApiResponse(responseCode = BAD_REQUEST, description = "timeout is not positive"),
             @ApiResponse(responseCode = CONFLICT, description = "object is locked by another user"),
             @ApiResponse(
                 description = "Lock information about an object",
