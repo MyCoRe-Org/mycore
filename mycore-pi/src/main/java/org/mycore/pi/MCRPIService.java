@@ -222,6 +222,10 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         }
         getGenerator();
         getMetadataService();
+
+        String prefix = MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX + getServiceID() + ".";
+        isPredicateConfigured(prefix + MCRPIJobService.CREATION_PREDICATE);
+        isPredicateConfigured(prefix + MCRPIJobService.REGISTRATION_PREDICATE);
     }
 
     public MCRPIMetadataService<T> getMetadataService() {
