@@ -19,7 +19,6 @@
 package org.mycore.frontend.support;
 
 import java.time.Instant;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -161,17 +160,14 @@ public final class MCRObjectIDLockTable implements MCRSessionListener {
      * @return The updated lock object, or {@code null} if no lock exists for the given ID.
      */
     public static MCRObjectLock updateLock(MCRObjectID objectId, Integer timeout) {
-        MCRObjectLock objectLock = getLock(objectId);
-        if (objectLock == null) {
-            return null;
-        }
-        objectLock.setUpdated(Instant.now());
-        if (timeout != null) {
-            objectLock.setTimeout(timeout);
-        }
-        if (objectLock.timeout != null) {
-            delayedUnlock(objectId, objectLock);
-        }
+        MCRObjectLock objectLock = getInstance().lockMap.computeIfPresent(objectId, (id, currentLock) -> {
+            currentLock.setUpdated(Instant.now());
+            if (timeout != null) {
+                currentLock.setTimeout(timeout);
+            }
+            return currentLock;
+        });
+        delayedUnlock(objectId, objectLock);
         return objectLock;
     }
 
@@ -210,9 +206,9 @@ public final class MCRObjectIDLockTable implements MCRSessionListener {
     /**
      * Schedules a task to automatically unlock an object after its timeout has passed.
      * <p>
-     * This method contains a re-check. If the lock is updated before the timeout expires,
-     * this original scheduled task will execute but will see that the lock's expiration time is now
-     * in the future, and it will do nothing. This prevents premature unlocking.
+     * The task removes the lock only if it is still the same lock object and has expired. A lock that was refreshed
+     * in the meantime, or replaced by a new lock, stays. The check and the removal run atomically, like
+     * {@link #updateLock(MCRObjectID, Integer)}, so a refresh cannot get lost.
      *
      * @param objectId   The ID of the object to unlock.
      * @param objectLock The lock object containing timeout information.
@@ -221,27 +217,14 @@ public final class MCRObjectIDLockTable implements MCRSessionListener {
         if (objectLock == null || objectLock.timeout == null) {
             return;
         }
-        CompletableFuture.delayedExecutor(objectLock.timeout, TimeUnit.MILLISECONDS).execute(() -> {
-            // Re-fetch the lock from the map to ensure we have the most current state.
-            MCRObjectLock currentLock = getLock(objectId);
-            if (currentLock == null) {
-                // The lock was already removed by some other means.
-                return;
-            }
-            // A lock is only unlocked if its original id matches the one we are checking.
-            // This prevents a new, unrelated lock on the same objectId from being prematurely removed.
-            if (!Objects.equals(currentLock.getId(), objectLock.getId())) {
-                return;
-            }
-            // Check if expiration time is reached
-            Instant now = Instant.now();
-            Instant unlockTime = currentLock.getExpirationTime();
-            if (now.isBefore(unlockTime)) {
-                return;
-            }
-            // Atomically remove the lock only if it is the exact same lock object.
-            getInstance().lockMap.remove(objectId, currentLock);
-        });
+        CompletableFuture.delayedExecutor(objectLock.timeout, TimeUnit.MILLISECONDS)
+            .execute(() -> getInstance().lockMap.computeIfPresent(objectId,
+                (id, currentLock) -> objectLock.equals(currentLock) && isExpired(currentLock) ? null : currentLock));
+    }
+
+    private static boolean isExpired(MCRObjectLock objectLock) {
+        Instant expirationTime = objectLock.getExpirationTime();
+        return expirationTime != null && !Instant.now().isBefore(expirationTime);
     }
 
     /**
