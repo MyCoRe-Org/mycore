@@ -93,7 +93,9 @@ public class MCRORCIDObjectResource {
             return new MCRORCIDPublicationStatus(true, false);
         }
         try {
-            final Work work = MCRORCIDWorkTransformerHelper.transformContent(new MCRJDOMContent(object.createXML()));
+            final MCRObject filteredObject = MCRORCIDUtils.filterObject(object);
+            final Work work = MCRORCIDWorkTransformerHelper
+                .transformContent(new MCRJDOMContent(filteredObject.createXML()));
             final Set<MCRIdentifier> identifiers = MCRORCIDWorkUtils.listTrustedIdentifiers(work);
             final boolean result
                 = new MCRORCIDWorkService(entry.getKey(), entry.getValue()).checkOwnWorkExists(identifiers);
