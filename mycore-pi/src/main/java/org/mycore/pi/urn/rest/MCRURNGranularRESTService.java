@@ -193,7 +193,7 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
             if (Boolean.parseBoolean(getProperties().getOrDefault("supportDfgViewerURN", "false"))) {
                 String suffix = "dfg";
                 persistURNStr(deriv, null, getServiceID() + "-" + suffix)
-                    .accept(() -> derivURN.withNamespaceSuffix(suffix + "-").asString(), "");
+                    .accept(() -> derivURN.withNamespaceSuffix(suffix + "-", true, "").asString(), "");
             }
 
             return derivURN;
@@ -320,7 +320,7 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
 
         public Supplier<String> getURNSupplier() {
             int currentCount = counter++;
-            return () -> urn.toGranular(setID, getIndex(currentCount)).asString();
+            return () -> urn.toGranular(setID, getIndex(currentCount), true, "").asString();
         }
 
         public String getIndex(int currentCount) {

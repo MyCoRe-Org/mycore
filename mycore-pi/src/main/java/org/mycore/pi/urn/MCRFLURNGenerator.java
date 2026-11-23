@@ -63,7 +63,7 @@ public class MCRFLURNGenerator extends MCRDNBURNGeneratorBase {
     private String lastNiss;
 
     public MCRFLURNGenerator(String namespace, String delimiter) {
-        super(namespace, delimiter);
+        super(namespace, true, delimiter);
     }
 
     @Override

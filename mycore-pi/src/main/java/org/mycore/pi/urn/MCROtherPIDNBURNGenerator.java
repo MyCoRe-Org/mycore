@@ -67,7 +67,7 @@ public class MCROtherPIDNBURNGenerator extends MCRDNBURNGeneratorBase {
     private final MCROtherPIValueExtractor extractor;
 
     public MCROtherPIDNBURNGenerator(String namespace, String delimiter, MCROtherPIValueExtractor extractor) {
-        super(namespace, delimiter);
+        super(namespace, true, delimiter);
         this.extractor = Objects.requireNonNull(extractor, "Extractor must not be null");
     }
 

@@ -34,25 +34,40 @@ import org.mycore.pi.MCRPIGenerator;
  * <ul>
  * <li> The property suffix {@link MCRUUIDURNGenerator#NAMESPACE_KEY} can be used to
  * specify the namespace.
+ * <li> The property suffix {@link MCRUUIDURNGenerator#APPEND_CHECKSUM_KEY} can be used to
+ * specify whether a checksum should be appended to the generated URN.
  * <li> The property suffix {@link MCRUUIDURNGenerator#DELIMITER_KEY} can be used to
- * specify a delimiter to be placed before and after the NISS (optional, defaults to the empty string).
+ * specify a delimiter to be placed between prefix, NISS and checksum (optional, defaults to the empty string).
  * </ul>
  * Example:
  * <pre><code>
  * [...].Class=org.mycore.pi.urn.MCRUUIDURNGenerator
  * [...].Namespace=urn:nbn:de:gbv:xyz
+ * [...].AppendChecksum=true
  * [...].Delimiter=-
  * </code></pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRUUIDURNGenerator.Factory.class)
 public class MCRUUIDURNGenerator extends MCRDNBURNGeneratorBase {
 
+    public static final String DEFAULT_PROPERTY_PREFIX = "MCR.Default.PI.Generator.DNBURN.UUID.";
+
     public static final String NAMESPACE_KEY = "Namespace";
+
+    public static final String APPEND_CHECKSUM_KEY = "AppendChecksum";
 
     public static final String DELIMITER_KEY = "Delimiter";
 
+    /**
+     * @deprecated Use {@link MCRUUIDURNGenerator(String, boolean, String)} instead.
+     */
+    @Deprecated(forRemoval = true)
     public MCRUUIDURNGenerator(String namespace, String delimiter) {
-        super(namespace, delimiter);
+        this(namespace, true, delimiter);
+    }
+
+    public MCRUUIDURNGenerator(String namespace, boolean appendChecksum, String delimiter) {
+        super(namespace, appendChecksum, delimiter);
     }
 
     @Override
@@ -65,12 +80,15 @@ public class MCRUUIDURNGenerator extends MCRDNBURNGeneratorBase {
         @MCRProperty(name = NAMESPACE_KEY)
         public String namespace;
 
+        @MCRProperty(name = APPEND_CHECKSUM_KEY, defaultName = DEFAULT_PROPERTY_PREFIX + APPEND_CHECKSUM_KEY)
+        public String appendChecksum;
+
         @MCRProperty(name = DELIMITER_KEY, required = false)
         public String delimiter = "";
 
         @Override
         public MCRUUIDURNGenerator get() {
-            return new MCRUUIDURNGenerator(namespace, delimiter);
+            return new MCRUUIDURNGenerator(namespace, Boolean.parseBoolean(appendChecksum), delimiter);
         }
 
     }

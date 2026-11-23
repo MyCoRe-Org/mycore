@@ -30,10 +30,21 @@ public abstract class MCRDNBURNGeneratorBase implements MCRPIGenerator<MCRDNBURN
 
     private final String namespace;
 
+    private final boolean appendChecksum;
+
     private final String delimiter;
 
+    /**
+     * @deprecated Use {@link MCRDNBURNGeneratorBase(String, boolean, String)} instead.
+     */
+    @Deprecated(forRemoval = true)
     public MCRDNBURNGeneratorBase(String namespace, String delimiter) {
+        this(namespace, true, delimiter);
+    }
+
+    public MCRDNBURNGeneratorBase(String namespace, boolean appendChecksum, String delimiter) {
         this.namespace = checkNamespace(Objects.requireNonNull(namespace, "Namespace must not be null"));
+        this.appendChecksum = appendChecksum;
         this.delimiter = Objects.requireNonNull(delimiter, "Delimiter must not be null");
     }
 
@@ -53,9 +64,12 @@ public abstract class MCRDNBURNGeneratorBase implements MCRPIGenerator<MCRDNBURN
     }
 
     @Override
-    public MCRDNBURN generate(MCRBase base, String additional)
-        throws MCRPersistentIdentifierException {
-        return new MCRDNBURN(namespace, delimiter + buildNISS(base, additional) + delimiter);
+    public MCRDNBURN generate(MCRBase base, String additional) throws MCRPersistentIdentifierException {
+        if (appendChecksum) {
+            return new MCRDNBURN(namespace, delimiter + buildNISS(base, additional) + delimiter, true);
+        } else {
+            return new MCRDNBURN(namespace, delimiter + buildNISS(base, additional), false);
+        }
     }
 
     protected abstract String buildNISS(MCRBase base, String additional) throws MCRPersistentIdentifierException;

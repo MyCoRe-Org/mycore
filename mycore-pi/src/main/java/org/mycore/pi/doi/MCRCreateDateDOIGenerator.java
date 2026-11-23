@@ -56,7 +56,7 @@ import org.mycore.pi.util.MCRPIGeneratorUtils;
 @MCRConfigurationProxy(proxyClass = MCRCreateDateDOIGenerator.Factory.class)
 public class MCRCreateDateDOIGenerator extends MCRGenericPIGenerator {
 
-    public static final String DEFAULT_PROPERTY_PREFIX = "MCR.Default.PI.Generator.CreateDate.";
+    public static final String DEFAULT_PROPERTY_PREFIX = "MCR.Default.PI.Generator.DOI.CreateDate.";
 
     public static final String DATE_FORMAT_KEY = "DateFormat";
 
