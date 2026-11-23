@@ -75,6 +75,18 @@ public class MCRErrorResponseMediaTypeFilterTest {
     }
 
     @Test
+    public void errorResponseShouldBecomeAcceptedTypeIfNegotiatedTypeIsNeitherJsonNorXml() {
+        MCRErrorResponse error = MCRErrorResponse.fromStatus(403);
+        when(responseContext.getEntity()).thenReturn(error);
+        when(responseContext.getMediaType()).thenReturn(MediaType.valueOf("image/png"));
+        when(request.selectVariant(any())).thenReturn(new Variant(MediaType.APPLICATION_XML_TYPE, (String) null, null));
+
+        filter.filter(requestContext, responseContext);
+
+        verify(responseContext).setEntity(error, annotations, MediaType.APPLICATION_XML_TYPE);
+    }
+
+    @Test
     public void otherEntitiesShouldNotBeTouched() {
         when(responseContext.getEntity()).thenReturn("file content");
         when(request.selectVariant(any())).thenReturn(null);
