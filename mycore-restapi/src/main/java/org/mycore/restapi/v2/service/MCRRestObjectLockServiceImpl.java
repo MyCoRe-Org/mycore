@@ -21,6 +21,7 @@ package org.mycore.restapi.v2.service;
 import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_MCRID;
 
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.support.MCRObjectIDLockTable;
 import org.mycore.frontend.support.MCRObjectLock;
@@ -38,8 +39,23 @@ import jakarta.ws.rs.core.Response;
  * for error cases.
  * <p>
  * Ownership is determined by the current user from {@link MCRSessionMgr#getCurrentSession()}.
+ * <p>
+ * Configuration:
+ * <ul>
+ *     <li>{@code MCR.RestAPI.V2.ObjectLock.Timeout.Default}: timeout in milliseconds of a new lock, if the request
+ *         does not provide one</li>
+ *     <li>{@code MCR.RestAPI.V2.ObjectLock.Timeout.Max}: maximum timeout in milliseconds, larger timeouts are
+ *         reduced to it</li>
+ * </ul>
  */
 public class MCRRestObjectLockServiceImpl implements MCRRestObjectLockService {
+
+    private static final int TIMEOUT_DEFAULT = MCRConfiguration2
+        .getInt("MCR.RestAPI.V2.ObjectLock.Timeout.Default")
+        .orElseThrow();
+
+    private static final int TIMEOUT_MAX = MCRConfiguration2.getInt("MCR.RestAPI.V2.ObjectLock.Timeout.Max")
+        .orElseThrow();
 
     /**
      * {@inheritDoc}
@@ -65,15 +81,16 @@ public class MCRRestObjectLockServiceImpl implements MCRRestObjectLockService {
     @Override
     public MCRObjectLock putLock(@PathParam(PARAM_MCRID) MCRObjectID id, MCRObjectLock requestBody) {
         MCRRestUtils.checkExists(id);
+        Integer timeout = getRequestedTimeout(requestBody);
         MCRObjectLock lock = MCRObjectIDLockTable.getLock(id);
         if (lock == null) {
-            return createLock(id, requestBody);
+            return createLock(id, timeout);
         }
         // check id
         String lockId = MCRSessionMgr.getCurrentSession().getUserInformation().getUserID();
         checkLockIdsAreEqual(lockId, lock.getId());
         // update the lock object
-        return MCRObjectIDLockTable.updateLock(id, requestBody != null ? requestBody.getTimeout() : null);
+        return MCRObjectIDLockTable.updateLock(id, timeout);
     }
 
     /**
@@ -100,16 +117,40 @@ public class MCRRestObjectLockServiceImpl implements MCRRestObjectLockService {
 
     /**
      * Creates a lock for the current user using the given timeout.
-     * If the timeout is not provided, 60 seconds are used.
+     * If the timeout is not provided, {@code MCR.RestAPI.V2.ObjectLock.Timeout.Default} is used.
      *
-     * @param id          the object ID
-     * @param requestBody lock request (maybe {@code null})
+     * @param id      the object ID
+     * @param timeout the timeout in milliseconds (maybe {@code null})
      * @return the created lock
+     * @throws jakarta.ws.rs.WebApplicationException 409 if another user locked the object in the meantime
      */
-    private static MCRObjectLock createLock(MCRObjectID id, MCRObjectLock requestBody) {
+    private static MCRObjectLock createLock(MCRObjectID id, Integer timeout) {
         String userId = MCRSessionMgr.getCurrentSession().getUserInformation().getUserID();
-        int timeout = (requestBody != null && requestBody.getTimeout() != null) ? requestBody.getTimeout() : 1000 * 60;
-        return MCRObjectIDLockTable.lock(id, userId, userId, timeout);
+        int lockTimeout = timeout != null ? timeout : Math.min(TIMEOUT_DEFAULT, TIMEOUT_MAX);
+        MCRObjectLock lock = MCRObjectIDLockTable.lock(id, userId, userId, lockTimeout);
+        checkLockIdsAreEqual(userId, lock.getId());
+        return lock;
+    }
+
+    /**
+     * Returns the timeout of the lock request, reduced to {@code MCR.RestAPI.V2.ObjectLock.Timeout.Max}.
+     *
+     * @param requestBody lock request (maybe {@code null})
+     * @return the timeout in milliseconds, or {@code null} if the request does not provide one
+     * @throws jakarta.ws.rs.WebApplicationException 400 if the timeout is not positive
+     */
+    static Integer getRequestedTimeout(MCRObjectLock requestBody) {
+        Integer timeout = requestBody != null ? requestBody.getTimeout() : null;
+        if (timeout == null) {
+            return null;
+        }
+        if (timeout <= 0) {
+            throw MCRErrorResponse.ofStatusCode(Response.Status.BAD_REQUEST.getStatusCode())
+                .withErrorCode(MCRErrorCodeConstants.MCROBJECT_INVALID_LOCK_TIMEOUT)
+                .withMessage("The timeout of a lock must be positive.")
+                .toException();
+        }
+        return Math.min(timeout, TIMEOUT_MAX);
     }
 
     /**
