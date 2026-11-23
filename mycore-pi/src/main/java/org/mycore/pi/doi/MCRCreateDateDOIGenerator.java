@@ -59,7 +59,7 @@ import org.mycore.pi.util.MCRPIGeneratorUtils;
  * <li>pattern <code>{PREFIX}/$ObjectDate-$Count</code> (where <code>{PREFIX}</code> is the currently used prefix)
  * <li>formatter {@link MCRISO8601DateFormatter} (with the currently used date format and locale {@link Locale#ENGLISH})
  * <li>the currently used counter precision and
- * <li>type {@link MCRDigitalObjectIdentifier#TEST_DOI_PREFIX}
+ * <li>type {@link MCRDigitalObjectIdentifier#TYPE}
  * </ul>
  * instead.
  */
