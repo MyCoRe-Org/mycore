@@ -625,8 +625,12 @@ public final class MCRMetadataManager {
      * @param id the object ID
      * @return the expanded object
      * @throws MCRPersistenceException if a persistence problem is occurred
+     * @throws IllegalArgumentException if the given ID is a derivate ID
      */
     public static MCRExpandedObject retrieveMCRExpandedObject(final MCRObjectID id) throws MCRPersistenceException {
+        if (id.getTypeId().equals(MCRDerivate.OBJECT_TYPE)) {
+            throw new IllegalArgumentException("Cannot retrieve derivate " + id + " as expanded object");
+        }
         return MCRExpandedObjectManager.getInstance().getExpandedObject(retrieveMCRObject(id));
     }
 
