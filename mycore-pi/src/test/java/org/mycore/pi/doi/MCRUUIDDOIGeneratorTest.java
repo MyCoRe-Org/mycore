@@ -62,7 +62,7 @@ public class MCRUUIDDOIGeneratorTest {
         try {
             UUID.fromString(uuid);
         } catch (Exception e) {
-            fail("NISS is not a valid UUID", e);
+            fail("Suffix is not a valid UUID", e);
         }
 
     }
@@ -109,7 +109,7 @@ public class MCRUUIDDOIGeneratorTest {
         try {
             UUID.fromString(uuid);
         } catch (Exception e) {
-            fail("NISS is not a valid UUID", e);
+            fail("Suffix is not a valid UUID", e);
         }
 
     }

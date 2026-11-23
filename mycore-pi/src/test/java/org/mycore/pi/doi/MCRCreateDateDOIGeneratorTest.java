@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Date;
 import java.util.Locale;
 
 import org.junit.jupiter.api.Test;
@@ -33,6 +32,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.pi.MCRMockCounter;
 import org.mycore.pi.MCRPIGenerator;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
@@ -44,6 +44,8 @@ import org.mycore.test.MyCoReTest;
 @MCRTestConfiguration(properties = {
     @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true"),
 })
+@SuppressWarnings("removal")
+@Deprecated(forRemoval = true)
 public class MCRCreateDateDOIGeneratorTest {
 
     public static final String DATE_FORMAT = "yyyyMMdd";
@@ -67,17 +69,8 @@ public class MCRCreateDateDOIGeneratorTest {
 
         String value = doi.substring(PREFIX.length() + 1);
 
-        assertTrue(value.startsWith(formatDate(new Date()) + "-"));
+        assertTrue(value.startsWith(formatCreateDate(object) + "-"));
         assertTrue(value.endsWith("-042"));
-
-    }
-
-    private String formatDate(Date date) {
-
-        MCRISO8601Date isoDate = new MCRISO8601Date();
-        isoDate.setDate(date);
-
-        return isoDate.format(DATE_FORMAT, Locale.ROOT);
 
     }
 
@@ -127,8 +120,17 @@ public class MCRCreateDateDOIGeneratorTest {
 
         String value = pi.substring(PREFIX.length() + 1);
 
-        assertTrue(value.startsWith(formatDate(new Date()) + "-"));
+        assertTrue(value.startsWith(formatCreateDate(object) + "-"));
         assertTrue(value.endsWith("-000"));
+
+    }
+
+    private String formatCreateDate(MCRObject object) {
+
+        MCRISO8601Date isoDate = new MCRISO8601Date();
+        isoDate.setDate(object.getService().getDate(MCRObjectService.DATE_TYPE_CREATEDATE));
+
+        return isoDate.format(DATE_FORMAT, Locale.ROOT);
 
     }
 
