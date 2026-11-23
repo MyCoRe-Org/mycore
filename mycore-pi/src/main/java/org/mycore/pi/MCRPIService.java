@@ -222,6 +222,10 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         }
         getGenerator();
         getMetadataService();
+
+        String prefix = MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX + getServiceID() + ".";
+        isPredicateConfigured(prefix + MCRPIJobService.CREATION_PREDICATE);
+        isPredicateConfigured(prefix + MCRPIJobService.REGISTRATION_PREDICATE);
     }
 
     public MCRPIMetadataService<T> getMetadataService() {
@@ -559,7 +563,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
     protected Predicate<MCRBase> getCreationPredicate() {
         final String predicateProperty = MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX +
             getServiceID() + "." + MCRPIJobService.CREATION_PREDICATE;
-        if (MCRConfiguration2.getString(predicateProperty + CLASS_SUFFIX).isEmpty()) {
+        if (!isPredicateConfigured(predicateProperty)) {
             return (o) -> false;
         }
         return getPredicateInstance(predicateProperty);
@@ -568,10 +572,21 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
     protected Predicate<MCRBase> getRegistrationPredicate() {
         final String predicateProperty = MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX +
             getServiceID() + "." + MCRPIJobService.REGISTRATION_PREDICATE;
-        if (MCRConfiguration2.getString(predicateProperty + CLASS_SUFFIX).isEmpty()) {
+        if (!isPredicateConfigured(predicateProperty)) {
             return (o) -> true;
         }
         return getPredicateInstance(predicateProperty);
+    }
+
+    static boolean isPredicateConfigured(String predicateProperty) {
+        if (MCRConfiguration2.getString(predicateProperty + CLASS_SUFFIX).isPresent()) {
+            return true;
+        }
+        if (MCRConfiguration2.getString(predicateProperty).isPresent()) {
+            throw new MCRConfigurationException("PI predicates must be configured with " + CLASS_SUFFIX
+                + " suffix:\n" + predicateProperty + " ==> " + predicateProperty + CLASS_SUFFIX);
+        }
+        return false;
     }
 
     public static Predicate<MCRBase> getPredicateInstance(String predicateProperty) {
