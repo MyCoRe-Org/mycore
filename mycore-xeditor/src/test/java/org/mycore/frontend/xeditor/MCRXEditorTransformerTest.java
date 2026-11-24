@@ -176,6 +176,16 @@ public class MCRXEditorTransformerTest extends MCRTestCase {
     }
 
     @Test
+    public void testValidationForceCheck() throws IOException, TransformerException, JDOMException,
+        SAXException, JaxenException {
+        MCREditorSession session = testTransformation("testValidationForceCheck-editor.xml", null,
+            "testValidationForceCheck-transformed1.xml");
+        assertFalse(session.getValidator().isValid());
+        testTransformation("testValidationForceCheck-editor.xml", null, session,
+            "testValidationForceCheck-transformed2.xml");
+    }
+
+    @Test
     public void testDefaultValue() throws IOException, TransformerException, JDOMException,
         SAXException, JaxenException {
         MCREditorSession session = testTransformation("testDefaultValue-editor.xml", null,
