@@ -230,6 +230,10 @@ public class MCROCFLVirtualObjectProvider {
         }
         try {
             OcflObjectVersion object = repository.getObject(objectVersionId);
+            // a deleted (not purged) object still exists, even if no file is left in the delete version
+            if (convertMessageToType(object.getVersionInfo().getMessage()) == MCROCFLMetadataVersion.DELETED) {
+                return true;
+            }
             return object.getFiles().stream()
                 .map(OcflObjectVersionFile::getPath)
                 .anyMatch(path -> path.startsWith(MCROCFLVirtualObject.FILES_DIRECTORY));

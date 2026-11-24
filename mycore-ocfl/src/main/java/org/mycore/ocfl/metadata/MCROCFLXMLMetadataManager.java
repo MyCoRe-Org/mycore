@@ -137,6 +137,10 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManager {
     public void create(MCRObjectID mcrid, MCRContent xml, Date lastModified, String user)
         throws MCRPersistenceException {
         String ocflObjectID = getOCFLObjectID(mcrid);
+        if (isDeleted(mcrid)) {
+            throw new MCRPersistenceException("Cannot create object '" + ocflObjectID
+                + "' because it was deleted. Restore or purge it first.");
+        }
         VersionInfo info = buildVersionInfo(MESSAGE_CREATED, lastModified, user);
         try (InputStream objectAsStream = getContentStream(xml)) {
             getRepository().updateObject(ObjectVersionId.head(ocflObjectID), info,
@@ -207,6 +211,51 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManager {
         } catch (IOException e) {
             throw new MCRPersistenceException("Failed to update object '" + ocflObjectID + "'", e);
         }
+    }
+
+    /**
+     * Restores a deleted (not purged) object by writing the given content as a new version on top of the delete
+     * version. The history of the object is kept.
+     * <p>
+     * Derivates cannot be restored this way, because their metadata and files share one OCFL object. Use
+     * {@code restore derivate {0} from ocfl with version {1}} instead.
+     *
+     * @param mcrid the id of the deleted object
+     * @param xml the content to restore, usually a former version of the object
+     * @param lastModified the date of the new version
+     * @param user the user of the new version, or {@code null} to use the current user
+     * @throws MCRUsageException if the object is a derivate or is not deleted
+     */
+    public void restore(MCRObjectID mcrid, MCRContent xml, Date lastModified, String user)
+        throws MCRPersistenceException {
+        String ocflObjectID = getOCFLObjectID(mcrid);
+        if (Objects.equals(mcrid.getTypeId(), MCRDerivate.OBJECT_TYPE)) {
+            throw new MCRUsageException("Cannot restore the metadata of derivate '" + ocflObjectID
+                + "' without its files. Restore the derivate instead.");
+        }
+        if (!isDeleted(mcrid)) {
+            throw new MCRUsageException("Cannot restore object '" + ocflObjectID + "' because it is not deleted");
+        }
+        try (InputStream objectAsStream = getContentStream(xml)) {
+            VersionInfo versionInfo = buildVersionInfo(MESSAGE_UPDATED, lastModified, user);
+            getRepository().updateObject(ObjectVersionId.head(ocflObjectID), versionInfo,
+                init -> init.writeFile(objectAsStream, buildFilePath(mcrid), OcflOption.OVERWRITE));
+        } catch (IOException e) {
+            throw new MCRPersistenceException("Failed to restore object '" + ocflObjectID + "'", e);
+        }
+    }
+
+    /**
+     * Checks if the object was deleted but not purged. Such an object still exists in the OCFL repository with its
+     * history, but {@link #exists(MCRObjectID)} returns {@code false}. Its id cannot be used for a new object until
+     * the object is restored or purged.
+     *
+     * @param mcrid the id of the object
+     * @return {@code true} if the head version of the object is a delete version
+     */
+    public boolean isDeleted(MCRObjectID mcrid) {
+        String ocflObjectID = getOCFLObjectID(mcrid);
+        return getRepository().containsObject(ocflObjectID) && isDeleted(ocflObjectID);
     }
 
     private String getOCFLObjectID(MCRObjectID mcrid) {

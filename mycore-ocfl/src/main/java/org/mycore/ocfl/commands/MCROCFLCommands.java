@@ -328,10 +328,15 @@ public class MCROCFLCommands {
         MCROCFLXMLMetadataManager manager = new MCROCFLXMLMetadataManager();
         manager.setRepositoryKey(MCRConfiguration2.getStringOrThrow("MCR.Metadata.Manager.Repository"));
         MCRContent content = manager.retrieveContent(mcrid, revision);
-        try {
-            MCRXMLMetadataManager.obtainInstance().update(mcrid, content, new Date(content.lastModified()));
-        } catch (MCRUsageException e) {
-            MCRXMLMetadataManager.obtainInstance().create(mcrid, content, new Date(content.lastModified()));
+        MCRXMLMetadataManager store = MCRXMLMetadataManager.obtainInstance();
+        // the restore is a new change, the content of an older version has no usable date (-1)
+        Date lastModified = new Date();
+        if (store.exists(mcrid)) {
+            store.update(mcrid, content, lastModified);
+        } else if (store instanceof MCROCFLXMLMetadataManager ocflStore && ocflStore.isDeleted(mcrid)) {
+            ocflStore.restore(mcrid, content, lastModified, null);
+        } else {
+            store.create(mcrid, content, lastModified);
         }
     }
 

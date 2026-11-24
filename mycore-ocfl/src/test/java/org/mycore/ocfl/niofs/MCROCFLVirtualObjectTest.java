@@ -286,14 +286,41 @@ public class MCROCFLVirtualObjectTest {
         MCRTransactionManager.beginTransactions();
         getVirtualObject().purge();
         MCRTransactionManager.commitTransactions();
-        assertFalse(
-            MCROCFLFileSystemProvider.get().virtualObjectProvider().exists(MCROCFLTestCaseHelper.DERIVATE_1),
-            "derivate should not exist");
 
         if (purge) {
+            assertFalse(
+                MCROCFLFileSystemProvider.get().virtualObjectProvider().exists(MCROCFLTestCaseHelper.DERIVATE_1),
+                "purged derivate should not exist");
             assertThrows(NotFoundException.class, MCROCFLVirtualObjectTest::getVirtualObject);
         } else {
+            // a deleted (not purged) derivate still exists in the repository and cannot be created again
+            assertTrue(
+                MCROCFLFileSystemProvider.get().virtualObjectProvider().exists(MCROCFLTestCaseHelper.DERIVATE_1),
+                "deleted derivate should still exist");
+            assertTrue(MCROCFLFileSystemProvider.get().virtualObjectProvider().isDeleted(
+                MCROCFLTestCaseHelper.DERIVATE_1), "derivate should be marked as deleted");
             assertFalse(getVirtualObject().exists(WHITE_PNG), "white.png should not exist");
+        }
+    }
+
+    @TestTemplate
+    public void purgeRemovesKeepFiles() throws IOException {
+        OcflObjectVersion before = repository.getObject(ObjectVersionId.head(
+            MCROCFLTestCaseHelper.DERIVATE_1_OBJECT_ID));
+        assertNotNull(before.getFile(FILES_DIRECTORY + "empty/.keep"), "should have an empty/.keep file");
+
+        MCRTransactionManager.beginTransactions();
+        getVirtualObject().purge();
+        MCRTransactionManager.commitTransactions();
+
+        if (!purge) {
+            OcflObjectVersion deleted = repository.getObject(ObjectVersionId.head(
+                MCROCFLTestCaseHelper.DERIVATE_1_OBJECT_ID));
+            assertTrue(deleted.getFiles().isEmpty(),
+                "the delete version should not contain any file, but has " + deleted.getFiles());
+            assertThrows(FileAlreadyExistsException.class,
+                () -> MCROCFLFileSystemProvider.getMCROCFLFileSystem().createRoot(MCROCFLTestCaseHelper.DERIVATE_1),
+                "a deleted derivate should not be created again");
         }
     }
 

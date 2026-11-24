@@ -967,7 +967,9 @@ public abstract class MCROCFLVirtualObject {
         }
         // delete
         repository.updateObject(targetVersionId, new VersionInfo().setMessage(MESSAGE_DELETED), (updater) -> {
-            List<MCRVersionedPath> keepFiles = directoryTracker.originalPathsWithKeepFile();
+            List<MCRVersionedPath> keepFiles = directoryTracker.originalPathsWithKeepFile().stream()
+                .map(directoryTracker::toKeepFile)
+                .toList();
             List<MCRVersionedPath> contentFiles = fileTracker.originalPaths();
             Stream.concat(keepFiles.stream(), contentFiles.stream())
                 .map(path -> toOcflFilesPath(path.toRelativePath()))
