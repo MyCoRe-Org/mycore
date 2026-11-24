@@ -32,8 +32,11 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -44,9 +47,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
+import org.mycore.common.events.MCREvent;
+import org.mycore.common.events.MCREventManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.MCRContentTypes;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 import org.mycore.frontend.cli.MCRAbstractCommands;
@@ -56,6 +62,7 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.imagetiler.MCRImage;
 import org.mycore.imagetiler.MCRTiledPictureProps;
 import org.mycore.iview2.events.MCRIView2TilingThreadStarter;
+import org.mycore.iview2.events.MCRThumbnailForPdfEventHandler;
 import org.mycore.iview2.services.MCRIView2Tools;
 import org.mycore.iview2.services.MCRTileJob;
 import org.mycore.iview2.services.MCRTilingQueue;
@@ -82,6 +89,10 @@ public class MCRIView2Commands extends MCRAbstractCommands {
     private static final String TILE_IMAGE_COMMAND_SYNTAX = "tile image {0} {1}";
 
     private static final String DEL_DERIVATE_TILES_COMMAND_SYNTAX = "delete tiles of derivate {0}";
+
+    private static final String MIGRATE_DERIVATE_TILES_COMMAND_SYNTAX = "migrate tiles of derivate {0}";
+
+    private static final String TILE_FILE_SUFFIX = ".iview2";
 
     /**
      * meta command to tile all images of all derivates.
@@ -220,7 +231,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
             " generates new one",
         order = 30)
     public static void checkImage(String derivate, String absoluteImagePath) throws IOException {
-        Path iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivate, absoluteImagePath);
+        Path iviewFile = MCRImage.getTiledPath(MCRIView2Tools.getTileDir(), derivate, absoluteImagePath);
         //file checks
         MCRTiledPictureProps props = getTiledPictureProperties(derivate, absoluteImagePath, iviewFile);
         if (props == null) {
@@ -396,7 +407,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         help = "removes tiles of a specific file identified by its derivate ID {0}",
         order = 100)
     public static void deleteDerivateTiles(String derivateID) throws IOException {
-        Path derivateDir = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivateID, null);
+        Path derivateDir = MCRImage.getTiledPath(MCRIView2Tools.getTileDir(), derivateID, null);
         Files.walkFileTree(derivateDir, new MCRRecursiveDeleter());
         MCRTilingQueue.getInstance().remove(derivateID);
     }
@@ -410,10 +421,148 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         help = "removes tiles of a specific file identified by its derivate ID {0} and absolute path {1}",
         order = 110)
     public static void deleteImageTiles(String derivate, String absoluteImagePath) throws IOException {
-        Path tileFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivate, absoluteImagePath);
+        Path tileFile = MCRImage.getTiledPath(MCRIView2Tools.getTileDir(), derivate, absoluteImagePath);
         deleteFileAndEmptyDirectories(tileFile);
         int removed = MCRTilingQueue.getInstance().remove(derivate, absoluteImagePath);
         LOGGER.info("removed tiles from {} images", removed);
+    }
+
+    /**
+     * meta command to migrate the tile files of all derivates to the current naming scheme.
+     * @return list of commands to execute.
+     */
+    @MCRCommand(syntax = "migrate tiles of all derivates",
+        help = "renames tile files of all derivates from the old naming without file extension to the full file name",
+        order = 120)
+    public static List<String> migrateAllTiles() {
+        MessageFormat syntaxMF = new MessageFormat(MIGRATE_DERIVATE_TILES_COMMAND_SYNTAX, Locale.ROOT);
+        return MCRCommandUtils.getIdsForType(MCRDerivate.OBJECT_TYPE)
+            .map(id -> syntaxMF.format(new Object[] { id }))
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * Migrates the tile files of this derivate from the old naming scheme, which strips the file extension
+     * (<code>talk.iview2</code>), to the current one, which uses the full file name (<code>talk.jpg.iview2</code>).
+     * <p>
+     * For every tile file not following the current naming scheme, all files of the derivate that map to it under
+     * the old naming scheme are determined:
+     * <ul>
+     *     <li>exactly one file: the tile file is renamed</li>
+     *     <li>several files: the origin is ambiguous, so the tile file is deleted and the tiles of every candidate
+     *     are generated again</li>
+     *     <li>no file: the tile file is orphaned and deleted</li>
+     * </ul>
+     * Tile files that already follow the current naming scheme are skipped, so the command can be run repeatedly.
+     * @param derivateID a derivate ID
+     */
+    @MCRCommand(syntax = MIGRATE_DERIVATE_TILES_COMMAND_SYNTAX,
+        help = "renames tile files of derivate {0} from the old naming without file extension to the full file name",
+        order = 130)
+    @SuppressWarnings("deprecation")
+    public static void migrateDerivateTiles(String derivateID) throws IOException {
+        Path tileDir = MCRIView2Tools.getTileDir();
+        Path derivateTileDir = MCRImage.getTiledPath(tileDir, derivateID, null);
+        if (!Files.isDirectory(derivateTileDir)) {
+            LOGGER.info("No tiles to migrate for derivate {}.", derivateID);
+            return;
+        }
+        MCRObjectID id = MCRObjectID.getInstance(derivateID);
+        MCRDerivate derivate = MCRMetadataManager.exists(id) ? MCRMetadataManager.retrieveMCRDerivate(id) : null;
+        String mainDoc = derivate == null ? null : derivate.getDerivate().getInternals().getMainDoc();
+        MCRPath derivateRoot = MCRPath.getPath(derivateID, "/");
+        List<String> files = Files.exists(derivateRoot) ? getTileSourcePaths(derivateRoot, mainDoc) : List.of();
+        Set<Path> currentTileFiles = files.stream()
+            .map(file -> MCRImage.getTiledPath(tileDir, derivateID, file))
+            .collect(Collectors.toSet());
+        Map<Path, List<String>> legacyTileFiles = files.stream()
+            .collect(Collectors.groupingBy(file -> MCRImage.getTiledFile(tileDir, derivateID, file)));
+        List<Path> tileFiles;
+        try (Stream<Path> stream = Files.walk(derivateTileDir)) {
+            tileFiles = stream
+                .filter(Files::isRegularFile)
+                .filter(tileFile -> tileFile.getFileName().toString().endsWith(TILE_FILE_SUFFIX))
+                .filter(tileFile -> !currentTileFiles.contains(tileFile))
+                .toList();
+        }
+        for (Path tileFile : tileFiles) {
+            List<String> candidates = legacyTileFiles.getOrDefault(tileFile, List.of());
+            switch (candidates.size()) {
+                case 0 -> {
+                    LOGGER.warn("Deleting orphaned tile file {}.", tileFile);
+                    Files.delete(tileFile);
+                }
+                case 1 -> moveTileFile(tileFile, MCRImage.getTiledPath(tileDir, derivateID, candidates.getFirst()));
+                default -> {
+                    LOGGER.warn("Tile file {} matches several files {}. Deleting it and generating tiles again.",
+                        tileFile, candidates);
+                    Files.delete(tileFile);
+                    regenerateTiles(derivate, derivateID, mainDoc, candidates);
+                }
+            }
+        }
+    }
+
+    private static List<String> getTileSourcePaths(MCRPath derivateRoot, String mainDoc) throws IOException {
+        List<String> paths = new ArrayList<>();
+        try (Stream<Path> stream = Files.walk(derivateRoot)) {
+            for (Path file : stream.filter(Files::isRegularFile).toList()) {
+                String path = MCRPath.ofPath(file).getOwnerRelativePath();
+                if (isTileSource(file, path, mainDoc)) {
+                    paths.add(path);
+                }
+            }
+        }
+        return paths;
+    }
+
+    /**
+     * Checks if tiles are generated for this file: supported images, videos and a PDF main document.
+     */
+    private static boolean isTileSource(Path file, String path, String mainDoc) throws IOException {
+        if (MCRIView2Tools.isFileSupported(file)) {
+            return true;
+        }
+        String contentType = MCRContentTypes.probeContentType(file);
+        if (contentType != null && contentType.startsWith("video/")) {
+            return true;
+        }
+        return isMainDoc(path, mainDoc) && path.toLowerCase(Locale.ROOT).endsWith(".pdf");
+    }
+
+    private static boolean isMainDoc(String path, String mainDoc) {
+        return mainDoc != null && stripLeadingSlash(path).equals(stripLeadingSlash(mainDoc));
+    }
+
+    private static void moveTileFile(Path source, Path target) throws IOException {
+        if (Files.exists(target)) {
+            LOGGER.info("Tile file {} already exists. Deleting old tile file {}.", target, source);
+            Files.delete(source);
+            return;
+        }
+        LOGGER.info("Renaming tile file {} to {}.", source, target);
+        Files.createDirectories(target.getParent());
+        Files.move(source, target);
+    }
+
+    private static void regenerateTiles(MCRDerivate derivate, String derivateID, String mainDoc, List<String> files)
+        throws IOException {
+        for (String file : files) {
+            MCRPath path = MCRPath.getPath(derivateID, file);
+            tileImage(path);
+            if (isMainDoc(file, mainDoc)) {
+                new MCRThumbnailForPdfEventHandler().updateThumbnail(derivate);
+            }
+            // lets other tile producers, e.g. for video frames, generate their tiles again
+            MCREvent evt = new MCREvent(MCREvent.ObjectType.PATH, MCREvent.EventType.REPAIR);
+            evt.put(MCREvent.PATH_KEY, path);
+            evt.put(MCREvent.FILEATTR_KEY, Files.readAttributes(path, BasicFileAttributes.class));
+            MCREventManager.getInstance().handleEvent(evt);
+        }
+    }
+
+    private static String stripLeadingSlash(String path) {
+        return path.startsWith("/") ? path.substring(1) : path;
     }
 
     private static void deleteFileAndEmptyDirectories(Path file) throws IOException {
