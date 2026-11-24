@@ -358,7 +358,7 @@
       <xsl:if test="@xpath">
         <xsl:value-of select="transformer:bind($transformer,@xpath,@null,@null)" />
       </xsl:if>
-      <xsl:if test="transformer:hasValidationError($transformer)">
+      <xsl:if test="transformer:hasValidationError($transformer,.)">
         <xsl:apply-templates select="." mode="message" />
       </xsl:if>
       <xsl:if test="@xpath">
