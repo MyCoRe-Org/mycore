@@ -50,11 +50,30 @@ import jakarta.persistence.UniqueConstraint;
     })
 @NamedQueries({
     @NamedQuery(name = MCRDeDupNoDuplicate.DELETE_BY_OBJECT_ID,
-        query = "DELETE FROM MCRDeDupNoDuplicate n WHERE n.objectId1 = :objectId OR n.objectId2 = :objectId")
+        query = "DELETE FROM MCRDeDupNoDuplicate n WHERE n.objectId1 = :objectId OR n.objectId2 = :objectId"),
+    @NamedQuery(name = MCRDeDupNoDuplicate.INSERT_IF_ABSENT,
+        query = "INSERT INTO MCRDeDupNoDuplicate (objectId1, objectId2, creator, created) "
+            + "VALUES (:objectId1, :objectId2, :creator, :created) "
+            + "ON CONFLICT DO NOTHING"),
+    @NamedQuery(name = MCRDeDupNoDuplicate.FIND_ALL,
+        query = "SELECT n FROM MCRDeDupNoDuplicate n"),
+    @NamedQuery(name = MCRDeDupNoDuplicate.FIND_ALL_PAIRS,
+        query = "SELECT n.objectId1, n.objectId2 FROM MCRDeDupNoDuplicate n")
 })
 public class MCRDeDupNoDuplicate {
 
     public static final String DELETE_BY_OBJECT_ID = "MCRDeDupNoDuplicate.deleteByObjectId";
+
+    /**
+     * Inserts a marking for {@code objectId1, objectId2, creator, created}, unless the pair is already marked.
+     */
+    public static final String INSERT_IF_ABSENT = "MCRDeDupNoDuplicate.insertIfAbsent";
+
+    /** Selects all no-duplicate markings. */
+    public static final String FIND_ALL = "MCRDeDupNoDuplicate.findAll";
+
+    /** Selects {@code objectId1, objectId2} of all no-duplicate markings. */
+    public static final String FIND_ALL_PAIRS = "MCRDeDupNoDuplicate.findAllPairs";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

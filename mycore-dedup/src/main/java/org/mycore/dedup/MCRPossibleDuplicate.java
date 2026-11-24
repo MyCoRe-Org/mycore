@@ -18,38 +18,55 @@
 
 package org.mycore.dedup;
 
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Objects;
+import java.util.SequencedSet;
 
 /**
  * A pair of objects that are possible duplicates of each other because they share the given
- * {@link MCRDeDupCriterion}. The two object ids are kept in a normalized order
- * ({@code objectId1 <= objectId2}) so that the pair {@code (a, b)} and {@code (b, a)} are represented
- * identically and compare equal.
+ * {@link MCRDeDupCriterion criteria}. The two object ids are kept in a normalized order
+ * ({@code objectId1 <= objectId2}): if they are given the other way round, they are swapped. So the pair
+ * {@code (a, b)} and {@code (b, a)} are represented identically and compare equal.
  *
  * @param objectId1 the lexicographically smaller object id of the pair
  * @param objectId2 the lexicographically larger object id of the pair
- * @param criterion the criterion the two objects have in common
+ * @param criteria  all criteria the two objects have in common, never empty and without {@code null}
  */
-public record MCRPossibleDuplicate(String objectId1, String objectId2, MCRDeDupCriterion criterion) {
+public record MCRPossibleDuplicate(String objectId1, String objectId2, SequencedSet<MCRDeDupCriterion> criteria) {
 
     public MCRPossibleDuplicate {
         Objects.requireNonNull(objectId1, "objectId1 must not be null");
         Objects.requireNonNull(objectId2, "objectId2 must not be null");
-        Objects.requireNonNull(criterion, "criterion must not be null");
+        Objects.requireNonNull(criteria, "criteria must not be null");
+        if (objectId1.compareTo(objectId2) > 0) {
+            String swapped = objectId1;
+            objectId1 = objectId2;
+            objectId2 = swapped;
+        }
+        SequencedSet<MCRDeDupCriterion> copy = new LinkedHashSet<>(criteria);
+        if (copy.isEmpty()) {
+            throw new IllegalArgumentException("criteria must not be empty");
+        }
+        copy.forEach(criterion -> Objects.requireNonNull(criterion, "criteria must not contain null"));
+        criteria = Collections.unmodifiableSequencedSet(copy);
     }
 
     /**
-     * Creates a possible duplicate for the two given object ids and a shared criterion, normalizing the
-     * order of the object ids.
+     * Returns the id of the object of this pair that is not the given one.
      *
-     * @param objectIdA one object id
-     * @param objectIdB the other object id
-     * @param criterion the shared criterion
+     * @param objectId one of the two object ids of this pair
+     * @return the other object id
+     * @throws IllegalArgumentException if the given object id is not part of this pair
      */
-    public static MCRPossibleDuplicate of(String objectIdA, String objectIdB, MCRDeDupCriterion criterion) {
-        if (objectIdA.compareTo(objectIdB) <= 0) {
-            return new MCRPossibleDuplicate(objectIdA, objectIdB, criterion);
+    public String otherObjectId(String objectId) {
+        if (objectId1.equals(objectId)) {
+            return objectId2;
         }
-        return new MCRPossibleDuplicate(objectIdB, objectIdA, criterion);
+        if (objectId2.equals(objectId)) {
+            return objectId1;
+        }
+        throw new IllegalArgumentException(
+            "Object " + objectId + " is not part of the pair " + objectId1 + " and " + objectId2);
     }
 }

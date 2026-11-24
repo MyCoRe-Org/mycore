@@ -48,11 +48,41 @@ import jakarta.persistence.UniqueConstraint;
     })
 @NamedQueries({
     @NamedQuery(name = MCRDeDupKey.DELETE_BY_OBJECT_ID,
-        query = "DELETE FROM MCRDeDupKey k WHERE k.objectId = :objectId")
+        query = "DELETE FROM MCRDeDupKey k WHERE k.objectId = :objectId"),
+    @NamedQuery(name = MCRDeDupKey.FIND_BY_OBJECT_ID,
+        query = "SELECT k FROM MCRDeDupKey k WHERE k.objectId = :objectId"),
+    @NamedQuery(name = MCRDeDupKey.FIND_DUPLICATE_KEYS_OF_OBJECT,
+        query = "SELECT o.objectId, o.type, o.value FROM MCRDeDupKey o, MCRDeDupKey s "
+            + "WHERE s.objectId = :objectId AND o.type = s.type AND o.value = s.value "
+            + "AND o.objectId != :objectId "
+            + "AND NOT EXISTS (SELECT 1 FROM MCRDeDupNoDuplicate n "
+            + "  WHERE (n.objectId1 = :objectId AND n.objectId2 = o.objectId) "
+            + "     OR (n.objectId2 = :objectId AND n.objectId1 = o.objectId)) "
+            + "ORDER BY o.objectId, o.type, o.value"),
+    @NamedQuery(name = MCRDeDupKey.FIND_SHARED_KEYS,
+        query = "SELECT k.objectId, k.type, k.value FROM MCRDeDupKey k "
+            + "WHERE EXISTS (SELECT 1 FROM MCRDeDupKey o "
+            + "  WHERE o.type = k.type AND o.value = k.value AND o.objectId != k.objectId) "
+            + "ORDER BY k.type, k.value, k.objectId")
 })
 public class MCRDeDupKey {
 
     public static final String DELETE_BY_OBJECT_ID = "MCRDeDupKey.deleteByObjectId";
+
+    /** Selects all keys of the object given as {@code objectId}. */
+    public static final String FIND_BY_OBJECT_ID = "MCRDeDupKey.findByObjectId";
+
+    /**
+     * Selects {@code objectId, type, value} of all keys of other objects that match a key of the object
+     * given as {@code objectId} and are not marked as no-duplicates of it, ordered by object id and criterion.
+     */
+    public static final String FIND_DUPLICATE_KEYS_OF_OBJECT = "MCRDeDupKey.findDuplicateKeysOfObject";
+
+    /**
+     * Selects {@code objectId, type, value} of all keys that are shared with at least one other object,
+     * ordered by criterion and object id.
+     */
+    public static final String FIND_SHARED_KEYS = "MCRDeDupKey.findSharedKeys";
 
     /** Maximum number of characters stored for a criterion value; longer values are truncated. */
     public static final int MAX_VALUE_LENGTH = 255;
