@@ -26,6 +26,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.SequencedSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -202,13 +203,13 @@ public class MCRDeDupKeyManager {
             .createNamedQuery(MCRDeDupKey.FIND_DUPLICATE_KEYS_OF_OBJECT, Object[].class)
             .setParameter(PARAM_OBJECT_ID, id)
             .getResultList();
-        Map<String, Set<MCRDeDupCriterion>> criteriaByOtherId = new LinkedHashMap<>();
+        Map<String, SequencedSet<MCRDeDupCriterion>> criteriaByOtherId = new LinkedHashMap<>();
         for (Object[] row : rows) {
             criteriaByOtherId.computeIfAbsent((String) row[0], ignored -> new LinkedHashSet<>())
                 .add(toCriterion(row));
         }
         return criteriaByOtherId.entrySet().stream()
-            .map(entry -> MCRPossibleDuplicate.of(id, entry.getKey(), entry.getValue()))
+            .map(entry -> new MCRPossibleDuplicate(id, entry.getKey(), entry.getValue()))
             .toList();
     }
 
@@ -294,7 +295,7 @@ public class MCRDeDupKeyManager {
             .getResultList();
 
         Set<ObjectIdPair> noDuplicatePairs = loadNoDuplicatePairs(em);
-        Map<ObjectIdPair, Set<MCRDeDupCriterion>> criteriaByPair = new LinkedHashMap<>();
+        Map<ObjectIdPair, SequencedSet<MCRDeDupCriterion>> criteriaByPair = new LinkedHashMap<>();
 
         int blockStart = 0;
         while (blockStart < rows.size()) {
@@ -307,7 +308,8 @@ public class MCRDeDupKeyManager {
             blockStart = blockEnd;
         }
         return criteriaByPair.entrySet().stream()
-            .map(entry -> MCRPossibleDuplicate.of(entry.getKey().first(), entry.getKey().second(), entry.getValue()))
+            .map(entry -> new MCRPossibleDuplicate(entry.getKey().first(), entry.getKey().second(),
+                entry.getValue()))
             .toList();
     }
 
@@ -327,8 +329,8 @@ public class MCRDeDupKeyManager {
      * Adds the given criterion to each pair of the given objects, leaving out the pairs that are marked
      * as no-duplicates of each other.
      */
-    private static void addPairs(Map<ObjectIdPair, Set<MCRDeDupCriterion>> criteriaByPair, List<String> objectIds,
-        MCRDeDupCriterion criterion, Set<ObjectIdPair> noDuplicatePairs) {
+    private static void addPairs(Map<ObjectIdPair, SequencedSet<MCRDeDupCriterion>> criteriaByPair,
+        List<String> objectIds, MCRDeDupCriterion criterion, Set<ObjectIdPair> noDuplicatePairs) {
         for (int a = 0; a < objectIds.size(); a++) {
             for (int b = a + 1; b < objectIds.size(); b++) {
                 ObjectIdPair pair = ObjectIdPair.of(objectIds.get(a), objectIds.get(b));

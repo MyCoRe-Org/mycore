@@ -18,7 +18,6 @@
 
 package org.mycore.dedup;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Objects;
@@ -51,19 +50,6 @@ public record MCRPossibleDuplicate(String objectId1, String objectId2, Sequenced
         }
         copy.forEach(criterion -> Objects.requireNonNull(criterion, "criteria must not contain null"));
         criteria = Collections.unmodifiableSequencedSet(copy);
-    }
-
-    /**
-     * Creates a possible duplicate for the two given object ids and their shared criteria. The iteration
-     * order of the criteria is kept.
-     *
-     * @param objectIdA one object id
-     * @param objectIdB the other object id
-     * @param criteria  the shared criteria, must not be empty
-     */
-    public static MCRPossibleDuplicate of(String objectIdA, String objectIdB,
-        Collection<MCRDeDupCriterion> criteria) {
-        return new MCRPossibleDuplicate(objectIdA, objectIdB, new LinkedHashSet<>(criteria));
     }
 
     /**
