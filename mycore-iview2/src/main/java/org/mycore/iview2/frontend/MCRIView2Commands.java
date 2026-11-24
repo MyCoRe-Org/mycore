@@ -52,6 +52,7 @@ import org.mycore.common.events.MCREventManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.MCRContentTypes;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 import org.mycore.frontend.cli.MCRAbstractCommands;
@@ -466,8 +467,11 @@ public class MCRIView2Commands extends MCRAbstractCommands {
             LOGGER.info("No tiles to migrate for derivate {}.", derivateID);
             return;
         }
+        MCRObjectID id = MCRObjectID.getInstance(derivateID);
+        MCRDerivate derivate = MCRMetadataManager.exists(id) ? MCRMetadataManager.retrieveMCRDerivate(id) : null;
+        String mainDoc = derivate == null ? null : derivate.getDerivate().getInternals().getMainDoc();
         MCRPath derivateRoot = MCRPath.getPath(derivateID, "/");
-        List<String> files = Files.exists(derivateRoot) ? getFilePaths(derivateRoot) : List.of();
+        List<String> files = Files.exists(derivateRoot) ? getTileSourcePaths(derivateRoot, mainDoc) : List.of();
         Set<Path> currentTileFiles = files.stream()
             .map(file -> MCRImage.getTiledPath(tileDir, derivateID, file))
             .collect(Collectors.toSet());
@@ -493,19 +497,41 @@ public class MCRIView2Commands extends MCRAbstractCommands {
                     LOGGER.warn("Tile file {} matches several files {}. Deleting it and generating tiles again.",
                         tileFile, candidates);
                     Files.delete(tileFile);
-                    regenerateTiles(derivateID, candidates);
+                    regenerateTiles(derivate, derivateID, mainDoc, candidates);
                 }
             }
         }
     }
 
-    private static List<String> getFilePaths(MCRPath derivateRoot) throws IOException {
+    private static List<String> getTileSourcePaths(MCRPath derivateRoot, String mainDoc) throws IOException {
+        List<String> paths = new ArrayList<>();
         try (Stream<Path> stream = Files.walk(derivateRoot)) {
-            return stream
-                .filter(Files::isRegularFile)
-                .map(file -> MCRPath.ofPath(file).getOwnerRelativePath())
-                .toList();
+            for (Path file : stream.filter(Files::isRegularFile).toList()) {
+                String path = MCRPath.ofPath(file).getOwnerRelativePath();
+                if (isTileSource(file, path, mainDoc)) {
+                    paths.add(path);
+                }
+            }
         }
+        return paths;
+    }
+
+    /**
+     * Checks if tiles are generated for this file: supported images, videos and a PDF main document.
+     */
+    private static boolean isTileSource(Path file, String path, String mainDoc) throws IOException {
+        if (MCRIView2Tools.isFileSupported(file)) {
+            return true;
+        }
+        String contentType = MCRContentTypes.probeContentType(file);
+        if (contentType != null && contentType.startsWith("video/")) {
+            return true;
+        }
+        return isMainDoc(path, mainDoc) && path.toLowerCase(Locale.ROOT).endsWith(".pdf");
+    }
+
+    private static boolean isMainDoc(String path, String mainDoc) {
+        return mainDoc != null && stripLeadingSlash(path).equals(stripLeadingSlash(mainDoc));
     }
 
     private static void moveTileFile(Path source, Path target) throws IOException {
@@ -519,14 +545,12 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         Files.move(source, target);
     }
 
-    private static void regenerateTiles(String derivateID, List<String> files) throws IOException {
-        MCRObjectID id = MCRObjectID.getInstance(derivateID);
-        MCRDerivate derivate = MCRMetadataManager.exists(id) ? MCRMetadataManager.retrieveMCRDerivate(id) : null;
-        String mainDoc = derivate == null ? null : derivate.getDerivate().getInternals().getMainDoc();
+    private static void regenerateTiles(MCRDerivate derivate, String derivateID, String mainDoc, List<String> files)
+        throws IOException {
         for (String file : files) {
             MCRPath path = MCRPath.getPath(derivateID, file);
             tileImage(path);
-            if (mainDoc != null && stripLeadingSlash(file).equals(stripLeadingSlash(mainDoc))) {
+            if (isMainDoc(file, mainDoc)) {
                 new MCRThumbnailForPdfEventHandler().updateThumbnail(derivate);
             }
             // lets other tile producers, e.g. for video frames, generate their tiles again
