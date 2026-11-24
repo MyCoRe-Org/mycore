@@ -27,8 +27,8 @@ import java.util.SequencedSet;
 /**
  * A pair of objects that are possible duplicates of each other because they share the given
  * {@link MCRDeDupCriterion criteria}. The two object ids are kept in a normalized order
- * ({@code objectId1 <= objectId2}) so that the pair {@code (a, b)} and {@code (b, a)} are represented
- * identically and compare equal.
+ * ({@code objectId1 <= objectId2}): if they are given the other way round, they are swapped. So the pair
+ * {@code (a, b)} and {@code (b, a)} are represented identically and compare equal.
  *
  * @param objectId1 the lexicographically smaller object id of the pair
  * @param objectId2 the lexicographically larger object id of the pair
@@ -40,6 +40,11 @@ public record MCRPossibleDuplicate(String objectId1, String objectId2, Sequenced
         Objects.requireNonNull(objectId1, "objectId1 must not be null");
         Objects.requireNonNull(objectId2, "objectId2 must not be null");
         Objects.requireNonNull(criteria, "criteria must not be null");
+        if (objectId1.compareTo(objectId2) > 0) {
+            String swapped = objectId1;
+            objectId1 = objectId2;
+            objectId2 = swapped;
+        }
         SequencedSet<MCRDeDupCriterion> copy = new LinkedHashSet<>(criteria);
         if (copy.isEmpty()) {
             throw new IllegalArgumentException("criteria must not be empty");
@@ -49,8 +54,8 @@ public record MCRPossibleDuplicate(String objectId1, String objectId2, Sequenced
     }
 
     /**
-     * Creates a possible duplicate for the two given object ids and their shared criteria, normalizing
-     * the order of the object ids. The iteration order of the criteria is kept.
+     * Creates a possible duplicate for the two given object ids and their shared criteria. The iteration
+     * order of the criteria is kept.
      *
      * @param objectIdA one object id
      * @param objectIdB the other object id
@@ -58,11 +63,7 @@ public record MCRPossibleDuplicate(String objectId1, String objectId2, Sequenced
      */
     public static MCRPossibleDuplicate of(String objectIdA, String objectIdB,
         Collection<MCRDeDupCriterion> criteria) {
-        SequencedSet<MCRDeDupCriterion> copy = new LinkedHashSet<>(criteria);
-        if (objectIdA.compareTo(objectIdB) <= 0) {
-            return new MCRPossibleDuplicate(objectIdA, objectIdB, copy);
-        }
-        return new MCRPossibleDuplicate(objectIdB, objectIdA, copy);
+        return new MCRPossibleDuplicate(objectIdA, objectIdB, new LinkedHashSet<>(criteria));
     }
 
     /**

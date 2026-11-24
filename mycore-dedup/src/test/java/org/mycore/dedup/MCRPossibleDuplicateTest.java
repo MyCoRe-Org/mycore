@@ -18,10 +18,12 @@
 
 package org.mycore.dedup;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Arrays;
 import java.util.LinkedHashSet;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
@@ -34,5 +36,17 @@ public class MCRPossibleDuplicateTest {
 
         assertThrows(NullPointerException.class,
             () -> new MCRPossibleDuplicate("mcr_test_00000001", "mcr_test_00000002", criteria));
+    }
+
+    @Test
+    public void objectIdsAreSwappedIntoNormalizedOrder() {
+        LinkedHashSet<MCRDeDupCriterion> criteria = new LinkedHashSet<>(
+            List.of(new MCRDeDupCriterion("identifier", "doi:10.1000/xyz")));
+
+        MCRPossibleDuplicate swapped = new MCRPossibleDuplicate("mcr_test_00000002", "mcr_test_00000001", criteria);
+
+        assertEquals("mcr_test_00000001", swapped.objectId1());
+        assertEquals("mcr_test_00000002", swapped.objectId2());
+        assertEquals(new MCRPossibleDuplicate("mcr_test_00000001", "mcr_test_00000002", criteria), swapped);
     }
 }
