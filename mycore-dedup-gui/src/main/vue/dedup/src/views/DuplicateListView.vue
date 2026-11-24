@@ -52,11 +52,13 @@
         <td>
           <button v-if="entry.criteria.length > 1" type="button"
                   class="btn btn-link btn-sm p-0 text-decoration-none nobreak"
-                  :aria-expanded="isExpanded(entry)" v-on:click="toggleExpanded(entry)">
+                  :aria-expanded="isExpanded(entry)" :aria-controls="criteriaListId(entry)"
+                  v-on:click="toggleExpanded(entry)">
             <span class="fas fa-fw" :class="isExpanded(entry) ? 'fa-chevron-down' : 'fa-chevron-right'"></span>
             {{ entry.criteria.length }} {{ i18n["dedup.gui.duplicates.criteria"] }}
           </button>
-          <ul v-if="entry.criteria.length == 1 || isExpanded(entry)" class="list-unstyled mb-0"
+          <ul v-show="entry.criteria.length == 1 || isExpanded(entry)" :id="criteriaListId(entry)"
+              class="list-unstyled mb-0"
               :class="{ 'mt-1': entry.criteria.length > 1 }">
             <li v-for="criterion in entry.criteria" :key="criterion.type + '-' + criterion.value">
               <strong>{{ criterion.type }}</strong>: {{ criterion.value }}
@@ -154,6 +156,10 @@ const i18n = reactive<{ [key: string]: string }>({
 });
 
 const pairKey = (entry: DuplicateEntry): string => entry.objectId1 + " " + entry.objectId2;
+
+/** The id of the criteria list of the given pair, referenced by the toggle button via `aria-controls`. */
+const criteriaListId = (entry: DuplicateEntry): string =>
+  "dedup-criteria-" + entry.objectId1 + "-" + entry.objectId2;
 
 const isExpanded = (entry: DuplicateEntry): boolean => model.expanded.has(pairKey(entry));
 
