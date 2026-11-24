@@ -57,8 +57,16 @@ public record MCRPossibleDuplicate(String objectId1, String objectId2, Sequenced
      *
      * @param objectId one of the two object ids of this pair
      * @return the other object id
+     * @throws IllegalArgumentException if the given object id is not part of this pair
      */
     public String otherObjectId(String objectId) {
-        return objectId.equals(objectId1) ? objectId2 : objectId1;
+        if (objectId1.equals(objectId)) {
+            return objectId2;
+        }
+        if (objectId2.equals(objectId)) {
+            return objectId1;
+        }
+        throw new IllegalArgumentException(
+            "Object " + objectId + " is not part of the pair " + objectId1 + " and " + objectId2);
     }
 }

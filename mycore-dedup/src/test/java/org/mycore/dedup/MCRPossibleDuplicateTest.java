@@ -49,4 +49,21 @@ public class MCRPossibleDuplicateTest {
         assertEquals("mcr_test_00000002", swapped.objectId2());
         assertEquals(new MCRPossibleDuplicate("mcr_test_00000001", "mcr_test_00000002", criteria), swapped);
     }
+
+    @Test
+    public void otherObjectIdReturnsTheOtherObjectOfThePair() {
+        MCRPossibleDuplicate duplicate = new MCRPossibleDuplicate("mcr_test_00000001", "mcr_test_00000002",
+            new LinkedHashSet<>(List.of(new MCRDeDupCriterion("identifier", "doi:10.1000/xyz"))));
+
+        assertEquals("mcr_test_00000002", duplicate.otherObjectId("mcr_test_00000001"));
+        assertEquals("mcr_test_00000001", duplicate.otherObjectId("mcr_test_00000002"));
+    }
+
+    @Test
+    public void otherObjectIdRejectsObjectOutsideThePair() {
+        MCRPossibleDuplicate duplicate = new MCRPossibleDuplicate("mcr_test_00000001", "mcr_test_00000002",
+            new LinkedHashSet<>(List.of(new MCRDeDupCriterion("identifier", "doi:10.1000/xyz"))));
+
+        assertThrows(IllegalArgumentException.class, () -> duplicate.otherObjectId("mcr_test_00000003"));
+    }
 }
