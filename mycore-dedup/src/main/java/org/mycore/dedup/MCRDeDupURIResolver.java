@@ -133,7 +133,9 @@ public class MCRDeDupURIResolver implements URIResolver {
         List<MCRPossibleDuplicate> duplicates) {
         return duplicates.stream()
             .collect(Collectors.toMap(duplicate -> duplicate.otherObjectId(objectIdString),
-                MCRPossibleDuplicate::criteria, (left, right) -> left, LinkedHashMap::new));
+                MCRPossibleDuplicate::criteria, (left, right) -> {
+                    throw new IllegalStateException("findDuplicates returned more than one entry for the same pair");
+                }, LinkedHashMap::new));
     }
 
     private Element buildResult(String forValue, Map<String, ? extends Collection<MCRDeDupCriterion>> duplicates) {
