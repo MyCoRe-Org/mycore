@@ -54,7 +54,7 @@ import jakarta.persistence.UniqueConstraint;
     @NamedQuery(name = MCRDeDupKey.FIND_DUPLICATE_KEYS_OF_OBJECT,
         query = "SELECT o.objectId, o.type, o.value FROM MCRDeDupKey o, MCRDeDupKey s "
             + "WHERE s.objectId = :objectId AND o.type = s.type AND o.value = s.value "
-            + "AND o.objectId <> :objectId "
+            + "AND o.objectId != :objectId "
             + "AND NOT EXISTS (SELECT 1 FROM MCRDeDupNoDuplicate n "
             + "  WHERE (n.objectId1 = :objectId AND n.objectId2 = o.objectId) "
             + "     OR (n.objectId2 = :objectId AND n.objectId1 = o.objectId)) "
@@ -62,7 +62,7 @@ import jakarta.persistence.UniqueConstraint;
     @NamedQuery(name = MCRDeDupKey.FIND_SHARED_KEYS,
         query = "SELECT k.objectId, k.type, k.value FROM MCRDeDupKey k "
             + "WHERE EXISTS (SELECT 1 FROM MCRDeDupKey o "
-            + "  WHERE o.type = k.type AND o.value = k.value AND o.objectId <> k.objectId) "
+            + "  WHERE o.type = k.type AND o.value = k.value AND o.objectId != k.objectId) "
             + "ORDER BY k.type, k.value, k.objectId")
 })
 public class MCRDeDupKey {
