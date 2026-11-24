@@ -77,10 +77,11 @@ public abstract class MCRValidator {
     /**
      * Returns {@code true} if validation of the given absolute XPath must be skipped because an earlier rule already
      * failed there. By default, a failed rule acts as a guard for all following rules on the same XPath. A rule
-     * declared with {@code force-check="true"} is evaluated anyway and may report its own failure.
+     * declared with {@code force-check="true"} ignores failures of other rule elements and is evaluated anyway, but
+     * remaining checks of its own rule element are still skipped once one of them failed.
      */
     protected boolean isCheckSkipped(MCRValidationResults results, String absPath) {
-        return !forceCheck && results.hasError(absPath);
+        return forceCheck ? results.hasError(absPath, ruleElement) : results.hasError(absPath);
     }
 
     public boolean validate(MCRValidationResults results, MCRBinding root) throws JaxenException {

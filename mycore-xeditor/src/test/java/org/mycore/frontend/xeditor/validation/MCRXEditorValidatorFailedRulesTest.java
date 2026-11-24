@@ -146,6 +146,46 @@ class MCRXEditorValidatorFailedRulesTest {
     }
 
     @Test
+    void forceCheckKeepsGuardWithinSameRule() throws JaxenException, JDOMException {
+        MCREditorSession session = buildSession("document[value='abc']");
+        org.w3c.dom.Element rule = addRule(session, "/document/value", "matches", "[0-9]+",
+            "class", getClass().getName(), "method", "recordValidation", "force-check", "true");
+
+        assertFalse(session.getValidator().isValid());
+        assertEquals(List.of(rule), getFailedRuleElements(session));
+        assertEquals(0, EXTERNAL_VALIDATIONS.get());
+    }
+
+    @Test
+    void forceCheckDoesNotPassInvalidValueToExternalMethodOfSameRule() throws JaxenException, JDOMException {
+        MCREditorSession session = buildSession("document[value='abc']");
+        org.w3c.dom.Element firstRule = addRule(session, "/document/value", "test", "false()");
+        org.w3c.dom.Element secondRule = addRule(session, "/document/value", "matches", "[0-9]+",
+            "class", getClass().getName(), "method", "isPositiveInteger", "force-check", "true");
+
+        assertFalse(session.getValidator().isValid());
+        assertEquals(List.of(firstRule, secondRule), getFailedRuleElements(session));
+    }
+
+    @Test
+    void returnsAllFailedRulesOfBindingInValidationOrder() throws JaxenException, JDOMException {
+        MCREditorSession session = buildSession("document[value='abc'][other='xyz']");
+        org.w3c.dom.Element firstRule = addRule(session, "/document/value", "test", "false()");
+        addRule(session, "/document/other", "test", "false()");
+        org.w3c.dom.Element secondRule = addRule(session, "/document/value", "matches", "[0-9]+",
+            "force-check", "true");
+
+        assertFalse(session.getValidator().isValid());
+
+        MCRBinding binding = new MCRBinding("/document/value", false, session.getRootBinding());
+        List<org.w3c.dom.Node> ruleElements = session.getValidator().getFailedRules(binding).stream()
+            .map(MCRValidator::getRuleElement)
+            .toList();
+        binding.detach();
+        assertEquals(List.of(firstRule, secondRule), ruleElements);
+    }
+
+    @Test
     void reportsOneRuleOnceForEachFailedBoundNode() throws JaxenException, JDOMException {
         MCREditorSession session = buildSession("document[value='a'][value='b']");
         org.w3c.dom.Element rule = addRule(session, "/document/value", "test", "false()");

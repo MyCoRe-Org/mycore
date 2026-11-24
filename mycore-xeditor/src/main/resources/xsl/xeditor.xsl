@@ -371,7 +371,7 @@
 
   <xsl:template match="xed:display-validation-message" mode="xeditor">
     <xsl:if test="transformer:hasValidationError($transformer)">
-      <xsl:for-each select="transformer:getFailedValidationRule($transformer)">
+      <xsl:for-each select="transformer:getLocalFailedValidationRules($transformer)">
         <xsl:if test="contains(@display,'local')">
           <xsl:apply-templates select="." mode="message" />
         </xsl:if>

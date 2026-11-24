@@ -114,6 +114,13 @@ public class MCRXEditorValidator {
         return results.getFailedRule(binding.getAbsoluteXPath());
     }
 
+    /**
+     * Returns all distinct failed rules for the binding's absolute XPath in validation order.
+     */
+    public List<MCRValidator> getFailedRules(MCRBinding binding) {
+        return results.getFailedRules(binding.getAbsoluteXPath());
+    }
+
     public void setValidationMarker(MCRBinding binding) {
         String xPath = binding.getAbsoluteXPath();
         String marker = results.getValidationMarker(xPath);

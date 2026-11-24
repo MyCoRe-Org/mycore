@@ -18,9 +18,12 @@
 
 package org.mycore.frontend.xeditor.validation;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.SequencedMap;
 
@@ -52,7 +55,7 @@ public class MCRValidationResults {
 
     private Map<String, String> xPath2Marker = new HashMap<>();
 
-    private SequencedMap<String, MCRValidator> xPath2FailedRule = new LinkedHashMap<>();
+    private Map<String, List<MCRValidator>> xPath2FailedRules = new HashMap<>();
 
     private SequencedMap<FailedRuleKey, MCRValidator> failedRules = new LinkedHashMap<>();
 
@@ -62,6 +65,13 @@ public class MCRValidationResults {
         return MARKER_ERROR.equals(xPath2Marker.get(xPath));
     }
 
+    /**
+     * Returns {@code true} if the given validation rule element already failed for the given absolute XPath.
+     */
+    public boolean hasError(String xPath, Node ruleElement) {
+        return failedRules.containsKey(new FailedRuleKey(xPath, ruleElement));
+    }
+
     public void mark(String xPath, boolean isValid, MCRValidator failedRule) {
         if (isValid) {
             if (!hasError(xPath)) {
@@ -69,9 +79,10 @@ public class MCRValidationResults {
             }
         } else {
             xPath2Marker.put(xPath, MARKER_ERROR);
-            Node ruleElement = failedRule == null ? null : failedRule.getRuleElement();
-            failedRules.putIfAbsent(new FailedRuleKey(xPath, ruleElement), failedRule);
-            xPath2FailedRule.putIfAbsent(xPath, failedRule);
+            FailedRuleKey key = new FailedRuleKey(xPath, failedRule.getRuleElement());
+            if (failedRules.putIfAbsent(key, failedRule) == null) {
+                xPath2FailedRules.computeIfAbsent(xPath, k -> new ArrayList<>()).add(failedRule);
+            }
             this.isValid = false;
         }
     }
@@ -84,7 +95,15 @@ public class MCRValidationResults {
      * Returns the first failed rule for the given absolute XPath, or {@code null} if no rule failed there.
      */
     public MCRValidator getFailedRule(String xPath) {
-        return xPath2FailedRule.get(xPath);
+        List<MCRValidator> rules = xPath2FailedRules.get(xPath);
+        return rules == null ? null : rules.getFirst();
+    }
+
+    /**
+     * Returns all distinct failed rules for the given absolute XPath in validation order.
+     */
+    public List<MCRValidator> getFailedRules(String xPath) {
+        return Collections.unmodifiableList(xPath2FailedRules.getOrDefault(xPath, List.of()));
     }
 
     /**
@@ -104,7 +123,8 @@ public class MCRValidationResults {
         /**
          * DOM {@link Node} does not define Java {@link Object#equals(Object)} semantics. Use object identity here so
          * equality consistently means that failures originated from the exact same validation rule element,
-         * independent of the DOM implementation.
+         * independent of the DOM implementation. All internal validators created from one {@code xed:validate}
+         * declaration share the same rule element instance, so they map to the same key.
          */
         @Override
         public boolean equals(Object obj) {
