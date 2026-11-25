@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mycoreclass ID="hostGenreClassification" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="MCRClassification.xsd">
+  <label xml:lang="en" text="Host genre classification" />
+  <categories>
+    <category ID="journal-article">
+      <label xml:lang="en" text="Journal article" />
+      <label xml:lang="x-mapping-xpath"
+        text="mods:genre[text()='article'] and mods:relatedItem[@type='host']/mods:genre[text()='journal']" />
+    </category>
+    <category ID="other">
+      <label xml:lang="en" text="Other" />
+      <label xml:lang="x-mapping-xpathfb" text="mods:titleInfo" />
+    </category>
+  </categories>
+</mycoreclass>
