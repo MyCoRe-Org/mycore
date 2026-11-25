@@ -325,6 +325,26 @@ describe('processing app', () => {
       expect(bodyModal('Properties').querySelector('.json-string-primitive')?.textContent).toBe('8');
     });
 
+    it('shows properties that are added to a collection later', async () => {
+      const socket = await mountApp();
+      await receive(socket, { type: 'REGISTRY' }, COLLECTION);
+
+      await receive(socket, { type: 'UPDATE_COLLECTION_PROPERTY', id: 1, propertyName: 'queued', propertyValue: 12 });
+
+      const rows = [...bodyModal('Properties').querySelectorAll('.property-row')];
+      expect(rows.map(row => row.querySelector('td')?.textContent)).toEqual(['threads', 'queued']);
+    });
+
+    it('shows markup in property values as text', async () => {
+      const socket = await mountApp();
+      await receive(socket, { type: 'REGISTRY' }, { ...COLLECTION, properties: { '<b>key</b>': '<img src=x onerror=alert(1)>' } });
+
+      const modal = bodyModal('Properties');
+      expect(modal.querySelector('img')).toBeNull();
+      expect(modal.querySelector('b')).toBeNull();
+      expect(modal.querySelector('.json-string-primitive')?.textContent).toBe('<img src=x onerror=alert(1)>');
+    });
+
     it('ignores property updates of unknown collections', async () => {
       const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
       const socket = await mountApp();

@@ -113,11 +113,8 @@ export class Collection {
   }
 
   public setProperty(name: string, value: any): void {
-    const updateKeys: boolean = name in this.properties;
     this.properties[name] = value;
-    if (updateKeys) {
-      this.updatePropertyKeys();
-    }
+    this.updatePropertyKeys();
   }
 
   /**

@@ -208,11 +208,11 @@ const unlockIfPossible = () => {
   if (!contentHandler || !isLockingPossible()) {
     return;
   }
-  try {
-    contentHandler.unlock(props.id);
-  } catch (e) {
-    console.error("unlock failed", e);
-  }
+  releaseLock(contentHandler, props.id);
+};
+
+const releaseLock = (contentHandler: ContentHandler, id: string) => {
+  contentHandler.unlock(id).catch(e => console.error("unlock failed", e));
 };
 
 const startLockRefresh = () => {
@@ -265,7 +265,16 @@ const switchExpandedView = async (expanded: boolean) => {
   }
 }
 
-watch(() => [props.type, props.id], async () => {
+watch(() => [props.type, props.id] as const, async (_value, previous) => {
+  if (previous !== undefined) {
+    const [previousType, previousId] = previous;
+    const previousHandler = ContentHandlerSelector.get(previousType);
+    if (previousHandler && lockResult.value?.status === "locked") {
+      releaseLock(previousHandler, previousId);
+    }
+    stopLockRefresh();
+    lockResult.value = undefined;
+  }
   expandedView.value = resolveExpandedViewOnNavigation(expandedViewPreference.value, supportsExpandedView.value);
   loading.value = true;
   success.value = undefined;

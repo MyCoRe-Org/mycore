@@ -38,11 +38,22 @@ export class Util {
       return "";
     }
     const date = new Date(timestamp);
-    return `${date.getMonth() + 1}.${String(date.getDate()).padStart(2, '0')}
-          ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}`;
+    return `${date.getMonth() + 1}.${String(date.getDate()).padStart(2, '0')} `
+      + `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}:`
+      + `${String(date.getSeconds()).padStart(2, '0')}`;
+  }
+
+  public static escapeHtml(value: unknown): string {
+    return String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   public static useJsonString(data: any): string {
+    const escapeHtml = Util.escapeHtml;
     function toHTML(json: any): string {
       if (json === undefined) {
         return formatNull('undefined');
@@ -75,15 +86,15 @@ export class Util {
     }
 
     function formatPrimitive(primitive: any): string {
-      return `<div class='json-string-primitive'>${primitive}</div>`;
+      return `<div class='json-string-primitive'>${escapeHtml(primitive)}</div>`;
     }
 
     function formatFunction(func: Function): string {
-      return `<div class='json-string-function'>${func.name}</div>`;
+      return `<div class='json-string-function'>${escapeHtml(func.name)}</div>`;
     }
 
     function formatDate(date: Date): string {
-      return `<div class='json-string-date'>${date.toString()}</div>`;
+      return `<div class='json-string-date'>${escapeHtml(date.toString())}</div>`;
     }
 
     function formatObject(json: any): string {
@@ -91,11 +102,11 @@ export class Util {
       for (const key in json) {
         if (!json.hasOwnProperty(key)) continue;
         html += `<div class='json-string-row json-string-object-row'>`;
-        html += `<div class='json-string-object-property-name'>${key}</div>`;
+        html += `<div class='json-string-object-property-name'>${escapeHtml(key)}</div>`;
         html += `<div class='json-string-object-property-value'>${toHTML(json[key])}</div>`;
-        html += `}</div>`;
+        html += `</div>`;
       }
-      html += `</div>`;
+      html += `}</div>`;
       return html;
     }
 

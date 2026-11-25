@@ -142,12 +142,31 @@ describe('texteditor app', () => {
       ]);
     });
 
-    it('enables the update button when the content is changed', async () => {
+    it('enables the update button only while the content differs from the loaded one', async () => {
       const wrapper = await mountAt(`/objects/${OBJECT_ID}`);
 
       await edit(wrapper, `${PRETTY_OBJECT_XML}\n`);
-
       expect(button(wrapper, 'Update').attributes('disabled')).toBeUndefined();
+
+      await edit(wrapper, PRETTY_OBJECT_XML);
+      expect(button(wrapper, 'Update').attributes('disabled')).toBeDefined();
+    });
+
+    it('ignores parameters of the content type', async () => {
+      backend.on(`api/v2/objects/${OBJECT_ID}`, (_url, init) =>
+        init?.method === 'PUT'
+          ? new Response(null, { status: 204 })
+          : xml(OBJECT_XML, { headers: { 'Content-Type': 'application/xml;charset=UTF-8' } })
+      );
+      const wrapper = await mountAt(`/objects/${OBJECT_ID}`);
+
+      expect(wrapper.get('pre.prism-editor__editor').find('.token.tag').exists()).toBe(true);
+      await edit(wrapper, '<mycoreobject/>');
+      await button(wrapper, 'Update').trigger('click');
+      await flushPromises();
+
+      const save = backend.apiRequests().find(call => call.init?.method === 'PUT' && call.url.endsWith(OBJECT_ID));
+      expect((save?.init?.headers as Record<string, string>)['Content-Type']).toBe('application/xml; charset=utf-8');
     });
 
     it('saves the object and reloads it', async () => {
@@ -267,6 +286,52 @@ describe('texteditor app', () => {
       const unlock = backend.apiRequests().find(call => call.init?.method === 'DELETE');
       expect(unlock?.url).toBe(`${API}objects/${OBJECT_ID}/lock`);
       expect(unlock?.init?.keepalive).toBe(true);
+    });
+
+    it('reports a failed release of the lock', async () => {
+      const consoleError = vi.mocked(console.error);
+      backend.on(/\/api\/v2\/objects\/[^/]+\/lock$/, (_url, init) =>
+        new Response(null, { status: init?.method === 'DELETE' ? 500 : 200 })
+      );
+      await mountAt(`/objects/${OBJECT_ID}`);
+
+      app!.wrapper.unmount();
+      app = null;
+      await flushPromises();
+
+      expect(consoleError).toHaveBeenCalledWith('unlock failed', expect.any(Error));
+    });
+
+    it('releases the lock of the previous object when another one is opened', async () => {
+      vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
+      backend
+        .on(/\/api\/v2\/objects\/[^/]+\/lock$/, (url, init) =>
+          new Response(null, { status: init?.method === 'PUT' && url.includes(OBJECT_ID) ? 409 : 200 })
+        )
+        .on('api/v2/objects/mir_mods_00000002?', () => xml('<mycoreobject ID="mir_mods_00000002"/>'));
+      const wrapper = await mountAt(`/objects/${OBJECT_ID}`);
+      expect(wrapper.find('.alert-warning').exists()).toBe(true);
+      backend
+        .on(/\/api\/v2\/objects\/[^/]+\/lock$/, () => new Response(null, { status: 200 }))
+        .on('api/v2/objects/mir_mods_00000003?', () => xml('<mycoreobject ID="mir_mods_00000003"/>'));
+      await router.push('/objects/mir_mods_00000003');
+      await flushPromises();
+      expect(wrapper.find('.alert-warning').exists()).toBe(false);
+      expect(wrapper.find('.alert-danger').exists()).toBe(false);
+
+      await router.push('/objects/mir_mods_00000002');
+      await flushPromises();
+      vi.advanceTimersByTime(30000);
+      await flushPromises();
+
+      const locks = calls(method => method !== 'GET').filter(call => call.endsWith('/lock'));
+      expect(locks).toEqual([
+        `PUT ${API}objects/${OBJECT_ID}/lock`,
+        `PUT ${API}objects/mir_mods_00000003/lock`,
+        `DELETE ${API}objects/mir_mods_00000003/lock`,
+        `PUT ${API}objects/mir_mods_00000002/lock`,
+        `PUT ${API}objects/mir_mods_00000002/lock`,
+      ]);
     });
 
     it('releases the lock when the page is left', async () => {

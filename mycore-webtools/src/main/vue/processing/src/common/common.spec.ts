@@ -42,7 +42,7 @@ describe('Util', () => {
   it('formats timestamps as month, day and time', () => {
     const timestamp = new Date(2026, 10, 5, 8, 3, 9).getTime();
 
-    expect(Util.formatDate(timestamp).replace(/\s+/g, ' ')).toBe('11.05 08:03:09');
+    expect(Util.formatDate(timestamp)).toBe('11.05 08:03:09');
     expect(Util.formatDate(undefined)).toBe('');
     expect(Util.formatDate(0)).toBe('');
   });
@@ -79,6 +79,22 @@ describe('Util', () => {
 
       expect(rows.map(row => row.querySelector('.json-string-object-property-name')?.textContent)).toEqual(['a', 'b']);
       expect(rows[1]!.querySelector('.json-string-object-property-value .json-string-object-property-name')?.textContent).toBe('c');
+    });
+
+    it('closes each object once after its rows', () => {
+      const object = render({ a: 1, b: 2 }).querySelector('.json-string-object')!;
+
+      expect(object.textContent).toBe('{a1b2}');
+    });
+
+    it('escapes markup in values, keys, function names and dates', () => {
+      const markup = '<script>alert("x")</script>';
+      const element = render({ [markup]: markup });
+
+      expect(element.querySelector('script')).toBeNull();
+      expect(element.querySelector('.json-string-object-property-name')?.textContent).toBe(markup);
+      expect(element.querySelector('.json-string-primitive')?.textContent).toBe(markup);
+      expect(Util.escapeHtml(`&<>"'`)).toBe('&amp;&lt;&gt;&quot;&#39;');
     });
 
     it('renders at most ten array entries', () => {

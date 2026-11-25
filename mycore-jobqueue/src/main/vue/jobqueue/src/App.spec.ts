@@ -116,6 +116,15 @@ describe('jobqueue app', () => {
       expect(fetchMock.apiRequests()).toEqual([]);
     });
 
+    it('shows the not found page when the job queue api is not available', async () => {
+      fetchMock.on('api/jobqueue/', () => new Response('', { status: 404 }));
+
+      const wrapper = await mountAt('/');
+
+      expect(router.currentRoute.value.name).toBe('404');
+      expect(wrapper.get('.jumbotron p').text()).toBe(translation('jobqueue.404'));
+    });
+
     it('navigates to the job table of a queue', async () => {
       fetchMock
         .on('api/jobqueue/', () => jsonResponse(QUEUES))
@@ -375,12 +384,16 @@ describe('jobqueue app', () => {
     });
 
     describe('parameter search', () => {
-      it('is hidden when no parameter filter is set', async () => {
+      it('is offered with an empty field when no parameter filter is set', async () => {
         serveJobs([job(1)]);
-
         const wrapper = await mountAt('/mail/ALL');
 
-        expect(wrapper.find('#parameterName').exists()).toBe(false);
+        expect((wrapper.get('#parameterName').element as HTMLInputElement).value).toBe('');
+        await wrapper.get('#parameterName').setValue('object:mir_mods_00000001');
+        await wrapper.get('.jobqueue-search-wrapper button').trigger('click');
+        await flushPromises();
+
+        expect(router.currentRoute.value.query).toEqual({ offset: '0', parameter: ['object:mir_mods_00000001'] });
       });
 
       it('sends the parameter filters of the route to the api', async () => {

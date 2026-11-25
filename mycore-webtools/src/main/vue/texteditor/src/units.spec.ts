@@ -1,4 +1,3 @@
-import 'prismjs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { ClassificationsContentHandler } from '@/apis/ClassificationsContentHandler';
@@ -109,8 +108,9 @@ describe('content handlers', () => {
 
   it('prettifies xml', () => {
     expect(objects.prettifyXml('<root><item x="1"><empty/></item>  <text>value</text></root>')).toBe(
-      ['<root>', '  <item x="1">', '    <empty/>', '  </item>', '  <text>value</text>', '</root>'].join('\r\n')
+      ['<root>', '  <item x="1">', '    <empty/>', '  </item>', '  <text>value</text>', '</root>'].join('\n')
     );
+    expect(objects.prettifyXml('<a><b><c/></b></a>')).toBe(['<a>', '  <b>', '    <c/>', '  </b>', '</a>'].join('\n'));
   });
 
   it('builds errors from the error headers of the response', () => {
@@ -208,11 +208,47 @@ describe('Auth', () => {
     expect(backend.calls.map(call => call.url)).toEqual([`${BASE}rsc/jwt`]);
   });
 
-  it('fails when the login is not successful', async () => {
-    new FetchMock().on('rsc/jwt', () => jsonResponse({ login_success: false }));
+  it('fails when the login is not successful and tries again on the next request', async () => {
+    const backend = new FetchMock().on('rsc/jwt', () => jsonResponse({ login_success: false }));
     const { getAuthorizationHeader } = await importAuth();
 
     await expect(getAuthorizationHeader(BASE)).rejects.toThrow('Login failed');
+
+    backend.on('rsc/jwt', () => jsonResponse({ login_success: true, access_token: 'abc', token_type: 'Bearer' }));
+    expect(await getAuthorizationHeader(BASE)).toBe('Bearer abc');
+  });
+
+  it('requests the jwt only once for concurrent requests', async () => {
+    const backend = new FetchMock().on('rsc/jwt', () =>
+      jsonResponse({ login_success: true, access_token: 'abc', token_type: 'Bearer' })
+    );
+    const { getAuthorizationHeader } = await importAuth();
+
+    const headers = await Promise.all([getAuthorizationHeader(BASE), getAuthorizationHeader(BASE)]);
+
+    expect(headers).toEqual(['Bearer abc', 'Bearer abc']);
+    expect(backend.calls).toHaveLength(1);
+  });
+
+  it('requests a new jwt shortly before the current one expires', async () => {
+    const now = Date.UTC(2026, 10, 25, 12, 0, 0);
+    vi.spyOn(Date, 'now').mockReturnValue(now);
+    const jwt = (exp: number, id: string) =>
+      `header.${btoa(JSON.stringify({ exp: exp / 1000, id })).replace(/=+$/, '')}.signature`;
+    let issued = 0;
+    const backend = new FetchMock().on('rsc/jwt', () =>
+      jsonResponse({ login_success: true, access_token: jwt(now + 600_000, `t${++issued}`), token_type: 'Bearer' })
+    );
+    const { getAuthorizationHeader } = await importAuth();
+
+    const first = await getAuthorizationHeader(BASE);
+    vi.spyOn(Date, 'now').mockReturnValue(now + 500_000);
+    expect(await getAuthorizationHeader(BASE)).toBe(first);
+    expect(backend.calls).toHaveLength(1);
+
+    vi.spyOn(Date, 'now').mockReturnValue(now + 540_000);
+    expect(await getAuthorizationHeader(BASE)).not.toBe(first);
+    expect(backend.calls).toHaveLength(2);
   });
 
   it('uses basic authentication in development mode', async () => {
