@@ -238,7 +238,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManager {
             storeObject.getVersionInfo().getMessage()) == MCROCFLMetadataVersion.DELETED) {
             throw new IOException("Cannot read already deleted object '" + ocflObjectID + "'");
         }
-        return new MCROCFLContent(repository, ocflObjectID, buildFilePath(mcrid));
+        return getContent(mcrid, ocflObjectID, storeObject.getVersionNum());
     }
 
     protected InputStream getStoredContentStream(MCRObjectID mcrid, OcflObjectVersion storeObject) throws IOException {

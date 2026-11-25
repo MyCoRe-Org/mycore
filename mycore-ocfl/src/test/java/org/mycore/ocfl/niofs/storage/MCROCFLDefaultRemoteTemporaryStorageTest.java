@@ -179,6 +179,60 @@ public class MCROCFLDefaultRemoteTemporaryStorageTest extends MCROCFLStorageTest
         assertFalse(Files.exists(tempFilePath), "The temporary file should be deleted after abort.");
     }
 
+    /**
+     * A file on disk the cache does not know, for example written by another process, must not block the import of
+     * the same content.
+     */
+    @TestTemplate
+    public void importFileWithOrphanOnDisk() throws IOException {
+        Path source = Files.createTempFile("orphan", ".txt");
+        try {
+            byte[] content = { 9, 9, 9 };
+            Files.write(source, content);
+            MCRDigest digest = writeOrphan(source, content);
+
+            assertEquals(digest, storage.importFile(source));
+            assertTrue(storage.exists(digest), "the imported content should be in the cache");
+            assertArrayEquals(content, read(storage, digest));
+        } finally {
+            Files.deleteIfExists(source);
+        }
+    }
+
+    /**
+     * A file on disk the cache does not know must not block a new cache entry with the same content.
+     */
+    @TestTemplate
+    public void newCacheEntryWithOrphanOnDisk() throws IOException {
+        Path source = Files.createTempFile("orphan", ".txt");
+        try {
+            byte[] content = { 8, 8, 8 };
+            Files.write(source, content);
+            MCRDigest digest = writeOrphan(source, content);
+
+            MCROCFLDefaultRemoteTemporaryStorage.CacheEntryWriter writer = storage.newCacheEntry("orphan.txt");
+            try {
+                writer.getChannel().write(ByteBuffer.wrap(content));
+                assertEquals(digest, writer.commit());
+            } finally {
+                writer.getChannel().close();
+            }
+            assertTrue(storage.exists(digest), "the committed content should be in the cache");
+            assertArrayEquals(content, read(storage, digest));
+        } finally {
+            Files.deleteIfExists(source);
+        }
+    }
+
+    private MCRDigest writeOrphan(Path source, byte[] content) throws IOException {
+        MCRDigest digest = MCROCFLFileSystemProvider.get().getDigestCalculator().calculate(source);
+        String hex = digest.toHexString();
+        Path orphan = storage.getRoot().resolve(hex.substring(0, 3)).resolve(hex);
+        Files.createDirectories(orphan.getParent());
+        Files.write(orphan, content);
+        return digest;
+    }
+
     @TestTemplate
     public void testJournalRecovery() throws IOException {
         // 1. Perform more actions to create a more complex journal

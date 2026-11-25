@@ -118,6 +118,8 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
         // create virtual object provider
         this.virtualObjectProvider = new MCROCFLVirtualObjectProvider(getRepository(), transactionalStorage,
             remoteStorage, digestCalculator);
+        // purges happen through the file system and through the metadata manager
+        getRepository().addPurgeListener(this.virtualObjectProvider::invalidateAll);
     }
 
     /**

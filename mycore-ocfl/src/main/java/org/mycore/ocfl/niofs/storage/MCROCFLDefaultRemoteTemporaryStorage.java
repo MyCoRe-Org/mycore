@@ -22,11 +22,13 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.net.URLConnection;
 import java.nio.channels.SeekableByteChannel;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileAttribute;
 import java.util.ArrayList;
@@ -301,8 +303,13 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
 
         // cache-miss: new content -> write to cache
         Path target = toCachePath(digest);
-        Files.createDirectories(target.getParent());
-        Files.write(target, bytes, options);
+        Path tempFile = newTempFile();
+        try {
+            Files.write(tempFile, bytes, options);
+            moveToFinalPath(tempFile, target);
+        } finally {
+            Files.deleteIfExists(tempFile);
+        }
 
         // update cache
         cacheUpdate(digest, target, originalFileName);
@@ -353,10 +360,13 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
 
         //  cache miss -> create
         Path target = toCachePath(digest);
-        Files.createDirectories(target.getParent());
-
-        // actual copy
-        Files.copy(source, target);
+        Path tempFile = newTempFile();
+        try {
+            Files.copy(source, tempFile);
+            moveToFinalPath(tempFile, target);
+        } finally {
+            Files.deleteIfExists(tempFile);
+        }
 
         // update cache
         cacheUpdate(digest, target, source.getFileName().toString());
@@ -411,8 +421,7 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
     @Override
     public CacheEntryWriter newCacheEntry(String originalFileName, FileAttribute<?>... attrs) throws IOException {
         // write to a temporary file because we don't know the final destination yet (depends on the digest)
-        Path tempFile = root.resolve("tmp-" + UUID.randomUUID());
-        Files.createDirectories(tempFile.getParent());
+        Path tempFile = newTempFile();
         Set<StandardOpenOption> createOptions = Set.of(StandardOpenOption.CREATE, StandardOpenOption.WRITE);
         SeekableByteChannel channel = Files.newByteChannel(tempFile, createOptions, attrs);
 
@@ -432,8 +441,7 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
 
             // move to the final path
             Path finalPath = toCachePath(digest);
-            Files.createDirectories(finalPath.getParent());
-            Files.move(tempFile, finalPath);
+            moveToFinalPath(tempFile, finalPath);
 
             // update cache
             cacheUpdate(digest, finalPath, originalFileName);
@@ -450,6 +458,29 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
             LOGGER.warn(() -> "Cache state mismatch for digest " + digest + ". Cache: " + existsInCache + ", Disk: "
                 + existsOnDisk);
             delete(digest);
+        }
+    }
+
+    /**
+     * Creates a temporary file in the cache root, on the same file store as the final cache paths.
+     */
+    private Path newTempFile() throws IOException {
+        Files.createDirectories(root);
+        return root.resolve("tmp-" + UUID.randomUUID());
+    }
+
+    /**
+     * Moves a completely written temporary file to its final path in one step. Other threads or processes never
+     * see a partially written file. A file that already exists at the final path is replaced: the path is derived
+     * from the digest of the content, so the existing file has the same content. It may exist on disk without
+     * being in the cache index, for example if another process using the same directory wrote it.
+     */
+    private static void moveToFinalPath(Path tempFile, Path finalPath) throws IOException {
+        Files.createDirectories(finalPath.getParent());
+        try {
+            Files.move(tempFile, finalPath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+        } catch (AtomicMoveNotSupportedException atomicMoveNotSupportedException) {
+            Files.move(tempFile, finalPath, StandardCopyOption.REPLACE_EXISTING);
         }
     }
 
