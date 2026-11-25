@@ -14,14 +14,6 @@ export default defineMCRVueApp(
   {
     // @mycore-org/vue-components imports bootstrap at runtime, the surrounding MyCoRe page provides it
     plugins: [bootstrapFromWindow()],
-    // vitest resolves without main fields, but the @mycore-org packages only declare a module entry
-    ...(process.env.VITEST
-      ? {
-          environments: {
-            client: { resolve: { mainFields: ['browser', 'module'] } },
-          },
-        }
-      : {}),
     test: {
       environment: 'jsdom',
       include: ['src/**/*.spec.ts'],

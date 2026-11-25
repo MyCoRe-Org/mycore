@@ -24,8 +24,10 @@ const FRONTEND_KEYS = [
   'label.permission',
   'label.reference',
   'label.secret',
+  'select',
   'success.add.title',
   'success.add.url',
+  'title.createAccessKey',
   'title.main',
   'title.viewAccessKey',
 ];
@@ -153,8 +155,27 @@ export async function wait(milliseconds = 20): Promise<void> {
   await settle();
 }
 
-export async function input(selector: string, value: string): Promise<void> {
-  const element = query<HTMLInputElement>(selector);
+export function field<T extends HTMLElement = HTMLInputElement>(
+  modalId: string,
+  labelKey: string
+): T {
+  const label = queryAll(`#${modalId} label`).find(
+    candidate => candidate.textContent?.trim() === `t(${labelKey})`
+  );
+  const id = label?.getAttribute('for');
+  if (!id) {
+    throw new Error(`no field labeled ${labelKey} in #${modalId}`);
+  }
+  return document.getElementById(id) as T;
+}
+
+export async function input(
+  target: string | HTMLElement,
+  value: string
+): Promise<void> {
+  const element = (
+    typeof target === 'string' ? query(target) : target
+  ) as HTMLInputElement;
   element.value = value;
   element.dispatchEvent(new Event('input'));
   await settle();

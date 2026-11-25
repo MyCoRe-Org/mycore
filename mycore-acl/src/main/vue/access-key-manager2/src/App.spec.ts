@@ -6,6 +6,7 @@ import {
   accessKey,
   accessKeyResponse,
   click,
+  field,
   input,
   installBackend,
   modalEvent,
@@ -113,6 +114,9 @@ describe('access key manager app', () => {
 
       app = await startApp('/admin');
 
+      expect(backend.requests('rsc/jwt').map(call => call.url)).toEqual([
+        `${WEB_APPLICATION_BASE_URL}rsc/jwt`,
+      ]);
       expect(listRequests(backend)).toEqual([`${API}/?limit=8`]);
       const [request] = backend.requests('api/v2/access-keys/?');
       expect(request?.init?.headers).toEqual({
@@ -238,10 +242,10 @@ describe('access key manager app', () => {
   describe('delete', () => {
     async function requestDelete(backend: FetchMock): Promise<void> {
       app = await startApp('/admin');
-      backend.on(
-        /api\/v2\/access-keys\/secret-hash-2$/,
-        () => new Response(null, { status: 204 })
-      );
+      backend.on(/api\/v2\/access-keys\/secret-hash-2$/, () => {
+        backend.on('api/v2/access-keys/?', () => accessKeyResponse([KEYS[0]!]));
+        return new Response(null, { status: 204 });
+      });
       const shown = modalEvent('confirmModal', 'shown');
       await click(
         queryAll('tbody tr')[1]!.querySelector('.fa-trash')!.closest('button')!
@@ -258,6 +262,9 @@ describe('access key manager app', () => {
       expect(modal.classList).toContain('show');
       expect(modal.querySelector('.modal-title')?.textContent).toBe(
         't(confirmRemove.title)'
+      );
+      expect(modal.querySelector('.modal-body')?.textContent?.trim()).toBe(
+        't(confirmRemove.text secret-hash-2)'
       );
       expect(modalButtons('confirmModal')).toHaveLength(2);
     });
@@ -367,19 +374,33 @@ describe('access key manager app', () => {
         false
       );
       expect(
-        queryAll('#createForm .is-invalid').map(element => element.id)
-      ).toEqual(['inputReference', 'inputSecret', 'inputPermission']);
+        queryAll('#createForm .is-invalid').map(element =>
+          document
+            .querySelector(`label[for="${element.id}"]`)
+            ?.textContent?.trim()
+        )
+      ).toEqual([
+        't(label.reference)',
+        't(label.secret)',
+        't(label.permission)',
+      ]);
     });
 
     it('creates the key, shows the activation link and reloads the list', async () => {
       const backend = installBackend(KEYS);
       await openCreateDialog(backend);
 
-      await input('#inputReference', 'mir_mods_00000007');
-      await input('#inputSecret', 'my secret');
-      await input('#inputPermission', 'read');
-      await input('#expirationInput', '2099-12-31');
-      await input('#commentTextarea', 'for review');
+      await input(
+        field('createAccessKeyModal', 'label.reference'),
+        'mir_mods_00000007'
+      );
+      await input(field('createAccessKeyModal', 'label.secret'), 'my secret');
+      await input(field('createAccessKeyModal', 'label.permission'), 'read');
+      await input(
+        field('createAccessKeyModal', 'label.expiration'),
+        '2099-12-31'
+      );
+      await input(field('createAccessKeyModal', 'label.comment'), 'for review');
       const created = modalEvent('createAccessKeyModal', 'hidden');
       const confirmationShown = modalEvent('confirmModal', 'shown');
       await click(modalButtons('createAccessKeyModal')[0]!);
@@ -425,9 +446,12 @@ describe('access key manager app', () => {
         jsonResponse({ ...CREATED, type: 'delete' })
       );
 
-      await input('#inputReference', 'mir_mods_00000007');
-      await input('#inputSecret', 'my secret');
-      await input('#inputPermission', 'delete');
+      await input(
+        field('createAccessKeyModal', 'label.reference'),
+        'mir_mods_00000007'
+      );
+      await input(field('createAccessKeyModal', 'label.secret'), 'my secret');
+      await input(field('createAccessKeyModal', 'label.permission'), 'delete');
       const confirmationShown = modalEvent('confirmModal', 'shown');
       await click(modalButtons('createAccessKeyModal')[0]!);
       await confirmationShown;
@@ -446,9 +470,12 @@ describe('access key manager app', () => {
           : accessKeyResponse(KEYS)
       );
 
-      await input('#inputReference', 'mir_mods_00000007');
-      await input('#inputSecret', 'my secret');
-      await input('#inputPermission', 'read');
+      await input(
+        field('createAccessKeyModal', 'label.reference'),
+        'mir_mods_00000007'
+      );
+      await input(field('createAccessKeyModal', 'label.secret'), 'my secret');
+      await input(field('createAccessKeyModal', 'label.permission'), 'read');
       await click(modalButtons('createAccessKeyModal')[0]!);
       await wait();
 
@@ -480,27 +507,24 @@ describe('access key manager app', () => {
       await openEditDialog(backend);
 
       expect(query('#infoAccessKeyModal').classList).toContain('show');
-      expect(
-        query<HTMLInputElement>('#infoAccessKeyModal #inputReference').value
-      ).toBe('mir_mods_00000001');
-      expect(
-        query<HTMLInputElement>('#infoAccessKeyModal #inputPermission').value
-      ).toBe('writedb');
-      expect(
-        query<HTMLInputElement>('#infoAccessKeyModal #expirationInput').value
-      ).toBe('2027-01-01');
-      expect(
-        query<HTMLInputElement>('#infoAccessKeyModal input[type=checkbox]')
-          .checked
-      ).toBe(false);
+      expect(field('infoAccessKeyModal', 'label.reference').value).toBe(
+        'mir_mods_00000001'
+      );
+      expect(field('infoAccessKeyModal', 'label.permission').value).toBe(
+        'writedb'
+      );
+      expect(field('infoAccessKeyModal', 'label.expiration').value).toBe(
+        '2027-01-01'
+      );
+      expect(field('infoAccessKeyModal', 'label.active').checked).toBe(false);
     });
 
     it('sends only the changed values and updates the row', async () => {
       const backend = installBackend(KEYS);
       await openEditDialog(backend);
 
-      await click('#infoAccessKeyModal input[type=checkbox]');
-      await input('#infoAccessKeyModal #commentTextarea', 'checked');
+      await click(field('infoAccessKeyModal', 'label.active'));
+      await input(field('infoAccessKeyModal', 'label.comment'), 'checked');
       const hidden = modalEvent('infoAccessKeyModal', 'hidden');
       await click(modalButtons('infoAccessKeyModal')[0]!);
       await hidden;

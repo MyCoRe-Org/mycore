@@ -46,8 +46,8 @@
   },
   "dependencies": {
     "@jsr/mycore__js-common": "^0.0.7",
-    "@mycore-org/vue-access-key-manager": "^0.2.0",
-    "@mycore-org/vue-components": "^0.1.5",
+    "@mycore-org/vue-access-key-manager": "^0.2.2",
+    "@mycore-org/vue-components": "^0.1.8",
     "bootstrap": "^5.3.3",
     "font-awesome": "^4.7.0",
     "prismjs": "^1.30.0",
