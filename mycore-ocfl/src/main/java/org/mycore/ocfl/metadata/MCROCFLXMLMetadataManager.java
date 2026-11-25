@@ -225,6 +225,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManager {
      * @param lastModified the date of the new version
      * @param user the user of the new version, or {@code null} to use the current user
      * @throws MCRUsageException if the object is a derivate or is not deleted
+     * @throws MCRPersistenceException if the content cannot be written
      */
     public void restore(MCRObjectID mcrid, MCRContent xml, Date lastModified, String user)
         throws MCRPersistenceException {
@@ -255,7 +256,12 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManager {
      */
     public boolean isDeleted(MCRObjectID mcrid) {
         String ocflObjectID = getOCFLObjectID(mcrid);
-        return getRepository().containsObject(ocflObjectID) && isDeleted(ocflObjectID);
+        try {
+            // one lookup instead of containsObject() + describeVersion(), create() calls this for every object
+            return isDeleted(ocflObjectID);
+        } catch (NotFoundException notFoundException) {
+            return false;
+        }
     }
 
     private String getOCFLObjectID(MCRObjectID mcrid) {

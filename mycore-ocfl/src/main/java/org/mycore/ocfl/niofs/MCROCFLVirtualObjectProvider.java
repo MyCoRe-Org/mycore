@@ -205,10 +205,11 @@ public class MCROCFLVirtualObjectProvider {
      * Checks if the specified owner and version exists in the repository.
      * <p>
      * This also will return true if the owner was marked for purge or was deleted (and not purged),
-     * because the object still exists in the OCFL repository.
+     * because the object still exists in the OCFL repository. This only applies to the head: an older delete version
+     * contains no files and is therefore reported as not existing.
      *
      * @param owner the owner of the object.
-     * @param version the version of the object
+     * @param version the version of the object, or {@code null} for the head
      * @return {@code true} if the owner and version exists, {@code false} otherwise.
      */
     public boolean exists(String owner, String version) {
@@ -231,7 +232,8 @@ public class MCROCFLVirtualObjectProvider {
         try {
             OcflObjectVersion object = repository.getObject(objectVersionId);
             // a deleted (not purged) object still exists, even if no file is left in the delete version
-            if (convertMessageToType(object.getVersionInfo().getMessage()) == MCROCFLMetadataVersion.DELETED) {
+            if (version == null
+                && convertMessageToType(object.getVersionInfo().getMessage()) == MCROCFLMetadataVersion.DELETED) {
                 return true;
             }
             return object.getFiles().stream()

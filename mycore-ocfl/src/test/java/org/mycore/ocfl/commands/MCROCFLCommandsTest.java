@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.OffsetDateTime;
@@ -40,16 +41,18 @@ import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.common.MCRTransactionManager;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRExpandedObject;
-import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
 import org.mycore.ocfl.MCROCFLTestCaseHelper;
 import org.mycore.ocfl.metadata.MCROCFLXMLMetadataManager;
+import org.mycore.ocfl.niofs.MCROCFLFileSystemProvider;
 import org.mycore.ocfl.niofs.MCROCFLFileSystemTransaction;
+import org.mycore.ocfl.niofs.MCROCFLVirtualObjectProvider;
 import org.mycore.ocfl.repository.MCROCFLRepository;
 import org.mycore.ocfl.test.MCROCFLSetupExtension;
 import org.mycore.ocfl.test.MCRPermutationExtension;
@@ -105,6 +108,26 @@ public class MCROCFLCommandsTest {
         }
         MCRExpandedObject mcrObject = MCRMetadataManager.retrieveMCRExpandedObject(derivate.getOwnerID());
         assertTrue(mcrObject.getStructure().containsDerivate(derivateId));
+    }
+
+    @TestTemplate
+    public void restoreDeleteVersionFails() throws Exception {
+        // prepare
+        MCRDerivate derivate = MCROCFLTestCaseHelper.loadObjectAndDerivate(JUNIT_OBJECT_1, JUNIT_DERIVATE_1);
+        deleteDerivate(derivate);
+        MCROCFLVirtualObjectProvider virtualObjectProvider = MCROCFLFileSystemProvider.get().virtualObjectProvider();
+        String ocflObjectId = MCROCFLObjectIDPrefixHelper.toDerivateObjectId(JUNIT_DERIVATE_1);
+        String deleteVersion = MCROCFLFileSystemProvider.get().getRepository().describeObject(ocflObjectId)
+            .getHeadVersionNum().toString();
+
+        // test
+        assertFalse(virtualObjectProvider.exists(JUNIT_DERIVATE_1, deleteVersion),
+            "an older delete version should not exist");
+        assertThrows(FileSystemException.class,
+            () -> MCROCFLCommands.restoreDerivateFromOCFL(JUNIT_DERIVATE_1, deleteVersion));
+        assertTrue(virtualObjectProvider.isDeleted(JUNIT_DERIVATE_1), "derivate should still be deleted");
+        assertEquals(deleteVersion, MCROCFLFileSystemProvider.get().getRepository().describeObject(ocflObjectId)
+            .getHeadVersionNum().toString(), "no version should be written");
     }
 
     @TestTemplate
