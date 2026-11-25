@@ -121,6 +121,8 @@ const hasWriteAccess = async () => {
 const load = async () => {
   const contentHandler: ContentHandler | undefined = ContentHandlerSelector.get(props.type);
   if (contentHandler === undefined) {
+    error.value = `Unsupported type '${props.type}'.`;
+    loading.value = false;
     return;
   }
   try {

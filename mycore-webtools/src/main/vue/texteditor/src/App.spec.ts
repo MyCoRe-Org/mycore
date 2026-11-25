@@ -102,6 +102,15 @@ describe('texteditor app', () => {
     expect(wrapper.get('h3').text()).toBe('Page not found');
   });
 
+  it('shows an error for unsupported types', async () => {
+    const wrapper = await mountAt('/unknown/something');
+
+    expect(wrapper.get('.alert-danger').text()).toBe("Unsupported type 'unknown'.");
+    expect(wrapper.find('.spinner').exists()).toBe(false);
+    expect(textarea(wrapper).readOnly).toBe(true);
+    expect(backend.calls).toEqual([]);
+  });
+
   describe('object', () => {
     it('loads the prettified object with the jwt and locks it', async () => {
       const wrapper = await mountAt(`/objects/${OBJECT_ID}`);
@@ -241,6 +250,36 @@ describe('texteditor app', () => {
       expect(hasButton(wrapper, 'Update')).toBe(false);
       expect(textarea(wrapper).readOnly).toBe(true);
       expect(calls().some(call => call.endsWith('/lock'))).toBe(false);
+    });
+
+    it('shows an error when the write access cannot be checked', async () => {
+      backend.on(/\/api\/v2\/objects\/.*\/try$/, () => Promise.reject(new TypeError('Failed to fetch')));
+
+      const wrapper = await mountAt(`/objects/${OBJECT_ID}`);
+
+      expect(wrapper.get('.alert-danger').text()).toBe('Failed to fetch');
+      expect(hasButton(wrapper, 'Update')).toBe(false);
+      expect(textarea(wrapper).value).toBe(PRETTY_OBJECT_XML);
+    });
+
+    it('keeps editor and preview scrolled together', async () => {
+      const wrapper = await mountAt(`/objects/${OBJECT_ID}`);
+      const input = textarea(wrapper);
+      const preview = wrapper.get('pre.prism-editor__editor').element as HTMLElement;
+      for (const element of [input, preview]) {
+        Object.defineProperty(element, 'scrollTop', { value: 0, writable: true });
+        Object.defineProperty(element, 'scrollLeft', { value: 0, writable: true });
+      }
+
+      input.scrollTop = 120;
+      input.scrollLeft = 30;
+      input.dispatchEvent(new Event('scroll'));
+      expect([preview.scrollTop, preview.scrollLeft]).toEqual([120, 30]);
+
+      preview.scrollTop = 40;
+      preview.scrollLeft = 0;
+      preview.dispatchEvent(new Event('scroll'));
+      expect([input.scrollTop, input.scrollLeft]).toEqual([40, 0]);
     });
 
     it('warns when another user holds the lock', async () => {
@@ -487,6 +526,19 @@ describe('texteditor app', () => {
       expect(wrapper.get('pre.prism-editor__editor').find('.token.title').exists()).toBe(true);
     });
 
+    it('falls back to xml highlighting for content types prism does not know', async () => {
+      const FILE = `${CONTENTS}/notes.dat`;
+      backend.on(`api/v2/objects/${FILE}?`, () =>
+        new Response('<note>mir_mods_00000002</note>', { headers: { 'Content-Type': 'application/octet-stream' } })
+      );
+
+      const wrapper = await mountAt(`/objects/${FILE}`);
+
+      const preview = wrapper.get('pre.prism-editor__editor');
+      expect(preview.find('.token.tag').exists()).toBe(true);
+      expect(preview.find('.mcr-link').attributes('data-mcr-id')).toBe('mir_mods_00000002');
+    });
+
     it('saves a content file without reloading it', async () => {
       const FILE = `${CONTENTS}/readme.md`;
       backend.on(`api/v2/objects/${FILE}`, (_url, init) =>
@@ -591,6 +643,25 @@ describe('texteditor app', () => {
       expect(save?.init?.body).toBe('<mycoreclass/>');
       expect(calls(method => method === 'GET')).toHaveLength(1);
       expect(wrapper.get('.alert-success').text()).toBe('Successfully saved!');
+    });
+
+    it('shows the server error when saving fails', async () => {
+      backend.on(`api/v2/classifications/${CLASS_ID}`, (_url, init) =>
+        init?.method === 'PUT'
+          ? new Response(null, { status: 403, headers: { 'X-Error-Message': 'Forbidden' } })
+          : xml(`<mycoreclass ID="${CLASS_ID}"/>`)
+      );
+      const wrapper = await mountAt(`/classifications/${CLASS_ID}`);
+
+      await edit(wrapper, '<mycoreclass/>');
+      await button(wrapper, 'Update').trigger('click');
+      await flushPromises();
+
+      expect(wrapper.get('.alert-danger').text()).toContain(
+        `Unable to save ${CLASS_ID}. Request failed with status code 403. Forbidden`
+      );
+      expect(wrapper.find('.alert-success').exists()).toBe(false);
+      expect(button(wrapper, 'Update').attributes('disabled')).toBeUndefined();
     });
 
     it('shows an error when the classification cannot be loaded', async () => {

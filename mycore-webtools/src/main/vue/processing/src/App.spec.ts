@@ -123,6 +123,17 @@ describe('processing app', () => {
       }
     });
 
+    it('uses a secure websocket on https pages', async () => {
+      vi.stubGlobal('location', { protocol: 'https:', host: 'repository.example.org' });
+      try {
+        const socket = await mountApp();
+        expect(socket.url).toBe('wss://repository.example.org/mir/ws/mycore-webtools/processing');
+      } finally {
+        vi.unstubAllGlobals();
+        WebSocketMock.install();
+      }
+    });
+
     it('uses the development server in development mode', async () => {
       vi.stubEnv('DEV', true);
       try {

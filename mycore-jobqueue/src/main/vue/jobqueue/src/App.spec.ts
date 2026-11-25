@@ -324,6 +324,16 @@ describe('jobqueue app', () => {
         expect(wrapper.find('.jobqueue-pagination').exists()).toBe(false);
       });
 
+      it('is hidden when the server sends no total count', async () => {
+        fetchMock.on('api/jobqueue/mail?', () => jsonResponse(queue([job(1), job(2)])));
+
+        const wrapper = await mountAt('/mail/ALL');
+
+        expect(wrapper.find('.jobqueue-pagination').exists()).toBe(false);
+        expect(wrapper.findAll('tbody tr')).toHaveLength(2);
+        expect(wrapper.find('.alert-danger').exists()).toBe(false);
+      });
+
       it('is shown above and below the table when there are more jobs', async () => {
         serveJobs([job(1)], 120);
 
