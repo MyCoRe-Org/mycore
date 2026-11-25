@@ -334,6 +334,11 @@ public class MCROCFLCommands {
         if (store.exists(mcrid)) {
             store.update(mcrid, content, lastModified);
         } else if (store instanceof MCROCFLXMLMetadataManager ocflStore && ocflStore.isDeleted(mcrid)) {
+            if (Objects.equals(mcrid.getTypeId(), MCRDerivate.OBJECT_TYPE)) {
+                // the files of the derivate are in the same OCFL object, restoring only the metadata loses them
+                throw new MCRUsageException("Cannot restore the metadata of derivate '" + mcrid
+                    + "' without its files. Use 'restore derivate {0} from ocfl with version {1}' instead.");
+            }
             ocflStore.restore(mcrid, content, lastModified, null);
         } else {
             store.create(mcrid, content, lastModified);

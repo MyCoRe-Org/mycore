@@ -217,23 +217,21 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManager {
      * Restores a deleted (not purged) object by writing the given content as a new version on top of the delete
      * version. The history of the object is kept.
      * <p>
-     * Derivates cannot be restored this way, because their metadata and files share one OCFL object. Use
-     * {@code restore derivate {0} from ocfl with version {1}} instead.
+     * For a derivate only the metadata is restored, its files stay deleted, because metadata and files share one
+     * OCFL object. To restore a derivate with its files, use {@code restore derivate {0} from ocfl with version {1}}.
+     * The metadata migration uses this method for derivates as well, when the history to migrate contains a delete
+     * followed by a create of the same id.
      *
      * @param mcrid the id of the deleted object
      * @param xml the content to restore, usually a former version of the object
      * @param lastModified the date of the new version
      * @param user the user of the new version, or {@code null} to use the current user
-     * @throws MCRUsageException if the object is a derivate or is not deleted
+     * @throws MCRUsageException if the object is not deleted
      * @throws MCRPersistenceException if the content cannot be written
      */
     public void restore(MCRObjectID mcrid, MCRContent xml, Date lastModified, String user)
         throws MCRPersistenceException {
         String ocflObjectID = getOCFLObjectID(mcrid);
-        if (Objects.equals(mcrid.getTypeId(), MCRDerivate.OBJECT_TYPE)) {
-            throw new MCRUsageException("Cannot restore the metadata of derivate '" + ocflObjectID
-                + "' without its files. Restore the derivate instead.");
-        }
         if (!isDeleted(mcrid)) {
             throw new MCRUsageException("Cannot restore object '" + ocflObjectID + "' because it is not deleted");
         }
