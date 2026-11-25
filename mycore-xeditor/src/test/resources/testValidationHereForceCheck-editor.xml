@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<html>
+  <body>
+    <xed:form xmlns:xed="http://www.mycore.de/xeditor">
+      <xed:source uri="resource:{$input}" />
+      <xed:bind xpath="document">
+        <xed:if test="$xed-validation-failed">
+          <h3>Fehlerhafte Eingabe:</h3>
+          <xed:display-validation-messages />
+        </xed:if>
+        <xed:bind xpath="title">
+          <div class="form-group {$xed-validation-marker}">
+            <input type="text" />
+            <xed:validate display="here" test="contains(.,'Dystopie')">Titel muss dystopisch sein!</xed:validate>
+            <xed:validate display="here" matches="[0-9]+">Titel muss eine Zahl sein!</xed:validate>
+            <xed:validate display="here global" test="string-length(.) &lt; 10" force-check="true">Titel zu lang!</xed:validate>
+            <xed:validate display="here" matches=".*Utopie.*" force-check="true">Titel muss utopisch sein!</xed:validate>
+          </div>
+        </xed:bind>
+      </xed:bind>
+    </xed:form>
+  </body>
+</html>

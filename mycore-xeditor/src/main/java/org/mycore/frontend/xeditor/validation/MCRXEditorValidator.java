@@ -108,6 +108,16 @@ public class MCRXEditorValidator {
     }
 
     /**
+     * Returns {@code true} if the validation rule declared by the given rule element failed for the binding's absolute
+     * XPath. Unlike {@link #hasError(MCRBinding)}, failures of other rules for the same XPath are ignored.
+     *
+     * @see MCRValidator#isDeclaredBy(Node)
+     */
+    public boolean hasError(MCRBinding binding, Node ruleElement) {
+        return getFailedRules(binding).stream().anyMatch(failedRule -> failedRule.isDeclaredBy(ruleElement));
+    }
+
+    /**
      * Returns the first failed rule for the binding's absolute XPath.
      */
     public MCRValidator getFailedRule(MCRBinding binding) {

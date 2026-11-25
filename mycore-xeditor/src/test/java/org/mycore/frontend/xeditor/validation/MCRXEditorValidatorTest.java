@@ -48,13 +48,16 @@ public class MCRXEditorValidatorTest extends MCRTestCase {
     }
 
     private void addRule(MCREditorSession session, String baseXPath, String... attributes) throws JDOMException {
+        session.getValidator().addRule(baseXPath, buildRule(attributes));
+    }
+
+    private org.w3c.dom.Element buildRule(String... attributes) throws JDOMException {
         Element rule = new Element("validation-rule");
         for (int i = 0; i < attributes.length;) {
             rule.setAttribute(attributes[i++], attributes[i++]);
         }
         new Document(rule);
-        org.w3c.dom.Element ruleAsDOMElement = new DOMOutputter().output(rule);
-        session.getValidator().addRule(baseXPath, ruleAsDOMElement);
+        return new DOMOutputter().output(rule);
     }
 
     private void checkResult(MCREditorSession session, String xPath, String marker)
@@ -62,6 +65,47 @@ public class MCRXEditorValidatorTest extends MCRTestCase {
         MCRBinding binding = new MCRBinding(xPath, false, session.getRootBinding());
         session.getValidator().setValidationMarker(binding);
         assertEquals(marker, session.getVariables().get(MCRXEditorValidator.XED_VALIDATION_MARKER));
+    }
+
+    @Test
+    public void testHasErrorOnlyForFailedRule() throws JDOMException, JaxenException {
+        MCREditorSession session = buildSession("document[title='abc']");
+        addRule(session, "/document/title", "required", "true");
+        addRule(session, "/document/title", "matches", "[0-9]+");
+        addRule(session, "/document/title", "test", "false()");
+        assertFalse(session.getValidator().isValid());
+
+        // rule elements are created anew when the form is displayed again, so use new instances here
+        MCRXEditorValidator validator = session.getValidator();
+        MCRBinding binding = new MCRBinding("/document/title", false, session.getRootBinding());
+        assertTrue(validator.hasError(binding));
+        assertFalse(validator.hasError(binding, buildRule("required", "true")));
+        assertTrue(validator.hasError(binding, buildRule("matches", "[0-9]+")));
+        assertFalse(validator.hasError(binding, buildRule("matches", "[a-z]+")));
+        // skipped because matches already failed for this XPath
+        assertFalse(validator.hasError(binding, buildRule("test", "false()")));
+        binding.detach();
+    }
+
+    @Test
+    public void testHasErrorForAllFailedForceCheckRules() throws JDOMException, JaxenException {
+        MCREditorSession session = buildSession("document[title='abc']");
+        addRule(session, "/document/title", "matches", "[0-9]+");
+        addRule(session, "/document/title", "test", "false()");
+        addRule(session, "/document/title", "test", "string-length(.) > 5", "force-check", "true");
+        addRule(session, "/document/title", "matches", "[a-z]+", "force-check", "true");
+        assertFalse(session.getValidator().isValid());
+
+        MCRXEditorValidator validator = session.getValidator();
+        MCRBinding binding = new MCRBinding("/document/title", false, session.getRootBinding());
+        assertTrue(validator.hasError(binding, buildRule("matches", "[0-9]+")));
+        // skipped because matches already failed for this XPath
+        assertFalse(validator.hasError(binding, buildRule("test", "false()")));
+        // evaluated despite the earlier failure and failed as well, though it is not the first failed rule
+        assertTrue(validator.hasError(binding, buildRule("test", "string-length(.) > 5", "force-check", "true")));
+        // evaluated despite the earlier failure, but valid
+        assertFalse(validator.hasError(binding, buildRule("matches", "[a-z]+", "force-check", "true")));
+        binding.detach();
     }
 
     @Test

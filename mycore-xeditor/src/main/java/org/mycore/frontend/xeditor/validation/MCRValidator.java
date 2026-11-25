@@ -19,6 +19,9 @@
 package org.mycore.frontend.xeditor.validation;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.TreeMap;
 
 import org.jaxen.JaxenException;
 import org.mycore.common.xml.MCRXPathBuilder;
@@ -41,10 +44,13 @@ public abstract class MCRValidator {
 
     private boolean forceCheck;
 
+    private RuleSignature ruleSignature;
+
     public void init(String baseXPath, Node ruleElement) {
         Node relativeXPath = ruleElement.getAttributes().getNamedItem("xpath");
         this.xPath = relativeXPath != null ? relativeXPath.getNodeValue() : baseXPath;
         this.ruleElement = ruleElement;
+        this.ruleSignature = RuleSignature.of(ruleElement);
 
         if (hasRequiredAttributes()) {
             relevantIfXPath = getAttributeValue(ATTR_RELEVANT_IF);
@@ -62,6 +68,18 @@ public abstract class MCRValidator {
 
     public Node getRuleElement() {
         return ruleElement;
+    }
+
+    /**
+     * Returns {@code true} if the given rule element declares the same validation rule as the rule element of this
+     * validator.
+     * <p>
+     * Rule elements are created anew each time the form is transformed, so a rule element seen while displaying
+     * validation results is never the instance that was validated. Rule elements are therefore compared by content:
+     * they are equal if they have the same attributes and the same text content.
+     */
+    public boolean isDeclaredBy(Node otherRuleElement) {
+        return ruleSignature.equals(RuleSignature.of(otherRuleElement));
     }
 
     public String getAttributeValue(String name) {
@@ -133,5 +151,18 @@ public abstract class MCRValidator {
 
     protected boolean isValid(String value) {
         return true;
+    }
+
+    private record RuleSignature(Map<String, String> attributes, String text) {
+
+        static RuleSignature of(Node ruleElement) {
+            Map<String, String> attributes = new TreeMap<>();
+            NamedNodeMap attributeNodes = ruleElement.getAttributes();
+            for (int i = 0; i < attributeNodes.getLength(); i++) {
+                Node attribute = attributeNodes.item(i);
+                attributes.put(attribute.getNodeName(), attribute.getNodeValue());
+            }
+            return new RuleSignature(attributes, Objects.toString(ruleElement.getTextContent(), ""));
+        }
     }
 }

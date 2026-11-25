@@ -304,6 +304,14 @@ public class MCRXEditorTransformer {
         return editorSession.getValidator().hasError(currentBinding);
     }
 
+    /**
+     * Returns {@code true} if the given validation rule failed for the current binding. Failures of other rules for the
+     * same XPath are ignored.
+     */
+    public boolean hasValidationError(Node ruleElement) {
+        return editorSession.getValidator().hasError(currentBinding, ruleElement);
+    }
+
     public Node getFailedValidationRule() {
         return editorSession.getValidator().getFailedRule(currentBinding).getRuleElement();
     }
