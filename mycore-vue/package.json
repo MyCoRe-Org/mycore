@@ -52,7 +52,7 @@
     "font-awesome": "^4.7.0",
     "prismjs": "^1.30.0",
     "vue": "^3.5.25",
-    "vue-i18n": "11.4.2",
+    "vue-i18n": "^11.4.23",
     "vue-prism-editor": "^2.0.0-alpha.2",
     "vue-router": "^4.6.3"
   },

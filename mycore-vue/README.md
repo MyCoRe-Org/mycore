@@ -154,8 +154,6 @@ entry. `@jsr/mycore__js-common` is the one case, all of its subpaths follow the 
 * A test server that playwright starts as a plain node process gets neither the transpilation nor the `paths`.
   The webcli websocket stub therefore pulls `ws` through a `createRequire` anchored in this module, the same
   idea as the anchor in `vite.shared.ts`. The a11y static server only uses node builtins and needs nothing.
-* `vue-i18n` is pinned to the exact version `11.4.2`. From `11.4.3` on it requires node 22, while the reactor POM
-  pins `node.version` to `v20.19.0`. The pin can be dropped as soon as the node version is raised.
 * `vite-plugin-eslint` (formerly access-key-manager2) is unmaintained and is not part of the shared toolchain.
   Linting runs as a standalone script instead.
 * `rollup-plugin-external-globals` (formerly access-key-manager2) does not work with rolldown. `bootstrapFromWindow()`
