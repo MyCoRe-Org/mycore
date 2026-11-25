@@ -68,7 +68,8 @@ public class MCRMODSPagesHelper {
 }
 
 /**
- * Normalizes the different variants of hyphens in a given input text to a simple "minus" character.  
+ * Normalizes the different variants of hyphens in a given input text to a simple "minus" character.
+ * Sequences of multiple hyphens, like the LaTeX style "--", are collapsed to a single "minus" character.
  * 
  * @author Frank Lützenkirchen 
  **/
@@ -76,15 +77,17 @@ class HyphenNormalizer {
 
     private static final char HYPHEN_NORM = '-';
 
-    private char[] hyphenVariants = { '\u002D', '\u2010', '\u2011', '\u2012', '\u2013', '\u2015', '\u2212', '\u2E3B',
-        '\uFE58', '\uFE63', };
+    private static final Pattern MULTIPLE_HYPHENS = Pattern.compile(HYPHEN_NORM + "{2,}");
+
+    private char[] hyphenVariants = { '\u002D', '\u2010', '\u2011', '\u2012', '\u2013', '\u2014', '\u2015', '\u2212',
+        '\u2E3B', '\uFE58', '\uFE63', };
 
     String normalize(String input) {
         String normalizedInput = input;
         for (char hypenVariant : hyphenVariants) {
             normalizedInput = normalizedInput.replace(hypenVariant, HYPHEN_NORM);
         }
-        return normalizedInput;
+        return MULTIPLE_HYPHENS.matcher(normalizedInput).replaceAll(String.valueOf(HYPHEN_NORM));
     }
 }
 
