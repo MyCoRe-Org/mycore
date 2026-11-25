@@ -62,7 +62,7 @@
     "@playwright/test": "^1.54.2",
     "@popperjs/core": "^2.11.8",
     "@types/bootstrap": "^5.2.10",
-    "@types/node": "^20.19.25",
+    "@types/node": "^24.19.4",
     "@types/prismjs": "^1.26.6",
     "@vitejs/plugin-vue": "^6.0.4",
     "@vitest/coverage-v8": "^4.1.0",
