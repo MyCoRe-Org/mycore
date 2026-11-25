@@ -114,6 +114,17 @@
             </configuration>
           </execution>
           <execution>
+            <id>yarn-test-texteditor</id>
+            <goals>
+              <goal>yarn</goal>
+            </goals>
+            <phase>test</phase>
+            <configuration>
+              <arguments>test:texteditor</arguments>
+              <workingDirectory>${basedir}/../mycore-vue</workingDirectory>
+            </configuration>
+          </execution>
+          <execution>
             <id>yarn-build-processing</id>
             <goals>
               <goal>yarn</goal>
@@ -122,6 +133,17 @@
             <configuration>
               <workingDirectory>${basedir}/../mycore-vue</workingDirectory>
               <arguments>build:processing</arguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>yarn-test-processing</id>
+            <goals>
+              <goal>yarn</goal>
+            </goals>
+            <phase>test</phase>
+            <configuration>
+              <arguments>test:processing</arguments>
+              <workingDirectory>${basedir}/../mycore-vue</workingDirectory>
             </configuration>
           </execution>
         </executions>
