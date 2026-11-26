@@ -191,8 +191,8 @@ public class MCROCFLVirtualObjectProvider {
     /**
      * Checks if the specified owner exists in the repository.
      * <p>
-     * This also will return true if the owner was marked for purge or was deleted (and not purged),
-     * because the object still exists in the OCFL repository.
+     * A deleted (not purged) owner does not exist. Its history stays in the OCFL repository and the owner can be
+     * created again on top of the delete version.
      *
      * @param owner the owner of the object.
      * @return {@code true} if the owner exists, {@code false} otherwise.
@@ -204,9 +204,8 @@ public class MCROCFLVirtualObjectProvider {
     /**
      * Checks if the specified owner and version exists in the repository.
      * <p>
-     * This also will return true if the owner was marked for purge or was deleted (and not purged),
-     * because the object still exists in the OCFL repository. This only applies to the head: an older delete version
-     * contains no files and is therefore reported as not existing.
+     * A delete version is reported as not existing. Delete versions written by older releases can still contain
+     * {@code .keep} files, so the version message is checked instead of the files.
      *
      * @param owner the owner of the object.
      * @param version the version of the object, or {@code null} for the head
@@ -214,8 +213,9 @@ public class MCROCFLVirtualObjectProvider {
      */
     public boolean exists(String owner, String version) {
         ObjectVersionId objectVersionId = toObjectVersionId(owner, version);
-        if (this.readMap.containsKey(objectVersionId)) {
-            return true;
+        MCROCFLVirtualObject readable = this.readMap.get(objectVersionId);
+        if (readable != null) {
+            return !readable.isDeleteVersion();
         }
         boolean isActive = MCROCFLFileSystemTransaction.isActive();
         Long transactionId = MCROCFLFileSystemTransaction.getTransactionId();
@@ -231,10 +231,8 @@ public class MCROCFLVirtualObjectProvider {
         }
         try {
             OcflObjectVersion object = repository.getObject(objectVersionId);
-            // a deleted (not purged) object still exists, even if no file is left in the delete version
-            if (version == null
-                && convertMessageToType(object.getVersionInfo().getMessage()) == MCROCFLMetadataVersion.DELETED) {
-                return true;
+            if (convertMessageToType(object.getVersionInfo().getMessage()) == MCROCFLMetadataVersion.DELETED) {
+                return false;
             }
             return object.getFiles().stream()
                 .map(OcflObjectVersionFile::getPath)

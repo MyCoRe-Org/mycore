@@ -21,9 +21,11 @@ package org.mycore.ocfl.commands;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.FileSystemException;
@@ -34,14 +36,11 @@ import java.util.stream.Stream;
 
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.function.Executable;
 import org.mycore.access.MCRAccessException;
-import org.mycore.common.MCRException;
-import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRUsageException;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.common.MCRTransactionManager;
-import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRExpandedObject;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -49,15 +48,16 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
 import org.mycore.ocfl.MCROCFLTestCaseHelper;
-import org.mycore.ocfl.metadata.MCROCFLXMLMetadataManager;
 import org.mycore.ocfl.niofs.MCROCFLFileSystemProvider;
 import org.mycore.ocfl.niofs.MCROCFLFileSystemTransaction;
+import org.mycore.ocfl.niofs.MCROCFLVirtualObject;
 import org.mycore.ocfl.niofs.MCROCFLVirtualObjectProvider;
 import org.mycore.ocfl.repository.MCROCFLRepository;
 import org.mycore.ocfl.test.MCROCFLSetupExtension;
 import org.mycore.ocfl.test.MCRPermutationExtension;
 import org.mycore.ocfl.test.PermutedParam;
 import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
+import org.mycore.ocfl.util.MCROCFLVersionHelper;
 import org.mycore.test.MCRJPAExtension;
 import org.mycore.test.MyCoReTest;
 
@@ -122,7 +122,10 @@ public class MCROCFLCommandsTest {
 
         // test
         assertFalse(virtualObjectProvider.exists(JUNIT_DERIVATE_1, deleteVersion),
-            "an older delete version should not exist");
+            "a delete version should not exist");
+        virtualObjectProvider.get(JUNIT_DERIVATE_1, deleteVersion);
+        assertFalse(virtualObjectProvider.exists(JUNIT_DERIVATE_1, deleteVersion),
+            "an already read delete version should not exist either");
         assertThrows(FileSystemException.class,
             () -> MCROCFLCommands.restoreDerivateFromOCFL(JUNIT_DERIVATE_1, deleteVersion));
         assertTrue(virtualObjectProvider.isDeleted(JUNIT_DERIVATE_1), "derivate should still be deleted");
@@ -131,29 +134,82 @@ public class MCROCFLCommandsTest {
     }
 
     @TestTemplate
-    public void createDeletedObjectFails() throws Exception {
+    public void createDeletedObject() throws Exception {
         MCRObject object = MCROCFLTestCaseHelper.createObject(JUNIT_OBJECT_1);
         MCRMetadataManager.create(object);
         deleteObject(object);
-        MCROCFLXMLMetadataManager metadataManager = (MCROCFLXMLMetadataManager) MCRXMLMetadataManager.obtainInstance();
         assertFalse(MCRMetadataManager.exists(object.getId()), "object should not exist");
-        assertTrue(metadataManager.isDeleted(object.getId()), "object should be deleted");
 
-        assertCreateRejected(() -> MCRMetadataManager.create(MCROCFLTestCaseHelper.createObject(JUNIT_OBJECT_1)));
-        assertTrue(metadataManager.isDeleted(object.getId()), "object should still be deleted");
+        // like the old SVN store, a deleted id can be created again and the history is kept
+        MCRMetadataManager.create(MCROCFLTestCaseHelper.createObject(JUNIT_OBJECT_1));
+
+        assertTrue(MCRMetadataManager.exists(object.getId()), "object should exist again");
+        String ocflObjectId = MCROCFLObjectIDPrefixHelper.MCROBJECT + JUNIT_OBJECT_1;
+        assertEquals(3, repository.describeObject(ocflObjectId).getVersionMap().size(),
+            "the history should be kept");
     }
 
     @TestTemplate
-    public void createDeletedDerivateFails() throws Exception {
+    public void createDeletedDerivate() throws Exception {
+        MCRDerivate derivate = MCROCFLTestCaseHelper.loadObjectAndDerivate(JUNIT_OBJECT_1, JUNIT_DERIVATE_1);
+        deleteDerivate(derivate);
+        MCRObjectID derivateId = derivate.getId();
+        String ocflObjectId = MCROCFLObjectIDPrefixHelper.toDerivateObjectId(JUNIT_DERIVATE_1);
+        int versions = repository.describeObject(ocflObjectId).getVersionMap().size();
+        // reading the deleted derivate must not prevent creating it again
+        assertFalse(Files.exists(MCRVersionedPath.head(JUNIT_DERIVATE_1, "/")), "root should not exist");
+
+        // like the old SVN store, a deleted id can be created again and the history is kept
+        MCRTransactionManager.requireTransactions(MCROCFLFileSystemTransaction.class);
+        MCRMetadataManager.create(MCROCFLTestCaseHelper.createDerivate(JUNIT_OBJECT_1, JUNIT_DERIVATE_1));
+        MCROCFLTestCaseHelper.loadDerivate(JUNIT_DERIVATE_1);
+        MCRTransactionManager.commitTransactions(MCROCFLFileSystemTransaction.class);
+
+        assertTrue(MCRMetadataManager.exists(derivateId), "derivate should exist again");
+        try (Stream<Path> directoryStream = Files.list(MCRVersionedPath.head(JUNIT_DERIVATE_1, "/"))) {
+            assertEquals(3, directoryStream.toList().size(), "the files should be created again");
+        }
+        assertTrue(repository.describeObject(ocflObjectId).getVersionMap().size() > versions,
+            "the history should be kept");
+    }
+
+    @TestTemplate
+    public void createDeletedDerivateWithLeftoverKeepFile() throws Exception {
+        MCRDerivate derivate = MCROCFLTestCaseHelper.loadObjectAndDerivate(JUNIT_OBJECT_1, JUNIT_DERIVATE_1);
+        deleteDerivate(derivate);
+        // older releases left the .keep files of empty directories in the delete version
+        String ocflObjectId = MCROCFLObjectIDPrefixHelper.toDerivateObjectId(JUNIT_DERIVATE_1);
+        String keepFile = MCROCFLVirtualObject.FILES_DIRECTORY + "leftover/.keep";
+        repository.updateObject(ObjectVersionId.head(ocflObjectId),
+            new VersionInfo().setMessage(MCROCFLVersionHelper.MESSAGE_DELETED),
+            updater -> updater.writeFile(new ByteArrayInputStream(new byte[0]), keepFile));
+        MCROCFLFileSystemProvider.get().virtualObjectProvider().invalidate(JUNIT_DERIVATE_1, null);
+        assertNotNull(repository.getObject(ObjectVersionId.head(ocflObjectId)).getFile(keepFile),
+            "the delete version should contain the leftover .keep file");
+
+        // the metadata is created before the root, both on top of the delete version
+        MCRTransactionManager.requireTransactions(MCROCFLFileSystemTransaction.class);
+        MCRMetadataManager.create(MCROCFLTestCaseHelper.createDerivate(JUNIT_OBJECT_1, JUNIT_DERIVATE_1));
+        MCROCFLTestCaseHelper.loadDerivate(JUNIT_DERIVATE_1);
+        MCRTransactionManager.commitTransactions(MCROCFLFileSystemTransaction.class);
+
+        assertTrue(MCRMetadataManager.exists(derivate.getId()), "derivate should exist again");
+        assertNull(repository.getObject(ObjectVersionId.head(ocflObjectId)).getFile(keepFile),
+            "the leftover .keep file should be removed by the create");
+    }
+
+    @TestTemplate
+    public void restoreMetadataOfDeletedDerivateFails() throws Exception {
         MCRDerivate derivate = MCROCFLTestCaseHelper.loadObjectAndDerivate(JUNIT_OBJECT_1, JUNIT_DERIVATE_1);
         deleteDerivate(derivate);
         String ocflObjectId = MCROCFLObjectIDPrefixHelper.toDerivateObjectId(JUNIT_DERIVATE_1);
         int versions = repository.describeObject(ocflObjectId).getVersionMap().size();
 
-        assertCreateRejected(
-            () -> MCRMetadataManager.create(MCROCFLTestCaseHelper.createDerivate(JUNIT_OBJECT_1, JUNIT_DERIVATE_1)));
+        assertThrows(MCRUsageException.class, () -> MCROCFLCommands.restoreObjFromOCFLVersioned(JUNIT_DERIVATE_1,
+            "v1"), "the metadata of a deleted derivate should not be restored without its files");
+        assertFalse(MCRMetadataManager.exists(derivate.getId()), "derivate should still not exist");
         assertEquals(versions, repository.describeObject(ocflObjectId).getVersionMap().size(),
-            "the failed create should not write a version");
+            "no version should be written");
     }
 
     @TestTemplate
@@ -170,7 +226,8 @@ public class MCROCFLCommandsTest {
         assertEquals(3, repository.describeObject(ocflObjectId).getVersionMap().size(),
             "restore should add a version and keep the history");
         VersionInfo restored = repository.getObject(ObjectVersionId.head(ocflObjectId)).getVersionInfo();
-        assertEquals("Updated", restored.getMessage());
+        assertEquals(MCROCFLVersionHelper.MESSAGE_CREATED, restored.getMessage(),
+            "the restore of a deleted object should create it again");
         OffsetDateTime deleted = repository.getObject(ObjectVersionId.version(ocflObjectId, "v2"))
             .getVersionInfo().getCreated();
         assertFalse(restored.getCreated().isBefore(deleted),
@@ -182,18 +239,6 @@ public class MCROCFLCommandsTest {
         MCRDerivate derivate = MCROCFLTestCaseHelper.loadObjectAndDerivate(JUNIT_OBJECT_1, JUNIT_DERIVATE_1);
         MCROCFLCommands.describeObject(MCROCFLObjectIDPrefixHelper.toDerivateObjectId(derivate.getId().toString()),
             repository.getId());
-    }
-
-    /**
-     * The event manager wraps the exception of the metadata store, so the cause chain is checked.
-     */
-    private static void assertCreateRejected(Executable create) {
-        Throwable thrown = assertThrows(MCRException.class, create, "a deleted id should not be created again");
-        while (thrown != null && !(thrown instanceof MCRPersistenceException)) {
-            thrown = thrown.getCause();
-        }
-        assertNotNull(thrown, "the metadata store should reject the create");
-        assertTrue(thrown.getMessage().contains("because it was deleted"), thrown.getMessage());
     }
 
     private static void deleteObject(MCRObject object) throws Exception {

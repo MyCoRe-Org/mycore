@@ -19,7 +19,6 @@
 package org.mycore.ocfl.metadata.migration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
@@ -84,7 +83,7 @@ public class MCROCFLMigrationTest {
 
     /**
      * An old store with history allowed to reuse the id of a deleted object, so the history can contain a delete
-     * followed by a create. A deleted OCFL object cannot be created again, the migration restores it instead.
+     * followed by a create. The migration writes the create on top of the delete version and keeps the history.
      */
     @TestTemplate
     public void migrateRecreatedIds() {
@@ -119,7 +118,6 @@ public class MCROCFLMigrationTest {
         for (String id : List.of(OBJECT_ID, DERIVATE_ID)) {
             MCRObjectID mcrid = MCRObjectID.getInstance(id);
             assertTrue(targetManager.exists(mcrid), id + " should exist after the migration");
-            assertFalse(targetManager.isDeleted(mcrid), id + " should not be deleted after the migration");
         }
     }
 

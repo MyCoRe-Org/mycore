@@ -196,15 +196,7 @@ public class MCROCFLMigration {
 
     private void writeRevision(MCROCFLRevision step, MCRObjectID objectID) throws IOException {
         switch (step.type()) {
-            case CREATED -> {
-                if (target.isDeleted(objectID)) {
-                    // the id was reused after a delete: a deleted OCFL object cannot be created again (MCR-3941),
-                    // the new content is written on top of the delete version and the history is kept
-                    target.restore(objectID, step.contentSupplier().get(), step.date(), step.user());
-                } else {
-                    target.create(objectID, step.contentSupplier().get(), step.date());
-                }
-            }
+            case CREATED -> target.create(objectID, step.contentSupplier().get(), step.date());
             case MODIFIED -> target.update(objectID, step.contentSupplier().get(), step.date());
             case DELETED -> target.delete(objectID, step.date(), step.user());
         }

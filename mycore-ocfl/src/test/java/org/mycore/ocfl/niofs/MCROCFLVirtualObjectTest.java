@@ -34,11 +34,14 @@ import org.mycore.ocfl.repository.MCROCFLRepository;
 import org.mycore.ocfl.test.MCROCFLSetupExtension;
 import org.mycore.ocfl.test.MCRPermutationExtension;
 import org.mycore.ocfl.test.PermutedParam;
+import org.mycore.ocfl.util.MCROCFLVersionHelper;
 import org.mycore.test.MyCoReTest;
 
 import io.ocfl.api.exception.NotFoundException;
 import io.ocfl.api.model.ObjectVersionId;
 import io.ocfl.api.model.OcflObjectVersion;
+import io.ocfl.api.model.OcflObjectVersionFile;
+import io.ocfl.api.model.VersionInfo;
 
 @MyCoReTest
 @ExtendWith({ MCRPermutationExtension.class, MCROCFLSetupExtension.class })
@@ -150,18 +153,11 @@ public class MCROCFLVirtualObjectTest {
         assertFalse(getVirtualObject().isAdded(testFile), "'testFile' should not be added");
         MCRTransactionManager.commitTransactions();
 
-        if (purge) {
-            // if the object was purged, then we can add it again
-            MCRTransactionManager.beginTransactions();
-            root.getFileSystem().createRoot(MCROCFLTestCaseHelper.DERIVATE_1);
-            assertTrue(getVirtualObject().isAdded(root), "'root' should be added");
-            MCRTransactionManager.commitTransactions();
-        } else {
-            MCRTransactionManager.beginTransactions();
-            assertThrows(FileAlreadyExistsException.class,
-                () -> root.getFileSystem().createRoot(MCROCFLTestCaseHelper.DERIVATE_1),
-                "derivate cannot be created because it was soft deleted and therefore should still exist.'");
-        }
+        // the derivate can be created again, after a delete on top of the delete version
+        MCRTransactionManager.beginTransactions();
+        root.getFileSystem().createRoot(MCROCFLTestCaseHelper.DERIVATE_1);
+        assertTrue(getVirtualObject().isAdded(root), "'root' should be added");
+        MCRTransactionManager.commitTransactions();
     }
 
     @TestTemplate
@@ -293,10 +289,9 @@ public class MCROCFLVirtualObjectTest {
                 "purged derivate should not exist");
             assertThrows(NotFoundException.class, MCROCFLVirtualObjectTest::getVirtualObject);
         } else {
-            // a deleted (not purged) derivate still exists in the repository and cannot be created again
-            assertTrue(
+            assertFalse(
                 MCROCFLFileSystemProvider.get().virtualObjectProvider().exists(MCROCFLTestCaseHelper.DERIVATE_1),
-                "deleted derivate should still exist");
+                "deleted derivate should not exist");
             assertTrue(MCROCFLFileSystemProvider.get().virtualObjectProvider().isDeleted(
                 MCROCFLTestCaseHelper.DERIVATE_1), "derivate should be marked as deleted");
             assertFalse(getVirtualObject().exists(WHITE_PNG), "white.png should not exist");
@@ -318,10 +313,40 @@ public class MCROCFLVirtualObjectTest {
                 MCROCFLTestCaseHelper.DERIVATE_1_OBJECT_ID));
             assertTrue(deleted.getFiles().isEmpty(),
                 "the delete version should not contain any file, but has " + deleted.getFiles());
-            assertThrows(FileAlreadyExistsException.class,
-                () -> MCROCFLFileSystemProvider.getMCROCFLFileSystem().createRoot(MCROCFLTestCaseHelper.DERIVATE_1),
-                "a deleted derivate should not be created again");
+            assertFalse(
+                MCROCFLFileSystemProvider.get().virtualObjectProvider().exists(MCROCFLTestCaseHelper.DERIVATE_1),
+                "deleted derivate should not exist");
         }
+    }
+
+    @TestTemplate
+    public void deleteVersionWithLeftoverKeepFile() throws IOException {
+        // older releases left the .keep files in the delete version
+        String keepFile = FILES_DIRECTORY + "empty/.keep";
+        repository.updateObject(ObjectVersionId.head(MCROCFLTestCaseHelper.DERIVATE_1_OBJECT_ID),
+            new VersionInfo().setMessage(MCROCFLVersionHelper.MESSAGE_DELETED), updater -> repository
+                .getObject(ObjectVersionId.head(MCROCFLTestCaseHelper.DERIVATE_1_OBJECT_ID)).getFiles().stream()
+                .map(OcflObjectVersionFile::getPath)
+                .filter(path -> !path.equals(keepFile))
+                .forEach(updater::removeFile));
+        MCROCFLFileSystemProvider.get().virtualObjectProvider().invalidate(MCROCFLTestCaseHelper.DERIVATE_1, null);
+        assertNotNull(repository.getObject(ObjectVersionId.head(MCROCFLTestCaseHelper.DERIVATE_1_OBJECT_ID))
+            .getFile(keepFile), "the delete version should contain the leftover .keep file");
+
+        assertFalse(
+            MCROCFLFileSystemProvider.get().virtualObjectProvider().exists(MCROCFLTestCaseHelper.DERIVATE_1),
+            "deleted derivate should not exist");
+        MCRTransactionManager.beginTransactions();
+        MCROCFLFileSystemProvider.getMCROCFLFileSystem().createRoot(MCROCFLTestCaseHelper.DERIVATE_1);
+        MCRTransactionManager.commitTransactions();
+        assertTrue(
+            MCROCFLFileSystemProvider.get().virtualObjectProvider().exists(MCROCFLTestCaseHelper.DERIVATE_1),
+            "derivate should exist again");
+        OcflObjectVersion created = repository.getObject(
+            ObjectVersionId.head(MCROCFLTestCaseHelper.DERIVATE_1_OBJECT_ID));
+        assertNull(created.getFile(keepFile), "the leftover .keep file should be removed by the create");
+        assertEquals(MCROCFLVersionHelper.MESSAGE_CREATED, created.getVersionInfo().getMessage(),
+            "a create on top of a delete version should be reported as created");
     }
 
     @TestTemplate
