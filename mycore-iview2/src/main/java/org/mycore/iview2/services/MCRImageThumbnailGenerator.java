@@ -46,6 +46,10 @@ public class MCRImageThumbnailGenerator implements MCRThumbnailGenerator {
     public Optional<BufferedImage> getThumbnail(MCRPath path, int size) throws IOException {
         Path iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), path.getOwner(),
             path.getOwnerRelativePath());
+        return Optional.of(getThumbnail(iviewFile, size));
+    }
+
+    BufferedImage getThumbnail(Path iviewFile, int size) throws IOException {
         MCRTiledPictureProps iviewFileProps = getIviewFileProps(iviewFile);
         final double width = iviewFileProps.getWidth();
         final double height = iviewFileProps.getHeight();
@@ -69,17 +73,21 @@ public class MCRImageThumbnailGenerator implements MCRThumbnailGenerator {
         try (FileSystem zipFileSystem = MCRIView2Tools.getFileSystem(iviewFile)) {
             Path rootPath = zipFileSystem.getPath("/");
             ImageReader imageReader = MCRIView2Tools.getTileImageReader();
-            BufferedImage testTile = MCRIView2Tools.readTile(rootPath, imageReader, sourceZoomLevel, 0, 0);
-            BufferedImage targetImage = getTargetImage(newWidth, newHeight, testTile);
-            Graphics2D graphics = targetImage.createGraphics();
-            graphics.scale(drawScale, drawScale);
-            for (int x = 0; x < Math.ceil(width * zoomLevelScale / 256); x++) {
-                for (int y = 0; y < Math.ceil(height * zoomLevelScale / 256); y++) {
-                    BufferedImage tile = MCRIView2Tools.readTile(rootPath, imageReader, sourceZoomLevel, x, y);
-                    graphics.drawImage(tile, x * 256, y * 256, null);
+            try {
+                BufferedImage testTile = MCRIView2Tools.readTile(rootPath, imageReader, sourceZoomLevel, 0, 0);
+                BufferedImage targetImage = getTargetImage(newWidth, newHeight, testTile);
+                Graphics2D graphics = targetImage.createGraphics();
+                graphics.scale(drawScale, drawScale);
+                for (int x = 0; x < Math.ceil(width * zoomLevelScale / 256); x++) {
+                    for (int y = 0; y < Math.ceil(height * zoomLevelScale / 256); y++) {
+                        BufferedImage tile = MCRIView2Tools.readTile(rootPath, imageReader, sourceZoomLevel, x, y);
+                        graphics.drawImage(tile, x * 256, y * 256, null);
+                    }
                 }
+                return targetImage;
+            } finally {
+                imageReader.dispose();
             }
-            return Optional.of(targetImage);
         }
     }
 
