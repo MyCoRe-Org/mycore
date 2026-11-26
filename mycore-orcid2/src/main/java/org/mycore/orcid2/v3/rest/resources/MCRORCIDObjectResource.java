@@ -94,6 +94,9 @@ public class MCRORCIDObjectResource {
         }
         try {
             final MCRObject filteredObject = MCRORCIDUtils.filterObject(object);
+            if (!MCRORCIDUtils.checkEmptyMODS(filteredObject)) {
+                return new MCRORCIDPublicationStatus(true, false);
+            }
             final Work work = MCRORCIDWorkTransformerHelper
                 .transformContent(new MCRJDOMContent(filteredObject.createXML()));
             final Set<MCRIdentifier> identifiers = MCRORCIDWorkUtils.listTrustedIdentifiers(work);
