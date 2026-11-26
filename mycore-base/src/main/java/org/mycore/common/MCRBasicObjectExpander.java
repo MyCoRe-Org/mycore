@@ -93,11 +93,11 @@ public class MCRBasicObjectExpander implements MCRObjectExpander {
         expandedObject.setSchema(mcrObject.getSchema());
         expandedObject.setLabel(mcrObject.getLabel());
 
-        expandClassifications(mcrObject);
+        inheritLinkedMetadata(expandedObject);
+
+        expandClassifications(expandedObject);
 
         expandedObject.getService().setDate(DATE_TYPE_EFFECTIVE_MODIFIED_DATE, new Date());
-
-        inheritLinkedMetadata(mcrObject);
 
         return expandedObject;
     }
