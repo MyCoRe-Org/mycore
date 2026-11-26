@@ -322,8 +322,9 @@ public class MCRUserManagerTest extends MCRUserTestCase {
         MCRUser currentUser = MCRUserManager.getCurrentUser();
         currentUser.setUserAttribute("added", "value");
         MCRUserManager.updateUser(currentUser);
-        getEntityManager().ifPresent(em -> em.getTransaction().setRollbackOnly());
+        MCRTransactionHelper.rollbackTransaction();
         startNewTransaction();
+        commitTransaction();
 
         assertSame(sessionUser, MCRSessionMgr.getCurrentSession().getUserInformation());
         assertNull(MCRUserManager.getCurrentUser().getUserAttribute("added"));

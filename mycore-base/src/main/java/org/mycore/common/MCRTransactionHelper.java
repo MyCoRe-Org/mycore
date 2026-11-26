@@ -80,12 +80,15 @@ public class MCRTransactionHelper {
 
     /**
      * Forces the database transaction to roll back. Roll back is only performed if {@link #isTransactionActive()}
-     * returns true.
+     * returns true. Tasks registered via {@link MCRSession#onCommit(Runnable)} are discarded.
      */
     public static void rollbackTransaction() {
         if (isTransactionActive()) {
             TRANSACTION.get().forEach(MCRPersistenceTransaction::rollback);
             TRANSACTION.remove();
+        }
+        if (MCRSessionMgr.hasCurrentSession()) {
+            MCRSessionMgr.getCurrentSession().discardOnCommitTasks();
         }
     }
 
