@@ -67,7 +67,7 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
 
     public static final double LOG_HALF = Math.log(1.0 / 2.0);
 
-    public static final java.util.List<String> SUPPORTED_FORMATS = Arrays.asList(ImageIO.getReaderFileSuffixes());
+    public static final java.util.List<String> SUPPORTED_FORMATS = Arrays.asList(ImageIO.getWriterFileSuffixes());
 
     public static final String MAX_BYTES_PROPERTY = "MaxImageBytes";
 
