@@ -24,13 +24,18 @@ import java.net.URLConnection;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.CopyOption;
+import java.nio.file.DirectoryIteratorException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileAttribute;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -70,7 +75,17 @@ import org.mycore.ocfl.niofs.MCROCFLDigestCalculator;
  *   Least Recently Used (LRU) policy managed by an internal queue.</li>
  *   <li><b>Journaling for Persistence:</b> All cache operations (add, remove) are logged to a journal file.
  *   This ensures that the cache state can be fully restored after an application restart, preventing the need to
- *   re-verify all cached files.</li>
+ *   re-verify all cached files. The journal is compacted on startup if it contains much more events than cache
+ *   entries. Temporary files of downloads that were interrupted, for example by a crash, are deleted on startup once
+ *   they are older than {@link #STALE_TEMP_FILE_AGE}.</li>
+ *   <li>
+ *     <b>Shared Use by Several Processes:</b>
+ *     Several processes may use the same directory, like the command line interface while the web application is
+ *     running. This is best effort: each process has its own cache index and LRU queue, files are only deleted on
+ *     eviction or explicitly. A file evicted by another process is a cache miss and loaded again. All processes
+ *     append to the same journal, it is only compacted on startup, see {@link #compactJournal()}. Clearing the cache
+ *     should only be done while no other process uses the directory.
+ *   </li>
  *   <li>
  *     <b>Concurrency:</b>
  *     Designed for safe use in a multithreaded environment, using concurrent data structures.
@@ -93,6 +108,19 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
     private static final String JOURNAL_ADD = "ADD";
 
     private static final String JOURNAL_REMOVE = "REMOVE";
+
+    private static final String TEMP_FILE_PREFIX = "tmp-";
+
+    /**
+     * Minimum age of a temporary file before it is deleted on startup. Younger files may be downloads of another
+     * process using the same directory that are still in progress.
+     */
+    static final Duration STALE_TEMP_FILE_AGE = Duration.ofHours(24);
+
+    /**
+     * The journal is compacted on startup if it contains more than this factor times the number of cache entries.
+     */
+    private static final int COMPACT_ON_STARTUP_FACTOR = 2;
 
     public static final String JOURNAL_CACHE_FILE = "cache.journal";
 
@@ -142,7 +170,8 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
 
         // init journal
         try {
-            initJournal();
+            long events = initJournal();
+            compactOnStartup(events);
         } catch (IOException | MCROCFLJournal.JournalEntry.DeserializationException e) {
             LOGGER.error(() -> "Corrupt journal found. Clearing cache and starting fresh.", e);
             try {
@@ -152,6 +181,8 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
                 throw new IllegalStateException("Failed to recover from corrupt journal", ioException);
             }
         }
+
+        deleteStaleTempFiles();
 
         // shutdown handler
         MCRShutdownHandler instance = MCRShutdownHandler.getInstance();
@@ -166,10 +197,62 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
         }
     }
 
-    private void initJournal() throws IOException {
+    /**
+     * Deletes temporary files of interrupted downloads, see {@link #newTempFile()}. Only files older than
+     * {@link #STALE_TEMP_FILE_AGE} are deleted: younger ones may be downloads of another process in progress.
+     * <p>
+     * Cache files that are not in the cache index, because the process ended between writing the file and appending
+     * to the journal, are kept. Their content matches their digest, and the next write of the same content takes
+     * them over.
+     */
+    private void deleteStaleTempFiles() {
+        Instant threshold = Instant.now().minus(STALE_TEMP_FILE_AGE);
+        try (DirectoryStream<Path> tempFiles = Files.newDirectoryStream(root, TEMP_FILE_PREFIX + "*")) {
+            for (Path tempFile : tempFiles) {
+                try {
+                    if (Files.isRegularFile(tempFile, LinkOption.NOFOLLOW_LINKS)
+                        && Files.getLastModifiedTime(tempFile).toInstant().isBefore(threshold)) {
+                        Files.deleteIfExists(tempFile);
+                        LOGGER.info(() -> "Deleted stale temporary file " + tempFile);
+                    }
+                } catch (IOException e) {
+                    LOGGER.warn(() -> "Failed to delete stale temporary file " + tempFile, e);
+                }
+            }
+        } catch (IOException | DirectoryIteratorException e) {
+            LOGGER.warn(() -> "Failed to delete stale temporary files in " + root, e);
+        }
+    }
+
+    /**
+     * Opens the journal and replays its events.
+     *
+     * @return the number of replayed events
+     */
+    private long initJournal() throws IOException {
         Path journalFile = root.resolve(JOURNAL_CACHE_FILE);
         this.journal = new MCROCFLJournal<>(journalFile, this::serializeCacheEvent, this::deserializeCacheEvent);
-        this.journal.open(this::applyCacheEvent);
+        AtomicLong events = new AtomicLong();
+        this.journal.open(event -> {
+            events.incrementAndGet();
+            applyCacheEvent(event);
+        });
+        return events.get();
+    }
+
+    /**
+     * Compacts the journal if it contains much more events than cache entries. Right after the replay, the cache
+     * state equals the journal, so compacting loses nothing that is in the journal.
+     */
+    private void compactOnStartup(long events) {
+        if (events <= (long) COMPACT_ON_STARTUP_FACTOR * count()) {
+            return;
+        }
+        try {
+            compactJournal();
+        } catch (IOException e) {
+            LOGGER.warn(() -> "Failed to compact the cache journal on startup.", e);
+        }
     }
 
     private String serializeCacheEvent(CacheEvent event) {
@@ -200,9 +283,11 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
         switch (event) {
             case CacheEvent.Add add -> {
                 this.queue.remove(add.digest());
-                this.cache.put(add.digest(), new FileInfo(add.digest(), add.size(), add.originalFileName()));
+                // the journal can contain more than one add event for the same digest
+                FileInfo previous = this.cache.put(add.digest(),
+                    new FileInfo(add.digest(), add.size(), add.originalFileName()));
                 this.queue.offer(add.digest());
-                this.totalAllocation.addAndGet(add.size());
+                this.totalAllocation.addAndGet(previous == null ? add.size() : add.size() - previous.size());
             }
             case CacheEvent.Remove remove -> {
                 this.queue.remove(remove.digest());
@@ -254,8 +339,9 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
     @Override
     public boolean exists(MCRDigest digest) {
         synchronizeCache(digest);
-        cacheTouch(digest);
         boolean isInCache = this.cache.containsKey(digest);
+        // only touch cached digests: a miss is often not followed by a cache write (partial read, copy), the digest
+        // would stay in the queue forever
         if (isInCache) {
             cacheTouch(digest);
         }
@@ -312,7 +398,7 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
         }
 
         // update cache
-        cacheUpdate(digest, target, originalFileName);
+        cacheUpdate(digest, bytes.length, originalFileName);
         rollOver();
         return digest;
     }
@@ -361,15 +447,17 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
         //  cache miss -> create
         Path target = toCachePath(digest);
         Path tempFile = newTempFile();
+        long size;
         try {
             Files.copy(source, tempFile);
+            size = Files.size(tempFile);
             moveToFinalPath(tempFile, target);
         } finally {
             Files.deleteIfExists(tempFile);
         }
 
         // update cache
-        cacheUpdate(digest, target, source.getFileName().toString());
+        cacheUpdate(digest, size, source.getFileName().toString());
         rollOver();
         return digest;
     }
@@ -440,33 +528,40 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
             }
 
             // move to the final path
-            Path finalPath = toCachePath(digest);
-            moveToFinalPath(tempFile, finalPath);
+            long size = Files.size(tempFile);
+            moveToFinalPath(tempFile, toCachePath(digest));
 
             // update cache
-            cacheUpdate(digest, finalPath, originalFileName);
+            cacheUpdate(digest, size, originalFileName);
             rollOver();
             return digest;
         }, () -> Files.deleteIfExists(tempFile));
     }
 
+    /**
+     * Removes the cache entry of the given digest if its file is missing on disk, for example because it was evicted
+     * by another process using the same directory.
+     * <p>
+     * A file on disk without a cache entry is left alone. It is either being written by another thread right now
+     * (moved to its final path, but not yet added to the cache), written by another process or left by a crash. All
+     * of them are complete, because files are only moved to their final path after they were written, and the path
+     * is derived from the digest of the content. The next write of the same content replaces the file.
+     */
     private void synchronizeCache(MCRDigest digest) {
-        Path physicalPath = toCachePath(digest);
-        boolean existsInCache = cache.containsKey(digest);
-        boolean existsOnDisk = Files.exists(physicalPath);
-        if (existsInCache != existsOnDisk) {
-            LOGGER.warn(() -> "Cache state mismatch for digest " + digest + ". Cache: " + existsInCache + ", Disk: "
-                + existsOnDisk);
-            delete(digest);
+        if (cache.containsKey(digest) && !Files.exists(toCachePath(digest))) {
+            LOGGER.warn(() -> "Cached file for digest " + digest + " is missing on disk. Removing it from the cache.");
+            // only remove the entry: deleting the file could delete one that another thread just wrote
+            cacheRemove(digest);
         }
     }
 
     /**
-     * Creates a temporary file in the cache root, on the same file store as the final cache paths.
+     * Creates a temporary file in the cache root, on the same file store as the final cache paths. Files of
+     * interrupted downloads are deleted on startup, see {@link #deleteStaleTempFiles()}.
      */
     private Path newTempFile() throws IOException {
         Files.createDirectories(root);
-        return root.resolve("tmp-" + UUID.randomUUID());
+        return root.resolve(TEMP_FILE_PREFIX + UUID.randomUUID());
     }
 
     /**
@@ -502,23 +597,21 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
      * Updates the cache with new file information and logs the event to the journal.
      *
      * @param digest The digest of the content.
-     * @param path The physical path where the content is stored.
+     * @param size The size of the content. It is passed instead of read from the cache file, which may already be
+     *             evicted again by a concurrent write.
      * @param originalFileName The original file name, used for content type detection.
-     * @throws IOException If an I/O error occurs.
      */
-    private void cacheUpdate(MCRDigest digest, Path path, String originalFileName) throws IOException {
+    private void cacheUpdate(MCRDigest digest, long size, String originalFileName) {
+        // concurrent writes of the same content can both reach this point, use the atomic put to count it once
+        FileInfo previous = this.cache.put(digest, new FileInfo(digest, size, originalFileName));
+        this.totalAllocation.addAndGet(previous == null ? size : size - previous.size());
+        cacheTouch(digest);
         try {
-            this.queue.remove(digest);
-            this.queue.offer(digest);
-            FileInfo fileInfo = this.cache.get(digest);
-            boolean newFile = fileInfo == null;
-            long size = Files.size(path);
-            this.totalAllocation.addAndGet(newFile ? size : size - fileInfo.size);
-            this.cache.put(digest, new FileInfo(digest, size, originalFileName));
             journal.append(new CacheEvent.Add(digest, size, originalFileName));
         } catch (IOException ioException) {
-            this.queue.remove(digest);
-            throw ioException;
+            // the entry stays: it is valid and part of the allocation, so it is evicted like any other entry. Only
+            // after a restart it is unknown, then the next write of the same content takes the file over
+            LOGGER.error(() -> "Failed to append the cache entry for " + digest + " to the journal.", ioException);
         }
     }
 
@@ -585,6 +678,12 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
      * the cache recovery process on startup.
      * <p>
      * The snapshot is created from the queue to preserve the LRU order.
+     * <p>
+     * The snapshot only contains the cache entries of this process. Entries another process using the same directory
+     * appended to the journal since this process replayed it are lost: after a restart, their files are not in the
+     * cache index, so they are neither counted nor evicted until the same content is written again. Therefore,
+     * compaction is only done automatically on startup, right after the journal was replayed. Other processes reopen
+     * the replaced journal with their next append.
      *
      * @throws IOException if an I/O error occurs during compaction.
      */
@@ -609,12 +708,14 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
     /**
      * Closes the journal writer, ensuring all buffered entries are flushed to disk.
      * This method is automatically registered with the {@link MCRShutdownHandler}.
+     * <p>
+     * The journal is not compacted here: another process using the same directory, like the web application while a
+     * command line interface ends, may still append to it. See {@link #compactJournal()}.
      *
      * @throws IOException if an I/O error occurs while closing the journal.
      */
     @Override
     public void close() throws IOException {
-        compactJournal();
         if (this.journal != null) {
             this.journal.close();
         }

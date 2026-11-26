@@ -107,6 +107,8 @@ public class MCROCFLVirtualObjectProviderTest {
         // fill the read cache with v1
         assertTrue(Files.exists(MCRVersionedPath.getPath(derivate, "v1", "/old.txt")));
 
+        // the purge permutation is reused to cover both ways to purge: removeRoot only purges with purge=true,
+        // the metadata manager always purges
         if (purge) {
             // purge through the file system
             MCRTransactionManager.beginTransactions();

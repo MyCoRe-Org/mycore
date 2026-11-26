@@ -543,7 +543,9 @@ public class MCROCFLCommands {
     }
 
     @MCRCommand(syntax = "compact ocfl remote storage journal",
-        help = "Compacts the journal for the remote temporary storage to improve startup performance.")
+        help = "Compacts the journal for the remote temporary storage to improve startup performance. The journal is "
+            + "also compacted on startup if necessary. Should not be run while another process, like the web "
+            + "application, uses the remote temporary storage.")
     public static void compactRemoteCacheJournal() throws IOException {
         MCROCFLFileSystemProvider provider = MCROCFLFileSystemProvider.get();
         MCROCFLRemoteTemporaryStorage remoteStorage = provider.remoteStorage();

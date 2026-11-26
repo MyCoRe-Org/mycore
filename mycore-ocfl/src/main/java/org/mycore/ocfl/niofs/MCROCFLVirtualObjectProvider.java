@@ -308,10 +308,15 @@ public class MCROCFLVirtualObjectProvider {
     /**
      * Invalidates all cached versions of the given OCFL object, for example after it was purged. Its id can be used
      * again for a new object, whose versions must not be confused with the cached ones.
+     * <p>
+     * Only derivates are cached, other objects like metadata, users or classifications are ignored.
      *
      * @param objectId the OCFL object id
      */
     public void invalidateAll(String objectId) {
+        if (!MCROCFLObjectIDPrefixHelper.isDerivateObjectId(objectId)) {
+            return;
+        }
         // first: versions that are loaded right now are not cached, see getOrCreateReadable
         this.purgeGeneration.incrementAndGet();
         this.readMap.keySet().removeIf(id -> id.getObjectId().equals(objectId));

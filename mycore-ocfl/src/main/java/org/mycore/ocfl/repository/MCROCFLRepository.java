@@ -26,6 +26,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import io.ocfl.api.OcflConfig;
 import io.ocfl.api.OcflObjectUpdater;
 import io.ocfl.api.OcflOption;
@@ -54,6 +57,8 @@ import io.ocfl.core.storage.OcflStorage;
  * </p>
  */
 public class MCROCFLRepository implements OcflRepository {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private final String id;
 
@@ -296,7 +301,14 @@ public class MCROCFLRepository implements OcflRepository {
     @Override
     public void purgeObject(String objectId) {
         base.purgeObject(objectId);
-        purgeListeners.forEach(listener -> listener.accept(objectId));
+        // the object is already purged, a failing listener must not look like a failed purge to the caller
+        for (Consumer<String> listener : purgeListeners) {
+            try {
+                listener.accept(objectId);
+            } catch (RuntimeException e) {
+                LOGGER.error(() -> "Purge listener failed for OCFL object " + objectId, e);
+            }
+        }
     }
 
     /**
@@ -310,6 +322,15 @@ public class MCROCFLRepository implements OcflRepository {
      */
     public void addPurgeListener(Consumer<String> listener) {
         purgeListeners.add(Objects.requireNonNull(listener));
+    }
+
+    /**
+     * Removes a listener registered with {@link #addPurgeListener(Consumer)}.
+     *
+     * @param listener the listener to remove
+     */
+    public void removePurgeListener(Consumer<String> listener) {
+        purgeListeners.remove(listener);
     }
 
     /**

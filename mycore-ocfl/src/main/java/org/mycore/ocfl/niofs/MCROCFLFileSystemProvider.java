@@ -44,6 +44,7 @@ import java.nio.file.attribute.FileAttributeView;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.digest.MCRDigest;
@@ -92,6 +93,14 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
     private MCROCFLVirtualObjectProvider virtualObjectProvider;
 
     /**
+     * The repository the purge listener of the {@link #virtualObjectProvider} is registered at, to remove it when
+     * {@link #init()} is called again.
+     */
+    private MCROCFLRepository purgeListenerRepository;
+
+    private Consumer<String> purgeListener;
+
+    /**
      * Initializes the OCFL file system provider.
      *
      * @throws IOException if an I/O error occurs during initialization.
@@ -116,10 +125,17 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
             .getSingleInstanceOf(MCROCFLRemoteTemporaryStorage.class, remoteStorageProperty).orElse(null);
 
         // create virtual object provider
-        this.virtualObjectProvider = new MCROCFLVirtualObjectProvider(getRepository(), transactionalStorage,
+        MCROCFLRepository repository = getRepository();
+        this.virtualObjectProvider = new MCROCFLVirtualObjectProvider(repository, transactionalStorage,
             remoteStorage, digestCalculator);
-        // purges happen through the file system and through the metadata manager
-        getRepository().addPurgeListener(this.virtualObjectProvider::invalidateAll);
+        // purges happen through the file system and through the metadata manager. The listener of a previous init
+        // is removed, it would keep the previous virtual object provider alive
+        if (this.purgeListenerRepository != null) {
+            this.purgeListenerRepository.removePurgeListener(this.purgeListener);
+        }
+        this.purgeListener = this.virtualObjectProvider::invalidateAll;
+        this.purgeListenerRepository = repository;
+        repository.addPurgeListener(this.purgeListener);
     }
 
     /**

@@ -24,9 +24,11 @@ import java.io.IOException;
 import java.io.Serial;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -64,6 +66,12 @@ import java.util.stream.Stream;
  *       <b>Closing:</b> Call {@link #close()} on application shutdown to ensure the file writer is properly closed.
  *   </li>
  * </ol>
+ * <p>
+ * Several processes may append to the same journal file. If another process replaces the file, for example by
+ * compacting it, the writer is reopened on the new file with the next {@link #append(Object)}. An entry appended
+ * while the other process compacts may be lost. This is detected by the {@link BasicFileAttributes#fileKey() file key},
+ * so only on file systems that provide one.
+ * </p>
  *
  * @param <E> The type of the event or entry object to be stored in the journal.
  */
@@ -76,6 +84,11 @@ public class MCROCFLJournal<E> implements Closeable {
     private final JournalEntry.Deserializer<E> deserializer;
 
     private BufferedWriter journalWriter;
+
+    /**
+     * The file key of the journal file the {@link #journalWriter} was opened on, {@code null} if not supported.
+     */
+    private Object journalFileKey;
 
     /**
      * Constructs a new journal instance.
@@ -111,13 +124,29 @@ public class MCROCFLJournal<E> implements Closeable {
             }
         }
         // Open the journal file for appending new entries
+        openWriter();
+    }
+
+    private void openWriter() throws IOException {
         this.journalWriter = Files.newBufferedWriter(journalFile, StandardCharsets.UTF_8,
             StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+        this.journalFileKey = readFileKey();
+    }
+
+    private Object readFileKey() throws IOException {
+        try {
+            return Files.readAttributes(journalFile, BasicFileAttributes.class).fileKey();
+        } catch (NoSuchFileException e) {
+            return null;
+        }
     }
 
     /**
      * Appends a new entry to the journal. This operation is synchronized and thread-safe.
      * The new entry is immediately flushed to the underlying file to ensure durability.
+     * <p>
+     * If the journal file was replaced or deleted by another process, the writer is reopened first. Otherwise the
+     * entry would be written to the replaced file and be lost.
      *
      * @param entry The entry to log.
      * @throws IOException if the write operation fails or if the journal is not open.
@@ -125,6 +154,10 @@ public class MCROCFLJournal<E> implements Closeable {
     public synchronized void append(E entry) throws IOException {
         if (journalWriter == null) {
             throw new IOException("Journal is not open. Call open() before appending.");
+        }
+        if (journalFileKey != null && !journalFileKey.equals(readFileKey())) {
+            journalWriter.close();
+            openWriter();
         }
         journalWriter.write(serializer.apply(entry));
         journalWriter.newLine();
@@ -159,8 +192,7 @@ public class MCROCFLJournal<E> implements Closeable {
         Files.move(tempJournalFile, journalFile, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
 
         // 4. Re-open the writer on the new, compacted journal file
-        this.journalWriter = Files.newBufferedWriter(journalFile, StandardCharsets.UTF_8,
-            StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+        openWriter();
     }
 
     /**
