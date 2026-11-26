@@ -9,6 +9,11 @@
           <mods:titleInfo>
             <mods:title>Article title</mods:title>
           </mods:titleInfo>
+          <mods:part>
+            <mods:extent unit="pages">
+              <mods:list>12—15</mods:list>
+            </mods:extent>
+          </mods:part>
           <mods:relatedItem type="host">
             <mods:titleInfo>
               <mods:title>Journal title</mods:title>

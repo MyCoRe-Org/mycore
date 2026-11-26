@@ -19,8 +19,10 @@
 package org.mycore.mods;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import java.util.Date;
 import java.util.List;
 
 import org.jdom2.Element;
@@ -40,24 +42,30 @@ public class MCRMODSCommandsTest extends MCRStoreTestCase {
 
     private MCRObjectID objectID;
 
+    private MCRObjectID unchangedObjectID;
+
     @Before
     public void setUp() throws Exception {
         super.setUp();
         objectID = MCRObjectID.getInstance("junit_mods_00000001");
+        unchangedObjectID = MCRObjectID.getInstance("junit_mods_00000002");
         MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.getSuperUserInstance());
         MCRMetadataManager.create(new MCRObject(getResourceAsURL(objectID + ".xml").toURI()));
+        MCRMetadataManager.create(new MCRObject(getResourceAsURL(unchangedObjectID + ".xml").toURI()));
     }
 
     @After
     public void tearDown() throws Exception {
         MCRMetadataManager.deleteMCRObject(objectID);
+        MCRMetadataManager.deleteMCRObject(unchangedObjectID);
         MCRStoreManager.removeStore(objectID.getBase());
         super.tearDown();
     }
 
     @Test
     public void testRepairPagesOfAllObjects() {
-        assertEquals(List.of("repair pages of mods object " + objectID), MCRMODSCommands.repairPagesOfAllObjects());
+        assertEquals(List.of("repair pages of mods object " + objectID, "repair pages of mods object "
+            + unchangedObjectID), MCRMODSCommands.repairPagesOfAllObjects());
     }
 
     @Test
@@ -65,6 +73,11 @@ public class MCRMODSCommandsTest extends MCRStoreTestCase {
         MCRMODSCommands.repairPages(objectID.toString());
 
         MCRMODSWrapper wrapper = new MCRMODSWrapper(MCRMetadataManager.retrieveMCRObject(objectID));
+
+        Element article = wrapper.getElement("mods:part/mods:extent[@unit='pages']");
+        assertEquals(2, article.getChildren().size());
+        assertEquals("12", article.getChildText("start", MCRConstants.MODS_NAMESPACE));
+        assertEquals("15", article.getChildText("end", MCRConstants.MODS_NAMESPACE));
 
         Element host = wrapper.getElement("mods:relatedItem[@type='host']/mods:part/mods:extent[@unit='pages']");
         assertEquals(2, host.getChildren().size());
@@ -75,5 +88,23 @@ public class MCRMODSCommandsTest extends MCRStoreTestCase {
         Element series = wrapper.getElement("mods:relatedItem[@type='series']/mods:part/mods:extent[@unit='pages']");
         assertEquals(1, series.getChildren().size());
         assertEquals("3-4 und 7-8", series.getChildText("list", MCRConstants.MODS_NAMESPACE));
+    }
+
+    @Test
+    public void testRepairPagesWithoutChanges() throws Exception {
+        Date modified = getModifyDate(unchangedObjectID);
+        assertNotNull(modified);
+
+        MCRMODSCommands.repairPages(unchangedObjectID.toString());
+
+        assertEquals(modified, getModifyDate(unchangedObjectID));
+        Element extent = new MCRMODSWrapper(MCRMetadataManager.retrieveMCRObject(unchangedObjectID))
+            .getElement("mods:part/mods:extent[@unit='pages']");
+        assertEquals(1, extent.getChildren().size());
+        assertEquals("S. 123 ff.", extent.getChildText("list", MCRConstants.MODS_NAMESPACE));
+    }
+
+    private static Date getModifyDate(MCRObjectID id) {
+        return MCRMetadataManager.retrieveMCRObject(id).getService().getDate("modifydate");
     }
 }
