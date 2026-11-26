@@ -350,8 +350,8 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
     }
 
     @Override
-    protected void checkConfiguration() throws MCRConfigurationException {
-        super.checkConfiguration();
+    protected void checkConfiguration(Context context) throws MCRConfigurationException {
+        super.checkConfiguration(context);
         if (getProperties().containsKey("RegistrationConditionProvider")) {
             throw new MCRConfigurationException("The MCRPIService " + getServiceID() +
                 " uses old property key RegistrationConditionProvider, use " + REGISTRATION_PREDICATE + " instead.");
