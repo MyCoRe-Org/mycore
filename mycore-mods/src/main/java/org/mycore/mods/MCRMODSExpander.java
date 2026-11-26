@@ -57,6 +57,7 @@ public class MCRMODSExpander extends MCRBasicObjectExpander {
     @Override
     protected void inheritLinkedMetadata(MCRObject baseExpanded) {
         MCRMODSWrapper modsWrapper = new MCRMODSWrapper(baseExpanded);
+        modsWrapper.removeInheritedMetadata();
 
         MCRObjectID parentID = baseExpanded.getStructure().getParentID();
 
