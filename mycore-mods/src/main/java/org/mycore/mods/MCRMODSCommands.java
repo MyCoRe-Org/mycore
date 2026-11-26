@@ -198,8 +198,9 @@ public class MCRMODSCommands extends MCRAbstractCommands {
 
     /**
      * Re-parses every mods:part/mods:extent[@unit='pages'] that contains only a mods:list element
-     * using {@link MCRMODSPagesHelper}. The extent is only replaced if a start page could be detected,
-     * so free text page lists stay unchanged. The object is only updated if an extent was changed.
+     * using {@link MCRMODSPagesHelper}. The extent is only replaced if a start and an end page could be detected,
+     * so free text page lists and lists with other information like "S. 123 ff." stay unchanged. The object is
+     * only updated if an extent was changed.
      *
      * @param objectID the ID of the MODS object to repair
      * @throws MCRAccessException if the current user may not update the object
@@ -221,7 +222,8 @@ public class MCRMODSCommands extends MCRAbstractCommands {
         for (Element extent : extents) {
             String pages = extent.getChildText("list", MCRConstants.MODS_NAMESPACE);
             Element parsed = MCRMODSPagesHelper.buildExtentPages(pages);
-            if (parsed.getChild("start", MCRConstants.MODS_NAMESPACE) == null) {
+            if (parsed.getChild("start", MCRConstants.MODS_NAMESPACE) == null
+                || parsed.getChild("end", MCRConstants.MODS_NAMESPACE) == null) {
                 continue;
             }
             LOGGER.info("{}: split pages '{}' into start and end page", objectID, pages);
