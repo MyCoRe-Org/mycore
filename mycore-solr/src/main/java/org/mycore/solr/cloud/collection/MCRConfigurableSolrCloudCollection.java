@@ -18,9 +18,6 @@
 
 package org.mycore.solr.cloud.collection;
 
-import static org.mycore.solr.MCRSolrDefaultPropertyConstants.DEFAULT_REPLICA_COUNT;
-import static org.mycore.solr.MCRSolrDefaultPropertyConstants.DEFAULT_SHARD_COUNT;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -104,6 +101,8 @@ public class MCRConfigurableSolrCloudCollection implements MCRSolrCloudCollectio
     public static class ConfigAdapter extends
         MCRAbstractSolrHttpBasedIndexConfigAdapter<MCRSolrCloudCollection> {
 
+        public static final String DEFAULT_PROPERTY_PREFIX = "MCR.Solr.Default";
+
         private String solrUrls;
         private String zkUrls;
         private String zkChroot;
@@ -119,7 +118,7 @@ public class MCRConfigurableSolrCloudCollection implements MCRSolrCloudCollectio
             return numShards;
         }
 
-        @MCRProperty(name = "NumShards", defaultName = DEFAULT_SHARD_COUNT)
+        @MCRProperty(name = "NumShards", defaultNamePrefix = DEFAULT_PROPERTY_PREFIX, defaultName = "ShardCount")
         public void setNumShards(String numShards) {
             this.numShards = numShards;
         }
@@ -128,7 +127,7 @@ public class MCRConfigurableSolrCloudCollection implements MCRSolrCloudCollectio
             return numNrtReplicas;
         }
 
-        @MCRProperty(name = "NumNrtReplicas", defaultName = DEFAULT_REPLICA_COUNT)
+        @MCRProperty(name = "NumNrtReplicas", defaultNamePrefix = DEFAULT_PROPERTY_PREFIX, defaultName = "ReplicaCount")
         public void setNumNrtReplicas(String numNrtReplicas) {
             this.numNrtReplicas = numNrtReplicas;
         }

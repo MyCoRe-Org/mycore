@@ -65,6 +65,8 @@ import org.mycore.resource.common.MCRResourceTracer;
 @MCRConfigurationProxy(proxyClass = MCRCombinedResourceProvider.Factory.class)
 public class MCRCombinedResourceProvider extends MCRResourceProviderBase {
 
+    public static final String DEFAULT_KEY_PREFIX = MCRResourceProviderBase.DEFAULT_KEY_PREFIX + ".Combined";
+
     public static final String PROVIDERS_KEY = "Providers";
 
     private final List<MCRResourceProvider> providers;
@@ -120,7 +122,7 @@ public class MCRCombinedResourceProvider extends MCRResourceProviderBase {
 
     public static class Factory implements Supplier<MCRCombinedResourceProvider> {
 
-        @MCRProperty(name = COVERAGE_KEY, defaultName = "MCR.Resource.Provider.Default.Combined.Coverage")
+        @MCRProperty(name = COVERAGE_KEY, defaultNamePrefix = DEFAULT_KEY_PREFIX)
         public String coverage;
 
         @MCRSentinel

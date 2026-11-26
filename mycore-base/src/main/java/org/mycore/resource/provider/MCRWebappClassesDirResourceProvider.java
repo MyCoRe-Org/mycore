@@ -53,6 +53,8 @@ import org.mycore.resource.hint.MCRResourceHintKeys;
 @MCRConfigurationProxy(proxyClass = MCRWebappClassesDirResourceProvider.Factory.class)
 public final class MCRWebappClassesDirResourceProvider extends MCRFileSystemResourceProviderBase {
 
+    public static final String DEFAULT_KEY_PREFIX = MCRResourceProviderBase.DEFAULT_KEY_PREFIX + ".WebappClassesDir";
+
     public MCRWebappClassesDirResourceProvider(String coverage) {
         super(coverage, MCRResourceProviderMode.RESOURCES);
     }
@@ -73,7 +75,7 @@ public final class MCRWebappClassesDirResourceProvider extends MCRFileSystemReso
 
     public static class Factory implements Supplier<MCRWebappClassesDirResourceProvider> {
 
-        @MCRProperty(name = COVERAGE_KEY, defaultName = "MCR.Resource.Provider.Default.WebappClassesDir.Coverage")
+        @MCRProperty(name = COVERAGE_KEY, defaultNamePrefix = DEFAULT_KEY_PREFIX)
         public String coverage;
 
         @Override

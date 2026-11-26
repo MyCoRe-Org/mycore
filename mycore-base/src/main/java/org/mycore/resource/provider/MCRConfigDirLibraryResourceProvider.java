@@ -57,6 +57,8 @@ import org.mycore.resource.hint.MCRResourceHintKeys;
 @MCRConfigurationProxy(proxyClass = MCRConfigDirLibraryResourceProvider.Factory.class)
 public final class MCRConfigDirLibraryResourceProvider extends MCRLibraryResourceProviderBase {
 
+    public static final String DEFAULT_KEY_PREFIX = MCRResourceProviderBase.DEFAULT_KEY_PREFIX + ".ConfigDirLibrary";
+
     public static final String MODE_KEY = "Mode";
 
     private final MCRResourceFilterMode mode;
@@ -80,10 +82,10 @@ public final class MCRConfigDirLibraryResourceProvider extends MCRLibraryResourc
 
     public static class Factory implements Supplier<MCRConfigDirLibraryResourceProvider> {
 
-        @MCRProperty(name = COVERAGE_KEY, defaultName = "MCR.Resource.Provider.Default.ConfigDirLibrary.Coverage")
+        @MCRProperty(name = COVERAGE_KEY, defaultNamePrefix = DEFAULT_KEY_PREFIX)
         public String coverage;
 
-        @MCRProperty(name = MODE_KEY, defaultName = "MCR.Resource.Provider.Default.ConfigDirLibrary.Mode")
+        @MCRProperty(name = MODE_KEY, defaultNamePrefix = DEFAULT_KEY_PREFIX)
         public String mode;
 
         @Override

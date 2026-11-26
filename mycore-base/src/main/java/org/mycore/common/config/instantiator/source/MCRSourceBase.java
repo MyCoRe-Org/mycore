@@ -18,17 +18,13 @@
 
 package org.mycore.common.config.instantiator.source;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRSentinel;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.common.config.instantiator.MCRInstantiatorUtils;
+import org.mycore.common.config.instantiator.MCRProperTree;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
 /**
@@ -59,7 +55,7 @@ abstract sealed class MCRSourceBase<Result> implements MCRSource permits MCRValu
     public final Result get(MCRInstanceConfiguration<?> configuration, MCRTarget target) {
 
         String name = name();
-        Map<String, String> fullProperties = configuration.fullProperties();
+        MCRProperTree fullProperties = configuration.fullProperties();
 
         MCRSourceContext context;
         Result result;
@@ -70,22 +66,22 @@ abstract sealed class MCRSourceBase<Result> implements MCRSource permits MCRValu
 
         if (absoluteName()) {
             context = new MCRSourceContext(target, name, "absolute " + description());
-            result = getResult(context, reduceProperties(fullProperties, name), fullProperties);
+            result = getResult(context, fullProperties.deeplyNested(name), fullProperties);
         } else if (name.isEmpty()) {
             context = new MCRSourceContext(target, configuration.name().canonical(), description());
             result = getResult(context, configuration.properties(), fullProperties);
         } else {
             context = new MCRSourceContext(target, configuration.name().canonical() + "." + name, description());
-            result = getResult(context, reduceProperties(configuration.properties(), name), fullProperties);
+            result = getResult(context, configuration.properties().deeplyNested(name), fullProperties);
         }
         if (logger.isDebugEnabled() && isMissingResult(result)) {
             logger.debug(context.missingValueMessage(target));
         }
 
-        String defaultName = defaultName();
+        String defaultName = getDefaultName(target);
         if (isMissingResult(result) && !defaultName.isEmpty()) {
             context = new MCRSourceContext(target, defaultName, "default " + description());
-            result = getResult(context, reduceProperties(fullProperties, defaultName), fullProperties);
+            result = getResult(context, fullProperties.deeplyNested(defaultName), fullProperties);
             if (logger.isDebugEnabled() && isMissingResult(result)) {
                 logger.debug(context.missingValueMessage(target));
             }
@@ -99,54 +95,20 @@ abstract sealed class MCRSourceBase<Result> implements MCRSource permits MCRValu
 
     }
 
-    protected static Map<String, String> reduceProperties(Map<String, String> properties, String prefix) {
-
-        final String prefixWithDelimiter = prefix + '.';
-        final int prefixWithDelimiterLength = prefixWithDelimiter.length();
-
-        Map<String, String> reducedProperties = new HashMap<>();
-        for (Map.Entry<String, String> entry : properties.entrySet()) {
-            String key = entry.getKey();
-            if (!key.startsWith(prefixWithDelimiter)) {
-                continue;
-            }
-            String reducedKey = key.substring(prefixWithDelimiterLength);
-            reducedProperties.put(reducedKey, entry.getValue());
-        }
-        String directProperty = properties.get(prefix);
-        if (directProperty != null) {
-            reducedProperties.put("", directProperty);
-        }
-        return reducedProperties;
-    }
-
-    protected static Set<String> nextNestedKeys(Map<String, String> properties) {
-        Set<String> keys = new HashSet<>();
-        properties.keySet().forEach((key) -> {
-            if (!key.isEmpty()) {
-                int index = key.indexOf('.');
-                if (index == -1) {
-                    keys.add(key);
-                } else {
-                    keys.add(key.substring(0, index));
-                }
-            }
-        });
-        return keys;
-    }
-
     protected abstract String description();
 
     protected abstract String name();
 
     protected abstract String defaultName();
 
+    protected abstract String defaultNamePrefix();
+
     protected abstract boolean supportsEmptyName();
 
     protected abstract boolean absoluteName();
 
-    protected abstract Result getResult(MCRSourceContext context, Map<String, String> properties,
-        Map<String, String> fullProperties);
+    protected abstract Result getResult(MCRSourceContext context, MCRProperTree properties,
+        MCRProperTree fullProperties);
 
     protected abstract boolean required();
 
@@ -156,12 +118,24 @@ abstract sealed class MCRSourceBase<Result> implements MCRSource permits MCRValu
 
     protected abstract Result missingResultReplacement();
 
-    protected final boolean rejectedBySentinel(MCRSourceContext context,
-        Map<String, String> properties) {
+    private String getDefaultName(MCRTarget target) {
+        if (!defaultNamePrefix().isEmpty()) {
+            if (!defaultName().isEmpty()) {
+                return defaultNamePrefix() + "." + defaultName();
+            }
+            if (name().isEmpty()) {
+                throw MCRInstantiatorUtils.defaultNameConflictException(target);
+            }
+            return defaultNamePrefix() + "." + name();
+        }
+        return defaultName();
+    }
+
+    protected final boolean rejectedBySentinel(MCRSourceContext context, MCRProperTree properties) {
 
         if (sentinel != null) {
             boolean sentinelValue = sentinel.defaultValue();
-            String configuredSentinelValue = properties.get(sentinel.name());
+            String configuredSentinelValue = properties.nested(sentinel.name()).value();
             if (configuredSentinelValue != null) {
                 sentinelValue = Boolean.parseBoolean(configuredSentinelValue);
             }
@@ -178,6 +152,10 @@ abstract sealed class MCRSourceBase<Result> implements MCRSource permits MCRValu
 
         return false;
 
+    }
+
+    protected final MCRProperTree filterProperties(MCRProperTree properties) {
+        return sentinel != null ? properties.excludeKey(sentinel.name()) : properties;
     }
 
 }

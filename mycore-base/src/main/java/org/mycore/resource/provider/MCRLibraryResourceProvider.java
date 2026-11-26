@@ -44,6 +44,8 @@ import org.mycore.common.config.annotation.MCRProperty;
 @MCRConfigurationProxy(proxyClass = MCRLibraryResourceProvider.Factory.class)
 public final class MCRLibraryResourceProvider extends MCRLibraryResourceProviderBase {
 
+    public static final String DEFAULT_KEY_PREFIX = MCRResourceProviderBase.DEFAULT_KEY_PREFIX + ".Library";
+
     public MCRLibraryResourceProvider(String coverage) {
         super(coverage, List.of());
     }
@@ -55,7 +57,7 @@ public final class MCRLibraryResourceProvider extends MCRLibraryResourceProvider
 
     public static class Factory implements Supplier<MCRLibraryResourceProvider> {
 
-        @MCRProperty(name = COVERAGE_KEY, defaultName = "MCR.Resource.Provider.Default.Library.Coverage")
+        @MCRProperty(name = COVERAGE_KEY, defaultNamePrefix = DEFAULT_KEY_PREFIX)
         public String coverage;
 
         @Override

@@ -19,11 +19,8 @@
 package org.mycore.common.config.instantiator.source;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.instantiator.MCRInstantiatorUtils;
@@ -74,25 +71,6 @@ public final class MCRSourceContext {
         List<String> hints = new ArrayList<>(this.hints);
         hints.add(hint);
         return new MCRSourceContext(target, property, description, hints);
-    }
-
-    public List<String> orderedIntegerKeys(Collection<String> keys) {
-
-        SortedMap<Integer, String> keyMap = new TreeMap<>();
-        for (String key : keys) {
-            try {
-                Integer integerValue = Integer.parseInt(key);
-                String alreadyMappedKey = keyMap.put(integerValue, key);
-                if (alreadyMappedKey != null && !alreadyMappedKey.equals(key)) {
-                    throw inconsistentIntegerKeysException(key, alreadyMappedKey);
-                }
-            } catch (NumberFormatException exception) {
-                throw nonIntegerKeyException(key, exception);
-            }
-        }
-
-        return new ArrayList<>(keyMap.values());
-
     }
 
     public MCRConfigurationException configurationException(String exceptionMessage) {
