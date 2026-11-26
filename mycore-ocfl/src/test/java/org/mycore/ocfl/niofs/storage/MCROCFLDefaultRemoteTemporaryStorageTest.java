@@ -268,6 +268,71 @@ public class MCROCFLDefaultRemoteTemporaryStorageTest extends MCROCFLStorageTest
     }
 
     /**
+     * Concurrent writes, reads and evictions must keep the cache index, the allocation, the files on disk and the
+     * journal consistent: no index entry without a file, no file without an index entry and a journal that replays
+     * to the same index.
+     */
+    @TestTemplate
+    public void concurrentWritesReadsAndEvictions() throws Exception {
+        storage.setEvictionStrategy(new FileCountEvictionStrategy(4));
+        int threads = 8;
+        List<Callable<Void>> tasks = writeAndReadTasks(threads);
+        ExecutorService executor = Executors.newFixedThreadPool(threads);
+        try {
+            for (Future<Void> future : executor.invokeAll(tasks)) {
+                future.get();
+            }
+        } finally {
+            executor.shutdownNow();
+        }
+
+        List<Path> cacheFiles;
+        try (Stream<Path> stream = Files.find(storage.getRoot(), Integer.MAX_VALUE,
+            (path, attr) -> attr.isRegularFile() && !path.getParent().equals(storage.getRoot()))) {
+            cacheFiles = stream.toList();
+        }
+        assertEquals(storage.count(), cacheFiles.size(), "every cache entry should have exactly one file on disk");
+        long sizeOnDisk = 0;
+        for (Path cacheFile : cacheFiles) {
+            sizeOnDisk += Files.size(cacheFile);
+        }
+        assertEquals(sizeOnDisk, storage.allocated(), "the allocation should match the files on disk");
+
+        // the order of the add and remove events in the journal must match the index: replaying the uncompacted
+        // journal has to restore the same state
+        try (MCROCFLDefaultRemoteTemporaryStorage replayed = newStorage(new FileCountEvictionStrategy(4))) {
+            assertEquals(storage.count(), replayed.count(), "the replayed journal should match the cache index");
+            assertEquals(storage.allocated(), replayed.allocated(),
+                "the replayed journal should match the allocation");
+        }
+    }
+
+    private List<Callable<Void>> writeAndReadTasks(int threads) {
+        int contents = 12;
+        CyclicBarrier barrier = new CyclicBarrier(threads);
+        List<Callable<Void>> tasks = new ArrayList<>();
+        for (int t = 0; t < threads; t++) {
+            int offset = t;
+            tasks.add(() -> {
+                barrier.await();
+                for (int i = 0; i < 200; i++) {
+                    byte[] content = ("content " + ((i + offset) % contents)).getBytes();
+                    MCRDigest digest = storage.write("file.txt", content);
+                    if (storage.exists(digest)) {
+                        try {
+                            assertArrayEquals(content, read(storage, digest));
+                        } catch (NoSuchFileException e) {
+                            // evicted by another thread between exists and read
+                        }
+                    }
+                }
+                return null;
+            });
+        }
+        return tasks;
+    }
+
+    /**
      * A journal may contain more than one add event for the same digest. Replaying it must allocate the content only
      * once.
      */
@@ -281,15 +346,12 @@ public class MCROCFLDefaultRemoteTemporaryStorageTest extends MCROCFLStorageTest
         List<String> lines = Files.readAllLines(journalFile);
         Files.write(journalFile, lines, StandardOpenOption.APPEND);
 
-        MCROCFLDefaultRemoteTemporaryStorage newStorage = new MCROCFLDefaultRemoteTemporaryStorage(
+        try (MCROCFLDefaultRemoteTemporaryStorage newStorage = new MCROCFLDefaultRemoteTemporaryStorage(
             storage.getRoot(),
             new FileCountEvictionStrategy(2),
-            MCROCFLFileSystemProvider.get().getDigestCalculator());
-        try {
+            MCROCFLFileSystemProvider.get().getDigestCalculator())) {
             assertEquals(2, newStorage.count(), "the recovered cache should contain two entries");
             assertEquals(allocated, newStorage.allocated(), "duplicate add events should not be allocated twice");
-        } finally {
-            newStorage.close();
         }
     }
 
@@ -312,18 +374,15 @@ public class MCROCFLDefaultRemoteTemporaryStorageTest extends MCROCFLStorageTest
             Files.write(recentTempFile, new byte[] { 5 });
             storage.close();
 
-            MCROCFLDefaultRemoteTemporaryStorage newStorage = new MCROCFLDefaultRemoteTemporaryStorage(
+            try (MCROCFLDefaultRemoteTemporaryStorage newStorage = new MCROCFLDefaultRemoteTemporaryStorage(
                 storage.getRoot(),
                 new FileCountEvictionStrategy(10),
-                MCROCFLFileSystemProvider.get().getDigestCalculator());
-            try {
+                MCROCFLFileSystemProvider.get().getDigestCalculator())) {
                 assertFalse(Files.exists(staleTempFile), "the stale temporary file should be deleted");
                 assertTrue(Files.exists(recentTempFile), "the recent temporary file should be kept");
                 assertTrue(Files.exists(toCachePath(orphanDigest)), "the orphaned cache file should be kept");
                 assertArrayEquals(new byte[] { 1 }, read(newStorage, digest1));
                 assertArrayEquals(new byte[] { 2 }, read(newStorage, digest2));
-            } finally {
-                newStorage.close();
             }
         } finally {
             Files.deleteIfExists(source);
@@ -356,14 +415,11 @@ public class MCROCFLDefaultRemoteTemporaryStorageTest extends MCROCFLStorageTest
         assertTrue(Files.readAllLines(journalFile()).size() > 2 * storage.count(),
             "the journal should contain more than twice as many events as entries");
 
-        MCROCFLDefaultRemoteTemporaryStorage newStorage = newStorage(new FileCountEvictionStrategy(2));
-        try {
+        try (MCROCFLDefaultRemoteTemporaryStorage newStorage = newStorage(new FileCountEvictionStrategy(2))) {
             assertEquals(2, Files.readAllLines(journalFile()).size(), "the journal should be compacted on startup");
             assertEquals(2, newStorage.count());
             assertTrue(newStorage.exists(digest3), "digest3 should exist after compaction");
             assertTrue(newStorage.exists(digest4), "digest4 should exist after compaction");
-        } finally {
-            newStorage.close();
         }
     }
 
@@ -384,12 +440,9 @@ public class MCROCFLDefaultRemoteTemporaryStorageTest extends MCROCFLStorageTest
         }
         storage.close();
 
-        MCROCFLDefaultRemoteTemporaryStorage newStorage = newStorage(new FileCountEvictionStrategy(10));
-        try {
+        try (MCROCFLDefaultRemoteTemporaryStorage newStorage = newStorage(new FileCountEvictionStrategy(10))) {
             assertEquals(3, newStorage.count(), "the journal should contain all three entries");
             assertTrue(newStorage.exists(digest3), "digest3 should be appended to the new journal");
-        } finally {
-            newStorage.close();
         }
     }
 

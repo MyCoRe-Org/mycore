@@ -26,6 +26,12 @@ public interface MCROCFLEvictionStrategy {
 
     /**
      * Determines whether files should be evicted from the storage.
+     * <p>
+     * The storage may call this method while holding its internal lock, for example
+     * {@link MCROCFLDefaultRemoteTemporaryStorage} after each new cache entry and once per evicted entry. Other
+     * threads that access the storage wait until it returns. Implementations should therefore only read the state of
+     * the storage, like {@link MCROCFLRemoteTemporaryStorage#allocated()} or
+     * {@link MCROCFLRemoteTemporaryStorage#count()}, and must not block, do I/O or wait for other threads.
      *
      * @param storage the storage to evict from.
      * @return {@code true} if files should be evicted, {@code false} otherwise.

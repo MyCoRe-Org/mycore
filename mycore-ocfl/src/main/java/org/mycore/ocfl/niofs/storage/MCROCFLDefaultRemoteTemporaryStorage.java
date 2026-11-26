@@ -37,14 +37,12 @@ import java.nio.file.attribute.FileAttribute;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Queue;
+import java.util.SequencedMap;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 
@@ -72,7 +70,8 @@ import org.mycore.ocfl.niofs.MCROCFLDigestCalculator;
  * <h2>Key Features:</h2>
  * <ul>
  *   <li><b>LRU Eviction:</b> Uses a pluggable {@link MCROCFLEvictionStrategy} to manage its size, with a
- *   Least Recently Used (LRU) policy managed by an internal queue.</li>
+ *   Least Recently Used (LRU) policy. The cache index is kept in access order, so a cache hit and the
+ *   eviction of the least recently used entry are O(1).</li>
  *   <li><b>Journaling for Persistence:</b> All cache operations (add, remove) are logged to a journal file.
  *   This ensures that the cache state can be fully restored after an application restart, preventing the need to
  *   re-verify all cached files. The journal is compacted on startup if it contains much more events than cache
@@ -81,14 +80,18 @@ import org.mycore.ocfl.niofs.MCROCFLDigestCalculator;
  *   <li>
  *     <b>Shared Use by Several Processes:</b>
  *     Several processes may use the same directory, like the command line interface while the web application is
- *     running. This is best effort: each process has its own cache index and LRU queue, files are only deleted on
+ *     running. This is best effort: each process has its own cache index and LRU order, files are only deleted on
  *     eviction or explicitly. A file evicted by another process is a cache miss and loaded again. All processes
  *     append to the same journal, it is only compacted on startup, see {@link #compactJournal()}. Clearing the cache
  *     should only be done while no other process uses the directory.
  *   </li>
  *   <li>
  *     <b>Concurrency:</b>
- *     Designed for safe use in a multithreaded environment, using concurrent data structures.
+ *     Designed for safe use in a multithreaded environment. The cache index, the allocation and the journal
+ *     appends are guarded by one lock. The short file operations that have to match the index run under the same
+ *     lock: moving a new file to its final path, deleting an evicted file and checking whether a cached file still
+ *     exists. Downloads, digest calculations and writes of temporary files run outside the lock. The lock is always
+ *     taken before the lock of the journal.
  *   </li>
  *   <li>
  *     <b>Transactional Writes:</b>
@@ -126,15 +129,28 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
 
     private final Path root;
 
+    /**
+     * Guarded by {@link #lock}.
+     */
     private MCROCFLEvictionStrategy evictionStrategy;
 
     private final MCROCFLDigestCalculator<Path, MCRDigest> digestCalculator;
 
-    private Map<MCRDigest, FileInfo> cache;
+    /**
+     * Guards {@link #cache}, {@link #totalAllocation}, {@link #evictionStrategy} and the journal. Always take it
+     * before the journal lock.
+     */
+    private final Object lock = new Object();
 
-    private Queue<MCRDigest> queue;
+    /**
+     * The cache index in access order: the eldest entry is the least recently used one. Guarded by {@link #lock}.
+     */
+    private SequencedMap<MCRDigest, FileInfo> cache;
 
-    private AtomicLong totalAllocation;
+    /**
+     * The sum of the sizes of all cached files. Guarded by {@link #lock}.
+     */
+    private long totalAllocation;
 
     private MCROCFLJournal<CacheEvent> journal;
 
@@ -157,28 +173,29 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
      * and replays the journal to restore the cache state from the previous session.
      */
     public void init() {
-        this.cache = new ConcurrentHashMap<>();
-        this.queue = new ConcurrentLinkedDeque<>();
-        this.totalAllocation = new AtomicLong(0);
+        synchronized (lock) {
+            this.cache = new LinkedHashMap<>(16, 0.75f, true);
+            this.totalAllocation = 0;
 
-        // create root directory
-        try {
-            Files.createDirectories(root);
-        } catch (IOException e) {
-            throw new IllegalStateException("Failed to initialize cache journal", e);
-        }
-
-        // init journal
-        try {
-            long events = initJournal();
-            compactOnStartup(events);
-        } catch (IOException | MCROCFLJournal.JournalEntry.DeserializationException e) {
-            LOGGER.error(() -> "Corrupt journal found. Clearing cache and starting fresh.", e);
+            // create root directory
             try {
-                clearAndReset();
-            } catch (IOException ioException) {
-                ioException.addSuppressed(e);
-                throw new IllegalStateException("Failed to recover from corrupt journal", ioException);
+                Files.createDirectories(root);
+            } catch (IOException e) {
+                throw new IllegalStateException("Failed to initialize cache journal", e);
+            }
+
+            // init journal
+            try {
+                long events = initJournal();
+                compactOnStartup(events);
+            } catch (IOException | MCROCFLJournal.JournalEntry.DeserializationException e) {
+                LOGGER.error(() -> "Corrupt journal found. Clearing cache and starting fresh.", e);
+                try {
+                    clearAndReset();
+                } catch (IOException ioException) {
+                    ioException.addSuppressed(e);
+                    throw new IllegalStateException("Failed to recover from corrupt journal", ioException);
+                }
             }
         }
 
@@ -279,21 +296,22 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
         }
     }
 
+    /**
+     * Applies a replayed journal event to the cache index. Called with {@link #lock} held.
+     */
     private void applyCacheEvent(CacheEvent event) {
         switch (event) {
             case CacheEvent.Add add -> {
-                this.queue.remove(add.digest());
-                // the journal can contain more than one add event for the same digest
+                // the journal can contain more than one add event for the same digest. In access order, put moves
+                // an existing entry to the end, like a touch
                 FileInfo previous = this.cache.put(add.digest(),
                     new FileInfo(add.digest(), add.size(), add.originalFileName()));
-                this.queue.offer(add.digest());
-                this.totalAllocation.addAndGet(previous == null ? add.size() : add.size() - previous.size());
+                this.totalAllocation += previous == null ? add.size() : add.size() - previous.size();
             }
             case CacheEvent.Remove remove -> {
-                this.queue.remove(remove.digest());
                 FileInfo info = this.cache.remove(remove.digest());
                 if (info != null) {
-                    this.totalAllocation.addAndGet(-info.size());
+                    this.totalAllocation -= info.size();
                 }
             }
         }
@@ -304,7 +322,9 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
      */
     @Override
     public int count() {
-        return this.cache.size();
+        synchronized (lock) {
+            return this.cache.size();
+        }
     }
 
     /**
@@ -312,7 +332,9 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
      */
     @Override
     public long allocated() {
-        return this.totalAllocation.get();
+        synchronized (lock) {
+            return this.totalAllocation;
+        }
     }
 
     /**
@@ -330,7 +352,9 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
      * @param evictionStrategy The new eviction strategy to apply.
      */
     public void setEvictionStrategy(MCROCFLEvictionStrategy evictionStrategy) {
-        this.evictionStrategy = evictionStrategy;
+        synchronized (lock) {
+            this.evictionStrategy = evictionStrategy;
+        }
     }
 
     /**
@@ -338,14 +362,8 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
      */
     @Override
     public boolean exists(MCRDigest digest) {
-        synchronizeCache(digest);
-        boolean isInCache = this.cache.containsKey(digest);
-        // only touch cached digests: a miss is often not followed by a cache write (partial read, copy), the digest
-        // would stay in the queue forever
-        if (isInCache) {
-            cacheTouch(digest);
-        }
-        return isInCache;
+        // only cached digests are touched: a miss is often not followed by a cache write (partial read, copy)
+        return touch(digest) != null;
     }
 
     /**
@@ -353,15 +371,19 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
      */
     @Override
     public void clear() throws IOException {
-        this.journal.close();
-        clearAndReset();
+        synchronized (lock) {
+            this.journal.close();
+            clearAndReset();
+        }
     }
 
+    /**
+     * Resets the cache index, deletes the cache directory and opens a new journal. Called with {@link #lock} held.
+     */
     private void clearAndReset() throws IOException {
         // reset cache
         this.cache.clear();
-        this.queue.clear();
-        this.totalAllocation.set(0);
+        this.totalAllocation = 0;
         // delete everything
         FileUtils.deleteDirectory(getRoot().toFile());
         // reset
@@ -379,27 +401,19 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
     public MCRDigest write(String originalFileName, byte[] bytes, OpenOption... options) throws IOException {
         MCRDigest digest = this.digestCalculator.calculate(bytes);
 
-        synchronizeCache(digest);
-
         // check if already in cache
-        if (this.cache.containsKey(digest)) {
-            cacheTouch(digest);
+        if (touch(digest) != null) {
             return digest;
         }
 
         // cache-miss: new content -> write to cache
-        Path target = toCachePath(digest);
         Path tempFile = newTempFile();
         try {
             Files.write(tempFile, bytes, options);
-            moveToFinalPath(tempFile, target);
+            addToCache(tempFile, digest, bytes.length, originalFileName);
         } finally {
             Files.deleteIfExists(tempFile);
         }
-
-        // update cache
-        cacheUpdate(digest, bytes.length, originalFileName);
-        rollOver();
         return digest;
     }
 
@@ -407,23 +421,17 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
      * {@inheritDoc}
      * <p>
      * This operation is considered a "use" of the cached item, so it updates the item's position
-     * in the LRU eviction queue, making it less likely to be evicted.
+     * in the LRU order, making it less likely to be evicted.
      */
     @Override
     public SeekableByteChannel readByteChannel(MCRDigest digest) throws IOException {
         Objects.requireNonNull(digest, "Digest should not be null.");
-
-        synchronizeCache(digest);
-
-        FileInfo fileInfo = cache.get(digest);
-        if (fileInfo == null) {
-            throw new NoSuchFileException(digest + " is not cached.");
-        }
-        try {
-            Path path = toCachePath(fileInfo.digest);
-            return Files.newByteChannel(path, StandardOpenOption.READ);
-        } finally {
-            cacheTouch(digest);
+        synchronized (lock) {
+            if (touch(digest) == null) {
+                throw new NoSuchFileException(digest + " is not cached.");
+            }
+            // open under the lock: an eviction after opening does not affect the open channel
+            return Files.newByteChannel(toCachePath(digest), StandardOpenOption.READ);
         }
     }
 
@@ -434,50 +442,35 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
     public MCRDigest importFile(Path source) throws IOException {
         MCRDigest digest = this.digestCalculator.calculate(source);
 
-        synchronizeCache(digest);
-
-        FileInfo fileInfo = this.cache.get(digest);
-
         // cache hit -> nothing to do
-        if (fileInfo != null) {
-            cacheTouch(digest);
+        if (touch(digest) != null) {
             return digest;
         }
 
         //  cache miss -> create
-        Path target = toCachePath(digest);
         Path tempFile = newTempFile();
-        long size;
         try {
             Files.copy(source, tempFile);
-            size = Files.size(tempFile);
-            moveToFinalPath(tempFile, target);
+            addToCache(tempFile, digest, Files.size(tempFile), source.getFileName().toString());
         } finally {
             Files.deleteIfExists(tempFile);
         }
-
-        // update cache
-        cacheUpdate(digest, size, source.getFileName().toString());
-        rollOver();
         return digest;
     }
 
     /**
      * {@inheritDoc}
      * <p>
-     * This operation also "touches" the cached item, updating its position in the LRU eviction queue.
+     * This operation also "touches" the cached item, updating its position in the LRU order.
+     * <p>
+     * The file is copied outside the lock, so an eviction during the copy can still make it fail.
      */
     @Override
     public void exportFile(MCRDigest sourceDigest, Path target, CopyOption... options) throws IOException {
-        synchronizeCache(sourceDigest);
-
-        FileInfo fileInfo = this.cache.get(sourceDigest);
-        if (fileInfo == null) {
+        if (touch(sourceDigest) == null) {
             throw new NoSuchFileException(sourceDigest + " is not cached.");
         }
-        Path path = toCachePath(fileInfo.digest);
-        Files.copy(path, target, options);
-        cacheTouch(sourceDigest);
+        Files.copy(toCachePath(sourceDigest), target, options);
     }
 
     /**
@@ -485,22 +478,17 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
      */
     @Override
     public String probeContentType(MCRDigest digest) throws IOException {
-        synchronizeCache(digest);
-        FileInfo fileInfo = this.cache.get(digest);
+        FileInfo fileInfo = touch(digest);
         if (fileInfo == null) {
             throw new NoSuchFileException(digest + " is not cached.");
         }
-        try {
-            // probe content type by original file name
-            String probedType = URLConnection.guessContentTypeFromName(fileInfo.originalFileName());
-            if (probedType != null) {
-                return probedType;
-            }
-            // fallback: probe content type with physical path
-            return Files.probeContentType(toCachePath(fileInfo.digest));
-        } finally {
-            cacheTouch(digest);
+        // probe content type by original file name
+        String probedType = URLConnection.guessContentTypeFromName(fileInfo.originalFileName());
+        if (probedType != null) {
+            return probedType;
         }
+        // fallback: probe content type with physical path
+        return Files.probeContentType(toCachePath(fileInfo.digest));
     }
 
     /**
@@ -517,41 +505,67 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
         return new CacheEntryWriter(channel, tempFile, () -> {
             // calculate the digest
             MCRDigest digest = this.digestCalculator.calculate(tempFile);
-
-            synchronizeCache(digest);
-
-            // check if already exist
-            if (this.cache.containsKey(digest)) {
-                Files.delete(tempFile);
-                cacheTouch(digest);
-                return digest;
+            try {
+                // move to the final path, unless the content is already cached
+                addToCache(tempFile, digest, Files.size(tempFile), originalFileName);
+            } finally {
+                Files.deleteIfExists(tempFile);
             }
-
-            // move to the final path
-            long size = Files.size(tempFile);
-            moveToFinalPath(tempFile, toCachePath(digest));
-
-            // update cache
-            cacheUpdate(digest, size, originalFileName);
-            rollOver();
             return digest;
         }, () -> Files.deleteIfExists(tempFile));
     }
 
     /**
-     * Removes the cache entry of the given digest if its file is missing on disk, for example because it was evicted
-     * by another process using the same directory.
+     * Looks up the cache entry of the given digest and marks it as most recently used.
      * <p>
-     * A file on disk without a cache entry is left alone. It is either being written by another thread right now
-     * (moved to its final path, but not yet added to the cache), written by another process or left by a crash. All
-     * of them are complete, because files are only moved to their final path after they were written, and the path
-     * is derived from the digest of the content. The next write of the same content replaces the file.
+     * If the entry exists but its file is missing on disk, for example because it was evicted by another process
+     * using the same directory, the entry is removed and {@code null} is returned. The check and the removal run
+     * under the {@link #lock}, so a concurrent write of the same content in this process is never removed.
+     * <p>
+     * A file on disk without a cache entry is left alone. It is either written by another process or left by a
+     * crash. Both are complete, because files are only moved to their final path after they were written, and the
+     * path is derived from the digest of the content. The next write of the same content replaces the file.
+     *
+     * @param digest the digest to look up
+     * @return the cache entry, or {@code null} on a cache miss
      */
-    private void synchronizeCache(MCRDigest digest) {
-        if (cache.containsKey(digest) && !Files.exists(toCachePath(digest))) {
-            LOGGER.warn(() -> "Cached file for digest " + digest + " is missing on disk. Removing it from the cache.");
-            // only remove the entry: deleting the file could delete one that another thread just wrote
-            cacheRemove(digest);
+    private FileInfo touch(MCRDigest digest) {
+        synchronized (lock) {
+            // get() moves the entry to the end of the access order
+            FileInfo fileInfo = this.cache.get(digest);
+            if (fileInfo == null) {
+                return null;
+            }
+            if (!Files.exists(toCachePath(digest))) {
+                LOGGER.warn(() -> "Cached file for digest " + digest + " is missing on disk. Removing it from the "
+                    + "cache.");
+                cacheRemove(digest);
+                return null;
+            }
+            return fileInfo;
+        }
+    }
+
+    /**
+     * Adds a completely written temporary file to the cache: moves it to its final path, adds it to the index and
+     * the journal and evicts other entries if necessary. All of this runs under the {@link #lock}, so the index and
+     * the files on disk are changed together. If the content was cached by another thread in the meantime, the
+     * existing entry is only touched and the temporary file is left for the caller to delete.
+     *
+     * @param tempFile the temporary file with the content
+     * @param digest the digest of the content
+     * @param size the size of the content
+     * @param originalFileName the original file name, used for content type detection
+     */
+    private void addToCache(Path tempFile, MCRDigest digest, long size, String originalFileName)
+        throws IOException {
+        synchronized (lock) {
+            if (touch(digest) != null) {
+                return;
+            }
+            moveToFinalPath(tempFile, toCachePath(digest));
+            cacheUpdate(digest, size, originalFileName);
+            rollOver();
         }
     }
 
@@ -594,18 +608,16 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
     }
 
     /**
-     * Updates the cache with new file information and logs the event to the journal.
+     * Adds or replaces the cache entry, marks it as most recently used and logs the event to the journal. Called
+     * with {@link #lock} held.
      *
      * @param digest The digest of the content.
-     * @param size The size of the content. It is passed instead of read from the cache file, which may already be
-     *             evicted again by a concurrent write.
+     * @param size The size of the content.
      * @param originalFileName The original file name, used for content type detection.
      */
     private void cacheUpdate(MCRDigest digest, long size, String originalFileName) {
-        // concurrent writes of the same content can both reach this point, use the atomic put to count it once
         FileInfo previous = this.cache.put(digest, new FileInfo(digest, size, originalFileName));
-        this.totalAllocation.addAndGet(previous == null ? size : size - previous.size());
-        cacheTouch(digest);
+        this.totalAllocation += previous == null ? size : size - previous.size();
         try {
             journal.append(new CacheEvent.Add(digest, size, originalFileName));
         } catch (IOException ioException) {
@@ -616,53 +628,46 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
     }
 
     /**
-     * Removes the specified {@link MCRDigest} from the cache.
+     * Removes the cache entry of the given digest and logs the event to the journal. The file is not deleted.
+     * Called with {@link #lock} held.
      *
      * @param digest The digest to remove from the cache.
+     * @return the removed entry, or {@code null} if there was none
      */
-    private void cacheRemove(MCRDigest digest) {
-        this.queue.remove(digest);
+    private FileInfo cacheRemove(MCRDigest digest) {
         FileInfo fileInfo = this.cache.remove(digest);
         if (fileInfo != null) {
-            this.totalAllocation.addAndGet(-fileInfo.size);
+            this.totalAllocation -= fileInfo.size();
             try {
                 journal.append(new CacheEvent.Remove(digest));
             } catch (IOException e) {
-                LOGGER.error(() -> "Failed to delete file or append to journal for " + digest, e);
+                LOGGER.error(() -> "Failed to append the removal of " + digest + " to the journal.", e);
             }
         }
-    }
-
-    /**
-     * "Touches" a cache entry by moving it to the end of the LRU queue.
-     *
-     * @param digest The digest of the entry to touch.
-     */
-    private void cacheTouch(MCRDigest digest) {
-        this.queue.remove(digest);
-        this.queue.offer(digest);
+        return fileInfo;
     }
 
     /**
      * Performs cache rollover based on the eviction strategy. If the strategy indicates eviction is needed,
      * the least recently used items are removed from the cache and filesystem until the condition is met.
+     * Called with {@link #lock} held.
      */
     private void rollOver() {
-        while (!this.queue.isEmpty() && evictionStrategy.shouldEvict(this)) {
-            MCRDigest digest = this.queue.poll();
-            delete(digest);
+        while (!this.cache.isEmpty() && evictionStrategy.shouldEvict(this)) {
+            // firstEntry() does not count as an access, so it does not change the order
+            evict(this.cache.firstEntry().getKey());
         }
     }
 
-    private void delete(MCRDigest digest) {
-        FileInfo fileInfo = this.cache.get(digest);
-        if(fileInfo == null) {
+    /**
+     * Removes the cache entry of the given digest and deletes its file. Called with {@link #lock} held, so no
+     * concurrent write of the same content can happen between the two.
+     */
+    private void evict(MCRDigest digest) {
+        if (cacheRemove(digest) == null) {
             return;
         }
-        // remove from cache
-        cacheRemove(digest);
-        // remove from filesystem
-        Path path = toCachePath(fileInfo.digest);
+        Path path = toCachePath(digest);
         try {
             Files.deleteIfExists(path);
         } catch (IOException ioException) {
@@ -677,7 +682,8 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
      * Compaction is useful to prevent the journal from growing indefinitely and to speed up
      * the cache recovery process on startup.
      * <p>
-     * The snapshot is created from the queue to preserve the LRU order.
+     * The snapshot is created from the cache index in access order to preserve the LRU order. The {@link #lock} is
+     * taken before the journal lock, like for every append.
      * <p>
      * The snapshot only contains the cache entries of this process. Entries another process using the same directory
      * appended to the journal since this process replayed it are lost: after a restart, their files are not in the
@@ -687,21 +693,16 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
      *
      * @throws IOException if an I/O error occurs during compaction.
      */
-    public synchronized void compactJournal() throws IOException {
-        journal.compact(() -> {
-            List<MCRDigest> orderedDigests = new ArrayList<>(this.queue);
-            List<CacheEvent> snapshot = new ArrayList<>(orderedDigests.size());
-            for (MCRDigest digest : orderedDigests) {
-                FileInfo fileInfo = this.cache.get(digest);
-                if (fileInfo != null) {
-                    snapshot.add(new CacheEvent.Add(digest, fileInfo.size(), fileInfo.originalFileName()));
-                } else {
-                    LOGGER.warn("Inconsistency detected during compaction: Digest {} is in the queue but not"
-                        + " in the cache. Skipping.", digest);
+    public void compactJournal() throws IOException {
+        synchronized (lock) {
+            journal.compact(() -> {
+                List<CacheEvent> snapshot = new ArrayList<>(this.cache.size());
+                for (FileInfo fileInfo : this.cache.values()) {
+                    snapshot.add(new CacheEvent.Add(fileInfo.digest(), fileInfo.size(), fileInfo.originalFileName()));
                 }
-            }
-            return snapshot;
-        });
+                return snapshot;
+            });
+        }
         LOGGER.info("Temporary storage cache compaction finished successfully.");
     }
 
@@ -716,8 +717,10 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
      */
     @Override
     public void close() throws IOException {
-        if (this.journal != null) {
-            this.journal.close();
+        synchronized (lock) {
+            if (this.journal != null) {
+                this.journal.close();
+            }
         }
     }
 
