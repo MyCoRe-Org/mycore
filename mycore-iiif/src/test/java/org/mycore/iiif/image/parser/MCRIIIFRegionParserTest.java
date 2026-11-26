@@ -31,6 +31,47 @@ public class MCRIIIFRegionParserTest {
     public static final int IMAGE_HEIGHT = 400;
 
     @org.junit.Test
+    public void testPercentRegionUsesImageHeight() {
+        Map<String, MCRIIIFImageSourceRegion> validCoords = new Hashtable<>();
+
+        // the height of a percent region has to be calculated from the image height, not from the image width
+        validCoords.put("pct:0,0,50,50", new MCRIIIFImageSourceRegion(0, 0, 250, 200));
+        validCoords.put("pct:10,10,20,20", new MCRIIIFImageSourceRegion(50, 40, 150, 120));
+
+        for (Map.Entry<String, MCRIIIFImageSourceRegion> entry : validCoords.entrySet()) {
+            MCRIIIFImageSourceRegion result = new MCRIIIFRegionParser(entry.getKey(), IMAGE_WIDTH, IMAGE_HEIGHT)
+                .parseImageRegion();
+            Assert.assertEquals(entry.getKey(), entry.getValue(), result);
+        }
+    }
+
+    @org.junit.Test
+    public void testPercentRegionUpToImageBorderIsValid() {
+        // percent * (size / 100.0) can be slightly bigger than the exact value, e.g. 100 * (1005 / 100.0) =
+        // 1005.0000000000001, which was rounded up to 1006 and marked the region as invalid
+        MCRIIIFRegionParser parser = new MCRIIIFRegionParser("pct:0,0,100,100", 1005, 1005);
+        parser.parseImageRegion();
+        Assert.assertTrue("pct:0,0,100,100 (1005x1005)", parser.isCompleteValid());
+
+        for (int size = 1; size <= 2000; size++) {
+            for (int pct = 0; pct < 100; pct++) {
+                String region = "pct:" + pct + "," + pct + "," + (100 - pct) + "," + (100 - pct);
+                // landscape and portrait, so that width and height are both checked with every size
+                assertCompleteValid(region, size, 2001);
+                assertCompleteValid(region, 2001, size);
+            }
+        }
+    }
+
+    private static void assertCompleteValid(String region, int width, int height) {
+        MCRIIIFRegionParser parser = new MCRIIIFRegionParser(region, width, height);
+        parser.parseImageRegion();
+        if (!parser.isCompleteValid()) {
+            Assert.fail(region + " (" + width + "x" + height + ") is not valid");
+        }
+    }
+
+    @org.junit.Test
     public void testParseImageRegion() {
         Map<String, MCRIIIFImageSourceRegion> validCoords = new Hashtable<>();
 
