@@ -102,6 +102,11 @@ public class MCRMODSCommandsTest extends MCRStoreTestCase {
             .getElement("mods:part/mods:extent[@unit='pages']");
         assertEquals(1, extent.getChildren().size());
         assertEquals("S. 123 ff.", extent.getChildText("list", MCRConstants.MODS_NAMESPACE));
+
+        Element host = new MCRMODSWrapper(MCRMetadataManager.retrieveMCRObject(unchangedObjectID))
+            .getElement("mods:relatedItem[@type='host']/mods:part/mods:extent[@unit='pages']");
+        assertEquals(1, host.getChildren().size());
+        assertEquals("S. 5 \u2014 Beilage", host.getChildText("list", MCRConstants.MODS_NAMESPACE));
     }
 
     private static Date getModifyDate(MCRObjectID id) {

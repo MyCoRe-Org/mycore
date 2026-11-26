@@ -14,6 +14,16 @@
               <mods:list>S. 123 ff.</mods:list>
             </mods:extent>
           </mods:part>
+          <mods:relatedItem type="host">
+            <mods:titleInfo>
+              <mods:title>Journal title</mods:title>
+            </mods:titleInfo>
+            <mods:part>
+              <mods:extent unit="pages">
+                <mods:list>S. 5 &#x2014; Beilage</mods:list>
+              </mods:extent>
+            </mods:part>
+          </mods:relatedItem>
         </mods:mods>
       </modsContainer>
     </def.modsContainer>
