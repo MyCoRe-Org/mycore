@@ -26,7 +26,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -35,17 +34,14 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.mycore.common.MCRClassTools;
-import org.mycore.common.MCRException;
+import org.mycore.common.config.instantiator.MCREmptyTree;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.common.config.instantiator.MCRInstanceConfiguration.Options;
 import org.mycore.common.config.instantiator.MCRInstanceName;
 import org.mycore.common.config.instantiator.MCRInstantiatorUtils;
+import org.mycore.common.config.instantiator.MCRProperTree;
+import org.mycore.common.config.instantiator.MCRPropertiesTree;
 import org.mycore.common.function.MCRTriConsumer;
-
-import com.google.common.base.Throwables;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.util.concurrent.UncheckedExecutionException;
 
 import jakarta.inject.Singleton;
 
@@ -101,14 +97,9 @@ public class MCRConfiguration2 {
 
     private static final Map<UUID, EventListener> LISTENERS = new ConcurrentHashMap<>();
 
-    private static final int CONFIGURATIONS_CACHE_SIZE = 32;
-
-    private static final Cache<ConfigurationKey, MCRInstanceConfiguration<?>> CONFIGURATIONS = CacheBuilder.newBuilder()
-        .maximumSize(CONFIGURATIONS_CACHE_SIZE)
-        .softValues()
-        .build();
-
     private static final AtomicReference<Map<String, String>> PROPERTIES = new AtomicReference<>(Map.of());
+
+    private static final AtomicReference<MCRProperTree> PROPER_TREE = new AtomicReference<>(MCRPropertiesTree.EMPTY);
 
     static Map<SingletonKey, Object> instanceHolder = new MCRConcurrentHashMap<>();
 
@@ -134,6 +125,19 @@ public class MCRConfiguration2 {
                     .stream()
                     .filter(entry -> !entry.getValue().isBlank())
                     .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, entry -> entry.getValue().trim()));
+            }
+            return existingValue;
+        });
+    }
+
+    /**
+     * Returns all configuration properties, excluding properties with blank values, i.e.
+     * only properties that are recognized by, for example, {@link #getString(String)} as a tree.
+     */
+    public static MCRProperTree getAllPropertiesTree() {
+        return PROPER_TREE.updateAndGet(existingValue -> {
+            if (existingValue instanceof MCREmptyTree) {
+                return MCRPropertiesTree.ofProperties(getAllPropertiesMap());
             }
             return existingValue;
         });
@@ -257,16 +261,8 @@ public class MCRConfiguration2 {
         return Optional.ofNullable((S) instanceHolder.computeIfAbsent(key, _ -> configuration.instantiate()));
     }
 
-    @SuppressWarnings({ "unchecked", "PMD.PreserveStackTrace" })
     private static <S> MCRInstanceConfiguration<S> getConfiguration(Class<S> superClass, String name) {
-        try {
-            return ((MCRInstanceConfiguration<S>) CONFIGURATIONS.get(
-                new ConfigurationKey(superClass.getName(), name),
-                () -> MCRInstanceConfiguration.ofName(superClass, name, Options.IMPLICIT))).copy();
-        } catch (ExecutionException | UncheckedExecutionException e) {
-            Throwables.throwIfUnchecked(e.getCause());
-            throw new MCRException("Failed to create instance configuration for " + name, e.getCause());
-        }
+        return MCRInstanceConfiguration.ofName(superClass, name, getAllPropertiesTree(), Options.IMPLICIT);
     }
 
     /**
@@ -508,8 +504,8 @@ public class MCRConfiguration2 {
     }
 
     public static <S> S instantiateClass(Class<S> superClass, String className) {
-        return MCRInstanceConfiguration.ofClassName(superClass, className, "MCR.AnonymousInstance." + className)
-            .instantiate();
+        return MCRInstanceConfiguration.ofClassName(superClass, className, "MCR.AnonymousInstance." + className,
+            getAllPropertiesTree()).instantiate();
     }
 
     public static <S> Stream<S> instantiateClasses(Class<S> superClass, String propertyName) {
@@ -528,10 +524,10 @@ public class MCRConfiguration2 {
     }
 
     static void clearCaches() {
-        // BEWARE: do NOT replace with constant value, i.e. do NOT replace with PROPERTIES.set(Map.of());
+        // BEWARE: do NOT replace with constant values, i.e. do NOT replace with PROPERTIES.set(Map.of());
         // AtomicReference#updateAndGet only works as expected, when each update sets a distinct value
         PROPERTIES.set(new HashMap<>());
-        CONFIGURATIONS.invalidateAll();
+        PROPER_TREE.set(new MCREmptyTree());
     }
 
     private static class EventListener {
@@ -558,9 +554,6 @@ public class MCRConfiguration2 {
     }
 
     record ConfigSingletonKey(String property, String classname) implements SingletonKey {
-    }
-
-    record ConfigurationKey(String superclassName, String name) {
     }
 
 }
