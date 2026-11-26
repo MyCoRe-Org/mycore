@@ -44,6 +44,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRPathContent;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
@@ -181,6 +182,61 @@ public class MCRMODSCommands extends MCRAbstractCommands {
         } catch (MCRException | MCRAccessException e) {
             LOGGER.error("Error while trying to enrich {} with configuration {}: ", modsId, configID, e);
         }
+    }
+
+    @MCRCommand(syntax = "repair pages of all mods objects",
+        help = "Re-parses page information of all MODS objects that is stored only as mods:list, "
+            + "e.g. \"275--281\", into mods:start and mods:end",
+        order = 50)
+    public static List<String> repairPagesOfAllObjects() {
+        return MCRConfiguration2.getOrThrow("MCR.MODS.Types", MCRConfiguration2::splitValue)
+            .flatMap(type -> MCRXMLMetadataManager.instance().listIDsOfType(type).stream())
+            .sorted()
+            .map(id -> "repair pages of mods object " + id)
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * Re-parses every mods:part/mods:extent[@unit='pages'] that contains only a mods:list element
+     * using {@link MCRMODSPagesHelper}. The extent is only replaced if a start and an end page could be detected
+     * and both contain a digit, so free text page lists and lists with other information like "S. 123 ff." or
+     * "S. 5 &#8212; Beilage" stay unchanged. The object is only updated if an extent was changed.
+     *
+     * @param objectID the ID of the MODS object to repair
+     * @throws MCRAccessException if the current user may not update the object
+     */
+    @MCRCommand(syntax = "repair pages of mods object {0}",
+        help = "Re-parses page information of MODS object {0} that is stored only as mods:list, "
+            + "e.g. \"275--281\", into mods:start and mods:end",
+        order = 51)
+    public static void repairPages(String objectID) throws MCRAccessException {
+        MCRObjectID mcrObjectID = MCRObjectID.getInstance(objectID);
+        if (!MCRMODSWrapper.isSupported(mcrObjectID)) {
+            LOGGER.warn("Object {} is not a MODS object, skipping.", objectID);
+            return;
+        }
+        MCRObject obj = MCRMetadataManager.retrieveMCRObject(mcrObjectID);
+        List<Element> extents = new MCRMODSWrapper(obj)
+            .getElements(".//mods:part/mods:extent[@unit='pages'][mods:list][count(*)=1]");
+        boolean changed = false;
+        for (Element extent : extents) {
+            String pages = extent.getChildText("list", MCRConstants.MODS_NAMESPACE);
+            Element parsed = MCRMODSPagesHelper.buildExtentPages(pages);
+            if (!containsDigit(parsed, "start") || !containsDigit(parsed, "end")) {
+                continue;
+            }
+            LOGGER.info("{}: split pages '{}' into start and end page", objectID, pages);
+            extent.setContent(parsed.removeContent());
+            changed = true;
+        }
+        if (changed) {
+            MCRMetadataManager.update(obj);
+        }
+    }
+
+    private static boolean containsDigit(Element extent, String name) {
+        String value = extent.getChildText(name, MCRConstants.MODS_NAMESPACE);
+        return value != null && value.chars().anyMatch(Character::isDigit);
     }
 
     private static MCRDerivate createDerivate(MCRObjectID documentID, File fileDir)
