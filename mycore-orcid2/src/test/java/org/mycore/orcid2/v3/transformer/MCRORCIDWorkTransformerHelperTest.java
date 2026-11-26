@@ -19,12 +19,15 @@
 package org.mycore.orcid2.v3.transformer;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
+import java.io.StringReader;
 import java.net.URL;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
+import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.XMLOutputter;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
@@ -58,5 +61,72 @@ public class MCRORCIDWorkTransformerHelperTest extends MCRTestCase {
         assertEquals(work.getUrl(), result.getUrl());
         assertEquals(work.getLanguageCode(), result.getLanguageCode());
         assertEquals(work.getWorkExternalIdentifiers(), result.getWorkExternalIdentifiers());
+    }
+
+    @Test
+    public void testTransformContentJournalTitle() throws Exception {
+        final Work work = transformMods("""
+            <mods:relatedItem type="host">
+              <mods:titleInfo type="abbreviated">
+                <mods:title>J. Test</mods:title>
+              </mods:titleInfo>
+              <mods:titleInfo>
+                <mods:nonSort>The</mods:nonSort>
+                <mods:title>Journal of Testing</mods:title>
+                <mods:subTitle>Theory and Practice</mods:subTitle>
+              </mods:titleInfo>
+              <mods:titleInfo type="translated" xml:lang="de">
+                <mods:title>Zeitschrift für Tests</mods:title>
+              </mods:titleInfo>
+            </mods:relatedItem>
+            <mods:relatedItem type="series">
+              <mods:titleInfo>
+                <mods:title>Series Title</mods:title>
+              </mods:titleInfo>
+            </mods:relatedItem>
+            <mods:relatedItem type="host">
+              <mods:titleInfo>
+                <mods:title>Second Host</mods:title>
+              </mods:titleInfo>
+            </mods:relatedItem>
+            """);
+        assertEquals("The Journal of Testing: Theory and Practice", work.getJournalTitle().getContent());
+    }
+
+    @Test
+    public void testTransformContentJournalTitleFallback() throws Exception {
+        final Work work = transformMods("""
+            <mods:relatedItem type="host">
+              <mods:titleInfo type="abbreviated">
+                <mods:title>J. Test</mods:title>
+              </mods:titleInfo>
+            </mods:relatedItem>
+            """);
+        assertEquals("J. Test", work.getJournalTitle().getContent());
+    }
+
+    @Test
+    public void testTransformContentWithoutJournalTitle() throws Exception {
+        final Work work = transformMods("""
+            <mods:relatedItem type="series">
+              <mods:titleInfo>
+                <mods:title>Series Title</mods:title>
+              </mods:titleInfo>
+            </mods:relatedItem>
+            """);
+        assertNull(work.getJournalTitle());
+    }
+
+    private static Work transformMods(String relatedItems) throws Exception {
+        final String mods = """
+            <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+              <mods:titleInfo>
+                <mods:title>Title</mods:title>
+              </mods:titleInfo>
+              %s
+            </mods:mods>
+            """.formatted(relatedItems);
+        final Element root = new SAXBuilder().build(new StringReader(mods)).detachRootElement();
+        return MCRORCIDWorkTransformerHelper.transformContent(new MCRJDOMContent(root));
     }
 }
