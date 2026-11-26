@@ -57,11 +57,8 @@ public class MCROCFLVirtualObjectProviderTest {
         assertTrue(virtualObjectProvider.exists(MCROCFLTestCaseHelper.DERIVATE_2));
         MCRTransactionManager.commitTransactions();
 
-        if (purge) {
-            assertFalse(virtualObjectProvider.exists(MCROCFLTestCaseHelper.DERIVATE_2));
-        } else {
-            assertTrue(virtualObjectProvider.exists(MCROCFLTestCaseHelper.DERIVATE_2));
-        }
+        // a deleted (not purged) derivate does not exist either, its history stays in the repository
+        assertFalse(virtualObjectProvider.exists(MCROCFLTestCaseHelper.DERIVATE_2));
     }
 
     @TestTemplate

@@ -328,10 +328,17 @@ public class MCROCFLCommands {
         MCROCFLXMLMetadataManager manager = new MCROCFLXMLMetadataManager();
         manager.setRepositoryKey(MCRConfiguration2.getStringOrThrow("MCR.Metadata.Manager.Repository"));
         MCRContent content = manager.retrieveContent(mcrid, revision);
-        try {
-            MCRXMLMetadataManager.obtainInstance().update(mcrid, content, new Date(content.lastModified()));
-        } catch (MCRUsageException e) {
-            MCRXMLMetadataManager.obtainInstance().create(mcrid, content, new Date(content.lastModified()));
+        // the restore is a new change, the content of an older version has no usable date (-1)
+        Date lastModified = new Date();
+        MCRXMLMetadataManager store = MCRXMLMetadataManager.obtainInstance();
+        if (store.exists(mcrid)) {
+            store.update(mcrid, content, lastModified);
+        } else if (Objects.equals(mcrid.getTypeId(), MCRDerivate.OBJECT_TYPE)) {
+            // the files of the derivate are in the same OCFL object, restoring only the metadata loses them
+            throw new MCRUsageException("Cannot restore the metadata of derivate '" + mcrid
+                + "' without its files. Use 'restore derivate {0} from ocfl with version {1}' instead.");
+        } else {
+            store.create(mcrid, content, lastModified);
         }
     }
 

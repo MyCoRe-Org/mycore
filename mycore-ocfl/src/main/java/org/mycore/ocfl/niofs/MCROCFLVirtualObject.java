@@ -21,6 +21,7 @@ package org.mycore.ocfl.niofs;
 import static org.mycore.ocfl.util.MCROCFLVersionHelper.MESSAGE_CREATED;
 import static org.mycore.ocfl.util.MCROCFLVersionHelper.MESSAGE_DELETED;
 import static org.mycore.ocfl.util.MCROCFLVersionHelper.MESSAGE_UPDATED;
+import static org.mycore.ocfl.util.MCROCFLVersionHelper.convertMessageToType;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -70,6 +71,7 @@ import org.mycore.ocfl.niofs.channels.MCROCFLClosableCallbackChannel;
 import org.mycore.ocfl.niofs.storage.MCROCFLTransactionalStorage;
 import org.mycore.ocfl.repository.MCROCFLRepository;
 import org.mycore.ocfl.util.MCROCFLDeleteUtils;
+import org.mycore.ocfl.util.MCROCFLMetadataVersion;
 import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
 
 import io.ocfl.api.DigestAlgorithmRegistry;
@@ -829,6 +831,10 @@ public abstract class MCROCFLVirtualObject {
      * The purge status can only be removed in the same transaction the purge was applied. If a purge was
      * done and the transaction was committed, the object cannot be created anymore!
      * <p>
+     * A deleted (not purged) object can be created again on top of its delete version, the history is kept.
+     * Files a delete version of an older release still contains (e.g. {@code .keep} files) are removed by the
+     * create.
+     * <p>
      * Implementation detail: A virtual object instance can exist without having an ocfl repository version and
      * without being created.
      *
@@ -840,6 +846,11 @@ public abstract class MCROCFLVirtualObject {
         if (this.readonly) {
             throw new MCRReadOnlyIOException("Cannot create read-only object: " + this);
         }
+        if (isDeleteVersion()) {
+            // a delete version of an older release can still contain .keep files, they are removed by the create
+            this.fileTracker.purge();
+            this.directoryTracker.purge();
+        }
         boolean hasFiles = !this.fileTracker.paths().isEmpty();
         boolean hasDirectories = !this.directoryTracker.paths().isEmpty();
         if (hasFiles || hasDirectories) {
@@ -850,6 +861,17 @@ public abstract class MCROCFLVirtualObject {
         MCRVersionedPath rootDirectory = this.toMCRPath("/");
         this.transactionalStorage.createDirectories(rootDirectory);
         this.directoryTracker.update(rootDirectory, true);
+    }
+
+    /**
+     * Checks if the loaded version of this virtual object is a delete version.
+     *
+     * @return {@code true} if the loaded version is a delete version, {@code false} otherwise or if no version is
+     *         loaded
+     */
+    boolean isDeleteVersion() {
+        return this.objectVersion != null
+            && convertMessageToType(this.objectVersion.getVersionInfo().getMessage()) == MCROCFLMetadataVersion.DELETED;
     }
 
     /**
@@ -933,7 +955,9 @@ public abstract class MCROCFLVirtualObject {
         // persist
         List<MCROCFLFileTracker.Change<MCRVersionedPath>> fileChanges = fileTracker.changes();
         List<MCROCFLDirectoryTracker.Change> dirChanges = directoryTracker.changes();
-        String type = this.objectVersion == null ? MESSAGE_CREATED : MESSAGE_UPDATED;
+        // a create on top of a delete version starts a new life of the object
+        String type = this.objectVersion == null || (this.markForCreate && isDeleteVersion()) ? MESSAGE_CREATED
+            : MESSAGE_UPDATED;
         AtomicBoolean updatedFiles = new AtomicBoolean(false);
         AtomicBoolean updatedDirectories = new AtomicBoolean(false);
         repository.updateObject(targetVersionId, new VersionInfo().setMessage(type), (updater) -> {
@@ -967,7 +991,9 @@ public abstract class MCROCFLVirtualObject {
         }
         // delete
         repository.updateObject(targetVersionId, new VersionInfo().setMessage(MESSAGE_DELETED), (updater) -> {
-            List<MCRVersionedPath> keepFiles = directoryTracker.originalPathsWithKeepFile();
+            List<MCRVersionedPath> keepFiles = directoryTracker.originalPathsWithKeepFile().stream()
+                .map(directoryTracker::toKeepFile)
+                .toList();
             List<MCRVersionedPath> contentFiles = fileTracker.originalPaths();
             Stream.concat(keepFiles.stream(), contentFiles.stream())
                 .map(path -> toOcflFilesPath(path.toRelativePath()))

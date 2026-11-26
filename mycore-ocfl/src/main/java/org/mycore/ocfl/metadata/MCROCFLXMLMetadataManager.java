@@ -137,10 +137,17 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManager {
     public void create(MCRObjectID mcrid, MCRContent xml, Date lastModified, String user)
         throws MCRPersistenceException {
         String ocflObjectID = getOCFLObjectID(mcrid);
+        // a create on top of a delete version starts with an empty object, a delete version of an older release
+        // can still contain files, e.g. the .keep files of a derivate
+        boolean recreate = getRepository().containsObject(ocflObjectID) && isDeleted(ocflObjectID);
         VersionInfo info = buildVersionInfo(MESSAGE_CREATED, lastModified, user);
         try (InputStream objectAsStream = getContentStream(xml)) {
-            getRepository().updateObject(ObjectVersionId.head(ocflObjectID), info,
-                init -> init.writeFile(objectAsStream, buildFilePath(mcrid)));
+            getRepository().updateObject(ObjectVersionId.head(ocflObjectID), info, init -> {
+                if (recreate) {
+                    init.clearVersionState();
+                }
+                init.writeFile(objectAsStream, buildFilePath(mcrid));
+            });
         } catch (IOException | OverwriteException e) {
             throw new MCRPersistenceException("Failed to create object '" + ocflObjectID + "'", e);
         }

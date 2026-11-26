@@ -19,6 +19,7 @@
 package org.mycore.ocfl.niofs;
 
 import static org.mycore.ocfl.util.MCROCFLVersionHelper.MESSAGE_UPDATED;
+import static org.mycore.ocfl.util.MCROCFLVersionHelper.convertMessageToType;
 
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
@@ -31,11 +32,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
+import io.ocfl.api.exception.NotFoundException;
 import io.ocfl.api.model.ObjectVersionId;
 import io.ocfl.api.model.VersionInfo;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRVersionedFileSystem;
 import org.mycore.ocfl.repository.MCROCFLRepository;
+import org.mycore.ocfl.util.MCROCFLMetadataVersion;
 import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
 
 import io.ocfl.api.OcflRepository;
@@ -121,13 +124,17 @@ public class MCROCFLFileSystem extends MCRVersionedFileSystem {
      */
     @Override
     public void restoreRoot(String owner, String version) throws FileSystemException {
+        MCROCFLRepository repository = provider().getRepository();
+        String ocflObjectId = MCROCFLObjectIDPrefixHelper.toDerivateObjectId(owner);
+        if (isDeleteVersion(repository, ocflObjectId, version)) {
+            throw new FileSystemException(null, null, "Cannot restore '" + owner + "' to version '" + version
+                + "' because it is a delete version. Choose a version before the deletion.");
+        }
         MCROCFLVirtualObjectProvider virtualObjectProvider = provider().virtualObjectProvider();
         if (!virtualObjectProvider.exists(owner, version)) {
             throw new NoSuchFileException(null, null, "No such version '" + version + "' for root '" + owner + "'.");
         }
         try {
-            MCROCFLRepository repository = provider().getRepository();
-            String ocflObjectId = MCROCFLObjectIDPrefixHelper.toDerivateObjectId(owner);
             repository.replicateVersionAsHead(ObjectVersionId.version(ocflObjectId, version),
                 new VersionInfo().setMessage(MESSAGE_UPDATED));
         } catch (Exception exc) {
@@ -135,6 +142,19 @@ public class MCROCFLFileSystem extends MCRVersionedFileSystem {
                 new FileSystemException(null, null, "Unable to restore '" + owner + "' to version '" + version + "'.");
             fileSystemException.initCause(exc);
             throw fileSystemException;
+        }
+    }
+
+    private static boolean isDeleteVersion(MCROCFLRepository repository, String ocflObjectId, String version) {
+        if (version == null) {
+            return false;
+        }
+        try {
+            String message = repository.describeVersion(ObjectVersionId.version(ocflObjectId, version))
+                .getVersionInfo().getMessage();
+            return convertMessageToType(message) == MCROCFLMetadataVersion.DELETED;
+        } catch (NotFoundException notFoundException) {
+            return false;
         }
     }
 
