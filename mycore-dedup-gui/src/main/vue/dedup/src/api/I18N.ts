@@ -48,3 +48,12 @@ export function resolveI18N(i18n: { [key: string]: string; }): void {
     });
   });
 }
+
+/**
+ * Resolves all translations whose key starts with the given prefix with a single request to the MyCoRe
+ * locale service. The result maps the full keys to their translations, it is empty if the request fails.
+ */
+export async function resolveI18NPrefix(prefix: string): Promise<{ [key: string]: string; }> {
+  const response = await fetch(`${getWebApplicationBaseURL()}rsc/locale/translate/${getCurrentLanguage()}/${prefix}*`);
+  return response.ok ? await response.json() : {};
+}
