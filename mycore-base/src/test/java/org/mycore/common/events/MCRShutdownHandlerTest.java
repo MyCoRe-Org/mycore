@@ -132,6 +132,7 @@ public class MCRShutdownHandlerTest {
                 return "high";
             }
         };
+        shutdownHandler.requests.clear();
         shutdownHandler.addCloseable(vHiPrio);
         shutdownHandler.addCloseable(lowPrio);
         shutdownHandler.addCloseable(hiPrio);
