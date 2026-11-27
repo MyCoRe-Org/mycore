@@ -22,20 +22,41 @@ export interface JWTResponse {
   token_type: string;
 }
 
-let token: string | undefined = undefined;
+const EXPIRATION_MARGIN = 60_000;
 
-export const getAuthorizationHeader = async (mcrApplicationBaseURL: string) => {
-  if (token) {
-    return token;
-  }
+let token: Promise<string> | undefined = undefined;
+let expiresAt: number = Number.POSITIVE_INFINITY;
+
+export const getAuthorizationHeader = async (mcrApplicationBaseURL: string): Promise<string> => {
   if (import.meta.env.DEV) {
     return "Basic " + btoa('administrator:alleswirdgut');
   }
+  if (token === undefined || Date.now() >= expiresAt) {
+    expiresAt = Number.POSITIVE_INFINITY;
+    token = fetchToken(mcrApplicationBaseURL);
+    token.catch(() => {
+      token = undefined;
+    });
+  }
+  return token;
+}
+
+const fetchToken = async (mcrApplicationBaseURL: string): Promise<string> => {
   const response = await fetch(`${mcrApplicationBaseURL}rsc/jwt`);
   const jwt = await response.json() as JWTResponse;
   if (!jwt.login_success) {
     throw new Error("Login failed");
   }
-  token = `${jwt.token_type} ${jwt.access_token}`;
-  return token;
+  expiresAt = getExpiration(jwt.access_token) - EXPIRATION_MARGIN;
+  return `${jwt.token_type} ${jwt.access_token}`;
+}
+
+const getExpiration = (accessToken: string): number => {
+  try {
+    const payload = accessToken.split(".")[1] ?? "";
+    const claims = JSON.parse(atob(payload.replace(/-/g, "+").replace(/_/g, "/")));
+    return typeof claims.exp === "number" ? claims.exp * 1000 : Number.POSITIVE_INFINITY;
+  } catch {
+    return Number.POSITIVE_INFINITY;
+  }
 }

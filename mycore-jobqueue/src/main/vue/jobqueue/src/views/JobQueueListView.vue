@@ -79,7 +79,7 @@ const retrieveJobs = async () => {
       model.status = 'error';
       if(response.status === 404){
         await router.replace({
-          name: 'JobQueue404'
+          name: '404'
         });
       }
     }

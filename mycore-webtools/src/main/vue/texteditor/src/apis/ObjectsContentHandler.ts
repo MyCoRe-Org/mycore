@@ -46,7 +46,7 @@ export class ObjectsContentHandler extends BaseContentHandler {
     }
     return {
       data: xml,
-      type: contentType
+      type: contentType.split(";")[0]!.trim()
     };
   }
 

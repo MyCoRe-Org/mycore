@@ -65,6 +65,17 @@
             </configuration>
           </execution>
           <execution>
+            <id>yarn-test-access-key-manager</id>
+            <goals>
+              <goal>yarn</goal>
+            </goals>
+            <phase>test</phase>
+            <configuration>
+              <arguments>test:access-key-manager</arguments>
+              <workingDirectory>${basedir}/../mycore-vue</workingDirectory>
+            </configuration>
+          </execution>
+          <execution>
             <id>yarn-lint-access-key-manager</id>
             <goals>
               <goal>yarn</goal>

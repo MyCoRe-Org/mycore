@@ -1,3 +1,5 @@
+import type {} from 'vitest/config';
+
 import {
   bootstrapFromWindow,
   defineMCRVueApp,
@@ -12,5 +14,19 @@ export default defineMCRVueApp(
   {
     // @mycore-org/vue-components imports bootstrap at runtime, the surrounding MyCoRe page provides it
     plugins: [bootstrapFromWindow()],
+    test: {
+      environment: 'jsdom',
+      include: ['src/**/*.spec.ts'],
+      setupFiles: ['src/test/setup.ts'],
+      restoreMocks: true,
+      server: {
+        deps: {
+          inline: [
+            '@mycore-org/vue-access-key-manager',
+            '@mycore-org/vue-components',
+          ],
+        },
+      },
+    },
   }
 );

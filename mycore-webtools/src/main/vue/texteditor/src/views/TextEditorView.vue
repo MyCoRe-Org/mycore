@@ -121,6 +121,8 @@ const hasWriteAccess = async () => {
 const load = async () => {
   const contentHandler: ContentHandler | undefined = ContentHandlerSelector.get(props.type);
   if (contentHandler === undefined) {
+    error.value = `Unsupported type '${props.type}'.`;
+    loading.value = false;
     return;
   }
   try {
@@ -192,8 +194,16 @@ const lockIfPossible = async () => {
   if (!contentHandler || !isLockingPossible()) {
     return;
   }
+  const {type, id} = props;
   try {
-    lockResult.value = await contentHandler.lock(props.id);
+    const result = await contentHandler.lock(id);
+    if (props.type !== type || props.id !== id || !isLockingPossible()) {
+      if (result.status === "locked") {
+        releaseLock(contentHandler, id);
+      }
+      return;
+    }
+    lockResult.value = result;
   } catch (err) {
     console.error(err);
     error.value = err instanceof Error ? err.message : String(err);
@@ -208,11 +218,11 @@ const unlockIfPossible = () => {
   if (!contentHandler || !isLockingPossible()) {
     return;
   }
-  try {
-    contentHandler.unlock(props.id);
-  } catch (e) {
-    console.error("unlock failed", e);
-  }
+  releaseLock(contentHandler, props.id);
+};
+
+const releaseLock = (contentHandler: ContentHandler, id: string) => {
+  contentHandler.unlock(id).catch(e => console.error("unlock failed", e));
 };
 
 const startLockRefresh = () => {
@@ -248,6 +258,7 @@ const switchExpandedView = async (expanded: boolean) => {
   if (expanded && isLockingPossible()) {
     unlockIfPossible();
     stopLockRefresh();
+    lockResult.value = undefined;
   }
   expandedView.value = expanded;
   expandedViewPreference.value = expanded;
@@ -265,7 +276,16 @@ const switchExpandedView = async (expanded: boolean) => {
   }
 }
 
-watch(() => [props.type, props.id], async () => {
+watch(() => [props.type, props.id] as const, async (_value, previous) => {
+  if (previous !== undefined) {
+    const [previousType, previousId] = previous;
+    const previousHandler = ContentHandlerSelector.get(previousType);
+    if (previousHandler && lockResult.value?.status === "locked") {
+      releaseLock(previousHandler, previousId);
+    }
+    stopLockRefresh();
+    lockResult.value = undefined;
+  }
   expandedView.value = resolveExpandedViewOnNavigation(expandedViewPreference.value, supportsExpandedView.value);
   loading.value = true;
   success.value = undefined;
