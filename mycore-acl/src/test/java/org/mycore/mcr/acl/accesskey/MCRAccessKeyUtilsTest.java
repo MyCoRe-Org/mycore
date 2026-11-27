@@ -28,6 +28,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRTransactionManager;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -99,6 +100,29 @@ public class MCRAccessKeyUtilsTest extends MCRAccessKeyTestCase {
         MCRAccessKeyUtils.addAccessKeySecretToCurrentUser(object.getId(), WRITE_KEY);
         assertNull(MCRAccessKeyUtils.getAccessKeySecretFromCurrentUser(object.getId()));
         assertNotNull(MCRAccessKeyUtils.getAccessKeySecretFromCurrentUser(derivate.getId()));
+    }
+
+    @Test
+    public void testStoredUser() {
+        final MCRUser user = new MCRUser("junit");
+        MCRUserManager.createUser(user);
+        // the session holds the user as of the time of the login, not the stored one
+        MCRSessionMgr.getCurrentSession().setUserInformation(MCRUserManager.getUser("junit").getSafeCopy());
+        startNewTransaction();
+        final MCRAccessKey accessKey = new MCRAccessKey(READ_KEY, PERMISSION_READ);
+        MCRAccessKeyManager.createAccessKey(object.getId(), accessKey);
+        MCRAccessKeyUtils.addAccessKeySecretToCurrentUser(object.getId(), READ_KEY);
+        commitTransaction();
+        assertNotNull(MCRAccessKeyUtils.getAccessKeySecretFromCurrentUser(object.getId()));
+        MCRAccessKeyUtils.removeAccessKeySecretFromCurrentUser(object.getId());
+        commitTransaction();
+        assertNull(MCRAccessKeyUtils.getAccessKeySecretFromCurrentUser(object.getId()));
+    }
+
+    private void commitTransaction() {
+        endTransaction();
+        MCRTransactionManager.commitTransactions();
+        beginTransaction();
     }
 
     @Test

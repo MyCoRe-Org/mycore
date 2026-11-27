@@ -20,7 +20,11 @@ package org.mycore.webcli.flow;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Flow;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.logging.log4j.LogManager;
@@ -38,6 +42,8 @@ public class MCRJSONSubscriber implements Flow.Subscriber<JsonObject> {
 
     private Flow.Subscription subscription;
 
+    private final CompletableFuture<Void> completion = new CompletableFuture<>();
+
     public MCRJSONSubscriber(Session session, ReentrantLock lock) {
         this.session = session;
         this.lock = lock;
@@ -54,7 +60,8 @@ public class MCRJSONSubscriber implements Flow.Subscriber<JsonObject> {
         if (!this.session.isOpen()) {
             LogManager.getLogger().warn("Session {} closed, cancel further log event subscription!",
                 session::getId);
-            subscription.cancel();
+            cancel();
+            return;
         }
         LogManager.getLogger().debug(() -> "Sending json: " + item.toString());
         lock.lock();
@@ -78,14 +85,38 @@ public class MCRJSONSubscriber implements Flow.Subscriber<JsonObject> {
                 LogManager.getLogger().warn("Error in Publisher or Subscriber.", throwable);
             }
         }
+        completion.complete(null);
     }
 
     @Override
     public void onComplete() {
         LogManager.getLogger().info("Finished sending JSON.");
+        completion.complete(null);
     }
 
     public void cancel() {
         this.subscription.cancel();
+        completion.complete(null);
+    }
+
+    /**
+     * Blocks until this subscriber has completed, which happens on {@link #onComplete()},
+     * {@link #onError(Throwable)} or {@link #cancel()}.
+     * <p>
+     * If the timeout elapses first, the method returns silently and only logs a warning.
+     * If the waiting thread is interrupted, the interrupt flag is restored and the method returns.
+     *
+     * @param timeout the maximum time to wait
+     * @param unit the time unit of the {@code timeout} argument
+     */
+    public void awaitCompletion(long timeout, TimeUnit unit) {
+        try {
+            completion.get(timeout, unit);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } catch (ExecutionException | TimeoutException e) {
+            LogManager.getLogger().warn("Not all messages could be sent to client of session {}.",
+                session::getId);
+        }
     }
 }

@@ -55,6 +55,7 @@ public class MCRRestV2App extends MCRJerseyRestApp {
         super();
         register(MCRContentNegotiationViaExtensionFilter.class);
         register(MCRNormalizeMCRObjectIDsFilter.class);
+        register(MCRRejectDerivateIDsFilter.class);
         register(MCRRestAPIAuthentication.class); // keep 'unchanged' in v2
         register(MCRRemoveMsgBodyFilter.class);
         register(MCRNoFormDataPutFilter.class);

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mycoreobject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="datamodel-document.xsd" ID="test_document_00000001" version="2023.06">
+  <structure />
+  <metadata />
+  <service>
+    <servdates class="MCRMetaISO8601Date">
+      <servdate type="createdate" inherited="0">2026-11-12T00:00:00.000Z</servdate>
+      <servdate type="modifydate" inherited="0">2026-11-12T00:00:00.000Z</servdate>
+    </servdates>
+  </service>
+</mycoreobject>

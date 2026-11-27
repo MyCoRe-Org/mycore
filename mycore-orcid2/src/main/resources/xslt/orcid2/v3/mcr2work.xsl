@@ -15,16 +15,14 @@
   </xsl:template>
 
   <xsl:template name="journal-title">
-    <xsl:if test="mods:relatedItem[@type='host']/mods:titleInfo">
+    <xsl:variable name="host-title-info"
+      select="(mods:relatedItem[@type='host'])[1]/(mods:titleInfo[not(@type)], mods:titleInfo)[1]" />
+    <xsl:if test="$host-title-info/mods:title">
       <work:journal-title>
-        <xsl:if test="mods:relatedItem/mods:titleInfo/mods:nonSort">
-          <xsl:value-of select="mods:relatedItem/mods:titleInfo/mods:nonSort/text()"/>
-          <xsl:text> </xsl:text>
-        </xsl:if>
-        <xsl:value-of select="mods:relatedItem/mods:titleInfo/mods:title/text()"/>
-        <xsl:if test="mods:relatedItem/mods:titleInfo/mods:subTitle">
+        <xsl:value-of select="string-join(($host-title-info/mods:nonSort, $host-title-info/mods:title), ' ')" />
+        <xsl:if test="$host-title-info/mods:subTitle">
           <xsl:text>: </xsl:text>
-          <xsl:value-of select="mods:relatedItem/mods:titleInfo/mods:subTitle/text()"/>
+          <xsl:value-of select="$host-title-info/mods:subTitle" />
         </xsl:if>
       </work:journal-title>
     </xsl:if>

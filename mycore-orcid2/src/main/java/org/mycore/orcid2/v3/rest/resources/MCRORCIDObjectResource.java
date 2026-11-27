@@ -32,6 +32,7 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.jersey.access.MCRRequireLogin;
 import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
+import org.mycore.orcid2.MCRORCIDUtils;
 import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.metadata.MCRORCIDPutCodeInfo;
@@ -242,7 +243,12 @@ public class MCRORCIDObjectResource {
 
     private MCRORCIDPutCodeInfo getWorkInfo(String orcid, MCRORCIDCredential credential, MCRObject object) {
         try {
-            final Work work = MCRORCIDWorkTransformerHelper.transformContent(new MCRJDOMContent(object.createXML()));
+            final MCRObject filteredObject = MCRORCIDUtils.filterObject(object);
+            if (!MCRORCIDUtils.checkEmptyMODS(filteredObject)) {
+                return new MCRORCIDPutCodeInfo();
+            }
+            final Work work = MCRORCIDWorkTransformerHelper
+                .transformContent(new MCRJDOMContent(filteredObject.createXML()));
             final Set<MCRIdentifier> identifiers = MCRORCIDWorkUtils.listTrustedIdentifiers(work);
             return new MCRORCIDWorkService(orcid, credential).getPutCodeInfo(identifiers);
         } catch (MCRORCIDException e) {
