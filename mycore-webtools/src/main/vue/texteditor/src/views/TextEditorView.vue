@@ -194,8 +194,16 @@ const lockIfPossible = async () => {
   if (!contentHandler || !isLockingPossible()) {
     return;
   }
+  const {type, id} = props;
   try {
-    lockResult.value = await contentHandler.lock(props.id);
+    const result = await contentHandler.lock(id);
+    if (props.type !== type || props.id !== id || !isLockingPossible()) {
+      if (result.status === "locked") {
+        releaseLock(contentHandler, id);
+      }
+      return;
+    }
+    lockResult.value = result;
   } catch (err) {
     console.error(err);
     error.value = err instanceof Error ? err.message : String(err);
@@ -250,6 +258,7 @@ const switchExpandedView = async (expanded: boolean) => {
   if (expanded && isLockingPossible()) {
     unlockIfPossible();
     stopLockRefresh();
+    lockResult.value = undefined;
   }
   expandedView.value = expanded;
   expandedViewPreference.value = expanded;

@@ -373,6 +373,31 @@ describe('texteditor app', () => {
       ]);
     });
 
+    it('releases a lock that is granted after another object was opened', async () => {
+      let grantLock: (response: Response) => void = () => {};
+      backend
+        .on(`api/v2/objects/${OBJECT_ID}/lock`, (_url, init) =>
+          init?.method === 'PUT'
+            ? new Promise<Response>(resolve => {
+                grantLock = resolve;
+              })
+            : new Response(null, { status: 200 })
+        )
+        .on('api/v2/objects/mir_mods_00000002?', () => xml('<mycoreobject ID="mir_mods_00000002"/>'));
+      await mountAt(`/objects/${OBJECT_ID}`);
+
+      await router.push('/objects/mir_mods_00000002');
+      await flushPromises();
+      grantLock(new Response(null, { status: 200 }));
+      await flushPromises();
+
+      expect(calls(method => method !== 'GET').filter(call => call.endsWith('/lock'))).toEqual([
+        `PUT ${API}objects/${OBJECT_ID}/lock`,
+        `PUT ${API}objects/mir_mods_00000002/lock`,
+        `DELETE ${API}objects/${OBJECT_ID}/lock`,
+      ]);
+    });
+
     it('releases the lock when the page is left', async () => {
       await mountAt(`/objects/${OBJECT_ID}`);
 
@@ -430,6 +455,18 @@ describe('texteditor app', () => {
         ]);
         expect(textarea(wrapper).readOnly).toBe(false);
         expect(localStorage.getItem(EXPANDED_VIEW_PREFERENCE_KEY)).toBe('false');
+      });
+
+      it('does not release the lock again when another object is opened', async () => {
+        backend.on('api/v2/objects/mir_mods_00000002?', () => xml('<mycoreobject ID="mir_mods_00000002"/>'));
+        const wrapper = await mountAt(`/objects/${OBJECT_ID}`);
+        await button(wrapper, 'Expanded').trigger('click');
+        await flushPromises();
+
+        await router.push('/objects/mir_mods_00000002');
+        await flushPromises();
+
+        expect(calls(method => method === 'DELETE')).toEqual([`DELETE ${API}objects/${OBJECT_ID}/lock`]);
       });
 
       it('opens objects in the expanded view when it was chosen before', async () => {

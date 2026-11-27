@@ -150,11 +150,6 @@ export async function click(selector: string | Element): Promise<void> {
   await settle();
 }
 
-export async function wait(milliseconds = 20): Promise<void> {
-  await new Promise(resolve => setTimeout(resolve, milliseconds));
-  await settle();
-}
-
 export function field<T extends HTMLElement = HTMLInputElement>(
   modalId: string,
   labelKey: string

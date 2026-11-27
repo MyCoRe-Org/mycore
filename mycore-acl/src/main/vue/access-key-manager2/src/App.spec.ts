@@ -14,7 +14,7 @@ import {
   queryAll,
   startApp,
   texts,
-  wait,
+  settle,
   type StartedApp,
 } from '@/test/helpers/appHarness';
 
@@ -276,7 +276,7 @@ describe('access key manager app', () => {
       const hidden = modalEvent('confirmModal', 'hidden');
       await click(modalButtons('confirmModal').at(-1)!);
       await hidden;
-      await wait();
+      await settle();
 
       const deletion = backend.calls.find(
         call => call.init?.method === 'DELETE'
@@ -296,7 +296,7 @@ describe('access key manager app', () => {
       const hidden = modalEvent('confirmModal', 'hidden');
       await click(modalButtons('confirmModal')[0]!);
       await hidden;
-      await wait();
+      await settle();
 
       expect(backend.calls.some(call => call.init?.method === 'DELETE')).toBe(
         false
@@ -313,7 +313,7 @@ describe('access key manager app', () => {
       );
 
       await click(modalButtons('confirmModal').at(-1)!);
-      await wait();
+      await settle();
 
       expect(app?.router.currentRoute.value.name).toBe('403');
     });
@@ -368,7 +368,7 @@ describe('access key manager app', () => {
       await openCreateDialog(backend);
 
       await click(modalButtons('createAccessKeyModal')[0]!);
-      await wait();
+      await settle();
 
       expect(backend.calls.some(call => call.init?.method === 'POST')).toBe(
         false
@@ -406,7 +406,7 @@ describe('access key manager app', () => {
       await click(modalButtons('createAccessKeyModal')[0]!);
       await created;
       await confirmationShown;
-      await wait();
+      await settle();
 
       const creation = backend.calls.find(call => call.init?.method === 'POST');
       expect(creation?.url).toBe(API);
@@ -477,7 +477,7 @@ describe('access key manager app', () => {
       await input(field('createAccessKeyModal', 'label.secret'), 'my secret');
       await input(field('createAccessKeyModal', 'label.permission'), 'read');
       await click(modalButtons('createAccessKeyModal')[0]!);
-      await wait();
+      await settle();
 
       expect(
         query('#createAccessKeyModal .alert-danger').textContent
@@ -528,7 +528,7 @@ describe('access key manager app', () => {
       const hidden = modalEvent('infoAccessKeyModal', 'hidden');
       await click(modalButtons('infoAccessKeyModal')[0]!);
       await hidden;
-      await wait();
+      await settle();
 
       const update = backend.calls.find(call => call.init?.method === 'PATCH');
       expect(update?.url).toBe(`${API}/secret-hash-2`);
