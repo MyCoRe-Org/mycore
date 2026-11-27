@@ -107,8 +107,18 @@ public class MCRXEditorValidator {
         return results.hasError(binding.getAbsoluteXPath());
     }
 
+    /**
+     * Returns the first failed rule for the binding's absolute XPath.
+     */
     public MCRValidator getFailedRule(MCRBinding binding) {
         return results.getFailedRule(binding.getAbsoluteXPath());
+    }
+
+    /**
+     * Returns all distinct failed rules for the binding's absolute XPath in validation order.
+     */
+    public List<MCRValidator> getFailedRules(MCRBinding binding) {
+        return results.getFailedRules(binding.getAbsoluteXPath());
     }
 
     public void setValidationMarker(MCRBinding binding) {
@@ -117,6 +127,10 @@ public class MCRXEditorValidator {
         session.getVariables().put(XED_VALIDATION_MARKER, marker);
     }
 
+    /**
+     * Returns failed validation rules in validation order. The validation marker is maintained independently per XPath;
+     * multiple distinct rule elements can therefore be returned for one error-marked XPath.
+     */
     public Collection<MCRValidator> getFailedRules() {
         return results.getFailedRules();
     }

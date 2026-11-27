@@ -64,10 +64,9 @@ public class StructureOverviewIT extends ViewerTestBase {
 
     /**
      * Checks if the structure Overview loaded from mets.xml works!
-     * @throws InterruptedException
      */
     @Test
-    public void testStructureOverview() throws InterruptedException {
+    public void testStructureOverview() {
         this.getDriver();
         this.getAppController().openViewer(this.getDriver(), getBaseURL(), getTestDerivate());
 
@@ -77,7 +76,6 @@ public class StructureOverviewIT extends ViewerTestBase {
         StructureOverviewController soController = controller.getStructureOverviewController();
 
         tbController.pressButton(ToolBarController.BUTTON_ID_SIDEBAR_CONTROLL);
-        sleep(1000);
         tbController.clickElementById(StructureOverviewController.CHAPTER_OVERVIEW_SELECTOR);
 
         int greenPixelCount = selectImgAndCountColor(soController, getGreenLabel(), Color.GREEN);
@@ -107,12 +105,9 @@ public class StructureOverviewIT extends ViewerTestBase {
      * @param label
      * @param color
      * @return
-     * @throws InterruptedException
      */
-    private int selectImgAndCountColor(StructureOverviewController soController, String label, Color color)
-        throws InterruptedException {
+    private int selectImgAndCountColor(StructureOverviewController soController, String label, Color color) {
         soController.selectImageByOrder(label);
-        sleep(500);
 
         String message = color + " schould be selected (class-attribut 'selected' should be set)!";
         assertTrue(soController.isImageSelected(label), message);

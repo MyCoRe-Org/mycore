@@ -93,6 +93,8 @@ public class MCRWebCLIContainer {
 
     private static final MCRProcessableExecutor EXECUTOR;
 
+    private static final long LOG_DELIVERY_TIMEOUT_SECONDS = 10;
+
     private static final MCRProcessableCollection PROCESSABLE_COLLECTION;
 
     private final ReentrantLock lock;
@@ -241,6 +243,8 @@ public class MCRWebCLIContainer {
 
         private MCRLogEventProcessor logEventProcessor;
 
+        private MCRJSONSubscriber log2web;
+
         private final SubmissionPublisher<List<String>> cmdListPublisher;
 
         private MCRCommandListProcessor cmdListProcessor;
@@ -282,6 +286,7 @@ public class MCRWebCLIContainer {
             MCRJSONSubscriber log2web = new MCRJSONSubscriber(webSocketSession, lock);
             logEventProcessor.subscribe(log2web);
             this.logEventProcessor = logEventProcessor;
+            this.log2web = log2web;
             logGrabber.subscribe(logEventProcessor);
             if (logGrabber.isStopped()) {
                 logGrabber.start();
@@ -459,6 +464,7 @@ public class MCRWebCLIContainer {
                 // stop grabbing logs of this thread
                 logGrabber.stop();
                 logConf.removeAppender(logGrabber.getName());
+                log2web.awaitCompletion(LOG_DELIVERY_TIMEOUT_SECONDS, TimeUnit.SECONDS);
                 try {
                     if (webSocketSession.isOpen()) {
                         LOGGER.info("Close session {}", webSocketSession::getId);

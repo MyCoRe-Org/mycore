@@ -52,7 +52,7 @@ public class MCRORCIDUtils {
         .getTransformer("ORCIDMODSFilter");
 
     private static final List<String> TRUSTED_IDENTIFIER_TYPES = MCRConfiguration2
-        .getString(MCRORCIDConstants.CONFIG_PREFIX + "Object.TrustedIdentifierTyps").stream()
+        .getString(MCRORCIDConstants.CONFIG_PREFIX + "Object.TrustedIdentifierTypes").stream()
         .flatMap(MCRConfiguration2::splitValue).collect(Collectors.toList());
 
     private static final List<String> PUBLISH_STATES = MCRConfiguration2

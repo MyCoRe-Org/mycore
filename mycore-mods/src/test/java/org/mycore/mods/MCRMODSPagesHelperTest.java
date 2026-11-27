@@ -36,6 +36,14 @@ public class MCRMODSPagesHelperTest {
         testPattern("pp. 234 - 238", "start=234", "end=238");
         testPattern(" 3ABC8 \u2010 3ABC567", "start=3ABC8", "end=3ABC567");
         testPattern("123-45 - 123-49", "start=123-45", "end=123-49");
+        testPattern("275--281", "start=275", "end=281");
+        testPattern("275 -- 281", "start=275", "end=281");
+        testPattern("S. 275---281", "start=275", "end=281");
+        testPattern("275\u2013281", "start=275", "end=281");
+        testPattern("275\u2014281", "start=275", "end=281");
+        testPattern("275 \u2014 281", "start=275", "end=281");
+        testPattern("275\u2013-281", "start=275", "end=281");
+        testPattern("123-45 -- 123-49", "start=123-45", "end=123-49");
 
         testPattern("234 (5 pages)", "start=234", "total=5");
         testPattern("234 (5 Seiten)", "start=234", "total=5");

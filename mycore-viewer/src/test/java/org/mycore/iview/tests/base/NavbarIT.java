@@ -108,7 +108,7 @@ public class NavbarIT extends ViewerTestBase {
     }
 
     @Test
-    public void testNavigationPrev() throws InterruptedException {
+    public void testNavigationPrev() {
         this.getAppController().openViewer(this.getDriver(), getBaseURL(), getTestDerivate());
 
         ImageViewerController controller = this.getViewerController();
@@ -133,7 +133,7 @@ public class NavbarIT extends ViewerTestBase {
     }
 
     @Test
-    public void testNavigationNext() throws InterruptedException {
+    public void testNavigationNext() {
         this.getAppController().openViewer(this.getDriver(), getBaseURL(), getTestDerivate());
 
         ImageViewerController controller = this.getViewerController();
@@ -157,18 +157,16 @@ public class NavbarIT extends ViewerTestBase {
         assertLess(bluePixelCount, bluePixelCountRGB, messagePattern);
     }
 
-    private int selectPrevImgAndCountColor(ToolBarController tbController, String label, Color color)
-        throws InterruptedException {
+    private int selectPrevImgAndCountColor(ToolBarController tbController, String label, Color color) {
         tbController.pressButton(ToolBarController.BUTTON_ID_PREV_IMG);
-        sleep(500);
+        tbController.awaitImageSelected(label);
 
         return countColor(tbController, label, color);
     }
 
-    private int selectNextImgAndCountColor(ToolBarController tbController, String label, Color color)
-        throws InterruptedException {
+    private int selectNextImgAndCountColor(ToolBarController tbController, String label, Color color) {
         tbController.pressButton(ToolBarController.BUTTON_ID_NEXT_IMG);
-        sleep(500);
+        tbController.awaitImageSelected(label);
 
         return countColor(tbController, label, color);
     }
@@ -191,12 +189,9 @@ public class NavbarIT extends ViewerTestBase {
      * @param label
      * @param color
      * @return
-     * @throws InterruptedException
      */
-    private int selectImgAndCountColor(ToolBarController tbController, String label, Color color)
-        throws InterruptedException {
+    private int selectImgAndCountColor(ToolBarController tbController, String label, Color color) {
         tbController.selectPictureWithOrder(label);
-        sleep(500);
 
         return countColor(tbController, label, color);
     }

@@ -96,7 +96,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <pmd.failOnViolation>true</pmd.failOnViolation>
     <pmd.version>7.16.0</pmd.version>
     <rdf4j.version>5.1.3</rdf4j.version>
-    <selenium.version>4.35.0</selenium.version>
+    <selenium.version>4.49.0</selenium.version>
     <site.suffix />
     <swagger.version>2.2.30</swagger.version>
     <uniqueVersion>false</uniqueVersion>
@@ -225,18 +225,6 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <url>https://www.mycore.de/maven-repo/</url>
     </repository>
   </repositories>
-  <pluginRepositories>
-    <pluginRepository>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <id>ossrh</id>
-      <url>https://central.sonatype.com/repository/maven-snapshots</url>
-    </pluginRepository>
-  </pluginRepositories>
   <distributionManagement>
     <site>
       <id>MyCoRe HQ</id>
@@ -2178,7 +2166,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>selenium-utils</artifactId>
-        <version>0.11</version>
+        <version>0.12</version>
         <scope>test</scope>
         <exclusions>
           <exclusion>

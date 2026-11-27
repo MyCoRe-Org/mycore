@@ -67,7 +67,7 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
 
     public static final double LOG_HALF = Math.log(1.0 / 2.0);
 
-    public static final java.util.List<String> SUPPORTED_FORMATS = Arrays.asList(ImageIO.getReaderFileSuffixes());
+    public static final java.util.List<String> SUPPORTED_FORMATS = Arrays.asList(ImageIO.getWriterFileSuffixes());
 
     public static final String MAX_BYTES_PROPERTY = "MaxImageBytes";
 
@@ -215,12 +215,16 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
 
     private static void drawTiles(Path tileRoot, int sourceZoomLevel, MCRIIIFImageSourceRegion sourceTiles,
         Graphics2D graphics) throws IOException {
-        for (int x = sourceTiles.x1(); x < sourceTiles.x2(); x++) {
-            for (int y = sourceTiles.y1(); y < sourceTiles.y2(); y++) {
-                ImageReader imageReader = MCRIView2Tools.getTileImageReader();
-                BufferedImage tile = MCRIView2Tools.readTile(tileRoot, imageReader, sourceZoomLevel, x, y);
-                graphics.drawImage(tile, x * 256, y * 256, null);
+        ImageReader imageReader = MCRIView2Tools.getTileImageReader();
+        try {
+            for (int x = sourceTiles.x1(); x < sourceTiles.x2(); x++) {
+                for (int y = sourceTiles.y1(); y < sourceTiles.y2(); y++) {
+                    BufferedImage tile = MCRIView2Tools.readTile(tileRoot, imageReader, sourceZoomLevel, x, y);
+                    graphics.drawImage(tile, x * 256, y * 256, null);
+                }
             }
+        } finally {
+            imageReader.dispose();
         }
     }
 

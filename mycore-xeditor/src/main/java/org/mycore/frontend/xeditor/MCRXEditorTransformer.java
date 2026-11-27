@@ -308,6 +308,17 @@ public class MCRXEditorTransformer {
         return editorSession.getValidator().getFailedRule(currentBinding).getRuleElement();
     }
 
+    /**
+     * Returns all distinct failed validation rules for the current binding in validation order.
+     */
+    public NodeSet getLocalFailedValidationRules() {
+        NodeSet nodeSet = new NodeSet();
+        for (MCRValidator failedRule : editorSession.getValidator().getFailedRules(currentBinding)) {
+            nodeSet.addNode(failedRule.getRuleElement());
+        }
+        return nodeSet;
+    }
+
     public NodeSet getFailedValidationRules() {
         NodeSet nodeSet = new NodeSet();
         for (MCRValidator failedRule : editorSession.getValidator().getFailedRules()) {

@@ -44,27 +44,27 @@ public class PaginationIT extends MetsEditorTestBase {
 
     @Test
     public void setPagination() {
-        WebElement row = webDriver.findElement(MCRBy.partialText("perthes_1855_0001.jpg")).findElement(
+        WebElement row = webDriver.waitAndFindElement(MCRBy.partialText("perthes_1855_0001.jpg")).findElement(
             By.xpath("ancestor::tr"));
-        row.findElement(By.xpath("//button[@title=\"???editPagination???\"]")).click();
-        row.findElement(By.xpath("//input")).sendKeys(TEST_STRING);
-        row.findElement(By.xpath("//button[@title=\"???paginationChange???\"]")).click();
-        assertNotNull(row.findElement(MCRBy.partialText(TEST_STRING)));
+        webDriver.waitAndFindElement(By.xpath("//button[@title=\"???editPagination???\"]")).click();
+        webDriver.waitAndFindElement(By.xpath("//input")).sendKeys(TEST_STRING);
+        webDriver.waitAndFindElement(By.xpath("//button[@title=\"???paginationChange???\"]")).click();
+        assertNotNull(webDriver.waitAndFindElement(MCRBy.partialText(TEST_STRING)));
     }
 
     @Test
     public void abortPagination() {
         WebElement row = webDriver.waitAndFindElement(MCRBy.partialText("perthes_1855_0001.jpg")).findElement(
             By.xpath("ancestor::tr"));
-        row.findElement(By.xpath("//button[@title=\"???editPagination???\"]")).click();
-        row.findElement(By.xpath("//input")).sendKeys(TEST_STRING);
-        row.findElement(By.xpath("//button[@title=\"???paginationAbort???\"]")).click();
+        webDriver.waitAndFindElement(By.xpath("//button[@title=\"???editPagination???\"]")).click();
+        webDriver.waitAndFindElement(By.xpath("//input")).sendKeys(TEST_STRING);
+        webDriver.waitAndFindElement(By.xpath("//button[@title=\"???paginationAbort???\"]")).click();
         assertTrue(row.findElements(MCRBy.partialText(TEST_STRING)).isEmpty(),
             "Pagination should not be set!");
     }
 
     @Test
-    public void autoPaginationAll() throws InterruptedException {
+    public void autoPaginationAll() {
         webDriver.waitAndFindElement(By.xpath("//button[@title=\"autoPagination\"]")).click();
 
         // wait for the Pagination-Dialog
@@ -72,44 +72,11 @@ public class PaginationIT extends MetsEditorTestBase {
         webDriver.waitAndFindElement(MCRBy.partialText("undefined(1)"));
         webDriver.waitAndFindElement(MCRBy.partialText("undefined(34)"));
         webDriver.waitAndFindElement(By.xpath("//input[@type=\"text\"]")).sendKeys("1v");
-        Select select = new Select(webDriver.findElement(By.tagName("select")));
+        Select select = new Select(webDriver.waitAndFindElement(By.tagName("select")));
         select.selectByVisibleText("???rectoVerso_lowercase???");
         webDriver.waitAndFindElement(By.xpath("//button[contains(text(),\"???paginationChange???\")]")).click();
         assertNotNull(webDriver.waitAndFindElement(MCRBy.partialText("1v")));
         assertNotNull(webDriver.waitAndFindElement(MCRBy.partialText("18r")));
     }
-
-    /* @Test
-    public void deletePaginationFew() throws InterruptedException {
-        WebDriver webDriver = getDriver();
-        autoPaginationFew();
-        WebElement row = webDriver.findElement(MCRBy.partialText("1v")).findElement(By.xpath("ancestor::tr"));
-        row.findElement(By.xpath("//button[@title=\"???removePagination???\"]")).click();
-        if (!webDriver.findElements(MCRBy.partialText("1v")).isEmpty())
-            throw new AssertionError("Pagination has not been removed!");
-    }*/
-
-    /*
-    @Test
-    public void revertChange() throws InterruptedException {
-        WebDriver webDriver = getDriver();
-        deletePaginationFew();
-        webDriver.findElement(By.xpath("//button[@title=\"???undo???\"]")).click();
-        webDriver.findElement(MCRBy.partialText("1v"));
-    }
-    */
-
-    //    TODO find a way to drag&drop the elements to test the sortation by hand
-    //    @Test
-    //    public void sortPagination() throws InterruptedException {
-    //        WebDriver webDriver = getDriver();
-    //        autoPaginationAll();
-    //        WebElement row1 = webDriver.findElement(MyBy.byTextIgnoreCSS("perthes_1855_0001.jpg")).findElement(
-    //            By.xpath("ancestor::td"));
-    //        Actions move = new Actions(webDriver);
-    //        WebElement rowToMove = webDriver.findElement(By.xpath("//tr[@ng-repeat-end][5]/td"));
-    //        move.doubleClick(row1).clickAndHold(row1).moveToElement(rowToMove).release(row1).perform();
-    //        Thread.sleep(100000);
-    //    }
 
 }
