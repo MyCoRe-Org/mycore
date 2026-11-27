@@ -14,6 +14,7 @@ import static org.mycore.ocfl.MCROCFLTestCaseHelper.KEEP_FILE;
 import static org.mycore.ocfl.MCROCFLTestCaseHelper.WHITE_PNG;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.ByteBuffer;
@@ -398,6 +399,23 @@ public class MCROCFLFileSystemProviderTest {
         assertTrue(attributeMap.containsKey("size"));
         assertTrue(attributeMap.containsKey("lastModifiedTime"));
         assertTrue(attributeMap.containsKey("lastAccessTime"));
+    }
+
+    /**
+     * Calling init() again must replace the purge listener of the previous virtual object provider instead of adding
+     * another one.
+     */
+    @TestTemplate
+    public void initReplacesPurgeListener() throws Exception {
+        Field purgeListenersField = MCROCFLRepository.class.getDeclaredField("purgeListeners");
+        purgeListenersField.setAccessible(true);
+        List<?> purgeListeners = (List<?>) purgeListenersField.get(repository);
+        int listenerCount = purgeListeners.size();
+
+        MCROCFLFileSystemProvider.get().init();
+        MCROCFLFileSystemProvider.get().init();
+
+        assertEquals(listenerCount, purgeListeners.size(), "init() should not add another purge listener");
     }
 
 }

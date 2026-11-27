@@ -15,6 +15,17 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.FileTime;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -177,6 +188,231 @@ public class MCROCFLDefaultRemoteTemporaryStorageTest extends MCROCFLStorageTest
             abortWriter.getChannel().close();
         }
         assertFalse(Files.exists(tempFilePath), "The temporary file should be deleted after abort.");
+    }
+
+    /**
+     * A file on disk the cache does not know, for example written by another process, must not block the import of
+     * the same content.
+     */
+    @TestTemplate
+    public void importFileWithOrphanOnDisk() throws IOException {
+        Path source = Files.createTempFile("orphan", ".txt");
+        try {
+            byte[] content = { 9, 9, 9 };
+            Files.write(source, content);
+            MCRDigest digest = writeOrphan(source, content);
+
+            assertEquals(digest, storage.importFile(source));
+            assertTrue(storage.exists(digest), "the imported content should be in the cache");
+            assertArrayEquals(content, read(storage, digest));
+        } finally {
+            Files.deleteIfExists(source);
+        }
+    }
+
+    /**
+     * A file on disk the cache does not know must not block a new cache entry with the same content.
+     */
+    @TestTemplate
+    public void newCacheEntryWithOrphanOnDisk() throws IOException {
+        Path source = Files.createTempFile("orphan", ".txt");
+        try {
+            byte[] content = { 8, 8, 8 };
+            Files.write(source, content);
+            MCRDigest digest = writeOrphan(source, content);
+
+            MCROCFLDefaultRemoteTemporaryStorage.CacheEntryWriter writer = storage.newCacheEntry("orphan.txt");
+            try {
+                writer.getChannel().write(ByteBuffer.wrap(content));
+                assertEquals(digest, writer.commit());
+            } finally {
+                writer.getChannel().close();
+            }
+            assertTrue(storage.exists(digest), "the committed content should be in the cache");
+            assertArrayEquals(content, read(storage, digest));
+        } finally {
+            Files.deleteIfExists(source);
+        }
+    }
+
+    /**
+     * Concurrent writes of the same content may all pass the cache check before one of them updates the cache. The
+     * content has to be allocated only once.
+     */
+    @TestTemplate
+    public void concurrentWritesOfSameContent() throws Exception {
+        storage.setEvictionStrategy(new FileCountEvictionStrategy(Integer.MAX_VALUE));
+        int threads = 8;
+        for (int round = 0; round < 20; round++) {
+            byte[] content = ("concurrent content " + round).getBytes();
+            long allocatedBefore = storage.allocated();
+            CyclicBarrier barrier = new CyclicBarrier(threads);
+            List<Callable<MCRDigest>> tasks = new ArrayList<>();
+            for (int i = 0; i < threads; i++) {
+                tasks.add(() -> {
+                    barrier.await();
+                    return storage.write("concurrent.txt", content);
+                });
+            }
+            ExecutorService executor = Executors.newFixedThreadPool(threads);
+            try {
+                for (Future<MCRDigest> future : executor.invokeAll(tasks)) {
+                    future.get();
+                }
+            } finally {
+                executor.shutdownNow();
+            }
+            assertEquals(allocatedBefore + content.length, storage.allocated(),
+                "the content should be allocated only once in round " + round);
+        }
+    }
+
+    /**
+     * A journal may contain more than one add event for the same digest. Replaying it must allocate the content only
+     * once.
+     */
+    @TestTemplate
+    public void replayDuplicateAddEvents() throws IOException {
+        long allocated = storage.allocated();
+        storage.close();
+
+        // the journal contains one add event per cached digest -> duplicate each of them
+        Path journalFile = storage.getRoot().resolve(MCROCFLDefaultRemoteTemporaryStorage.JOURNAL_CACHE_FILE);
+        List<String> lines = Files.readAllLines(journalFile);
+        Files.write(journalFile, lines, StandardOpenOption.APPEND);
+
+        MCROCFLDefaultRemoteTemporaryStorage newStorage = new MCROCFLDefaultRemoteTemporaryStorage(
+            storage.getRoot(),
+            new FileCountEvictionStrategy(2),
+            MCROCFLFileSystemProvider.get().getDigestCalculator());
+        try {
+            assertEquals(2, newStorage.count(), "the recovered cache should contain two entries");
+            assertEquals(allocated, newStorage.allocated(), "duplicate add events should not be allocated twice");
+        } finally {
+            newStorage.close();
+        }
+    }
+
+    /**
+     * Temporary files of interrupted downloads are deleted on startup once they are stale. Younger temporary files
+     * may be downloads of another process in progress, cache files without a journal entry are complete and are
+     * taken over by the next write of the same content: both are kept.
+     */
+    @TestTemplate
+    public void initDeletesStaleTempFiles() throws IOException {
+        Path source = Files.createTempFile("orphan", ".txt");
+        try {
+            Files.write(source, new byte[] { 7, 7, 7 });
+            MCRDigest orphanDigest = writeOrphan(source, new byte[] { 7, 7, 7 });
+            Path staleTempFile = storage.getRoot().resolve("tmp-interrupted-download");
+            Files.write(staleTempFile, new byte[] { 6 });
+            Files.setLastModifiedTime(staleTempFile, FileTime.from(Instant.now()
+                .minus(MCROCFLDefaultRemoteTemporaryStorage.STALE_TEMP_FILE_AGE).minus(Duration.ofMinutes(1))));
+            Path recentTempFile = storage.getRoot().resolve("tmp-download-in-progress");
+            Files.write(recentTempFile, new byte[] { 5 });
+            storage.close();
+
+            MCROCFLDefaultRemoteTemporaryStorage newStorage = new MCROCFLDefaultRemoteTemporaryStorage(
+                storage.getRoot(),
+                new FileCountEvictionStrategy(10),
+                MCROCFLFileSystemProvider.get().getDigestCalculator());
+            try {
+                assertFalse(Files.exists(staleTempFile), "the stale temporary file should be deleted");
+                assertTrue(Files.exists(recentTempFile), "the recent temporary file should be kept");
+                assertTrue(Files.exists(toCachePath(orphanDigest)), "the orphaned cache file should be kept");
+                assertArrayEquals(new byte[] { 1 }, read(newStorage, digest1));
+                assertArrayEquals(new byte[] { 2 }, read(newStorage, digest2));
+            } finally {
+                newStorage.close();
+            }
+        } finally {
+            Files.deleteIfExists(source);
+        }
+    }
+
+    /**
+     * Another process using the same directory may still append to the journal, closing must not replace it.
+     */
+    @TestTemplate
+    public void closeDoesNotCompactJournal() throws IOException {
+        storage.write(path3.getFileName().toString(), new byte[] { 3 });
+        Path journalFile = journalFile();
+        List<String> linesBefore = Files.readAllLines(journalFile);
+        assertTrue(linesBefore.size() > storage.count(), "the journal should contain more events than entries");
+
+        storage.close();
+
+        assertEquals(linesBefore, Files.readAllLines(journalFile), "closing should not compact the journal");
+    }
+
+    /**
+     * A journal with much more events than cache entries is compacted on startup.
+     */
+    @TestTemplate
+    public void initCompactsJournal() throws IOException {
+        MCRDigest digest3 = storage.write(path3.getFileName().toString(), new byte[] { 3 });
+        MCRDigest digest4 = storage.write("file4", new byte[] { 4 });
+        storage.close();
+        assertTrue(Files.readAllLines(journalFile()).size() > 2 * storage.count(),
+            "the journal should contain more than twice as many events as entries");
+
+        MCROCFLDefaultRemoteTemporaryStorage newStorage = newStorage(new FileCountEvictionStrategy(2));
+        try {
+            assertEquals(2, Files.readAllLines(journalFile()).size(), "the journal should be compacted on startup");
+            assertEquals(2, newStorage.count());
+            assertTrue(newStorage.exists(digest3), "digest3 should exist after compaction");
+            assertTrue(newStorage.exists(digest4), "digest4 should exist after compaction");
+        } finally {
+            newStorage.close();
+        }
+    }
+
+    /**
+     * If another process replaces the journal, for example by compacting it on startup, the entries of this process
+     * must be appended to the new journal instead of the replaced one.
+     */
+    @TestTemplate
+    public void appendAfterJournalWasReplacedByAnotherProcess() throws IOException {
+        storage.setEvictionStrategy(new FileCountEvictionStrategy(Integer.MAX_VALUE));
+        MCROCFLDefaultRemoteTemporaryStorage otherProcess = newStorage(new FileCountEvictionStrategy(2));
+        MCRDigest digest3;
+        try {
+            otherProcess.compactJournal();
+            digest3 = storage.write(path3.getFileName().toString(), new byte[] { 3 });
+        } finally {
+            otherProcess.close();
+        }
+        storage.close();
+
+        MCROCFLDefaultRemoteTemporaryStorage newStorage = newStorage(new FileCountEvictionStrategy(10));
+        try {
+            assertEquals(3, newStorage.count(), "the journal should contain all three entries");
+            assertTrue(newStorage.exists(digest3), "digest3 should be appended to the new journal");
+        } finally {
+            newStorage.close();
+        }
+    }
+
+    private Path journalFile() {
+        return storage.getRoot().resolve(MCROCFLDefaultRemoteTemporaryStorage.JOURNAL_CACHE_FILE);
+    }
+
+    private MCROCFLDefaultRemoteTemporaryStorage newStorage(MCROCFLEvictionStrategy evictionStrategy) {
+        return new MCROCFLDefaultRemoteTemporaryStorage(storage.getRoot(), evictionStrategy,
+            MCROCFLFileSystemProvider.get().getDigestCalculator());
+    }
+
+    private Path toCachePath(MCRDigest digest) {
+        String hex = digest.toHexString();
+        return storage.getRoot().resolve(hex.substring(0, 3)).resolve(hex);
+    }
+
+    private MCRDigest writeOrphan(Path source, byte[] content) throws IOException {
+        MCRDigest digest = MCROCFLFileSystemProvider.get().getDigestCalculator().calculate(source);
+        Path orphan = toCachePath(digest);
+        Files.createDirectories(orphan.getParent());
+        Files.write(orphan, content);
+        return digest;
     }
 
     @TestTemplate

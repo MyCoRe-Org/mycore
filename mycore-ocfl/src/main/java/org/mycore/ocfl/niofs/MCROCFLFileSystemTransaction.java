@@ -97,18 +97,15 @@ public class MCROCFLFileSystemTransaction implements MCRPersistenceTransaction {
                 return;
             }
             List<MCROCFLVirtualObject> snapshot = new ArrayList<>(virtualObjects);
-            List<MCROCFLVirtualObject> modifiedObjects = new ArrayList<>();
             for (MCROCFLVirtualObject virtualObject : snapshot) {
                 try {
                     if (virtualObject.persist()) {
-                        modifiedObjects.add(virtualObject);
+                        // right away, a later object can still fail
+                        virtualObjectProvider.invalidate(virtualObject.getOwner(), virtualObject.getVersion());
                     }
                 } catch (IOException ioException) {
                     throw new UncheckedIOException("Unable to persist '" + virtualObject + "'.", ioException);
                 }
-            }
-            for (MCROCFLVirtualObject modifiedObject : modifiedObjects) {
-                virtualObjectProvider.invalidate(modifiedObject.getOwner(), modifiedObject.getVersion());
             }
         } finally {
             clean();

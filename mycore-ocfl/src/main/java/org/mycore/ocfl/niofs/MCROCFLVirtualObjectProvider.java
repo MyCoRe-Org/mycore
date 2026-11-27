@@ -30,6 +30,7 @@ import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -65,6 +66,11 @@ public class MCROCFLVirtualObjectProvider {
     private final Map<ObjectVersionId, MCROCFLVirtualObject> readMap;
 
     private final Queue<ObjectVersionId> readQueue;
+
+    /**
+     * Counts purges, so that versions loaded while an object is purged are not cached.
+     */
+    private final AtomicLong purgeGeneration = new AtomicLong();
 
     private final Map<Long, Map<ObjectVersionId, MCROCFLVirtualObject>> writeMap;
 
@@ -299,6 +305,24 @@ public class MCROCFLVirtualObjectProvider {
         this.readQueue.remove(objectVersionId);
     }
 
+    /**
+     * Invalidates all cached versions of the given OCFL object, for example after it was purged. Its id can be used
+     * again for a new object, whose versions must not be confused with the cached ones.
+     * <p>
+     * Only derivates are cached, other objects like metadata, users or classifications are ignored.
+     *
+     * @param objectId the OCFL object id
+     */
+    public void invalidateAll(String objectId) {
+        if (!MCROCFLObjectIDPrefixHelper.isDerivateObjectId(objectId)) {
+            return;
+        }
+        // first: versions that are loaded right now are not cached, see getOrCreateReadable
+        this.purgeGeneration.incrementAndGet();
+        this.readMap.keySet().removeIf(id -> id.getObjectId().equals(objectId));
+        this.readQueue.removeIf(id -> id.getObjectId().equals(objectId));
+    }
+
     private String toObjectId(String owner) {
         return MCROCFLObjectIDPrefixHelper.toDerivateObjectId(owner);
     }
@@ -318,14 +342,30 @@ public class MCROCFLVirtualObjectProvider {
     }
 
     private MCROCFLVirtualObject getOrCreateReadable(ObjectVersionId id) throws NotFoundException {
-        return this.readMap.computeIfAbsent(id, (key) -> {
-            updateReadCache(id);
-            OcflObjectVersion object = repository.getObject(id);
-            return repository.isRemote()
-                ? new MCROCFLRemoteVirtualObject(repository, object, transactionalStorage, remoteStorage,
-                    digestCalculator, true)
-                : new MCROCFLLocalVirtualObject(repository, object, transactionalStorage, digestCalculator, true);
-        });
+        MCROCFLVirtualObject cached = this.readMap.get(id);
+        if (cached != null) {
+            return cached;
+        }
+        // loaded outside the map: updateReadCache changes the map, which is not allowed inside computeIfAbsent
+        long generation = this.purgeGeneration.get();
+        OcflObjectVersion object = repository.getObject(id);
+        MCROCFLVirtualObject loaded = repository.isRemote()
+            ? new MCROCFLRemoteVirtualObject(repository, object, transactionalStorage, remoteStorage,
+                digestCalculator, true)
+            : new MCROCFLLocalVirtualObject(repository, object, transactionalStorage, digestCalculator, true);
+        MCROCFLVirtualObject existing = this.readMap.putIfAbsent(id, loaded);
+        if (existing != null) {
+            return existing;
+        }
+        if (this.purgeGeneration.get() != generation) {
+            // an object was purged while loading, the loaded version may belong to it: do not keep it
+            this.readMap.remove(id, loaded);
+            return loaded;
+        }
+        // a purge right after the check may leave the id in the read queue without a map entry, that is harmless:
+        // it only counts towards the queue size until it is evicted
+        updateReadCache(id);
+        return loaded;
     }
 
     private void updateReadCache(ObjectVersionId id) {

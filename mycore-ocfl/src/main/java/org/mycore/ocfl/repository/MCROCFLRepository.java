@@ -22,8 +22,12 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import io.ocfl.api.OcflConfig;
 import io.ocfl.api.OcflObjectUpdater;
@@ -54,6 +58,8 @@ import io.ocfl.core.storage.OcflStorage;
  */
 public class MCROCFLRepository implements OcflRepository {
 
+    private static final Logger LOGGER = LogManager.getLogger();
+
     private final String id;
 
     private final OcflRepository base;
@@ -61,6 +67,8 @@ public class MCROCFLRepository implements OcflRepository {
     private final boolean remote;
 
     private final OcflStorage storage;
+
+    private final List<Consumer<String>> purgeListeners = new CopyOnWriteArrayList<>();
 
     /**
      * Constructs a new {@code MCROCFLRepository}.
@@ -293,6 +301,36 @@ public class MCROCFLRepository implements OcflRepository {
     @Override
     public void purgeObject(String objectId) {
         base.purgeObject(objectId);
+        // the object is already purged, a failing listener must not look like a failed purge to the caller
+        for (Consumer<String> listener : purgeListeners) {
+            try {
+                listener.accept(objectId);
+            } catch (RuntimeException e) {
+                LOGGER.error(() -> "Purge listener failed for OCFL object " + objectId, e);
+            }
+        }
+    }
+
+    /**
+     * Registers a listener that is called after an object was purged, for example to invalidate caches. The id of
+     * a purged object can be used again for a new object.
+     * <p>
+     * Only purges through this instance are reported. A purge by another process using the same repository, for
+     * example the command line interface while the web application is running, is not noticed.
+     *
+     * @param listener called with the id of the purged OCFL object
+     */
+    public void addPurgeListener(Consumer<String> listener) {
+        purgeListeners.add(Objects.requireNonNull(listener));
+    }
+
+    /**
+     * Removes a listener registered with {@link #addPurgeListener(Consumer)}.
+     *
+     * @param listener the listener to remove
+     */
+    public void removePurgeListener(Consumer<String> listener) {
+        purgeListeners.remove(listener);
     }
 
     /**
