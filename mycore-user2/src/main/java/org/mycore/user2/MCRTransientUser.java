@@ -62,7 +62,10 @@ public class MCRTransientUser extends MCRUser {
             if (attributeMapper != null) {
                 Map<String, Object> attributes = new HashMap<>();
                 for (String key : attributeMapper.getAttributeNames()) {
-                    attributes.put(key, userInfo.getUserAttribute(key));
+                    String value = userInfo.getUserAttribute(key);
+                    if (value != null) {
+                        attributes.put(key, value);
+                    }
                 }
 
                 try {
