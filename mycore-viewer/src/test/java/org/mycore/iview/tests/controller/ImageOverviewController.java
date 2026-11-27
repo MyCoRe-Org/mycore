@@ -38,13 +38,22 @@ public class ImageOverviewController extends SideBarController {
     }
 
     /**
-     * builds xpath for and calls function {@link SideBarController#clickElementByXpath(String)}
+     * builds xpath for and calls function {@link SideBarController#clickElementByXpath(String)}. The click is
+     * repeated until the image is marked as selected, because a click on a thumbnail may get lost while the image
+     * overview is still being shown.
      * @param orderLabel
      */
     public void clickImageByOrder(String orderLabel) {
-        clickElementByXpath(
-            String.format(Locale.ROOT, "//div[@class=\"caption\" and contains(text(),\"%s\")]", orderLabel));
-        awaitImageSelected(orderLabel);
+        String xpath = String.format(Locale.ROOT, "//div[@class=\"caption\" and contains(text(),\"%s\")]",
+            orderLabel);
+        clickElementByXpath(xpath);
+        waitUntil(orderLabel + " to be selected", () -> {
+            if (isImageSelected(orderLabel)) {
+                return true;
+            }
+            clickElementByXpath(xpath);
+            return false;
+        });
     }
 
     /**
