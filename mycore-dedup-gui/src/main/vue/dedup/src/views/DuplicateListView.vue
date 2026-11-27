@@ -61,7 +61,7 @@
               class="list-unstyled mb-0"
               :class="{ 'mt-1': entry.criteria.length > 1 }">
             <li v-for="criterion in entry.criteria" :key="criterion.type + '-' + criterion.value">
-              <strong>{{ criterion.type }}</strong>: {{ criterion.value }}
+              <strong>{{ criterionLabel(criterion.type) }}</strong>: {{ criterion.value }}
             </li>
           </ul>
         </td>
@@ -109,7 +109,7 @@ import { RouterLink, useRoute } from "vue-router";
 import type { DuplicateEntry, DuplicateList } from "@/api/Model";
 import { getWebApplicationBaseURL } from "@/api/BaseURL";
 import { getAuthorizationHeader } from "@/api/Auth";
-import { resolveI18N } from "@/api/I18N";
+import { resolveI18N, resolveI18NPrefix } from "@/api/I18N";
 import { getObjectURL } from "@/api/Utils";
 import SortArrow from "@/components/SortArrow.vue";
 import PublicationDisplay from "@/components/PublicationDisplay.vue";
@@ -154,6 +154,15 @@ const i18n = reactive<{ [key: string]: string }>({
   "dedup.gui.action.cancel": "dedup.gui.action.cancel",
   "dedup.gui.notAllowed": "dedup.gui.notAllowed",
 });
+
+/** Prefix of the message keys of the criterion types, see `MCRDeDupCriterion`. */
+const CRITERION_PREFIX = "dedup.criterion.";
+
+/** Translations of the criterion types, keyed by the full message key. */
+const criterionLabels = reactive<{ [key: string]: string }>({});
+
+/** The translated criterion type, or the type itself if there is no translation. */
+const criterionLabel = (type: string): string => criterionLabels[CRITERION_PREFIX + type] ?? type;
 
 const pairKey = (entry: DuplicateEntry): string => entry.objectId1 + " " + entry.objectId2;
 
@@ -257,6 +266,11 @@ watch(filterId, resolveList);
 onMounted(() => {
   resolveList();
   resolveI18N(i18n);
+  resolveI18NPrefix(CRITERION_PREFIX)
+    .then(translations => Object.assign(criterionLabels, translations))
+    .catch(() => {
+      // without translations the criterion types are shown as they are
+    });
 });
 </script>
 

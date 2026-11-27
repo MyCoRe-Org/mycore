@@ -27,6 +27,10 @@ import java.util.Objects;
  * {@code shelfmark} or a combined title/author criterion) and a normalized {@code value}.
  * Two objects are considered possible duplicates if they share an equal criterion, i.e. a criterion
  * with the same {@code type} and {@code value}.
+ * <p>
+ * User interfaces show the type through the message key {@code dedup.criterion.{type}} and fall back to the
+ * type itself if there is none. A module that adds a criterion builder should provide that key for the types
+ * it creates.
  *
  * @param type  classifies the criterion, e.g. {@code identifier}, {@code shelfmark}
  * @param value the normalized value of the criterion, e.g. a normalized identifier or title
