@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "mycore-wcms2",
   "devDependencies": {
-    "tinymce": "^7.9.3",
+    "tinymce": "^8.9.3",
     "tinymce-i18n": "^24.7.15",
     "dijit": "1.17.3",
     "dojo": "1.17.3",
