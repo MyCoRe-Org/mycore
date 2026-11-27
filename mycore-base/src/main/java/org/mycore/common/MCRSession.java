@@ -438,12 +438,17 @@ public class MCRSession implements Cloneable {
     }
 
     /**
-     * Add a task which will be executed after {@link #commitTransaction()} was called.
+     * Add a task which will be executed after {@link #commitTransaction()} was called. The task is discarded if the
+     * transaction is rolled back.
      *
      * @param task thread witch will be executed after an commit
      */
     public void onCommit(Runnable task) {
         this.onCommitTasks.get().offer(Objects.requireNonNull(task));
+    }
+
+    void discardOnCommitTasks() {
+        onCommitTasks.remove();
     }
 
     protected void submitOnCommitTasks() {
